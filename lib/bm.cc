@@ -178,6 +178,32 @@ void EVAL_BM_ACTION_BASE::ac_eval(ELEMENT* d)const
   ac_final_adjust(&(d->_ev));
 }
 /*--------------------------------------------------------------------------*/
+std::map<IString, PARA_BASE EVAL_BM_ACTION_BASE::*> EVAL_BM_ACTION_BASE::_param_dict=
+{
+  {IString("bandwidth"),(PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_bandwidth},
+  {IString("delay"),    (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_delay},
+  {IString("phase"),    (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_phase},
+  {IString("ioffset"),  (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_ioffset},
+  {IString("ooffset"),  (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_ooffset},
+  {IString("scale"),    (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_scale},
+  {IString("tc1"),      (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_tc1},
+  {IString("tc2"),      (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_tc2},
+  {IString("ic"),       (PARA_BASE EVAL_BM_ACTION_BASE::*) &EVAL_BM_ACTION_BASE::_ic}
+};
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_ACTION_BASE::set_param_by_name(std::string Name, std::string Value)
+{
+  untested();
+  auto i=_param_dict.find(IString(Name));
+  if(i!=_param_dict.end()) {
+    PARA_BASE EVAL_BM_ACTION_BASE::* x=i->second;
+    PARA_BASE& p=this->*x;
+    p = Value;
+  } else {
+    COMMON_COMPONENT::set_param_by_name(Name, Value);
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool EVAL_BM_ACTION_BASE::parse_params_obsolete_callback(CS& cmd)
 {
   return ONE_OF

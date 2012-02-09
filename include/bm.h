@@ -26,6 +26,9 @@
 #define E_BM_H
 #include "e_compon.h"
 /*--------------------------------------------------------------------------*/
+#include <map>              // parameter dictionaries
+#include "boost/assign.hpp" // initialization templates
+/*--------------------------------------------------------------------------*/
 class SPLINE;
 class FPOLY1;
 /*--------------------------------------------------------------------------*/
@@ -56,6 +59,7 @@ protected:
   PARAMETER<double> _tc1;
   PARAMETER<double> _tc2;
   PARAMETER<double> _ic;
+  static std::map<IString, PARA_BASE EVAL_BM_ACTION_BASE::*> _param_dict;
 protected:
   explicit	EVAL_BM_ACTION_BASE(int c=0);
   explicit	EVAL_BM_ACTION_BASE(const EVAL_BM_ACTION_BASE& p);
@@ -77,6 +81,7 @@ public: // override virtual
   virtual bool	ac_too()const = 0;
 protected: // override virtual
   bool  	parse_params_obsolete_callback(CS&);
+  void  	set_param_by_name(std::string Name, std::string Value);
 public:
   bool		has_ext_args()const;
   static COMMON_COMPONENT* parse_func_type(CS&);
@@ -101,6 +106,8 @@ private: // override virtual
   bool		ac_too()const		{return false;}
   bool		parse_numlist(CS&);
   bool  	parse_params_obsolete_callback(CS&);
+  // doesnt make sense. set value through device
+  // void   set_param_by_name(string Name, string Value);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

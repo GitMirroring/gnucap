@@ -26,6 +26,7 @@
 #include "e_elemnt.h"
 #include "u_lang.h"
 #include "bm.h"
+#include "io_trace.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -36,6 +37,7 @@ const double _default_rise  (0);
 const double _default_fall  (0);
 const double _default_width (BIGBIG);
 const double _default_period(BIGBIG);
+const double _default_t2    (NOT_INPUT);
 /*--------------------------------------------------------------------------*/
 class EVAL_BM_PULSE : public EVAL_BM_ACTION_BASE {
 private:
@@ -47,6 +49,9 @@ private:
   PARAMETER<double> _width;
   PARAMETER<double> _period;
   PARAMETER<double> _end;
+  PARAMETER<double> _t2;
+  static std::map<IString, PARA_BASE EVAL_BM_PULSE::*> _param_dict;
+
   explicit	EVAL_BM_PULSE(const EVAL_BM_PULSE& p);
 public:
   explicit      EVAL_BM_PULSE(int c=0);
@@ -62,7 +67,8 @@ private: // override vitrual
   std::string	name()const		{return "pulse";}
   bool		ac_too()const		{return false;}
   bool		parse_numlist(CS&);
-  bool		parse_params_obsolete_callback(CS&);
+  void		set_param_by_name(std::string Name, std::string Value);
+  bool      parse_params_obsolete_callback(CS& cmd);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -135,6 +141,7 @@ void EVAL_BM_PULSE::precalc_last(const CARD_LIST* Scope)
   _fall.e_val(_default_fall, Scope);
   _width.e_val(_default_width, Scope);
   _period.e_val(_default_period, Scope);
+  _t2.e_val(_default_t2, Scope);
 
   if (_width == 0.) {
     _width = _default_width;
@@ -144,6 +151,12 @@ void EVAL_BM_PULSE::precalc_last(const CARD_LIST* Scope)
     _period = _default_period;
   }else{
   }
+
+  if (_t2.has_good_value()){
+	incomplete();
+	_width = _t2 - _delay;
+  }
+
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_PULSE::tr_eval(ELEMENT* d)const
@@ -237,6 +250,27 @@ bool EVAL_BM_PULSE::parse_params_obsolete_callback(CS& cmd)
     || Get(cmd, "period", &_period)
     || EVAL_BM_ACTION_BASE::parse_params_obsolete_callback(cmd)
     ;
+}
+/*--------------------------------------------------------------------------*/
+std::map<IString, PARA_BASE EVAL_BM_PULSE::*> EVAL_BM_PULSE::_param_dict={
+  {IString("iv"),    (PARA_BASE EVAL_BM_PULSE::*) &EVAL_BM_PULSE::_iv},
+  {IString("pv"),    (PARA_BASE EVAL_BM_PULSE::*) &EVAL_BM_PULSE::_pv},
+  {IString("delay"), (PARA_BASE EVAL_BM_PULSE::*) &EVAL_BM_PULSE::_delay},
+  {IString("rise"),  (PARA_BASE EVAL_BM_PULSE::*) &EVAL_BM_PULSE::_rise},
+  {IString("width"), (PARA_BASE EVAL_BM_PULSE::*) &EVAL_BM_PULSE::_width},
+  {IString("period"),(PARA_BASE EVAL_BM_PULSE::*) &EVAL_BM_PULSE::_period}
+};
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_PULSE::set_param_by_name(std::string Name, std::string Value)
+{
+  auto i=_param_dict.find(IString(Name));
+  if(i!=_param_dict.end()){ untested();
+    auto x=i->second;
+    PARA_BASE& p=this->*x;
+    p = Value;
+  }else{
+    EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

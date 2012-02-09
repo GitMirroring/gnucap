@@ -50,6 +50,9 @@ private:
   PARAMETER<double> _samples;
   PARAMETER<bool>   _zero;
   PARAMETER<bool>   _peak;
+  static std::map<IString, PARA_BASE EVAL_BM_SIN::*> _param_dict;
+  void set_param_by_name(std::string Name, std::string Value);
+
   mutable double _actual_frequency;
   explicit	EVAL_BM_SIN(const EVAL_BM_SIN& p);
 public:
@@ -220,6 +223,37 @@ bool EVAL_BM_SIN::parse_params_obsolete_callback(CS& cmd)
     || Get(cmd, "pe{ak}", 	&_peak)
     || EVAL_BM_ACTION_BASE::parse_params_obsolete_callback(cmd)
     ;
+}
+/*--------------------------------------------------------------------------*/
+std::map<IString, PARA_BASE EVAL_BM_SIN::*> EVAL_BM_SIN::_param_dict={
+  {IString("offset"),   (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_offset},
+  {IString("o"),        (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_offset},
+  {IString("amplitude"),(PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_amplitude},
+  {IString("a"),        (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_amplitude},
+  {IString("frequency"),(PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_frequency},
+  {IString("f"),        (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_frequency},
+  {IString("delay"),    (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_delay},
+  {IString("de"),       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_delay},
+  {IString("damping"),  (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_damping},
+  {IString("da"),       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_damping},
+  {IString("samples"),  (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_samples},
+  {IString("sa"),       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_samples},
+  {IString("zero"),     (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_zero},
+  {IString("ze"),       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_zero},
+  {IString("peak"),     (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_peak},
+  {IString("pe"),       (PARA_BASE EVAL_BM_SIN::*) &EVAL_BM_SIN::_peak}
+};
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_SIN::set_param_by_name(std::string Name, std::string Value)
+{
+  auto i=_param_dict.find(IString(Name));
+  if(i!=_param_dict.end()){ untested();
+    auto x=i->second;
+    PARA_BASE& p=this->*x;
+    p = Value;
+  }else{
+    EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

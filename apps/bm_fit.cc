@@ -43,6 +43,8 @@ private:
   PARAMETER<double> _above;
   PARAMETER<double> _delta;
   PARAMETER<int>    _smooth;
+  static std::map<IString, PARA_BASE EVAL_BM_FIT::*> _param_dict;
+
   std::vector<std::pair<PARAMETER<double>,PARAMETER<double> > > _table;
   SPLINE* _spline;
   explicit	EVAL_BM_FIT(const EVAL_BM_FIT& p);
@@ -59,6 +61,7 @@ private: // override virtual
   std::string	name()const		{return "fit";}
   bool		ac_too()const		{return false;}
   bool		parse_numlist(CS&);
+  void		set_param_by_name(std::string Name, std::string Value);
   bool		parse_params_obsolete_callback(CS&);
 };
 /*--------------------------------------------------------------------------*/
@@ -195,6 +198,26 @@ bool EVAL_BM_FIT::parse_numlist(CS& cmd)
     untested();
   }
   return cmd.gotit(start);
+}
+/*--------------------------------------------------------------------------*/
+std::map<IString, PARA_BASE EVAL_BM_FIT::*> EVAL_BM_FIT::_param_dict={
+  {IString("order"), (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_order},
+  {IString("below"), (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_below},
+  {IString("above"), (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_above},
+  {IString("delta"), (PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_delta},
+  {IString("smooth"),(PARA_BASE EVAL_BM_FIT::*) &EVAL_BM_FIT::_smooth}
+};
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_FIT::set_param_by_name(std::string Name, std::string Value)
+{
+  auto i=_param_dict.find(IString(Name));
+  if(i!=_param_dict.end()){ untested();
+    auto x=i->second;
+    PARA_BASE& p=this->*x;
+    p = Value;
+  }else{
+    EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_FIT::parse_params_obsolete_callback(CS& cmd)

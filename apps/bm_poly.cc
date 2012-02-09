@@ -38,6 +38,7 @@ private:
   PARAMETER<double> _min;
   PARAMETER<double> _max;
   PARAMETER<bool>   _abs;
+  static std::map<IString, PARA_BASE EVAL_BM_POLY::*> _param_dict;
   std::vector<PARAMETER<double> > _c;
   explicit	EVAL_BM_POLY(const EVAL_BM_POLY& p);
 public:
@@ -53,6 +54,7 @@ private: // override vitrual
   std::string	name()const		{return "poly";}
   bool		ac_too()const		{untested();return false;}
   bool		parse_numlist(CS&);
+  void		set_param_by_name(std::string Name, std::string Value);
   bool		parse_params_obsolete_callback(CS&);
   void		skip_type_tail(CS& cmd)const {cmd.umatch("(1)");}
 };
@@ -176,6 +178,24 @@ bool EVAL_BM_POLY::parse_numlist(CS& cmd)
     untested();
   }
   return cmd.gotit(start);
+}
+/*--------------------------------------------------------------------------*/
+std::map<IString, PARA_BASE EVAL_BM_POLY::*> EVAL_BM_POLY::_param_dict={
+  {IString("min"),  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_min},
+  {IString("max"),  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_max},
+  {IString("abs"),  (PARA_BASE EVAL_BM_POLY::*) &EVAL_BM_POLY::_abs}
+};
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_POLY::set_param_by_name(std::string Name, std::string Value)
+{
+  auto i=_param_dict.find(IString(Name));
+  if(i!=_param_dict.end()){ untested();
+    auto x=i->second;
+    PARA_BASE& p=this->*x;
+    p = Value;
+  }else{
+    EVAL_BM_ACTION_BASE::set_param_by_name(Name, Value);
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_POLY::parse_params_obsolete_callback(CS& cmd)
