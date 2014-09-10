@@ -84,6 +84,8 @@ protected:
   virtual void	print_results(double);
   virtual void	alarm();
   virtual void	store_results(double);
+private:
+  WAVE** _wavep;
 public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:				/* s__solve.cc */

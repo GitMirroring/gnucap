@@ -69,7 +69,6 @@ SIM_DATA::SIM_DATA()
    _late_evalq(),
    _evalq(NULL),
    _evalq_uc(NULL),
-   _waves(NULL),
    _has_op(s_NONE)
 {
   _evalq = &_evalq1;
@@ -121,15 +120,14 @@ SIM_DATA::~SIM_DATA()
   assert(_evalq1.empty());
   assert(_evalq2.empty());
   assert(_late_evalq.empty());
-  assert(_evalq);
-  assert(_evalq_uc);
-  _evalq = NULL;
-  _evalq_uc = NULL;
 
-  if (_waves) {
-    delete [] _waves;
-    _waves = NULL;
-  }else{
+  if (_evalq) {
+    _evalq = NULL;
+  }else{untested();
+  }
+  if (_evalq_uc) {
+    _evalq_uc = NULL;
+  }else{untested();
   }
 }
 /*--------------------------------------------------------------------------*/

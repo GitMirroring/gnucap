@@ -81,13 +81,19 @@ void SIM::outdata(double x, int outflags)
  */
 void SIM::head(double start, double stop, const std::string& col1)
 {
-  if (_sim->_waves) {
-    delete [] _sim->_waves;
-  }else{
+  _sim->_waves[_sim->_label].clear();
+
+  if(_wavep){untested();
+    delete[] _wavep;
+  }else{untested();
   }
+  _wavep = new WAVE*[storelist().size()];
 
-  _sim->_waves = new WAVE [storelist().size()];
-
+  unsigned ii = 0;
+  for (PROBELIST::const_iterator
+	 p=storelist().begin();  p!=storelist().end();  ++p) { untested();
+    _wavep[ii++] = &(_sim->_waves[_sim->_label][p->label()]);
+  }
 
   if (!plopen(start, stop, plotlist())) {
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -143,10 +149,11 @@ void SIM::alarm(void)
  */
 void SIM::store_results(double x)
 {
+  trace1(("store_results " + label()).c_str(), x);
   int ii = 0;
   for (PROBELIST::const_iterator
 	 p=storelist().begin();  p!=storelist().end();  ++p) {
-    _sim->_waves[ii++].push(x, p->value());
+    _wavep[ii++]->push(x, p->value());
   }
 }
 /*--------------------------------------------------------------------------*/
