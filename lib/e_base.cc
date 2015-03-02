@@ -23,6 +23,7 @@
  */
 //testing=script 2014.07.04
 #include "ap.h"
+#include "globals.h" // wavelist_dispatcher
 #include "u_sim_data.h"
 #include "m_wave.h"
 #include "u_prblst.h"
@@ -150,11 +151,11 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
 /*static*/ WAVE* CKT_BASE::find_wave(const std::string& probe_name)
 {
   trace0(("find_wave \"" + probe_name + "\" ... " + _sim->_label).c_str());
-  std::map<std::string,WAVE>* w = &_sim->_waves[_sim->_label];
-  std::map<std::string,WAVE>::iterator i;
-  i = w->find(probe_name);
-  if(i!=_sim->_waves[_sim->_label].end()){ untested();
-    return &i->second;
+  WAVELIST* wl = wavelist_dispatcher[_sim->_label];
+  assert(wl);
+  WAVE* w = (*wl)[probe_name];
+  if(w) {
+    return w;
   }
   std::string prefix;
   std::string suffix;
@@ -163,9 +164,9 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
   cmd >> ":";
   suffix = cmd.ctos("");
   trace0(("\"" + prefix + "\":\"" + suffix + "\"").c_str());
-  i = _sim->_waves[prefix].find(suffix);
-  if(i!=_sim->_waves[prefix].end()){ untested();
-    return &i->second;
+  wl = wavelist_dispatcher[prefix];
+  if(wl){
+    return (*wl)[suffix];
   }
 
   return NULL;
