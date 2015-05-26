@@ -22,7 +22,7 @@
 TARGET = gnucap
 #------------------------------------------------------------------------
 INSTALL_DIR = $(PREFIX)/bin
-INSTALL_FILES = $(TARGET)$(TARGET_EXT) ../gnucap-conf
+INSTALL_FILES = $(TARGET)$(TARGET_EXT) ../gnucap-conf ../../gnucap.mk
 #------------------------------------------------------------------------
 INSTALL_SYSCONF_DIR = $(PREFIX)/etc
 INSTALL_SYSCONF_FILES = ../gnucap.conf
