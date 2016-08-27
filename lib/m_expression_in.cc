@@ -87,19 +87,15 @@ void Expression::arglist(CS& File)
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void Expression::leaf(CS& File)
 {
-#if 0
-  if (File.peek() == '"') {untested();
-    Quoted_String name(File);
-    push_back(new Token_SYMBOL(name, ""));
-    // do not put constants in symbol table
-  } // else 
-#endif
   unsigned here = File.cursor();
   Name_String name(File);
-  if (!File.stuck(&here)) {
+  if (File.peek() == '"') {untested();
+    Quoted_String s(File);
+    push_back(new Token_STRCONST(s));
+  }else if (!File.stuck(&here)) { untested();
     arglist(File);
     push_back(new Token_SYMBOL(name, ""));
-  }else{itested();
+  }else{untested();
     throw Exception_CS("what's this?", File);
   }
 }

@@ -1,0 +1,9 @@
+* g++ -I../include -fPIC -shared f_strlen.cc -o f_strlen.so
+
+param p0={"aaa"}
+
+param
+
+eval p0
+
+end

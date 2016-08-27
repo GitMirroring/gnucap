@@ -1,6 +1,6 @@
-/*$Id: c_exp.cc,v 26.127 2009/11/09 16:06:11 al Exp $ -*- C++ -*-
- * Copyright (C) 2007 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
+/*                             -*- C++ -*-
+ * Copyright (C) 2016 Felix Salfelder
+ * Author: same
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -18,28 +18,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
- *------------------------------------------------------------------
  */
-//testing=none
+
+#include "u_probe.h"
+#include "u_function.h"
 #include "globals.h"
-#include "m_expression.h"
-#include "c_comand.h"
-/*--------------------------------------------------------------------------*/
+#include "e_card.h"
+#include "e_cardlist.h"
+#include "e_node.h"
+
 namespace {
-/*--------------------------------------------------------------------------*/
-class CMD_ : public CMD {
+class strlen : public FUNCTION {
 public:
-  void do_it(CS& cmd, CARD_LIST* Scope)
-  { untested();
-    Expression e(cmd);
-    cmd.check(bDANGER, "syntax error");
-    Expression r(e, Scope);
-    std::cout << e << '=' << r << '\n';
-  }
-} p0;
-DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "exp|eval", &p0);
+	strlen() : FUNCTION()
+	{ untested();
+	}
+public:
+	std::string eval(CS& Cmd, const CARD_LIST* Scope)const
+	{ untested();
+		trace1("eval", Cmd.fullstring());
+		std::string what(Cmd.ctos(TOKENTERM));
+		return to_string(unsigned(what.size()));
+	}
+} p_strlen;
+DISPATCHER<FUNCTION>::INSTALL d_strlen(&function_dispatcher, "strlen", &p_strlen);
 /*--------------------------------------------------------------------------*/
 }
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-// vim:ts=8:sw=2:noet:

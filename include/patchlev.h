@@ -1,1 +1,1 @@
-#define PATCHLEVEL "develop 2018.08.31"
+#define PATCHLEVEL "qe-2 2018.08.31"

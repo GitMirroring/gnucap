@@ -1,0 +1,8 @@
+
+* g++ -I../include -fPIC -shared f_strlen.cc -o f_strlen.so
+.load ./f_strlen.so
+
+.eval exp(2)
+.eval strlen("abcdef")
+
+.end

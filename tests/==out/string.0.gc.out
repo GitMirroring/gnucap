@@ -1,0 +1,4 @@
+ p0="aaa"
+parameter "aaa" not specified, using default
+parameter "aaa" value is "NOT_INPUT"
+p0= NA
