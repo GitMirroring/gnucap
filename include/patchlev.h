@@ -1,1 +1,1 @@
-#define PATCHLEVEL "develop 2017.11.18"
+#define PATCHLEVEL "verilog_cmd-1 2018.01.10"
