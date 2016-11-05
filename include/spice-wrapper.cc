@@ -595,10 +595,6 @@ void MODEL_SPICE::Set_param_by_name(std::string Name, std::string new_value)
 /*--------------------------------------------------------------------------*/
 void MODEL_SPICE::set_param_by_name(std::string Name, std::string Value)
 {
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&Name);
-  }else{
-  }
   _params.set(Name, Value);
   Set_param_by_name(Name, to_string(_params[Name].e_val(1,scope())));
 }
@@ -835,10 +831,6 @@ void DEV_SPICE::Set_param_by_name(std::string Name, std::string new_value)
 /*--------------------------------------------------------------------------*/
 void DEV_SPICE::set_param_by_name(std::string Name, std::string Value)
 {
-  if (OPT::case_insensitive) {
-    notstd::to_lower(&Name);
-  }else{
-  }
   COMPONENT::set_param_by_name(Name, Value);
   COMMON_PARAMLIST* c = dynamic_cast<COMMON_PARAMLIST*>(mutable_common());
   assert(c);
