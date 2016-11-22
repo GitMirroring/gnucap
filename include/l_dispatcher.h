@@ -227,6 +227,9 @@ public:
       return NULL;
     }
   }
+  TT* clone(const char* s) { untested();
+    return clone(IString(s));
+  }
 
   class INSTALL {
   private:
