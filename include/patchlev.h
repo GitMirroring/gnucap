@@ -1,1 +1,1 @@
-#define PATCHLEVEL "uninstall 2019.12.20"
+#define PATCHLEVEL "output 2018.12.20"

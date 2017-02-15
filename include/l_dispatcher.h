@@ -47,6 +47,7 @@ public:
     for (iterator ii=_map->begin();
 	 ii != _map->end();
 	 ++ii) {
+      trace1("", ii->first);
       assert(!(ii->second));
     }
 #endif

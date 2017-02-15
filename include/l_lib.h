@@ -72,7 +72,7 @@ namespace OS {
     char* ev = ::getenv(s.c_str());
     if (ev) {
       return ev;
-    }else{itested();
+    }else{
       return "";
     }
   }
@@ -82,7 +82,7 @@ namespace OS {
       throw Exception("setenv: bad name " + Name);
     }else if (Value == "") {untested();
       throw Exception("setenv: bad value " + Value);
-    }else if (!Overwrite && getenv(Name) != "") {untested();
+    }else if (!Overwrite && getenv(Name) != "") {
       error(bDEBUG, "setenv: " + Name + " overwrite prohibited");
     }else{
       std::string ev = Name + "=" + Value;

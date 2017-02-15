@@ -1,0 +1,26 @@
+
+width out=30
+print tran time(0)
+plot tran time(0)(0,2)
+
+// plot, because plot probes have been modified last
+tran 0 1 .5
+
+// noplot
+tran 0 1 .5 noplot
+
+// don't know. should it not?
+tran 0 1 .5
+
+// plot as specified
+tran 0 1 .5 plot
+
+// still plot
+tran 0 1 .5
+
+print tran time(0)
+
+// print, print probes have been modified last
+tran 0 1 .5
+
+end

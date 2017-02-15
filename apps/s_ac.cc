@@ -28,6 +28,7 @@
 #include "u_parameter.h"
 #include "u_prblst.h"
 #include "s__.h"
+#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -66,6 +67,7 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// TODO:: does not use command_base (why?)
 void AC::do_it(CS& Cmd, CARD_LIST* Scope)
 {
   _scope = Scope;
@@ -101,21 +103,23 @@ void AC::do_it(CS& Cmd, CARD_LIST* Scope)
   
   ::status.ac.stop();
   ::status.total.stop();
-}
+  // can't call finish from here.
+  // (can't use command_base either)
+  // why is this needed?
+  outflush();
+} // AC::do_it
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 static int needslinfix;	// flag: lin option needs patch later (spice compat)
 /*--------------------------------------------------------------------------*/
 void AC::setup(CS& Cmd)
 {
-  _out = IO::mstdout;
-  _out.reset(); //BUG// don't know why this is needed
-  
+  outreset(); //BUG// don't know why this is needed
+  _sim->_axes.set_axis(0, &_sim->_freq);
+
   //temp_c = OPT::temp_c;
   // Don't set temperature.  Keep whatever was there before,
   // from "op" or whatever.
-
-  bool ploton = IO::plotset  &&  plotlist().size() > 0;
 
   ONE_OF
     || (Get(Cmd, "*",		&_step_in) && (_stepmode = TIMES))
@@ -153,12 +157,11 @@ void AC::setup(CS& Cmd)
       || (Get(Cmd, "lin",	  &_step_in) && (_stepmode = LIN_PTS))
       || (Get(Cmd, "o{ctave}",	  &_step_in) && (_stepmode = OCTAVE))
       || Get(Cmd, "dt{emp}",	  &_sim->_temp_c,  mOFFSET, OPT::temp_c)
-      || Get(Cmd, "pl{ot}",	  &ploton)
       || Get(Cmd, "pr{evoppoint}",&_prevopppoint)
       || Get(Cmd, "sta{rt}",	  &_start)
       || Get(Cmd, "sto{p}",	  &_stop)
       || Get(Cmd, "te{mperature}",&_sim->_temp_c)
-      || outset(Cmd,&_out)
+      || outset(Cmd)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
   Cmd.check(bWARNING, "what's this??");
@@ -222,8 +225,7 @@ void AC::setup(CS& Cmd)
   }else{
   }
 
-  IO::plotout = (ploton) ? IO::mstdout : OMSTREAM();
-  initio(_out);
+  outinit();
 }
 /*--------------------------------------------------------------------------*/
 void AC::solve()
@@ -254,7 +256,7 @@ void AC::sweep()
   do {
     _sim->_jomega = COMPLEX(0., _sim->_freq * M_TWO_PI);
     solve();
-    outdata(_sim->_freq, ofPRINT | ofSTORE);
+    outcommit(OUTPUT::ofPRINT | OUTPUT::ofSTORE);
   } while (next());
 }
 /*--------------------------------------------------------------------------*/

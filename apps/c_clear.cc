@@ -25,11 +25,13 @@
 
 #include "c_comand.h"
 #include "globals.h"
+#include "u_prblst.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
 /* cmd_clear: clear the whole circuit, including faults, etc
- *   equivalent to unfault; unkeep; delete all; title = (blank)
+ *   equivalent to
+ *   unfault; unkeep; {probes,data} clear; delete all; title = (blank)
  */
 class CMD_CLEAR : public CMD {
 public:
@@ -37,11 +39,11 @@ public:
   {
     command("unfault", Scope);
     command("unmark", Scope);
-    //command("ic clear", Scope);
-    //command("nodeset clear", Scope);
-    command("alarm clear", Scope);
-    command("plot clear", Scope);
-    command("print clear", Scope);
+
+    // detach all probes and uninstall probelists
+    command("probes clear", Scope);
+
+    command("data clear", Scope);
     command("delete all", Scope);
     command("title '", Scope);
   }

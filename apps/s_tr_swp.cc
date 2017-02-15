@@ -28,6 +28,7 @@
 #include "u_status.h"
 #include "declare.h"	/* gen */
 #include "s_tr.h"
+#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 //	void	TRANSIENT::sweep(void);
 //	void	TRANSIENT::first(void);
@@ -94,13 +95,14 @@ void TRANSIENT::sweep()
   
   {
     bool printnow = (_sim->_time0 == _tstart || _trace >= tALLTIME);
-    int outflags = ofNONE;
+    int outflags = OUTPUT::ofNONE;
     if (printnow) {
-      outflags = ofPRINT | ofSTORE | ofKEEP;
+      outflags = OUTPUT::ofPRINT | OUTPUT::ofSTORE | OUTPUT::ofKEEP;
     }else{
-      outflags = ofSTORE;
+      outflags = OUTPUT::ofSTORE;
     }
-    outdata(_sim->_time0, outflags);
+    //outdata(_sim->_time0, outflags);
+    outcommit(outflags);
   }
   
   while (next()) {
@@ -132,18 +134,18 @@ void TRANSIENT::sweep()
 	|| (_accepted && (_trace >= tALLTIME
 			  || step_cause() == scUSER
 			  || (!_tstrobe.has_hard_value() && _sim->_time0+_sim->_dtmin > _tstart)));
-      int outflags = ofNONE;
+      int outflags = OUTPUT::ofNONE;
       if (printnow) {
-	outflags = ofPRINT | ofSTORE | ofKEEP;
+	outflags = OUTPUT::ofPRINT | OUTPUT::ofSTORE | OUTPUT::ofKEEP;
       }else if (_accepted) {
-	outflags = ofSTORE;
+	outflags = OUTPUT::ofSTORE;
       }else{
       }
-      outdata(_sim->_time0, outflags);
+      outcommit(outflags);
     }
     
     if (!_converged && OPT::quitconvfail) {untested();
-      outdata(_sim->_time0, ofPRINT);
+      outcommit(OUTPUT::ofPRINT);
       throw Exception("convergence failure, giving up");
     }else{
     }

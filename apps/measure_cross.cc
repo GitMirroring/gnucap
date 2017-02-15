@@ -40,7 +40,7 @@ public:
     
     unsigned here = Cmd.cursor();
     Cmd >> probe_name;
-    WAVE* w = find_wave(probe_name);
+    WAVE const* w = find_wave(probe_name);
 
     if (!w) {
       Cmd.reset(here);

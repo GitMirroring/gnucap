@@ -24,34 +24,175 @@
 //testing=script,complete 2006.07.14
 #ifndef U_PROBE_H
 #define U_PROBE_H
+#include "io_trace.h"
 #include "e_base.h"
 #include "l_compar.h" // inorder
+#include "l_lib.h" // wmatch
 /*--------------------------------------------------------------------------*/
-class INTERFACE PROBE : public CKT_BASE {
-private:
-  std::string	_what;    
-  const CKT_BASE* _brh;
-  double	_lo,_hi;
-  explicit  PROBE() {unreachable(); incomplete();}
+/*--------------------------------------------------------------------------*/
+class INTERFACE PROBE_BASE : public CKT_BASE {
 public:
-  explicit  PROBE(const std::string& what, const CKT_BASE *brh);
-	    PROBE(const PROBE& p);
-	    ~PROBE()				{detach();}
+  enum STATIC {_STATIC};
+public:
+  explicit PROBE_BASE(STATIC)
+    : _what("proto"),
+      _brh(NULL)
+  {
+  }
 
-  void	    set_limit(double Lo,double Hi)	{_lo = Lo; _hi = Hi;}
-  void	    detach();
-  PROBE&    operator=(const PROBE& p);
+protected:
+  explicit PROBE_BASE() {unreachable(); incomplete();}
+  explicit PROBE_BASE(const std::string& what, CKT_BASE const* brh)
+    : _what(what),
+      _brh(brh)
+  {
+    trace2("construct baseprobe", what, _brh);
+    if (_brh) {
+      _brh->inc_probes();
+      set_label( _what + '(' + _brh->long_label() + ')');
+    }else{ untested();
+      unreachable();
+    }
+  }
+  explicit PROBE_BASE(const PROBE_BASE& p)
+    : CKT_BASE(p),
+      _what(p._what),
+      _brh(p._brh)
+  { untested();
+    if (_brh) { untested();
+      _brh->inc_probes();
+    }else{ untested();
+    }
+  }
+public:
+  virtual ~PROBE_BASE(){
+    detach();
+  }
+  virtual PROBE_BASE* new_wrap(PROBE_BASE* n) const{ untested();
+    return n;
+  }
+public:
+  virtual unsigned param_count() const{
+    return 0;
+  }
+  virtual std::string param_value(unsigned) const{ untested();
+    unreachable();
+    return "NA";
+  }
+  virtual void set_param_by_index(unsigned, double);
+//  virtual std::string label() const;
+  virtual double value()const = 0;
+  std::string const& label() const{return short_label();}
+public: // compare probes.
+  bool operator==(const PROBE_BASE& p)const { untested();
+    return ( ( _what == p._what )
+           &&(  _brh == p._brh  ));
+  }
+public: // compare (for STL)
+  bool operator==(const CKT_BASE& brh)const;
+  bool operator!=(const CKT_BASE& b)const { untested();
+    return (brh() != &b);
+  }
+  bool operator==(const std::string& par)const {
+    return wmatch(label(), par);
+  }
+  bool operator!=(const std::string& par)const { untested();
+    return !( *this == par);
+  }
+protected:
+  void detach();
+  std::string const& what()const{
+    return _what;
+  }
+  CKT_BASE const* brh()const{
+    return _brh;
+  }
 
-  const std::string label()const;
-  double	  value()const;
-  const CKT_BASE* object()const	 {return _brh;}
-  double	  lo()const	 {return _lo;}
-  double	  hi()const	 {return _hi;}
-  double	  range()const	 {return hi()-lo();}
-  bool		  in_range()const{return in_order(lo(),value(),hi());}
 private:
-  double	  probe_node()const;
+  std::string _what;
+  CKT_BASE const* _brh;
 };
+/*--------------------------------------------------------------------------*/
+// used in out_plot and out_alarm
+class RANGE_PROBE : public PROBE_BASE{
+public:
+  explicit RANGE_PROBE(STATIC x) : PROBE_BASE(x) {}
+private:
+  explicit RANGE_PROBE() : PROBE_BASE() {unreachable(); incomplete();}
+  explicit RANGE_PROBE(RANGE_PROBE const&x);
+public:
+  explicit RANGE_PROBE(std::string const& what, PROBE_BASE const*brh);
+  ~RANGE_PROBE(){ untested();
+  }
+private: // PROBE_BASE
+  // static, actually. but then can not override
+  PROBE_BASE* new_wrap(PROBE_BASE* n) const{
+    RANGE_PROBE* x=new RANGE_PROBE(what(), n);
+    return x;
+  }
+  unsigned param_count() const{
+    return 2;
+  }
+  void set_param_by_index(unsigned i, double d);
+  double value() const{
+    if(PROBE_BASE const* p=prechecked_cast<PROBE_BASE const*>(brh())){
+      return p->value();
+    }else{ unreachable();
+      // range probes cannot be attached to components.
+      // PROBELIST->RANGE_PROBE->some_PROBE->COMPONENT
+      // where some_PROBE is determined by COMPONENT
+      return 99;
+    }
+  }
+  virtual std::string param_value(unsigned i) const{
+    switch(i){
+      case 0:
+	return to_string(_lo);
+      case 1:
+	return to_string(_hi);
+      default: untested();
+        return "NA";
+    }
+  }
+public:
+  double range()const {
+    return hi() - lo();
+  }
+  double lo()const {
+    return _lo;
+  }
+  double hi()const {
+    return _hi;
+  }
+  bool in_range()const{
+    return in_order(lo(), value(), hi());
+  }
+
+private:
+  double _lo, _hi;
+};
+/*--------------------------------------------------------------------------*/
+// currently used in GROUND_NODE. useful everywhere.
+// T needs to be convertible to double.
+template<class T>
+class PTR_PROBE : public PROBE_BASE{
+private:
+  explicit PTR_PROBE(PTR_PROBE const& x) : PROBE_BASE(x) {}
+public:
+  explicit PTR_PROBE(std::string const& what, CKT_BASE const* brh, T const* t)
+  : PROBE_BASE(what, brh), _value(t){
+    assert(t);
+  }
+public:
+  double value() const{
+    assert(_value);
+    return double(*_value);
+  }
+private:
+  T const* _value;
+}; // PTR_PROBE
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

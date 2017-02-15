@@ -2,6 +2,7 @@ nmos n gate
 >>>>>.print op v(nodes) iter(0) gm(m1) gds(m1) gmb(m1) 
 cmosn: rsh - rs - rd conflict: using rsh
 cmosn: is - js conflict
+probe wildcard: skipping v on 0
 >>>>>.op 
 cmosn: rsh - rs - rd conflict: using rsh
 cmosn: is - js conflict

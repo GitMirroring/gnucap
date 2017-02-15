@@ -1,0 +1,40 @@
+options trace
+
+
+width out=50
+
+print dc iter(0)
+print dc -iter(0)
+print dc iter(0)
+print dc
+
+dc
+
+verilog
+
+resistor #(.r(1)) r1(0,0);
+resistor #(.r(1)) r2(0,0);
+
+alarm dc v(r1) r(r*)(0,2)
+alarm dc
+print dc
+print dc +hidden(0) +v(r1) +r(r1)
+print dc
+print dc -iter(0)
+
+dc r1 0 5 1
+alarm dc clear
+
+plot tran time(0) (0,2)
+tran 0 1 .1
+
+delete r1
+dc
+
+// print all iter(0)
+print dc clear
+print op v(0)
+dc
+op
+
+end

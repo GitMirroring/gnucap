@@ -26,6 +26,7 @@
 #define E_NODE_H
 #include "u_sim_data.h"
 #include "e_base.h"
+#include "u_probe.h"
 /*--------------------------------------------------------------------------*/
 class MODEL_LOGIC;
 /*--------------------------------------------------------------------------*/
@@ -131,7 +132,32 @@ public: // virtuals
     return _sim->_ac[m_()];
   }
 };
-extern NODE ground_node;
+/*--------------------------------------------------------------------------*/
+class INTERFACE GROUND_NODE : public NODE{
+private: // types
+  class BYPASS_PROBE : public PROBE_BASE{
+  private:
+    explicit BYPASS_PROBE(BYPASS_PROBE const& x) : PROBE_BASE(x) { untested(); }
+    explicit BYPASS_PROBE(std::string const& what, CKT_BASE const* brh)
+    : PROBE_BASE(what, brh) {
+    }
+  public:
+    double value() const{
+      return OPT::bypass + 10*_sim->_bypass_ok;
+    }
+  public:
+    friend class GROUND_NODE;
+  };
+private:
+  explicit GROUND_NODE(GROUND_NODE const&) : NODE(){unreachable();}
+public:
+  explicit GROUND_NODE( std::string const& s, int n)
+    : NODE(s, n){
+  }
+public:
+  virtual PROBE_BASE const* new_probe(std::string const& s) const;
+};
+extern GROUND_NODE ground_node;
 /*--------------------------------------------------------------------------*/
 class INTERFACE LOGIC_NODE : public NODE {
 private:

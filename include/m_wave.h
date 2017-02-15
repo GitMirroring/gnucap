@@ -26,12 +26,14 @@
 #define M_WAVE_H
 #include "l_denoise.h"
 #include "m_interp.h"
+#include "l_dispatcher.h"
 /*--------------------------------------------------------------------------*/
-class WAVE {
+class WAVE : public CKT_BASE {
 private:
   std::deque<DPAIR> _w;
   double _delay;
 public:
+  WAVE* clone()const{return new WAVE(*this);}
   typedef std::deque<DPAIR>::iterator iterator;
   typedef std::deque<DPAIR>::const_iterator const_iterator;
 
@@ -49,6 +51,37 @@ public:
   WAVE&	   operator*=(double x);
   const_iterator begin()const {return _w.begin();}
   const_iterator end()const {return _w.end();}
+};
+/*--------------------------------------------------------------------------*/
+class WAVESTASH : public CKT_BASE{
+public:
+  typedef std::string key_type;
+  typedef std::map<key_type, WAVE> container_type;
+  typedef container_type::const_iterator const_iterator;
+private:
+  WAVESTASH(const WAVESTASH&x):CKT_BASE(x){ unreachable(); }
+public:
+  WAVESTASH() : CKT_BASE(), _container() {}
+  ~WAVESTASH() {
+  }
+public:
+  const_iterator find(const key_type& k) const{
+    return _container.find(k);
+  }
+  const_iterator end() const{
+    return _container.end();
+  }
+  void clear(){
+    _container.clear();
+  }
+  WAVE& operator[](const std::string& s){
+    return _container[s];
+  }
+//  WAVE const& operator[](const std::string& s) const{
+//    return _container[s];
+//  }
+private:
+  container_type _container;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -71,9 +104,10 @@ inline WAVE& WAVE::initialize()
 }
 /*--------------------------------------------------------------------------*/
 inline WAVE::WAVE(const WAVE& w)
-  :_w(w._w),
-   _delay(w._delay)
-{ untested();
+  : CKT_BASE(w),
+    _w(w._w),
+    _delay(w._delay)
+{
 }
 /*--------------------------------------------------------------------------*/
 // constructor -- argument is the delay

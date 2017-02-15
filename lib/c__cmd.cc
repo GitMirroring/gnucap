@@ -96,7 +96,6 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope)
     IO::mstdout.form("time=%8.2f\n", timecheck.check().elapsed());
   }else{
   }
-  plclose();
   outreset();
 
   if (get_timer_was_running) {
@@ -114,7 +113,7 @@ void CMD::command(const std::string& cs, CARD_LIST* scope)
   CMD* c = command_dispatcher[s];
   if (c) {
     c->do_it(cmd, scope);
-  }else{
+  }else{ untested();
     error(bDEBUG, "bad internal command: " + s + '\n');
   }
 }

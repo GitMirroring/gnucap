@@ -30,10 +30,6 @@ class PROBELIST;
 /*--------------------------------------------------------------------------*/
 /* fft     */ INTERFACE	void	fft(COMPLEX*,int,int);
 /* generat */ INTERFACE	double	gen();
-/* plot    */ INTERFACE void	plottr(double,const PROBELIST&);
-	      INTERFACE int	plopen(double,double,const PROBELIST&);
-	      INTERFACE	void	plclose();
-	      INTERFACE	void	plclear();
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

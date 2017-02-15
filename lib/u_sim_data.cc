@@ -69,7 +69,7 @@ SIM_DATA::SIM_DATA()
    _late_evalq(),
    _evalq(NULL),
    _evalq_uc(NULL),
-   _waves(NULL),
+   _axes(),
    _has_op(s_NONE)
 {
   _evalq = &_evalq1;
@@ -125,12 +125,6 @@ SIM_DATA::~SIM_DATA()
   assert(_evalq_uc);
   _evalq = NULL;
   _evalq_uc = NULL;
-
-  if (_waves) {
-    delete [] _waves;
-    _waves = NULL;
-  }else{
-  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
