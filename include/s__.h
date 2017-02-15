@@ -33,6 +33,7 @@ class CS;
 class PROBELIST;
 class COMPONENT;
 class WAVE;
+class OUTPUT;
 /*--------------------------------------------------------------------------*/
 class SIM : public CMD {
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
@@ -45,15 +46,10 @@ protected:
     tITERATION = 4,	/* show every iteration, including nonconverged	*/
     tVERBOSE   = 5	/* show extended diagnostics			*/
   };
-  enum OUTFLAGS { // bit fields
-    ofNONE  = 0,
-    ofPRINT = 1,
-    ofSTORE = 2,
-    ofKEEP  = 4
-  };
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   CARD_LIST* _scope;
-  OMSTREAM   _out;		/* places to send the results		*/
+private: // places to send the results
+  OUTPUT* _output;
 public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 private:
@@ -61,12 +57,15 @@ private:
 private:
   virtual void	setup(CS&)	= 0;
   virtual void	sweep()		= 0;
-  virtual void	finish()	{}
+  virtual void	finish();
   virtual bool	is_step_rejected()const {return false;}
 
-  explicit SIM(const SIM&):CMD(),_scope(NULL) {unreachable(); incomplete();}
+  explicit SIM(const SIM&)
+    : CMD(),_scope(NULL), _output(NULL) {unreachable(); incomplete();}
 protected:
-  explicit SIM(): CMD(),_scope(NULL) {}
+  explicit SIM()
+    : CMD(), _scope(NULL), _output(NULL) {
+    }
 public:
   ~SIM();
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
@@ -74,16 +73,18 @@ protected:
   	 void	command_base(CS&);	/* s__init.cc */
 	 void	reset_timers();	
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
-protected:
-	 const PROBELIST& alarmlist()const;	/* s__out.cc */
-	 const PROBELIST& plotlist()const;
-	 const PROBELIST& printlist()const;
-	 const PROBELIST& storelist()const;
-  virtual void	outdata(double, int);
-  virtual void	head(double,double,const std::string&);
-  virtual void	print_results(double);
-  virtual void	alarm();
-  virtual void	store_results(double);
+protected: // OUTPUT interface, s__out.cc
+  void outinit();
+  bool outset(CS&);
+  void outreset();
+  void outcommit(int flags);
+  void outhead();
+  void outflush();
+  PROBELIST const* outprobes() const; // hack
+  // ...
+protected: // obsolete wrappers.
+  void outdata(double const&, int);
+  void head(double,double,const std::string&);
 public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:				/* s__solve.cc */
@@ -98,7 +99,10 @@ private:
 	void	set_damp();
 	void	load_matrix();
 	void	solve_equations();
-};
+public:
+  OUTPUT* attach_output(OUTPUT&);
+  void detach_output(OUTPUT&);
+}; // SIM
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

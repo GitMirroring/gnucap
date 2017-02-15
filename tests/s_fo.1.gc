@@ -1,0 +1,12 @@
+spice
+
+* test if fo uses the correct probelist.
+
+V3  1  0  SIN   freq=5k nozero nopeak
+V3  2  0  SIN   freq=10k nozero nopeak
+.print tran v(1)
+.tran 0 10u 5u
+.print fourier v(nodes)
+.fourier 1k 3k 1k
+.list 
+.end 

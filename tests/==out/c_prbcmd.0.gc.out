@@ -1,0 +1,36 @@
+>>>>>dc 
+#          
+ 0.        
+>>>>>alarm dc v(0) 
+alarm dc v(0) 
+         ^ ? cannot resolve
+alarm dc v(0) 
+            ^ ? need a probe
+alarm dc v(0) 
+            ^ ? need device or node
+alarm dc v(0) 
+              ^ ? need )
+>>>>>dc 
+>>>>>alarm clear 
+>>>>>dc 
+#          
+ 0.        
+>>>>>alarm dc v(0) 
+alarm dc v(0) 
+         ^ ? cannot resolve
+alarm dc v(0) 
+            ^ ? need a probe
+alarm dc v(0) 
+            ^ ? need device or node
+alarm dc v(0) 
+              ^ ? need )
+>>>>>alarm dc clear 
+>>>>>dc 
+>>>>>probe tran hidden(0) 
+>>>>>probe tran 
+        hidden(0)
+>>>>>probes clear 
+>>>>>tran 0 1 1 
+ 0.        
+ 1.        
+>>>>>end 

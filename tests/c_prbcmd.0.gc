@@ -1,0 +1,16 @@
+options trace
+
+dc
+alarm dc v(0)
+dc
+alarm clear
+dc
+alarm dc v(0)
+alarm dc clear
+dc
+probe tran hidden(0)
+probe tran
+probes clear
+tran 0 1 1
+
+end

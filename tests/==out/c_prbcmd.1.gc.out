@@ -1,0 +1,85 @@
+>>>>>width out=50 
+>>>>>print dc iter(0) 
+>>>>>print dc -iter(0) 
+>>>>>print dc iter(0) 
+>>>>>print dc 
+        iter(0)
+>>>>>dc 
+#           iter(0)   
+ 0.         2.        
+>>>>>verilog 
+>>>>>alarm dc v(r1) r(r*)(0,2) 
+>>>>>alarm dc 
+        v(r1)( 0., 0.) r(r1)( 0., 2.) r(r2)( 0.,
++ 2.)
+>>>>>print dc 
+        iter(0)
+>>>>>print dc +hidden(0) +v(r1) +r(r1) 
+>>>>>print dc 
+        iter(0) hidden(0) v(r1) r(r1)
+>>>>>print dc -iter(0) 
+>>>>>dc r1 0 5 1 
+#           hidden(0)  v(r1)      r(r1)     
+r1: short circuit
+r1: short circuit
+r1: short circuit
+r1: short circuit
+ 0.         0.         0.         10.u      
+ 1.         0.         0.         1.        
+ 2.         0.         0.         2.        
+ 3.         0.         0.         3.        
+r(r1)= 3.        
+ 4.         0.         0.         4.        
+r(r1)= 4.        
+ 5.         0.         0.         5.        
+r(r1)= 5.        
+>>>>>alarm dc clear 
+>>>>>plot tran time(0) (0,2) 
+>>>>>tran 0 1 .1 
+time(0)
+       0.        0.5       1.        1.5       2.
+        +---------+---------+---------+---------+
+r1: short circuit
+ 0.     *         .         .         .         |
+ 0.1    | *       .         .         .         |
+ 0.2    |   *     .         .         .         |
+ 0.3    |     *   .         .         .         |
+ 0.4    |       * .         .         .         |
+ 0.5    |         *         .         .         |
+ 0.6    |         . *       .         .         |
+ 0.7    |         .   *     .         .         |
+ 0.8    |         .     *   .         .         |
+ 0.9    |         .       * .         .         |
+ 1.     |         .         *         .         |
+        +---------+---------+---------+---------+
+>>>>>delete r1 
+>>>>>dc 
+#           hidden(0) 
+ 0.         0.        
+ 1.         0.        
+ 2.         0.        
+ 3.         0.        
+ 4.         0.        
+ 5.         0.        
+>>>>>print dc clear 
+>>>>>print op v(0) 
+print op v(0) 
+         ^ ? cannot resolve
+print op v(0) 
+            ^ ? need a probe
+print op v(0) 
+            ^ ? need device or node
+print op v(0) 
+              ^ ? need )
+>>>>>dc 
+#          
+ 0.        
+ 1.        
+ 2.        
+ 3.        
+ 4.        
+ 5.        
+>>>>>op 
+#          
+ 27.       
+>>>>>end 

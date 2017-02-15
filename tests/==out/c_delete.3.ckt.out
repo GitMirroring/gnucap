@@ -1,5 +1,6 @@
 ' a test of the delete command 
 >>>>>.print op v(nodes) 
+probe wildcard: skipping v on 0
 >>>>>.list 
 Y1 ( 1 0 )  0.
 Y2 ( 2 0 )  0.

@@ -25,9 +25,11 @@
  */
 //testing=script,sparse 2006.07.17
 #include "io_.h"
+#include "u_out.h"
 #include "ap.h"
+#include "u_out.h"
 /*--------------------------------------------------------------------------*/
-	void	initio(OMSTREAM&);
+//	void	initio(OMSTREAM&, OUTPUT*);
 //static	void	decipher(char*);
 	void	outreset(void);
 	OMSTREAM* outset(CS&,OMSTREAM*);
@@ -38,7 +40,9 @@ static FILE* to_pipe;
 /*--------------------------------------------------------------------------*/
 /* initio: initialize file encryption, etc
  */
-void initio(OMSTREAM& Where)
+#if 0
+// move to OUTPUT::init?
+void initio(OUTPUT* o)
 {
   const char* tag = "''''";
   if (Where.cipher()) {		/* if writing an encrypted file,    */
@@ -46,7 +50,6 @@ void initio(OMSTREAM& Where)
     Where << tag << '\n';	/* mark it as encrypted		    */
   }else{
   }
-#if 0
   if (Whence) {
     char buf[BUFLEN];
     if (!fgets(buf, BUFLEN, Whence))	/* if the first line deciphers to   */
@@ -58,8 +61,8 @@ void initio(OMSTREAM& Where)
       fseek(Whence,0L,SEEK_SET);
     }
   }
-#endif
 }
+#endif
 /*--------------------------------------------------------------------------*/
 #if 0
 /* decipher: un-encrypt a line of text in place

@@ -53,14 +53,19 @@ bm_sin.cc bm_tanh.cc bmm_table.cc bmm_semi.cc
 C_SRCS = \
 c_clear.cc c_comand.cc c_delete.cc c_exp.cc  c_genrat.cc \
 c_help.cc \
-c_list.cc c_measure.cc c_modify.cc c_param.cc c_prbcmd.cc \
-c_status.cc c_sweep.cc c_sim.cc c_system.cc
+c_list.cc c_measure.cc c_modify.cc c_param.cc \
+c_status.cc c_sweep.cc c_sim.cc c_system.cc c_data.cc
 
 # simulation commands, usually multiple files for one command
 S_SRCS = \
 s__init.cc s__out.cc s__solve.cc \
 s_ac.cc s_dc.cc s_fo.cc \
 s_tr.cc s_tr_set.cc s_tr_swp.cc
+
+# output commands etc.
+OUT_SRCS = \
+out_tee.cc \
+out__cmd.cc out_print.cc out_alarm.cc out_store.cc out_plot.cc
 
 # netlist languages
 LANG_SRCS = \
@@ -81,6 +86,7 @@ $(D_SRCS) \
 $(BM_SRCS) \
 $(C_SRCS) \
 $(S_SRCS) \
+$(OUT_SRCS) \
 $(LANG_SRCS) \
 $(FUNC_SRCS) \
 $(OTHER_SRCS)

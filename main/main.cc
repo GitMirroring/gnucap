@@ -98,7 +98,7 @@ static void read_startup_files(void)
   if (OPT::language) {
     OPT::case_insensitive = OPT::language->case_insensitive();
     OPT::units            = OPT::language->units();
-  }else{
+  }else{ untested();
     OPT::case_insensitive = false;
     OPT::units            = uSI;
   }
@@ -163,7 +163,7 @@ static void setup_traps(void)
  */
 static void finish(void)
 {
-  plclose();
+  // plclose();
   outreset();
 }
 /*--------------------------------------------------------------------------*/
@@ -171,15 +171,15 @@ static void process_cmd_line(int argc, const char *argv[])
 {
   for (int ii = 1;  ii < argc;  /*inside*/) {
     try {
-      if (strncmp(argv[ii], "--", 2) == 0) {
-	if (ii < argc) {
+      if (strncmp(argv[ii], "--", 2) == 0) { untested();
+	if (ii < argc) { untested();
 	  CS cmd(CS::_STRING, argv[ii++]+2); // command line
 	  CMD::cmdproc(cmd, &CARD_LIST::card_list); 
 	}else{untested();
 	}
-      }else if (strcasecmp(argv[ii], "-c") == 0) {
+      }else if (strcasecmp(argv[ii], "-c") == 0) { untested();
 	++ii;
-	if (ii < argc) {
+	if (ii < argc) { untested();
 	  CS cmd(CS::_STRING, argv[ii++]); // command line
 	  CMD::cmdproc(cmd, &CARD_LIST::card_list); 
 	}else{untested();
@@ -207,9 +207,9 @@ static void process_cmd_line(int argc, const char *argv[])
 	  throw Exception_Quit("");
 	}else{untested();
 	}
-      }else if (strcasecmp(argv[ii], "-a") == 0) {
+      }else if (strcasecmp(argv[ii], "-a") == 0) { untested();
 	++ii;
-	if (ii < argc) {
+	if (ii < argc) { untested();
 	  CMD::command(std::string("attach ") + argv[ii++], &CARD_LIST::card_list);
 	}else{untested();
 	}
@@ -240,7 +240,6 @@ int main(int argc, const char *argv[])
 {
   prepare_env();
   CKT_BASE::_sim = new SIM_DATA;
-  CKT_BASE::_probe_lists = new PROBE_LISTS;
   try {
   {
     SET_RUN_MODE xx(rBATCH);
@@ -267,24 +266,24 @@ int main(int argc, const char *argv[])
       exit(0);
     }
   }
-  {
+  { untested();
     SET_RUN_MODE xx(rINTERACTIVE);
     CS cmd(CS::_STDIN);
-    for (;;) {
-      if (!sigsetjmp(env.p, true)) {
-	try {
-	  if (OPT::language) {
+    for (;;) { untested();
+      if (!sigsetjmp(env.p, true)) { untested();
+	try { untested();
+	  if (OPT::language) { untested();
 	    OPT::language->parse_top_item(cmd, &CARD_LIST::card_list);
 	  }else{untested();
 	    CMD::cmdproc(cmd.get_line(I_PROMPT), &CARD_LIST::card_list);
 	  }
-	}catch (Exception_End_Of_Input& e) {
+	}catch (Exception_End_Of_Input& e) { untested();
 	  error(bDANGER, e.message() + '\n');
 	  finish();
 	  //CMD::command("quit", &CARD_LIST::card_list);
 	  //exit(0);
 	  break;
-	}catch (Exception& e) {
+	}catch (Exception& e) { untested();
 	  error(bDANGER, e.message() + '\n');
 	  finish();
 	}
@@ -296,14 +295,14 @@ int main(int argc, const char *argv[])
   }catch (Exception_Quit&) {
   }catch (Exception& e) {untested();
     error(bDANGER, e.message() + '\n');
+  }catch(...){
+	incomplete();
   }
   
   //CARD_LIST::card_list.erase_all();
   CMD::command("clear", &CARD_LIST::card_list);
   assert(CARD_LIST::card_list.is_empty());
   CMD::command("detach_all", &CARD_LIST::card_list);
-  delete CKT_BASE::_probe_lists;
-  CKT_BASE::_probe_lists = NULL;
   delete CKT_BASE::_sim;
   CKT_BASE::_sim = NULL;
   

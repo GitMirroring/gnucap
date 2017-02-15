@@ -1,18 +1,48 @@
-/*$Id: plot.cc,v 26.110 2009/05/28 15:32:04 al Exp $
- * (this file is a mess.  it should be redone.)
+/*                        -*- C++ -*-
+ * Copyright (C) 2015-18 Felix Salfelder
+ * Author: Felix Salfelder <felix@salfelder.org>
+ *
+ * This file is part of "Gnucap", the Gnu Circuit Analysis Package
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ *------------------------------------------------------------------
+ * plot command
+ * set up ascii plot (select points, maintain probe lists)
+ * command line operations
  */
-//testing=script 2006.07.17
-#include "declare.h"	/* self */
-#include "constant.h"
-#include "u_opt.h"
+#include "u_sim_data.h"
+#include "c_comand.h"
 #include "u_prblst.h"
+#include "globals.h"
+#include "declare.h" // plopen
+#include "u_out.h"
+#include "s__.h"
+/*--------------------------------------------------------------------------*/
+OMSTREAM plotout; // plot.cc
+bool plotset; // plot.cc
+/*--------------------------------------------------------------------------*/
+namespace {
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 	void	plottr(double,const PROBELIST&);
 	int	plopen(double,double,const PROBELIST&);
 	void	plclose(void);
-	void	plclear(void);
+	//void	plclear(void);
 static	void	plborder(void);
-static	void	calibrate(const PROBE&);
+static	void	calibrate(const PROBE_BASE&);
 static	int	round_to_int(double);
 static	void	plhead(const PROBELIST&);
 static	int	point(double,double,double,int,int,int);
@@ -40,13 +70,21 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
 	 i =  plotlist.begin();
 	 i != plotlist.end();
 	 ++i) {
-      val[ii] = i->value();
-      if (i->range() != 0.) {
-	lo[ii] = i->lo();
-	hi[ii] = i->hi();
-      }else{
+      val[ii] = (*i)->value();
+      RANGE_PROBE const* P=dynamic_cast<RANGE_PROBE const*>(*i);
+      if(!P){
+       // user did not probide bounds.
+       // (how does this happen?!)
 	lo[ii] = -5.;
 	hi[ii] = 5.;
+      }else{
+	if (P->range() != 0.) {
+	  lo[ii] = P->lo();
+	  hi[ii] = P->hi();
+	}else{
+	  lo[ii] = -5.;
+	  hi[ii] = 5.;
+	}
       }
       ++ii;
       if (ii >= 2) {
@@ -67,12 +105,15 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
 int plopen(double start, double stop, const PROBELIST& plotlist)
 {
   if (start == stop) {
-    IO::plotout = OMSTREAM();
+    plotout = OMSTREAM();
   }
-  if (!IO::plotout.any()) {
+#if 0
+  if (!IO::plotout.any()) {untested();
     plclear();
     return false;
+  }else{
   }
+#endif
   xstart  = start;
   xstop   = stop;
   plhead(plotlist);
@@ -90,9 +131,10 @@ void plclose(void)
   }
   plborder();
   active = false;
-  IO::plotout = OMSTREAM();
+  plotout = OMSTREAM();
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 /* plclear: clear graphics mode
  */
 void plclear(void)
@@ -102,17 +144,18 @@ void plclear(void)
   }
   active = false;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 /* plborder: draw the border -- Ascii graphics
  */
 static void plborder(void)
 {
-  IO::plotout.tab(INDENT) << border << '\n';
+  plotout.tab(INDENT) << border << '\n';
 }
 /*--------------------------------------------------------------------------*/
 /* calibrate: calibrate the y axis.  ascii plot.
  */
-static void calibrate(const PROBE& prb)
+static void calibrate(PROBE_BASE const& prb)
 {
   static char nums[20];		/* this label string        */
   static char highs[20];	/* the last label string    */
@@ -124,12 +167,17 @@ static void calibrate(const PROBE& prb)
   double markno;		/* loop counter                             */
  
   double hi, lo;
-  if (prb.range() == 0) {
+  if(RANGE_PROBE const* A=dynamic_cast<RANGE_PROBE const*>(&prb)){
+    if (A->range() == 0) {
+      hi = 5;
+      lo = -5;
+    }else{
+      hi = A->hi();
+      lo = A->lo();
+    }
+  }else{
     hi = 5;
     lo = -5;
-  }else{
-    hi = prb.hi();
-    lo = prb.lo();
   }
   double range = hi - lo;
   
@@ -138,7 +186,7 @@ static void calibrate(const PROBE& prb)
   /* *strchr(&highs[2],' ') = '\0'; */	    /* make the top label, and save */
   stop = OUTWIDTH - static_cast<int>(strlen(highs)) - 1; /* space for it. */
   
-  IO::plotout << prb.label();
+  plotout << prb.label();
   range = hi - lo;
   filled = 0;
   for (markno = 0.;  markno < OPT::ydivisions;  markno++) {
@@ -152,12 +200,12 @@ static void calibrate(const PROBE& prb)
     cal = round_to_int(INDENT + CONSSCALE * (markno/OPT::ydivisions));
     start = cal - (numsize+1)/2;
     if (start > filled  &&  start+numsize < stop) {
-      IO::plotout.tab(start) << nums;		 /* if it fits, print it */
+      plotout.tab(start) << nums;		 /* if it fits, print it */
       filled = start + numsize ;
     }else{untested();
     }
   }
-  IO::plotout.tab(stop) << highs << '\n';    /* print the last calibration */
+  plotout.tab(stop) << highs << '\n';    /* print the last calibration */
 }
 /*--------------------------------------------------------------------------*/
 static int round_to_int(double x)
@@ -174,7 +222,7 @@ static void plhead(const PROBELIST& plotlist)
        i =  plotlist.begin();
        i != plotlist.end();
        ++i) {
-    calibrate(*i);
+      calibrate(**i);
   }
   for (int ii = 0;  ii < CONSSCALE; ii++) {		/* build strings */
     border[ii] = '-';
@@ -245,8 +293,71 @@ static void plotarg(
     adata[point(zz,zlo,zhi,CONSSCALE,0,1)] = '+';/* zap data into string */
   }
   adata[point(yy,ylo,yhi,CONSSCALE,0,1)] = '*';
-  IO::plotout.form( "%-8.8s%s", xxs, adata );
-  IO::plotout << '\n';
+  plotout.form( "%-8.8s%s", xxs, adata );
+  plotout << '\n';
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+class OUTPUT_CMD_PLOT : public OUTPUT_CMD {
+private: // types
+  typedef RANGE_PROBE probe_type;
+private:
+  OUTPUT_CMD_PLOT(const OUTPUT_CMD_PLOT&p)
+    : OUTPUT_CMD(p)
+  {
+  }
+public:
+  OUTPUT_CMD_PLOT() : OUTPUT_CMD() {
+    set_label("plot");
+  }
+  virtual ~OUTPUT_CMD_PLOT(){
+  }
+  OUTPUT_CMD* clone() const{
+    return new OUTPUT_CMD_PLOT(*this);
+  }
+private: // OUTPUT_CMD
+  void setup(CS& cmd) {
+    plotset = true;
+    OUTPUT_CMD::setup(cmd);
+  }
+  virtual PROBE_BASE const* probe_proto() const{
+    return &_probe_proto;
+  }
+  void init(){
+    plotout = (plotset) ? IO::mstdout : OMSTREAM();
+  }
+private: // OUTPUT
+  void head(std::string const& label){
+    OUTPUT::head(label);
+    PROBELIST const& pr=probelist();
+    // if(0&& !plotout.any()){
+    // }else
+    double start=_sim->_axes[0]._min;
+    double stop=_sim->_axes[0]._max;
+    if(pr.size()){
+      plopen(start, stop, pr);
+    }
+  }
+  void commit(int flags){
+    double x=coord(0); // can only plot univariate
+    if(!(flags & ofPRINT)){
+    }else if(probelist().size()){
+      plottr(x, probelist());
+    }else{ untested();
+    }
+  }
+  void flush(){
+    plclose();
+  }
+private:
+  static probe_type _probe_proto;
+}p2;
+OUTPUT_CMD_PLOT::probe_type OUTPUT_CMD_PLOT::_probe_proto(PROBE_BASE::_STATIC);
+DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "iplot|plot", &p2);
+/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -33,10 +33,79 @@
 class WAVE;
 class CARD;
 class LOGIC_NODE;
+class SIM_DATA;
 /*--------------------------------------------------------------------------*/
 enum TRI_STATE {tsNO=0, tsYES=1, tsBAD=-1};
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+class INTERFACE SIM_AXES{
+public:
+  struct axis_t{
+    explicit axis_t() : _x(NULL), _label(""), _min(1e99), _max(-1e99) { }
+    axis_t(axis_t const& p)
+      : _x(p._x), _label(p._label), _min(p._min), _max(p._max){ untested();
+    }
+    explicit axis_t(double const* x, std::string l, double min, double max)
+      : _x(x), _label(l), _min(min), _max(max){
+    }
+    double const* _x;
+    std::string _label;
+    double _min;
+    double _max;
+  };
+private:
+  typedef std::vector<axis_t> container_type;
+  SIM_AXES(): _axes(0){ }
+  SIM_AXES(SIM_AXES const&) : _axes(0){ unreachable(); }
+public:
+  void hack(double const*x){ untested();
+    _axes.resize(1);
+    _axes[0]._x=x;
+  }
+  void set_axis(unsigned pos, double const *x, std::string label="", double
+      lb=1e99, double ub=-1e99){
+    if(pos>=_axes.size()){
+      _axes.resize(pos+1);
+    }else{
+    }
+    axis_t& ap=_axes[pos];
+    ap._label = label;
+    ap._min = lb;
+    ap._max = ub;
+    if(x){
+      ap._x = x;
+    }else{
+    }
+  }
+  /*
+  axis_t& operator=(axis_t const& a){
+    _x = a._x;
+    _label = a._label;
+    _min = a._min;
+    _max = a._max;
+    return *this;
+  }
+  */
+  size_t size() const{
+    return _axes.size();
+  }
+  axis_t const& operator[](size_t i) const{
+    assert(i<_axes.size());
+    return _axes[i];
+  }
+  double x(unsigned i) const{
+    assert(i<_axes.size());
+    assert(_axes[i]._x);
+    return *_axes[i]._x;
+  }
+private:
+  container_type _axes;
+  friend class SIM_DATA; // so it can construct SIM_AXES
+};
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 struct INTERFACE SIM_DATA {
+public:
   double _time0;	/* time now */
   double _freq;		/* AC frequency to analyze at (Hertz) */
   double _temp_c;	/* ambient temperature, actual */
@@ -79,7 +148,8 @@ struct INTERFACE SIM_DATA {
   std::deque<CARD*>  _late_evalq; /* eval after everything else */
   std::deque<CARD*>* _evalq;   /* pointer to evalq to process */
   std::deque<CARD*>* _evalq_uc;/* pointer to evalq under construction */
-  WAVE *_waves;		/* storage for waveforms "store" command*/
+//  std::string _label;
+  SIM_AXES _axes;
   SIM_MODE _has_op;
   SIM_DATA();
   ~SIM_DATA();

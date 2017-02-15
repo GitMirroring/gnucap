@@ -28,6 +28,7 @@
 #include "u_cardst.h"
 #include "e_elemnt.h"
 #include "s__.h"
+#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -36,7 +37,7 @@ public:
   void	finish();
 protected:
   void	fix_args(int);
-  void	options(CS&, int);
+  void	options(CS&, unsigned nest);
 private:
   void	sweep();
   void	sweep_recursive(int);
@@ -49,7 +50,7 @@ protected:
   
 protected:
   enum {DCNEST = 4};
-  int _n_sweeps;
+  unsigned _n_sweeps;
   PARAMETER<double> _start[DCNEST];
   PARAMETER<double> _stop[DCNEST];
   PARAMETER<double> _step_in[DCNEST];
@@ -133,13 +134,16 @@ DCOP::DCOP()
   
   //BUG// in SIM.  should be initialized there.
   //_sim->_genout=0.;
-  _out=IO::mstdout;
+  // _out=IO::mstdout;
   //_sim->_uic=false;
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::finish(void)
 {
-  for (int ii = 0;  ii < _n_sweeps;  ++ii) {
+  // SIM::finish(); // why not?
+  outflush();
+
+  for (unsigned ii=0; ii<_n_sweeps; ++ii) {
     if (_zap[ii]) { // component
       _stash[ii].restore();
       _zap[ii]->dec_probes();
@@ -156,9 +160,8 @@ void OP::setup(CS& Cmd)
   _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
-  _out = IO::mstdout;
-  _out.reset(); //BUG// don't know why this is needed */
-  bool ploton = IO::plotset  &&  plotlist().size() > 0;
+
+  outreset();
 
   _zap[0] = NULL;
   _sweepval[0] = &(_sim->_temp_c);
@@ -176,14 +179,14 @@ void OP::setup(CS& Cmd)
   _step[0] = 0.;
   _sim->_genout = 0.;
 
-  options(Cmd,0);
+  options(Cmd, 0);
 
   _n_sweeps = 1;
   Cmd.check(bWARNING, "what's this?");
   _sim->_freq = 0;
 
-  IO::plotout = (ploton) ? IO::mstdout : OMSTREAM();
-  initio(_out);
+  outinit();
+  _sim->_axes.set_axis(0, _sweepval[0]);
 
   _start[0].e_val(OPT::temp_c, _scope);
   fix_args(0);
@@ -194,9 +197,8 @@ void DC::setup(CS& Cmd)
   _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
-  _out = IO::mstdout;
-  _out.reset(); //BUG// don't know why this is needed */
-  bool ploton = IO::plotset  &&  plotlist().size() > 0;
+
+  outreset();
 
   if (Cmd.more()) {
     for (_n_sweeps = 0; Cmd.more() && _n_sweeps < DCNEST; ++_n_sweeps) {
@@ -223,19 +225,18 @@ void DC::setup(CS& Cmd)
       }
       
       _sim->_genout = 0.;
-      options(Cmd,_n_sweeps);
+      options(Cmd, _n_sweeps);
     }
-  }else{ 
+  }else{
   }
   Cmd.check(bWARNING, "what's this?");
 
-  IO::plotout = (ploton) ? IO::mstdout : OMSTREAM();
-  initio(_out);
+  outinit();
 
   assert(_n_sweeps > 0);
-  for (int ii = 0;  ii < _n_sweeps;  ++ii) {
+  for (unsigned ii=0; ii<_n_sweeps; ++ii) {
     _start[ii].e_val(0., _scope);
-    fix_args(ii);
+    fix_args(int(ii));
 
     if (_zap[ii]) { // component
       _stash[ii] = _zap[ii];			// stash the std value
@@ -248,6 +249,8 @@ void DC::setup(CS& Cmd)
     }
   }
   _sim->_freq = 0;
+  // later: propagate all of them
+  _sim->_axes.set_axis(0, _sweepval[0]);
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::fix_args(int Nest)
@@ -300,7 +303,7 @@ void DCOP::fix_args(int Nest)
   }
 }
 /*--------------------------------------------------------------------------*/
-void DCOP::options(CS& Cmd, int Nest)
+void DCOP::options(CS& Cmd, unsigned Nest)
 {
   _sim->_uic = _loop[Nest] = _reverse_in[Nest] = false;
   size_t here = Cmd.cursor();
@@ -332,7 +335,7 @@ void DCOP::options(CS& Cmd, int Nest)
 		       "need none, off, warnings, iterations, verbose")
 	   )
 	  )
-      || outset(Cmd,&_out)
+      || outset(Cmd)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
 }
@@ -349,7 +352,7 @@ void DCOP::sweep()
     _sim->clear_limit();
     CARD_LIST::card_list.tr_begin();
   }
-  sweep_recursive(_n_sweeps);
+  sweep_recursive(int(_n_sweeps));
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::sweep_recursive(int Nest)
@@ -377,7 +380,7 @@ void DCOP::sweep_recursive(int Nest)
       CARD_LIST::card_list.tr_accept();
       ::status.accept.stop();
       _sim->_has_op = _sim->_mode;
-      outdata(*_sweepval[Nest], ofPRINT | ofSTORE | ofKEEP);
+      outcommit(OUTPUT::ofPRINT | OUTPUT::ofSTORE | OUTPUT::ofKEEP);
       itl = OPT::DCXFER;
     }else{
       sweep_recursive(Nest);

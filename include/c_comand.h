@@ -27,11 +27,14 @@
 #include "e_card.h"
 /*--------------------------------------------------------------------------*/
 class CS;
+class OUTPUT;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CMD : public CKT_BASE {
 public:
   std::string value_name()const {return "";}
   virtual void do_it(CS&, CARD_LIST*) = 0;
+  virtual OUTPUT* attach_output(OUTPUT&){ unreachable(); return NULL; }
+  virtual void detach_output(OUTPUT&){ untested(); }
   virtual ~CMD() {}
   static  void  cmdproc(CS&, CARD_LIST*);
   static  void	command(const std::string&, CARD_LIST*);

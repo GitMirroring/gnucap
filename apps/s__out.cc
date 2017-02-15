@@ -22,30 +22,40 @@
  * tr,dc analysis output functions (and some ac)
  */
 //testing=obsolete,script 2005.09.17
+#include "globals.h"
 #include "u_sim_data.h"
 #include "u_status.h"
+#include "u_out.h"
 #include "m_wave.h"
 #include "u_prblst.h"
 #include "declare.h"	/* plottr, plopen */
 #include "s__.h"
 /*--------------------------------------------------------------------------*/
-/* SIM::____list: access probe lists
- */
-const PROBELIST& SIM::alarmlist()const
+/*--------------------------------------------------------------------------*/
+bool SIM::outset(CS& cmd)
 {
-  return _probe_lists->alarm[_sim->_mode];
+  if(_output){
+    return _output->set(cmd);
+  }else{ untested();
+    return false;
+  }
 }
-const PROBELIST& SIM::plotlist()const
+/*--------------------------------------------------------------------------*/
+void SIM::outreset()
 {
-  return _probe_lists->plot[_sim->_mode];
+  if(_output){
+    _output->reset();
+  }else{
+  }
 }
-const PROBELIST& SIM::printlist()const
+/*--------------------------------------------------------------------------*/
+PROBELIST const* SIM::outprobes() const
 {
-  return _probe_lists->print[_sim->_mode];
-}
-const PROBELIST& SIM::storelist()const
-{
-  return _probe_lists->store[_sim->_mode];
+  if(_output){
+    return _output->probes();
+  }else{
+    return NULL;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* SIM::out: output the data, "keep" for ac reference
@@ -54,101 +64,102 @@ const PROBELIST& SIM::storelist()const
  * store = all points, for internal postprocessing, measure
  * keep = after the command is done, dcop for ac
  */
-void SIM::outdata(double x, int outflags)
+void SIM::outcommit(int outflags)
 {
   ::status.output.start();
-  if (outflags & ofKEEP) {
+  if (outflags & OUTPUT::ofKEEP) {
     _sim->keep_voltages();
   }else{
   }
-  if (outflags & ofPRINT) {
-    plottr(x, plotlist());
-    print_results(x);
+
+  if (!(outflags & OUTPUT::ofPRINT)) {
+    ++::status.hidden_steps;
+  }else{
+  }
+
+  if(_output){
+    _output->commit(outflags);
+  }else{ untested();
+  }
+
+  if (outflags & OUTPUT::ofPRINT) {
     _sim->reset_iteration_counter(iPRINTSTEP);
     ::status.hidden_steps = 0;
-  }else{
-    ++::status.hidden_steps;
-  }
-  if (outflags & ofSTORE) {
-    alarm();
-    store_results(x);
   }else{
   }
   ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
+// obsolete
+void SIM::outdata(double const& x, int outflags)
+{ untested();
+  _sim->_axes.hack(&x);   // bit of a hack.
+  outcommit(outflags); // go for it.
+}
+/*--------------------------------------------------------------------------*/
 /* SIM::head: print column headings and draw plot borders
+ * obsolete version, all output functions start with "out"
  */
 void SIM::head(double start, double stop, const std::string& col1)
 {
-  if (_sim->_waves) {
-    delete [] _sim->_waves;
-  }else{
-  }
-
-  _sim->_waves = new WAVE [storelist().size()];
-
-
-  if (!plopen(start, stop, plotlist())) {
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    int width = std::min(OPT::numdgt+5, BIGBUFLEN-10);
-    char format[20];
-    //sprintf(format, "%%c%%-%u.%us", width, width);
-    sprintf(format, "%%c%%-%us", width);
-
-    _out.form(format, '#', col1.c_str());
-
-    for (PROBELIST::const_iterator
-	   p=printlist().begin();  p!=printlist().end();  ++p) {
-      _out.form(format, ' ', p->label().c_str());
-    }
-    _out << '\n';
-  }else{
-  }
+  _sim->_axes.set_axis(0, NULL, col1, start, stop);
+  outhead();
 }
 /*--------------------------------------------------------------------------*/
-/* SIM::print_results: print the list of results (text form) to _out
- * The argument is the first column (independent variable, aka "x")
- */
-void SIM::print_results(double x)
+void SIM::outinit()
 {
-  if (!IO::plotout.any()) {
-    _out.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
-    assert(x != NOT_VALID);
-    _out << x;
-    for (PROBELIST::const_iterator
-	   p=printlist().begin();  p!=printlist().end();  ++p) {
-      _out << p->value();
-    }
-    _out << '\n';
+  if(_output){
+    _output->init();
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void SIM::outhead()
+{
+  if(_output){
+    _output->head();
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void SIM::finish()
+{
+  outflush();
+}
+/*--------------------------------------------------------------------------*/
+void SIM::outflush()
+{
+  if(_output){
+    _output->flush();
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
+//OUTPUT* SIM::output()
+//{
+//  return _output;
+//}
+/*--------------------------------------------------------------------------*/
+OUTPUT* SIM::attach_output(OUTPUT& o)
+{
+  if(_output){
+    // let output decide.
+    _output = _output->attach_output(o);
   }else{
+    _output = &o;
   }
+  return _output;
 }
 /*--------------------------------------------------------------------------*/
-/* SIM::alarm: print a message when a probe is out of range
- */
-void SIM::alarm(void)
+void SIM::detach_output(OUTPUT& o)
 {
-  _out.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
-  for (PROBELIST::const_iterator
-	 p=alarmlist().begin();  p!=alarmlist().end();  ++p) {
-    if (!p->in_range()) {
-      _out << p->label() << '=' << p->value() << '\n';
-    }else{
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
-/* SIM::store: store data in preparation for post processing
- */
-void SIM::store_results(double x)
-{
-  int ii = 0;
-  for (PROBELIST::const_iterator
-	 p=storelist().begin();  p!=storelist().end();  ++p) {
-    _sim->_waves[ii++].push(x, p->value());
+  if(_output == &o){
+    _output = NULL;
+  }else{
+    _output->detach_output(o);
   }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-// vim:ts=8:sw=2:noet:
+/*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet

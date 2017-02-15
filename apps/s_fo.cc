@@ -28,12 +28,16 @@
 #include "u_sim_data.h"
 #include "u_status.h"
 #include "m_phase.h"
-#include "declare.h"	/* plclose, plclear, fft */
+#include "declare.h"	/* fft */
 #include "u_prblst.h"
 #include "s_tr.h"
+#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
+// TODO: do not inherit from TRANSIENT
+//       currently hijacking some control,
+//       e.g. _sim->set_command_fourier(); in do_it
 class FOURIER : public TRANSIENT {
 public:
   void	do_it(CS&, CARD_LIST*);
@@ -52,16 +56,24 @@ private:
   void	setup(CS&);	/* s_fo_set.cc */
   void	fftallocate();
   void	fftunallocate();
-  void	foout();	/* s_fo_out.cc */
-  void	fohead(const PROBE&);
+  void	foout();
+  void	fohead(const PROBE_BASE&);
   void	foprint(COMPLEX*);
-  void	store_results(double); // override virtual
+  void tr_sweep();
+//  void	store_results(double); // override virtual
+public: // tap
+  int stepno() const{ return _stepno; }
+  int timesteps() const{ return _timesteps; }
+  int scUser() const{ return scUSER; }
 private:
   PARAMETER<double> _fstart;	/* user start frequency */
   PARAMETER<double> _fstop;	/* user stop frequency */
   PARAMETER<double> _fstep;	/* fft frequecncy step */
   int    _timesteps;	/* number of time steps in tran analysis, incl 0 */
+public:
   COMPLEX** _fdata;	/* storage to allow postprocessing */
+private:
+  OMSTREAM _out;
 };
 /*--------------------------------------------------------------------------*/
 static	int	to_pow_of_2(double);
@@ -75,6 +87,7 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->set_command_fourier();
   reset_timers();
   ::status.four.reset().start();
+  _sim->_axes.set_axis(0, &_sim->_freq);
   
   try {
     setup(Cmd);
@@ -93,11 +106,11 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
 
     switch (ENV::run_mode) {
     case rPRE_MAIN:	unreachable();		break;
-    case rBATCH:	untested();
+    case rBATCH:
       // fall through
     case rINTERACTIVE:  itested();
       // fall through
-    case rSCRIPT:	sweep(); foout();	break;
+    case rSCRIPT:	tr_sweep(); foout();	break;
     case rPRESET:	untested(); /*nothing*/ break;
     }
   }catch (Exception& e) {untested();
@@ -117,21 +130,60 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+class transient_data_tap : public OUTPUT{
+public:
+  transient_data_tap(FOURIER& t, PROBELIST const* op)
+    : _t(t), _outprobes(op) {
+    _t.attach_output(*this);
+  }
+  ~transient_data_tap(){
+    _t.detach_output(*this);
+  }
+private: // pure, unused
+  void do_it(CS&, CARD_LIST*){ unreachable(); }
+private:
+  void head(std::string const&){
+  }
+  void commit(int flags){
+    // _zap->commit(sel, flags);
+    store(flags);
+  }
+  void store(int);
+private:
+  FOURIER& _t;
+  PROBELIST const* _outprobes;
+};
+/*--------------------------------------------------------------------------*/
+void FOURIER::tr_sweep()
+{
+  // this is a bit of a bug.
+  // TRANSIENT is a baseclass, hence already has some of the probes.
+  //
+  // possibly the wrong ones.
+  transient_data_tap tdg(*this, outprobes());
+  sweep();
+}
+/*--------------------------------------------------------------------------*/
 /* store: stash time domain data in preparation for Fourier Transform
  */
-void FOURIER::store_results(double X)
+void transient_data_tap::store(int)
 {
-  TRANSIENT::store_results(X);
-
-  if (step_cause() == scUSER) {
+  if (_t.step_cause() != _t.scUser()) {
+  }else if (_outprobes){ itested();
     int ii = 0;
-    for (PROBELIST::const_iterator
-	   p=printlist().begin();  p!=printlist().end();  ++p) {
-      assert(_stepno < _timesteps);
-      _fdata[ii][_stepno] = p->value();
-      ++ii;
+    for (PROBELIST::const_iterator p=_outprobes->begin();
+         p!=_outprobes->end(); ++p) {
+      assert(_t.stepno() < _t.timesteps());
+      PROBE_BASE const* P=dynamic_cast<PROBE_BASE const*>(*p);
+      if(!P){
+	incomplete();
+	continue;
+      }else{
+	_t._fdata[ii][_t.stepno()] = P->value();
+	++ii;
+      }
     }
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -139,22 +191,29 @@ void FOURIER::store_results(double X)
  */
 void FOURIER::foout()
 {
-  plclose();
-  plclear();
+  //plclose();
+  //plclear();
   int ii = 0;
-  for (PROBELIST::const_iterator
-	 p=printlist().begin();  p!=printlist().end();  ++p) {
-    fohead(*p);
-    fft(_fdata[ii], _timesteps-1,  0);
-    foprint(_fdata[ii]);
-    ++ii;
+  if (PROBELIST const* pl=outprobes()){
+    for (PROBELIST::const_iterator p=pl->begin(); p!=pl->end(); ++p) {
+      PROBE_BASE const* P=dynamic_cast<PROBE_BASE const*>(*p);
+      if(!P){
+	incomplete();
+	continue;
+      }
+      fohead(*P);
+      fft(_fdata[ii], _timesteps-1,  0);
+      foprint(_fdata[ii]);
+      ++ii;
+    }
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
 /* fo_head: print output header
  * arg is index into probe array, to select probe name
  */
-void FOURIER::fohead(const PROBE& Prob)
+void FOURIER::fohead(const PROBE_BASE& Prob)
 {
   _out.form("# %-10s", Prob.label().c_str())
     << "--------- actual ---------  -------- relative --------\n"
@@ -277,6 +336,7 @@ void FOURIER::setup(CS& Cmd)
   }
 
   options(Cmd);
+  _out = IO::mstdout; // tmp hack
 
   _fstart.e_val(0., _scope);
   _fstep.e_val(0., _scope);
@@ -320,10 +380,13 @@ void FOURIER::setup(CS& Cmd)
  */
 void FOURIER::fftallocate()
 {
-  int probes = printlist().size();
-  _fdata = new COMPLEX*[probes];
-  for (int ii = 0;  ii < probes;  ++ii) {
-    _fdata[ii] = new COMPLEX[_timesteps+100];
+  if (PROBELIST const* pl=outprobes()){
+    int probes = pl->size();
+    _fdata = new COMPLEX*[probes];
+    for (int ii = 0;  ii < probes;  ++ii) {
+      _fdata[ii] = new COMPLEX[_timesteps+100];
+    }
+  }else{ unreachable();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -331,13 +394,15 @@ void FOURIER::fftallocate()
  */
 void FOURIER::fftunallocate()
 {
-  if (_fdata) {
-    for (int ii = 0;  ii < printlist().size();  ++ii) {
+  assert (_fdata);
+
+  if (PROBELIST const* pl=outprobes()){
+    for (int ii=0; ii < pl->size(); ++ii) {
       delete [] _fdata[ii];
     }
     delete [] _fdata;
     _fdata = NULL;
-  }else{untested();
+  }else{unreachable();
   }
 }
 /*--------------------------------------------------------------------------*/

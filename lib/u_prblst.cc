@@ -28,14 +28,56 @@
 #include "u_nodemap.h"
 #include "ap.h"
 #include "u_prblst.h"
+#include "globals.h"
+#include "io_error.h"
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+PROBE_LISTS::~PROBE_LISTS()
+{
+  // clear command does that.
+  assert(probe_dispatcher.begin()==probe_dispatcher.end());
+}
+/*--------------------------------------------------------------------------*/
+void PROBE_LISTS::clear()
+{
+  for(DISPATCHER<CARD*>::const_iterator i=probe_dispatcher.begin();
+      i!=probe_dispatcher.end(); ++i){
+    PROBELIST* P=dynamic_cast<PROBELIST*>(i->second);
+
+    if(P){
+      P->clear();
+      delete P;
+      probe_dispatcher.uninstall(i);
+    }else if(i->second){ untested();
+      unreachable();
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+PROBELIST& PROBE_LISTS::get(std::string const& reason)
+{
+  if(PROBELIST* p=probe_dispatcher[reason]){
+    trace1("probelist exists", reason);
+    return *p;
+  }else{
+    PROBELIST* q=new PROBELIST();
+    trace2("probelist new", reason, q);
+    probe_dispatcher.install(reason, q);
+    return *q;
+  }
+}
 /*--------------------------------------------------------------------------*/
 void PROBE_LISTS::purge(CKT_BASE* brh)
 {
-  for (int i = 0;  i < sCOUNT;  ++i) {
-    alarm[i].remove_one(brh);
-    plot[i] .remove_one(brh);
-    print[i].remove_one(brh);
-    store[i].remove_one(brh);
+  for(DISPATCHER<CARD*>::const_iterator i=probe_dispatcher.begin();
+      i!=probe_dispatcher.end(); ++i){
+    PROBELIST* l=prechecked_cast<PROBELIST*>(i->second);
+    if(l){
+      l->remove_one(brh);
+    }else{ untested();
+      // uninstalled already
+    }
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -43,32 +85,61 @@ void PROBELIST::listing(const std::string& label)const
 {
   IO::mstdout.form("%-7s", label.c_str());
   for (const_iterator p = begin();  p != end();  ++p) {
-    IO::mstdout << ' ' << p->label();
-    if (p->range() != 0.) {untested();
-      IO::mstdout.setfloatwidth(5) 
-	<< '(' << p->lo() << ',' << p->hi() << ')';
+    assert(*p);
+    IO::mstdout << ' ' << (*p)->short_label();
+    if ((*p)->param_count() != 0.) {
+      // use u_lang?
+      IO::mstdout.setfloatwidth(5) << '(' << (*p)->param_value(0);
+      for(unsigned i=1; i<(*p)->param_count(); ++i){
+	IO::mstdout << ',' << (*p)->param_value(1);
+      }
+      IO::mstdout << ')';
     }else{
     }
   }
   IO::mstdout << '\n';
 }
 /*--------------------------------------------------------------------------*/
-void PROBELIST::clear(void)
+void PROBELIST::clear()
 {
+  trace2("PROBELIST::clear", bag.size(), this);
   erase(begin(), end());
+}
+/*--------------------------------------------------------------------------*/
+void PROBELIST::erase(PROBELIST::iterator b, PROBELIST::iterator e)
+{
+  for (iterator i=b; i!=e; ++i) {
+    assert (*i);
+    trace1("PROBELIST::erase deleting", (*i)->short_label());
+    delete(*i);
+    *i = NULL;
+  }
+  trace0("PROBELIST::erase");
+  bag.erase(b,e);
+  trace0("PROBELIST::erase done");
 }
 /*--------------------------------------------------------------------------*/
 /* check for match
  * called by STL remove, below
  * both are needed to support different versions of STL
  */
-bool operator==(const PROBE& prb, const std::string& par)
-{
-  return wmatch(prb.label(), par);
-}
-bool operator!=(const PROBE& prb, const std::string& par)
+//bool operator==(const PROBE_BASE& prb, const std::string& par)
+//{ untested();
+//  trace2("==", prb.label(), par);
+//  return wmatch(prb.label(), par);
+//}
+bool operator!=(const PROBE_BASE& prb, const std::string& par)
 {untested();
   //return !wmatch(prb.label(), par);
+  return !(prb == par);
+}
+bool operator==(PROBE_BASE const* prb, std::string const& par)
+{ untested();
+  assert(prb);
+  return wmatch(prb->short_label(), par);
+}
+bool operator!=(PROBE_BASE const* prb, std::string const& par)
+{ untested();
   return !(prb == par);
 }
 /*--------------------------------------------------------------------------*/
@@ -89,49 +160,91 @@ void PROBELIST::remove_list(CS& cmd)
   }else{
   }
 
-  iterator x = remove(begin(), end(), parameter);
-  if (x != end()) {
-    erase(x, end());
-  }else{itested();
-    cmd.warn(bWARNING, mark, "probe isn't set -- can't remove");
+  bool gone=false;
+
+  for (iterator p = begin();  p != end(); ) {
+    assert (*p);
+    if ((**p)==parameter){
+      gone = true;
+      delete(*p);
+      p = bag.erase(p);
+    } else {
+      ++p;
+    }
   }
+
+  if (!gone) { untested();
+    cmd.warn(bWARNING, mark, "probe isn't set -- can't remove");
+  }else{
+  }
+  trace1("PROBELIST::remove_list", bag.size());
 }
 /*--------------------------------------------------------------------------*/
 /* check for match
  * called by STL remove, below
  * both are needed to support different versions of stl
  */
-bool operator==(const PROBE& prb, const CKT_BASE* brh)
+// bool operator==(const PROBE_BASE& prb, const CKT_BASE* b)
+// { untested();
+//   return (prb.brh() == b);
+// }
+//bool operator!=(const PROBE_BASE& prb, const CKT_BASE* b)
+//{untested();
+//  return (prb.brh() != b);
+//}
+bool operator==(PROBE_BASE const* prb, CKT_BASE const& brh)
 {
-  return (prb.object() == brh);
+  return *prb == brh;
 }
-bool operator!=(const PROBE& prb, const CKT_BASE* brh)
-{untested();
-  return (prb.object() != brh);
+bool operator!=(PROBE_BASE const* prb, CKT_BASE const& brh)
+{ untested();
+  return *prb != brh;
 }
 /*--------------------------------------------------------------------------*/
 /* remove a brh from a PROBELIST
  * removes all probes on brh
  */
-void PROBELIST::remove_one(CKT_BASE *brh)
+namespace detail{
+struct probe_finder_deleter {
+  probe_finder_deleter(CKT_BASE const* brh)
+    : _b(brh)
+  {
+  }
+  bool operator()(PROBE_BASE const*& p) const {
+    if (p == *_b) {
+//      trace4("finder delete", _b->short_label(), _b, p, p->brh());
+ //     trace2("deleting", p, p->object());
+      delete const_cast<PROBE_BASE*>(p);
+      return true;
+    }else{
+      trace1("unequal probes", _b->short_label());
+      return false;
+    }
+  }
+  CKT_BASE const* _b;
+};
+} // detail
+/*--------------------------------------------------------------------------*/
+void PROBELIST::remove_one(CKT_BASE *card)
 {
-  assert(brh);
-  erase(remove(begin(), end(), brh), end());
-  // remove .. removes all that match and compacts the list, leaving blanks at the end
-  // erase  .. shortens, throw away the blanks at the end
+  assert(card);
+  trace3("removing probes", size(), card, card->short_label());
+
+  detail::probe_finder_deleter d(card);
+  iterator new_end=remove_if ( begin(), end(), d );
+  bag.erase( new_end, end());
 }
 /*--------------------------------------------------------------------------*/
 /* add_list: add a "list" of probes, usually only one
  * This means possibly several probes with a single parameter
  * like "v(r*)" meaning all resistors
  * but not "v(r4) v(r5)" which has two parameters.
- * It also takes care of setting the range for plot or alarm.
+ * It no longer takes care of setting the range for plot or alarm.
  */
 void PROBELIST::add_list(CS& cmd)
 {
-  int oldcount = size();
   std::string what(cmd.ctos(TOKENTERM));/* parameter */
-  if (what.empty()) {untested();
+  if (what.empty()) {
     cmd.warn(bWARNING, "need a probe");
   }else{
   }
@@ -140,9 +253,6 @@ void PROBELIST::add_list(CS& cmd)
   if (cmd.umatch("nodes ")) {
     // all nodes
     add_all_nodes(what);
-  }else if (cmd.umatch("0")) {
-    // node 0 means system stuff
-    push_new_probe(what, 0);
   }else if (cmd.is_alnum() || cmd.match1("*?")) {
     // branches or named nodes
     size_t here1 = cmd.cursor();
@@ -173,24 +283,13 @@ void PROBELIST::add_list(CS& cmd)
     cmd.warn(bWARNING, "need )");
   }else{
   }
-
-  if (cmd.skip1b('(')) {	/* range for plotting and alarm */
-    double lo = cmd.ctof();
-    double hi = cmd.ctof();
-    for (iterator p = begin() + oldcount;  p != end();  ++p) {
-      p->set_limit(lo,hi);
-    }    
-    if (!cmd.skip1b(')')) {untested();
-      cmd.check(bWARNING, "need )");
-    }else{
-    }
-  }else{
-  }
 }
 /*--------------------------------------------------------------------------*/
-void PROBELIST::push_new_probe(const std::string& param,const CKT_BASE* object)
+void PROBELIST::push_new_probe(const std::string& param, CKT_BASE const* obj)
 {
-  bag.push_back(PROBE(param, object));
+  assert(obj);
+  PROBE_BASE const* n=obj->new_probe(param);
+  bag.push_back(n);
 }
 /*--------------------------------------------------------------------------*/
 void PROBELIST::add_all_nodes(const std::string& what)
@@ -199,10 +298,16 @@ void PROBELIST::add_all_nodes(const std::string& what)
        i = CARD_LIST::card_list.nodes()->begin();
        i != CARD_LIST::card_list.nodes()->end();
        ++i) {
-    if ((i->first != "0") && (i->first.find('.') == std::string::npos)) {
+    std::string const& nn=i->first;
+    if (nn.find('.') == std::string::npos) {
       NODE* node = i->second;
       assert (node);
-      push_new_probe(what, node);
+      try{
+	push_new_probe(what, node);
+      }catch(Exception_Cant_Find& e){
+	error(bTRACE, "probe wildcard: skipping %s on %s\n",
+	    what.c_str(), nn.c_str());
+      }
     }else{
     }
   }
@@ -254,12 +359,14 @@ bool PROBELIST::add_branches(const std::string&device,
     // no dots, look here
     if (device.find_first_of("*?") != std::string::npos) {
       // there's a wild card.  do linear search for all
-      { // nodes
+      {
 	for (NODE_MAP::const_iterator 
 	     i = scope->nodes()->begin();
 	     i != scope->nodes()->end();
 	     ++i) {
-	  if (i->first != "0") {
+	  if (i->first == "0") {
+	// cast to GROUND_NODE instead?
+	  }else{
 	    NODE* node = i->second;
 	    assert (node);
 	    if (wmatch(node->short_label(), device)) {
@@ -267,7 +374,6 @@ bool PROBELIST::add_branches(const std::string&device,
 	      found_something = true;
 	    }else{
 	    }
-	  }else{
 	  }
 	}
       }

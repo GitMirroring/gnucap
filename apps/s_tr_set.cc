@@ -26,6 +26,7 @@
 #include "u_prblst.h"
 #include "ap.h"
 #include "s_tr.h"
+#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 //	void	TRANSIENT::setup(CS&);
 //	void	TRANSIENT::options(CS&);
@@ -175,10 +176,9 @@ void TRANSIENT::setup(CS& Cmd)
  */
 void TRANSIENT::options(CS& Cmd)
 {
-  _out = IO::mstdout;
-  _out.reset(); //BUG// don't know why this is needed
+  outreset();
+
   _sim->_temp_c = OPT::temp_c;
-  bool ploton = IO::plotset  &&  plotlist().size() > 0;
   _sim->_uic = _cold = false;
   _trace = tNONE;
   size_t here = Cmd.cursor();
@@ -189,7 +189,6 @@ void TRANSIENT::options(CS& Cmd)
       || Get(Cmd, "dtma{x}",	   &_dtmax_in)
       || Get(Cmd, "dtmi{n}",	   &_dtmin_in)
       || Get(Cmd, "dtr{atio}",	   &_dtratio_in)
-      || Get(Cmd, "pl{ot}",	   &ploton)
       || Get(Cmd, "sk{ip}",	   &_skip_in)
       || Get(Cmd, "sta{rt}",	   &_tstart)
       || Get(Cmd, "sto{p}",	   &_tstop)
@@ -209,18 +208,19 @@ void TRANSIENT::options(CS& Cmd)
 		       "rejected, iterations, verbose")
 	   )
 	  )
-      || outset(Cmd,&_out)
+      || outset(Cmd)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
   Cmd.check(bWARNING, "what's this?");
 
-  IO::plotout = (ploton) ? IO::mstdout : OMSTREAM();
-  initio(_out);
+  outinit();
+  _sim->_axes.set_axis(0, &_sim->_time0);
 
   _dtmax_in.e_val(BIGBIG, _scope);
   _dtmin_in.e_val(OPT::dtmin, _scope);
   _dtratio_in.e_val(OPT::dtratio, _scope);
   _skip_in.e_val(1, _scope);
+
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

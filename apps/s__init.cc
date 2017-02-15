@@ -39,6 +39,9 @@ void SIM::command_base(CS& cmd)
     _sim->init();
     CARD_LIST::card_list.precalc_last();
 
+    // TODO: move to setup..
+    // _sim->_axes.resize(num_coords());
+
     _sim->alloc_vectors();
     _sim->_aa.reallocate();
     _sim->_aa.dezero(OPT::gmin);
@@ -75,6 +78,7 @@ SIM::~SIM()
     _sim->uninit();
   }else{
   }
+  assert(!_output);
 }
 /*--------------------------------------------------------------------------*/
 void SIM::reset_timers()

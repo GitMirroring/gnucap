@@ -1,0 +1,10 @@
+spice
+
+v1 1 0 ac 1
+r1 0 2 100
+c1 1 2 1u
+
+.print ac v(2) vp(2) vm(2) vr(2) vi(2)
+.op
+.ac oct 1 1k 4k
+.end

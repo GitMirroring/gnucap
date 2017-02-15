@@ -27,111 +27,76 @@
 #include "e_base.h"
 #include "u_probe.h"
 /*--------------------------------------------------------------------------*/
-PROBE::PROBE(const std::string& what,const CKT_BASE *brh)
-  :CKT_BASE(),
-   _what(what),
-   _brh(brh),
-   _lo(0.),
-   _hi(0.)
+bool PROBE_BASE::operator==(const CKT_BASE& b)const
 {
-  if (_brh) {
-    _brh->inc_probes();
-  }else{
+  if(PROBE_BASE const* p=prechecked_cast<PROBE_BASE const*>(brh())){
+    return *p==b;
+  }else{ unreachable();
+    return (brh() == &b);
   }
 }
 /*--------------------------------------------------------------------------*/
-PROBE::PROBE(const PROBE& p)
-  :CKT_BASE(p),
-   _what(p._what),
-   _brh(p._brh),
-   _lo(p._lo),
-   _hi(p._hi)
-{
-  if (_brh) {
-    _brh->inc_probes();
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-/* operator=  ...  assignment
- * copy a probe
- */
-PROBE& PROBE::operator=(const PROBE& p)
-{
-  detach();
-  _what = p._what;
-  _brh  = p._brh;
-  _lo   = p._lo;
-  _hi   = p._hi;
-  if (_brh) {
-    _brh->inc_probes();
-  }else{
-  }
-  return *this;
-}
 /*--------------------------------------------------------------------------*/
 /* "detach" a probe from a device
  * which means ...  1. tell the device that the probe has been removed
  *		    2. blank out the probe, so it doesn't reference anything
  * does not remove the probe from the list
  */
-void PROBE::detach()
+void PROBE_BASE::detach()
 {
-  if (_brh) {
+  if (!_brh) {
+  }else if(_brh->has_probes()){
     _brh->dec_probes();
-  }else{
+  }else{ untested();
+    unreachable();
+    trace1("",_what);
   }
   _what = "";
+
+  if( PROBE_BASE const* p=dynamic_cast<PROBE_BASE const*>(_brh)) {
+    delete p;
+//  }else if( COMPONENT const* c=dynamic_cast<COMPONENT const*>(_brh)){ untested();
+//  }else{ untested();
+//    unreachable();
+  }
   _brh = NULL;
 }
 /*--------------------------------------------------------------------------*/
-/* label: returns a string corresponding to a possible probe point
- * (suitable for printing)
- * It has nothing to do with whether it was selected or not
- */
-const std::string PROBE::label(void)const
-{
-  if (_brh) {
-    return _what + '(' + _brh->long_label() + ')';
-  }else{
-    return _what + "(0)";
-  }
+void PROBE_BASE::set_param_by_index(unsigned, double){ untested();
+   // pass string value, use PARAMETERs?
+  incomplete(); // currently
 }
 /*--------------------------------------------------------------------------*/
-double PROBE::value(void)const
+/*--------------------------------------------------------------------------*/
+RANGE_PROBE::RANGE_PROBE(const std::string& what, PROBE_BASE const*brh)
+  :PROBE_BASE(what, brh),
+   _lo(0.),
+   _hi(0.)
 {
-  // _brh is either a node or a "branch", which is really any device
-  if (_brh) {
-    return _brh->probe_num(_what);
-  }else{
-    return probe_node();
-  }
+  assert(brh);
+  trace1("RANGE_PROBE::RANGE_PROBE", what);
+  set_label(brh->label());
 }
 /*--------------------------------------------------------------------------*/
-double PROBE::probe_node(void)const
-{
-  if (Umatch(_what, "iter ")) {
-    assert(iPRINTSTEP - sCOUNT == 0);
-    assert(iSTEP      - sCOUNT == 1);
-    assert(iTOTAL     - sCOUNT == 2);
-    assert(iCOUNT     - sCOUNT == 3);
-    return _sim->_iter[sCOUNT];
-  }else if (Umatch(_what, "bypass ")) {untested();
-    return OPT::bypass + 10*_sim->_bypass_ok;
-  }else if (Umatch(_what, "control ")) {
-    return ::status.control;
-  }else if (Umatch(_what, "damp ")) {untested();
-    return _sim->_damp;
-  }else if (Umatch(_what, "gen{erator} ")) {untested();
-    return _sim->_genout;
-  }else if (Umatch(_what, "hidden ")) {
-    return ::status.hidden_steps;
-  }else if (Umatch(_what, "temp{erature} ")) {
-    return _sim->_temp_c;
-  }else if (Umatch(_what, "time ")) {untested();
-    return _sim->_time0;
-  }else{
-    return NOT_VALID;
+RANGE_PROBE::RANGE_PROBE(const RANGE_PROBE& p)
+  :PROBE_BASE(p),
+   _lo(p._lo),
+   _hi(p._hi)
+{ untested();
+  incomplete();
+}
+/*--------------------------------------------------------------------------*/
+void RANGE_PROBE::set_param_by_index(unsigned i, double d){
+  switch(i){
+    case 0:
+      _lo = d;
+      break;
+    case 1:
+      _hi = d;
+      break;
+    default: untested();
+      incomplete(); // need to throw? pass to baseclass?
+      unreachable(); // currently not needed.
   }
 }
 /*--------------------------------------------------------------------------*/

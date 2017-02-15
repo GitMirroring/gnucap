@@ -31,16 +31,20 @@ class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBELIST : public CKT_BASE {
 private:
-  typedef std::vector<PROBE> _container;
-  _container bag;
+  typedef std::vector<PROBE_BASE const*> container_type;
+  container_type bag;
 
-  explicit PROBELIST(const PROBELIST&p) : CKT_BASE(p) {unreachable();incomplete();}
+private:
+  explicit PROBELIST(const PROBELIST&p)
+   : CKT_BASE(p), bag(p.bag) { untested();
+     incomplete();
+  }
 public:
   explicit PROBELIST() {}
   ~PROBELIST() {}
 
-  typedef _container::iterator	     iterator;
-  typedef _container::const_iterator const_iterator;
+  typedef container_type::iterator	     iterator;
+  typedef container_type::const_iterator const_iterator;
   void	   listing(const std::string&)const;
   void     clear();
 
@@ -53,19 +57,27 @@ public:
   iterator begin()		{return bag.begin();}
   iterator end()		{return bag.end();}
 private:
-  void	  erase(iterator b, iterator e) {bag.erase(b,e);}
+  void	  erase(iterator b, iterator e);
   void	  push_new_probe(const std::string& param, const CKT_BASE* object);
   bool    add_branches(const std::string&,const std::string&,const CARD_LIST*);
   void    add_all_nodes(const std::string&);
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {
+private:
+  PROBE_LISTS( const PROBE_LISTS&){ unreachable(); }
+  PROBE_LISTS() {
+  }
+  ~PROBE_LISTS();
 public:
-  PROBELIST alarm[sCOUNT]; // list of alarm probes
-  PROBELIST plot[sCOUNT];  // list of plot probes
-  PROBELIST print[sCOUNT]; // list of print probes
-  PROBELIST store[sCOUNT]; // list of probes to store for postproc
-  void purge(CKT_BASE*);
+  PROBELIST& operator[](std::string const& reason) const{ untested();
+    return get(reason);
+  }
+public:
+  static PROBELIST& get(std::string const& reason);
+  static void clear();
+public:
+  static void purge(CKT_BASE*);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

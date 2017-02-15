@@ -26,7 +26,5 @@
 
 OMSTREAM IO::mstdout(stdout);
 OMSTREAM IO::error(stdout);
-OMSTREAM IO::plotout;
-bool	IO::plotset(false);
 int	IO::formaat(0);
 bool	IO::incipher(false);
