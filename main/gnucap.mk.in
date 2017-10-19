@@ -1,17 +1,11 @@
 #!@WHICH_MAKE@ -f
 
+prefix=@prefix@
+sysconfdir=@sysconfdir@
+include ${sysconfdir}/gnucap.conf
+
 help:
 	@echo "$(lastword $(MAKEFILE_LIST)) <target>"
-
-prefix = @prefix@
-LDFLAGS = @LDFLAGS@
-LIBS = @LIBS@
-AM_V_CXX_ = @echo CXX $@;
-AM_V_CXX_0 = @echo CXX $@;
-AM_V_CXX = $(AM_V_CXX_$V)
-CXX = @CXX@
-CXXFLAGS = @CXXFLAGS@
-CPPFLAGS = @CPPFLAGS@
 
 # non GNUCAP_-prefixed variables are meant to override stuff.
 %.so: %.cc
