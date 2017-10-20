@@ -2,7 +2,18 @@
 
 prefix=@prefix@
 sysconfdir=@sysconfdir@
-include ${sysconfdir}/gnucap.conf
+
+# too many quotation marks
+# include ${sysconfdir}/gnucap.conf
+
+exec_prefix=@exec_prefix@
+includedir=@includedir@
+libdir=@libdir@
+pkglibdir=@pkglibdir@
+LIBS=@LIBS@
+CXX=@CXX@
+CXXFLAGS=@CXXFLAGS@
+datarootdir=@datarootdir@
 
 help:
 	@echo "$(lastword $(MAKEFILE_LIST)) <target>"
