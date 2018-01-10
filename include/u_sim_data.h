@@ -94,8 +94,8 @@ public:
   void set_limit();  /* s__aux.cc */
   void set_limit(double v);
   void clear_limit();
-  void keep_voltages(bool push=false); // TODO: remove arg
-  void restore_voltages(bool pop=false); // TODO: remove arg
+  void keep_voltages();
+  void restore_voltages();
   void pop_voltages();
   void push_voltages();
   void zero_voltages();

@@ -159,14 +159,10 @@ void SIM_DATA::clear_limit()
   _vmin = OPT::vmin;
 }
 /*--------------------------------------------------------------------------*/
-void SIM_DATA::keep_voltages(bool push)
+void SIM_DATA::keep_voltages()
 {
-  trace2("SIM_DATA::keep_voltages", push, _freezetime);
+  trace1("SIM_DATA::keep_voltages", _freezetime);
   assert(_vdcstack.size());
-  if(push) {untested();
-    push_voltages();
-  }else{ untested();
-  }
   double* vdc = _vdcstack.top();
   if (!_freezetime){
     for (int ii=1;  ii <= _total_nodes;  ++ii) {
@@ -175,13 +171,12 @@ void SIM_DATA::keep_voltages(bool push)
     _last_time = (_time0 > 0.) ? _time0 : 0.;
   }else{untested();
     //BUG// probably incorrect
-    if(push) incomplete();
   }
 }
 /*--------------------------------------------------------------------------*/
-void SIM_DATA::restore_voltages(bool pop)
+void SIM_DATA::restore_voltages()
 { untested();
-  trace2("SIM_DATA::restore_voltages", _freezetime, pop);
+  trace1("SIM_DATA::restore_voltages", _freezetime);
   assert(!_vdcstack.empty());
 
   double* vdc = _vdcstack.top();
@@ -190,9 +185,6 @@ void SIM_DATA::restore_voltages(bool pop)
     //_nstat[_nm[ii]].set_last_change_time(0);
     //_nstat[_nm[ii]].store_old_last_change_time();
     //_nstat[_nm[ii]].set_final_time(0);
-  }
-  if(pop){ untested();
-    pop_voltages();
   }
 }
 /*--------------------------------------------------------------------------*/
