@@ -420,7 +420,11 @@ void DCOP::sweep_recursive(int Nest)
 	//if(!firstloop) 
 	_sim->pop_voltages();
 	_sim->restore_voltages();
-        if(firstloop)_sim->keep_voltages(true); // push values for sweep. hmmm
+        if(firstloop){ untested();
+	  _sim->push_voltages();
+	  _sim->keep_voltages();
+	}else{ untested();
+	}
       } else {
 	trace2("not converged II", Nest, *(_sweepval[Nest]));
 	// step back...
@@ -450,7 +454,11 @@ void DCOP::sweep_recursive(int Nest)
         CARD_LIST::card_list.tr_accept();
         ::status.accept.stop();
         _sim->keep_voltages();
-        if(firstloop)_sim->keep_voltages(true); // push values for sweep. hmmm
+        if(firstloop){ untested();
+	  _sim->push_voltages();
+	  _sim->keep_voltages();
+	}else{ untested();
+	}
       }
       if (printnow) {
 	extra_steps = 0;
