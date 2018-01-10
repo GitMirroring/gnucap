@@ -163,7 +163,7 @@ DCOP::DCOP()
 void DCOP::finish(void)
 {
   for (int ii = 0;  ii < _n_sweeps;  ++ii) {
-    if (exists(_zap[ii])) { // component
+    if (_zap[ii]) { // component
       _stash[ii].restore();
       _zap[ii]->dec_probes();
       _zap[ii]->precalc_first();
@@ -261,7 +261,7 @@ void DC::setup(CS& Cmd)
     _start[ii].e_val(0., _scope);
     fix_args(ii);
 
-    if (exists(_zap[ii])) { // component
+    if (_zap[ii]) { // component
       _stash[ii] = _zap[ii];			// stash the std value
       _zap[ii]->inc_probes();			// we need to keep track of it
       _zap[ii]->set_value(_zap[ii]->value(),0);	// zap out extensions
@@ -456,9 +456,9 @@ void DCOP::sweep_recursive(int Nest)
 	extra_steps = 0;
 	fixzero(_sweepval[Nest], _step[Nest]); // hack
 	if (_converged){
-	  outdata(*_sweepval[Nest]);
+	  outdata(*_sweepval[Nest], ofPRINT | ofSTORE);
 	} else {
-	  outdata(- *_sweepval[Nest]);
+	  outdata(- *_sweepval[Nest], ofPRINT | ofSTORE);
 	}
       }
 
