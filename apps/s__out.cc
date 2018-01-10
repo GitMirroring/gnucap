@@ -83,6 +83,9 @@ void SIM::outdata(double x, int outflags)
 void SIM::head(double start, double stop, const std::string& col1)
 {
   WAVELIST* wl = wavelist_dispatcher[_sim->_label];
+    if(!wl){
+      std::cerr << _sim->_label << "\n";
+    }
   assert(wl);
 
   _wavep = new WAVE*[storelist().size()];
@@ -90,8 +93,6 @@ void SIM::head(double start, double stop, const std::string& col1)
   unsigned ii = 0;
   for (PROBELIST::const_iterator
 	 p=storelist().begin();  p!=storelist().end();  ++p) { untested();
-    WAVELIST* wl = wavelist_dispatcher[_sim->_label];
-    assert(wl);
     WAVE* w = (*wl)[p->label()];
     if(!w){
       w = new WAVE;
@@ -157,7 +158,6 @@ void SIM::alarm(void)
  */
 void SIM::store_results(double x)
 {
-  trace1(("store_results " + label()).c_str(), x);
   int ii = 0;
   for (PROBELIST::const_iterator
 	 p=storelist().begin();  p!=storelist().end();  ++p) {

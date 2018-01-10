@@ -99,7 +99,8 @@ inline WAVE& WAVE::initialize()
 }
 /*--------------------------------------------------------------------------*/
 inline WAVE::WAVE(const WAVE& w)
-  :_w(w._w),
+  :CKT_BASE(w),
+   _w(w._w),
    _delay(w._delay)
 { untested();
 }
@@ -107,7 +108,8 @@ inline WAVE::WAVE(const WAVE& w)
 // constructor -- argument is the delay
 //
 inline WAVE::WAVE(double d)
-  :_w(),
+  :CKT_BASE(),
+   _w(),
    _delay(d)
 {
   initialize();
