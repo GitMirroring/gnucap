@@ -164,12 +164,12 @@ void SIM_DATA::keep_voltages(bool push)
   trace2("SIM_DATA::keep_voltages", push, _freezetime);
   assert(_vdcstack.size());
   if(push) {untested();
-    _vdcstack.push(new double[_total_nodes+1]);
+    push_voltages();
   }else{ untested();
   }
   double* vdc = _vdcstack.top();
   if (!_freezetime){
-    for (unsigned ii = 1;  ii <= _total_nodes;  ++ii) {
+    for (int ii=1;  ii <= _total_nodes;  ++ii) {
       vdc[ii] = _v0[ii];
     }
     _last_time = (_time0 > 0.) ? _time0 : 0.;
@@ -185,7 +185,7 @@ void SIM_DATA::restore_voltages(bool pop)
   assert(!_vdcstack.empty());
 
   double* vdc = _vdcstack.top();
-  for (unsigned ii = 1;  ii <= _total_nodes;  ++ii) {
+  for (int ii = 1;  ii <= _total_nodes;  ++ii) {
     _vt1[ii] = _v0[ii] = vdc[ii];
     //_nstat[_nm[ii]].set_last_change_time(0);
     //_nstat[_nm[ii]].store_old_last_change_time();
@@ -194,6 +194,12 @@ void SIM_DATA::restore_voltages(bool pop)
   if(pop){ untested();
     pop_voltages();
   }
+}
+/*--------------------------------------------------------------------------*/
+void SIM_DATA::push_voltages()
+{ untested();
+  double* vdc =  new double[_total_nodes+1]();
+  _vdcstack.push(vdc);
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::pop_voltages()
@@ -309,9 +315,7 @@ void SIM_DATA::alloc_hold_vectors()
   }
 
   assert(_vdcstack.empty());
-  double* vdc =  new double[_total_nodes+1];
-  _vdcstack.push(vdc);
-  std::fill_n(vdc, _total_nodes+1, 0);
+  push_voltages();
 
   assert(_nstat);
 }
