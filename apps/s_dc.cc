@@ -115,8 +115,8 @@ void DC::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->set_command_dc();
   _sim->_phase = p_INIT_DC;
   ::status.dc.reset().start();
-  _sim->_temp_c = temp_c_in;
   command_base(Cmd);
+  _sim->_has_op = s_DC;
   _scope = NULL;
   ::status.dc.stop();
 }
@@ -128,8 +128,8 @@ void OP::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->set_command_op();
   _sim->_phase = p_INIT_DC;
   ::status.op.reset().start();
-  _sim->_temp_c = temp_c_in;
   command_base(Cmd);
+  _sim->_has_op = s_OP;
   _scope = NULL;
   ::status.op.stop();
 }
@@ -155,7 +155,6 @@ DCOP::DCOP()
   
   //BUG// in SIM.  should be initialized there.
   //_sim->_genout=0.;
-  temp_c_in=OPT::temp_c;
   _out=IO::mstdout;
   //_sim->_uic=false;
 }
@@ -176,7 +175,7 @@ void DCOP::finish(void)
 /*--------------------------------------------------------------------------*/
 void OP::setup(CS& Cmd)
 {
-  _sim->_temp_c = temp_c_in;
+  _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
   _out = IO::mstdout;
@@ -184,7 +183,7 @@ void OP::setup(CS& Cmd)
   bool ploton = IO::plotset  &&  plotlist().size() > 0;
 
   _zap[0] = NULL;
-  _sweepval[0] = &temp_c_in;
+  _sweepval[0] = &(_sim->_temp_c);
 
   if (Cmd.match1("'\"({") || Cmd.is_float()) {
     Cmd >> _start[0];
