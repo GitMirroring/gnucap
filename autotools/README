@@ -3,3 +3,7 @@ $ autotools/bootstrap
 
 will create "configure.gnu", which should behave much like a normal autotools
 "configure" script
+
+TODO: does not yet work on mingw.
+- configure.ac needs to detect condition (see e.g. qucs)
+- plugins need to be linked to libgnucap (see e.g. apps/Make2.mingw32 +31)
