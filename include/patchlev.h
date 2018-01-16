@@ -1,1 +1,1 @@
-#define PATCHLEVEL "develop 2018.08.31"
+#define PATCHLEVEL "autotools-3 2018.08.31"
