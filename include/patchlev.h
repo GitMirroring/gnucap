@@ -1,1 +1,1 @@
-#define PATCHLEVEL "develop 2018.06.04"
+#define PATCHLEVEL "autotools-2 2018.06.05"

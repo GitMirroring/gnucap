@@ -1,6 +1,13 @@
 #!/bin/sh
 
 #---------------------------------------------------
+#  hand over to autotools, if it is there.
+
+if [ -x $0.gnu ]; then
+	exec $0.gnu "$@"
+fi
+
+#---------------------------------------------------
 #  This stuff introduced by SDB to enable --prefix
 #  at configure time
 
