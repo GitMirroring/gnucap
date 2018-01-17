@@ -44,8 +44,7 @@ public:
   }
   ~DISPATCHER_BASE() {
 #if !defined(NDEBUG)
-    for (typename std::map<std::string, CKT_BASE*>::iterator
-	 ii = _map->begin();
+    for (iterator ii=_map->begin();
 	 ii != _map->end();
 	 ++ii) {
       assert(!(ii->second));
@@ -55,7 +54,12 @@ public:
     _map = NULL;
   }
 
-  typedef std::map<std::string, CKT_BASE*>::const_iterator const_iterator;
+  typedef std::map<std::string, CKT_BASE*> container_type;
+protected:
+  typedef container_type::value_type value_type;
+  typedef container_type::iterator iterator;
+public:
+  typedef container_type::const_iterator const_iterator;
   //class const_iterator : public std::map<std::string, CKT_BASE*>::const_iterator {};
 
   const_iterator begin()const		{assert(_map); return _map->begin();}
@@ -74,8 +78,7 @@ public:
 
   void uninstall(CKT_BASE* p) {
     assert(_map);
-    for (typename std::map<std::string, CKT_BASE*>::iterator
-	 ii = _map->begin();
+    for (iterator ii=_map->begin();
 	 ii != _map->end();
 	 ++ii) {
       if (ii->second == p) {
@@ -84,13 +87,29 @@ public:
       }
     }
 #if !defined(NDEBUG)
-    for (typename std::map<std::string, CKT_BASE*>::iterator
-	 ii = _map->begin();
+    for (iterator ii=_map->begin();
 	 ii != _map->end();
 	 ++ii) {
       assert(ii->second != p);
     }
 #endif
+  }
+
+  void uninstall(const_iterator p) {
+    assert(_map);
+#if !defined(NDEBUG)
+    bool found=false;
+    for (iterator ii=_map->begin();
+	 ii != _map->end();
+	 ++ii) {
+      if(p==ii) found=true; // it's ours.
+    }
+    assert(found);
+#endif
+    // if it's ours, it is pointing to a mutable place.
+    value_type& m=const_cast<value_type&>(*p);
+
+    m.second = NULL;
   }
 
   void uninstall(const std::string& s) {untested();
