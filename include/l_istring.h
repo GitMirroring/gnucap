@@ -1,5 +1,5 @@
 /*                           -*- C++ -*-
- * Copyright (C) 2016 Felix Salfelder
+ * Copyright (C) 2016-18 Felix Salfelder
  * Authors: Felix Salfelder <felix@salfelder.org>
  *          Albert Davis <aldavis@gnu.org>
  *
@@ -96,56 +96,12 @@ struct ichar_traits : std::char_traits<Ichar>{
 
   // compare needs to be different. default to insensitive order.
   // if enabled, use sensitive order as a tie break.
-  static int compare_old (const char_type* p, const char_type* q, size_t)
-  {
-    typedef enum{
-      lt  =-1,
-      same=0,
-      gt  =1
-    }ord_t;
-    char_type const* i=p;
-    char_type const* j=q;
-
-    ord_t ret = same;
-    ord_t try_ord = same;
-    for (;;) {
-      if (!*i && !*j) {
-	// both end, matched
-	ret =  (OPT::case_insensitive) ? same : try_ord;
-	break;
-      }else if (*i == *j) {
-	// sensitive match, move on
-	++i;
-	++j;
-      }else if (i->to_lower() == j->to_lower()) {
-	// insensitive match, move on, but remember
-	if (try_ord==same){ itested();
-	  try_ord = (*i < *j) ? lt : gt;
-	}else{ untested();
-	  // don't touch. the left most difference decides
-	}
-	++i;
-	++j;
-      }else if (*i < *j) {
-	// includes *i, p ends
-	ret =  lt;
-	break;
-      }else if (*i > *j) {
-	// includes *j, q ends
-	ret =  gt;
-	break;
-      }else{untested();
-	unreachable();
-	break;
-      }
-    }
-
-    return ret;
-  }
   // return +-1 if substrings compare to less or more.
   // zero means, they are equal
   // result multiplied by two if tie break is not required.
-  static int compare_new (const char_type* i, const char_type* j, size_t n)
+  //
+  // e.g. compare("v", "V") returns 1, "v" is weakly greater than "V"
+  static int compare (const char_type* i, const char_type* j, size_t n)
   {
     typedef enum{
       lt  =-1,
@@ -190,17 +146,10 @@ struct ichar_traits : std::char_traits<Ichar>{
 
     return (OPT::case_insensitive)? same : try_ord;
   }
-  static int compare (const char_type* p, const char_type* q, size_t n){
-    int ret=compare_new(p, q, n);
-    // compare_old ignores n, returns -1 for "v", "V?"
-    // compare_new (correctly) returns 1, as "v" is weakly greater than "V"
-    // assert(!ret || ret * compare_old(p, q, n) > 0);
-    return ret;
-  }
 };
 }
 /*--------------------------------------------------------------------------*/
-class IString : public std::basic_string<Ichar, detail::ichar_traits> { //
+class IString : public std::basic_string<Ichar, detail::ichar_traits> {
 private:
   typedef std::basic_string<Ichar, detail::ichar_traits> base;
 public: // construct
