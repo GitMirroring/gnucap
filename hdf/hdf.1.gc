@@ -1,0 +1,14 @@
+load ./out_hdf.so
+
+options trace
+
+build
+vsource v1 0 1
+vsource v2 0 2
+.
+
+hdfprobe tran v(v1) v(v2) hidden(0) iter(0)
+* v(vsource) i(v1)
+
+tran 0 1 .1 trace=a
+end

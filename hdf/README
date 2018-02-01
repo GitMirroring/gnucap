@@ -1,0 +1,11 @@
+writing hdf5 files.
+
+checking the soundness/usefulness of the output rewrite.
+this is not meant to be part of the gnucap main repo.
+
+instructions (need gnucap >= 20.12.19)
+$ apt install libhdf5-dev
+$ make CPPFLAGS=-I/usr/include/hdf5/seria
+$ gnucap hdf.1.gc
+$ apt install hdf-compass
+$ HDFCompass file.h5
