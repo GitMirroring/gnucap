@@ -1,0 +1,12 @@
+* test if fo uses the correct probelist.
+
+spice
+V3  1  0  SIN   freq=1k nozero nopeak
+
+.acs
+print tran v(1)
+fourier 1 1 1
+
+status notime
+
+end
