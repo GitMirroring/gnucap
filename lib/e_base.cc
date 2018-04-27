@@ -164,9 +164,9 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
   if(!wl){untested();
   }else if(WAVESTASH* WL=dynamic_cast<WAVESTASH*>(wl)){
     WAVESTASH::const_iterator w = WL->find(probe_name);
-    if(w!=WL->end()) { untested();
+    if(w!=WL->end()) {
       return &(w->second);
-    }else{ untested();
+    }else{
     }
   }else{ untested();
   }

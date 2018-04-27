@@ -56,7 +56,7 @@ private:
   void init();
 private: // override OUTPUT
   PROBELIST const* probes() const{
-    if(_outputs.empty()){untested();
+    if(_outputs.empty()){
       return NULL;
     }else{
       // incomplete. but not better in old code.

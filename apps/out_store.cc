@@ -37,10 +37,9 @@ namespace {
 /*--------------------------------------------------------------------------*/
 class OUTPUT_CMD_STORE : public OUTPUT_CMD {
 private:
-  OUTPUT_CMD_STORE(const OUTPUT_CMD_STORE&p)
+  explicit OUTPUT_CMD_STORE(const OUTPUT_CMD_STORE&p)
     : OUTPUT_CMD(p)
   {
-    unreachable();
   }
 public:
   virtual ~OUTPUT_CMD_STORE(){ }

@@ -170,12 +170,12 @@ void EVAL_BM_COND::parse_common_obsolete_callback(CS& cmd) //used
   // apply rules to determine states not explicitly specified
   if (!_func[s_OP] && _set[s_DC])    {attach_common(_func[s_DC],  &(_func[s_OP]));}
   if (!_func[s_OP] && _set[s_NONE])  {attach_common(_func[s_NONE],&(_func[s_OP]));}
-  if (!_func[s_OP] && _set[s_TRAN])  {untested();attach_common(_func[s_TRAN],&(_func[s_OP]));}
+  if (!_func[s_OP] && _set[s_TRAN])  {attach_common(_func[s_TRAN],&(_func[s_OP]));}
   if (!_func[s_OP])		     {attach_common(&func_zero,  &(_func[s_OP]));}
   
   if (!_func[s_DC] && _set[s_NONE])  {attach_common(_func[s_NONE],&(_func[s_DC]));}
   if (!_func[s_DC] && _set[s_OP])    {untested();attach_common(_func[s_OP],  &(_func[s_DC]));}
-  if (!_func[s_DC] && _set[s_TRAN])  {untested();attach_common(_func[s_TRAN],&(_func[s_DC]));}
+  if (!_func[s_DC] && _set[s_TRAN])  {attach_common(_func[s_TRAN],&(_func[s_DC]));}
   if (!_func[s_DC])		     {attach_common(&func_zero,  &(_func[s_DC]));}
 
   if (!_func[s_TRAN]&&_set[s_NONE])  {attach_common(_func[s_NONE],&(_func[s_TRAN]));}

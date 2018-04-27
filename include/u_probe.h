@@ -122,7 +122,7 @@ private:
   explicit RANGE_PROBE(RANGE_PROBE const&x);
 public:
   explicit RANGE_PROBE(std::string const& what, PROBE_BASE const*brh);
-  ~RANGE_PROBE(){ untested();
+  ~RANGE_PROBE(){
   }
 private: // PROBE_BASE
   // static, actually. but then can not override
