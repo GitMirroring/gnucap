@@ -1,1 +1,1 @@
-#define PATCHLEVEL "output 2018.12.20"
+#define PATCHLEVEL "fo-output-plugin 2019.12.20"

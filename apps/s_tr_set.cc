@@ -134,7 +134,8 @@ void TRANSIENT::setup(CS& Cmd)
   _tstart.e_val(0., _scope);
   _tstop.e_val(NOT_INPUT, _scope);
   if (_tstart < 0 || _tstop <= _tstart) {untested();
-    throw Exception("transient: bad time args");
+    throw Exception("transient: bad time args: " +
+	to_string(_tstart) + ", " + to_string(_tstop));
   }else{
   }
 
@@ -147,9 +148,9 @@ void TRANSIENT::setup(CS& Cmd)
 
   // snap to last time, so the intent is clear, even if
   // _tstart has been converted to string and back.
-  if(fabs(_tstart - _sim->_last_time) < _sim->_dtmin*.01){ untested();
+  if(fabs(_tstart - _sim->_last_time) < _sim->_dtmin*.01){
     _tstart = _sim->_last_time;
-  }else{ untested();
+  }else{
   }
 
   if  (_cold || _tstart < _sim->_last_time  ||  _sim->_last_time <= 0.) {
@@ -188,6 +189,7 @@ void TRANSIENT::options(CS& Cmd)
   _sim->_temp_c = OPT::temp_c;
   _sim->_uic = _cold = false;
   _trace = tNONE;
+  std::string mode = "";
   unsigned here = Cmd.cursor();
   do{
     ONE_OF
@@ -202,6 +204,7 @@ void TRANSIENT::options(CS& Cmd)
       || Get(Cmd, "str{obeperiod}",&_tstrobe)
       || Get(Cmd, "te{mperature}", &_sim->_temp_c)
       || Get(Cmd, "uic",	   &_sim->_uic)
+      || Get(Cmd, "mode",	   &mode)
       || (Cmd.umatch("tr{ace} {=}") &&
 	  (ONE_OF
 	   || Set(Cmd, "n{one}",      &_trace, tNONE)
@@ -219,6 +222,11 @@ void TRANSIENT::options(CS& Cmd)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
   Cmd.check(bWARNING, "what's this?");
+
+  if(mode=="fourier"){
+    _sim->set_command_fourier();
+  }else{
+  }
 
   outinit();
   _sim->_axes.set_axis(0, &_sim->_time0);

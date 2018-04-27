@@ -1062,7 +1062,7 @@ DISPATCHER<CMD>::INSTALL d8(&command_dispatcher, "spice", &p8);
 class CMD_ACS : public CMD {
 public:
   void do_it(CS&, CARD_LIST* Scope)
-  {untested();
+  {
     command("options lang=acs", Scope);
   }
 } p9;
