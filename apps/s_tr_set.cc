@@ -145,6 +145,13 @@ void TRANSIENT::setup(CS& Cmd)
   }
   _tstrobe.e_val(_tstop-_tstart, _scope);
 
+  // snap to last time, so the intent is clear, even if
+  // _tstart has been converted to string and back.
+  if(fabs(_tstart - _sim->_last_time) < _sim->_dtmin*.01){ untested();
+    _tstart = _sim->_last_time;
+  }else{ untested();
+  }
+
   if  (_cold || _tstart < _sim->_last_time  ||  _sim->_last_time <= 0.) {
     _cont = false;
     _time1 = _sim->_time0 = 0.;
