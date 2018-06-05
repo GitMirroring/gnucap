@@ -68,6 +68,41 @@ public:
     return rv;
   }
 
+  void install(const IString& s, TT* p) {
+    assert(s.find(',', 0) == IString::npos);
+    if (!_map) {unreachable();
+      puts("build error: link order: dispatcher not yet constructed\n");
+      _map = new std::map<IString, CKT_BASE*>;
+    }else{
+    }
+    trace0(s.c_str());
+    // loop over all keys, separated by '|'
+    for (IString::size_type			// bss: begin sub-string
+	 bss = 0, ess = s.find('|', bss);	// ess: end sub-string
+	 bss != IString::npos;
+	 bss = (ess != IString::npos) ? ess+1 : IString::npos,
+	   ess = s.find('|', bss)) {
+      IString name = s.substr(bss, 
+		(ess != IString::npos) ? ess-bss : IString::npos);
+      trace2(name.c_str(), bss, ess);
+      if (name == "") {untested();
+	// quietly ignore empty string
+      }else if ((*_map)[name]) {
+	// duplicate .. stash the old one so we can get it back
+	error(bWARNING, name + ": already installed, replacing\n");
+	IString save_name = name + IString(":0");
+	for (int ii = 0; (*_map)[save_name]; ++ii) {untested();
+	  save_name = name + IString(":") + to_string(ii);
+	}
+	(*_map)[save_name] = (*_map)[name];	
+	error(bWARNING, "stashing as " + save_name + "\n");
+      }else{
+	// it's new, just put it in
+      }
+      (*_map)[name] = p;
+    }
+  }
+  
   void uninstall(CKT_BASE* p) {
     assert(_map);
     for (typename std::map<IString, CKT_BASE*>::iterator
@@ -207,6 +242,17 @@ public:
       assert(p);
       _d->install(_name, p);
     }
+    //
+    // // same as above, but cannot delegate yet
+    // INSTALL(DISPATCHER<TT>* d, const std::string& name, TT* p) :
+    //   _name(IString(name)),
+    //   _d(d),
+    //   _p(p)
+    // {
+    //   assert(_d);
+    //   assert(p);
+    //   _d->install(_name, p);
+    // }
 
     ~INSTALL() {
       //_d->uninstall(_name);
