@@ -93,7 +93,7 @@ void print_pair(OMSTREAM& o, LANGUAGE* lang, const std::string& name,
 template <class T>
 void print_pair(OMSTREAM& o, LANGUAGE* lang, const IString& name,
 		T value, bool test=true)
-{ untested();
+{
   return print_pair(o, lang, name.to_string(), value, test);
 }
 /*--------------------------------------------------------------------------*/

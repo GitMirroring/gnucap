@@ -192,7 +192,7 @@ public:
       return NULL;
     }
   }
-  TT* clone(const char* s) { untested();
+  TT* clone(const char* s) {
     return clone(IString(s));
   }
 

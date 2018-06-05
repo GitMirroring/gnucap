@@ -308,12 +308,12 @@ inline bool Umatch(const IString&s, const std::string&t)
 }
 /*--------------------------------------------------------------------------*/
 inline bool wmatch(const std::string& s1, const IString& s2)
-{ untested();
+{
   return wmatch(s1, s2.to_string());
 }
 /*--------------------------------------------------------------------------*/
 inline bool wmatch(const IString& s1, const std::string& s2)
-{ untested();
+{
   return wmatch(s1.to_string(), s2);
 }
 /*--------------------------------------------------------------------------*/
@@ -329,7 +329,7 @@ inline bool wmatch(const std::string& s1, const char* s2)
 /*--------------------------------------------------------------------------*/
 template<class MAP>
 inline typename MAP::const_iterator find_in_map(MAP const&d, IString const& k)
-{ untested();
+{
   // later: report close misses and ambiguous matches
   return d.find(k);
 }

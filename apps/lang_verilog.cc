@@ -43,26 +43,26 @@ public:
   UNITS units()const {return uSI;}
 
 public: // override virtual, used by callback
-  std::string arg_front()const {untested();
+  std::string arg_front()const {
     switch (_mode) {
     case mPARAMSET:untested(); return " .";			    break;
-    case mDEFAULT:untested();  return (arg_count++ > 0) ? ", ." : "."; break;
+    case mDEFAULT:  return (arg_count++ > 0) ? ", ." : "."; break;
     }
     unreachable();
     return "";
   }
-  std::string arg_mid()const {untested();
+  std::string arg_mid()const {
     switch (_mode) {
     case mPARAMSET:untested(); return "="; break;
-    case mDEFAULT:untested();  return "("; break;
+    case mDEFAULT:  return "("; break;
     }
     unreachable();
     return "";
   }
-  std::string arg_back()const {untested();
+  std::string arg_back()const {
     switch (_mode) {
     case mPARAMSET:untested(); return ";"; break;
-    case mDEFAULT:untested();  return ")"; break;
+    case mDEFAULT:  return ")"; break;
     }
     unreachable();
     return "";
