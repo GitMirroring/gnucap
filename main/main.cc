@@ -67,8 +67,10 @@ static void prepare_env()
   OS::setenv("GNUCAP_PLUGPATH", ldlpath + (plugpath+9), false);
 }
 /*--------------------------------------------------------------------------*/
-static void read_startup_files(void)
+static void read_startup_files(int argc, const char *argv[])
 {
+  USE(argc);
+  USE(argv);
   {
     std::string name = findfile(SYSTEMSTARTFILE, SYSTEMSTARTPATH, R_OK);
     if (name != "") {untested();
@@ -247,7 +249,7 @@ int main(int argc, const char *argv[])
 #if 0
       try {untested();
 #endif
-	read_startup_files();
+	read_startup_files(argc, argv);
 	setup_traps();
 	process_cmd_line(argc,argv);
 #if 0
@@ -309,3 +311,4 @@ int main(int argc, const char *argv[])
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:et
