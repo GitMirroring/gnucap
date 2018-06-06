@@ -32,7 +32,6 @@ class WAVE;
 class OMSTREAM;
 class SIM_DATA;
 class PROBE_LISTS;
-class IString;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
 private:
