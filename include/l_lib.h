@@ -24,8 +24,6 @@
 #define L_LIB_H
 #include "md.h"
 /*--------------------------------------------------------------------------*/
-class IString;
-/*--------------------------------------------------------------------------*/
 	  char*		trim(char*);
 INTERFACE bool		Umatch(const std::string&, const std::string&);
 INTERFACE bool		wmatch(const std::string& s1, const std::string& s2);
