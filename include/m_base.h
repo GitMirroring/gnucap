@@ -223,7 +223,7 @@ public:
   explicit String()	    {}
   explicit String(const std::string& s) :_data(s) {}
   operator const std::string&()const	{return _data;}
-  std::string val_string()const		{untested();return _data;}
+  std::string val_string()const		{return _data;}
   bool to_bool()const			{untested();return (_data != "");}
 
   Base* minus()const			{untested(); return NULL;}
@@ -285,7 +285,7 @@ class Quoted_String	// the first non-blank character is a quote
 public:
   void parse(CS&);
 public:
-  explicit Quoted_String(CS& file)	{untested();parse(file);}
+  explicit Quoted_String(CS& file)	{parse(file);}
   explicit Quoted_String()		{untested();}
 };
 /*--------------------------------------------------------------------------*/

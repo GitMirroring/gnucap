@@ -100,7 +100,7 @@ void Expression::dump(std::ostream& out)const
       Token* t = new Token_SYMBOL(tmp, "");
       locals.push_back(t);
       stack.push_back(t);
-    }else if (dynamic_cast<const Token_STRCONST*>(*i)) { untested();
+    }else if (dynamic_cast<const Token_STRCONST*>(*i)) {
     }else{
       unreachable();
     }

@@ -91,8 +91,8 @@ public:
       }
       
       std::string full_file_name;
-      if (short_file_name[0]=='/' || short_file_name[0]=='.'){untested();
-	if (OS::access_ok(short_file_name, R_OK)) {untested();
+      if (short_file_name[0]=='/' || short_file_name[0]=='.'){
+	if (OS::access_ok(short_file_name, R_OK)) {
 	  // found it, local or root
 	  full_file_name = short_file_name;
 	}else{untested();

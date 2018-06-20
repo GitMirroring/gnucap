@@ -71,7 +71,7 @@ class Token_STRCONST : public Token
 {
 public:
   explicit Token_STRCONST(String const& Name)
-    : Token(Name.val_string(), NULL, "") {untested();}
+    : Token(Name.val_string(), NULL, "") {}
   explicit Token_STRCONST(const Token_STRCONST& P) : Token(P) {untested();}
   Token* clone()const {untested();return new Token_STRCONST(*this);}
   void stack_op(Expression*)const;

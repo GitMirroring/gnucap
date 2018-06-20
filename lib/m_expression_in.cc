@@ -89,10 +89,10 @@ void Expression::leaf(CS& File)
 {
   unsigned here = File.cursor();
   Name_String name(File);
-  if (File.peek() == '"') {untested();
+  if (File.peek() == '"') {
     Quoted_String s(File);
     push_back(new Token_STRCONST(s));
-  }else if (!File.stuck(&here)) { untested();
+  }else if (!File.stuck(&here)) {
     arglist(File);
     push_back(new Token_SYMBOL(name, ""));
   }else{untested();

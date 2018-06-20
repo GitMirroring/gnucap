@@ -30,7 +30,7 @@
 #include "u_parameter.h"
 /*--------------------------------------------------------------------------*/
 Token* Token_BINOP::op(const Token* T1, const Token* T2)const
-{ untested();
+{
   assert(T1);
   assert(T2);
   assert(dynamic_cast<const Token_CONSTANT*>(T1));
@@ -40,69 +40,69 @@ Token* Token_BINOP::op(const Token* T1, const Token* T2)const
 
   // not "or" operator, both ops exist -- do it
   Base* b = 0;
-  if (name() == "*") { untested();
+  if (name() == "*") {
     b = (T1->data())->multiply(T2->data());
-  }else if (name() == "+") { untested();
+  }else if (name() == "+") {
     b = (T1->data())->add(T2->data());
-  }else if (name() == "-") { untested();
+  }else if (name() == "-") {
     b = (T1->data())->subtract(T2->data());
-  }else if (name() == "/") { untested();
+  }else if (name() == "/") {
     b = (T1->data())->divide(T2->data());
-  }else if (name() == "==") { untested();
+  }else if (name() == "==") {
     b = (T1->data())->equal(T2->data());
-  }else if (name() == "!=") { untested();
+  }else if (name() == "!=") {
     b = (T1->data())->not_equal(T2->data());
-  }else if (name() == "<") { untested();
+  }else if (name() == "<") {
     b = (T1->data())->less(T2->data());
-  }else if (name() == ">") { untested();
+  }else if (name() == ">") {
     b = (T1->data())->greater(T2->data());
-  }else if (name() == "<=") { untested();
+  }else if (name() == "<=") {
     b = (T1->data())->leq(T2->data());
-  }else if (name() == ">=") { untested();
+  }else if (name() == ">=") {
     b = (T1->data())->geq(T2->data());
-  }else if (name() == "||") { untested();
+  }else if (name() == "||") {
     b = (T1->data())->logic_or(T2->data());
-  }else if (name() == "&&") { untested();
+  }else if (name() == "&&") {
     b = (T1->data())->logic_and(T2->data());
   }else{ untested();
     // op (name()) not one of those listed
     unreachable();
     return NULL;
   }
-  if (b) { untested();
-    if (T1->aRgs() == "") { untested();
+  if (b) {
+    if (T1->aRgs() == "") {
     }else{untested();
     }
-    if (T2->aRgs() == "") { untested();
+    if (T2->aRgs() == "") {
     }else{untested();
     }
     return new Token_CONSTANT(b->val_string(), b, (T1->aRgs()+T2->aRgs()));
-  }else{ untested();
+  }else{
     // can get here if either T1 or T2 has no data
     return new Token_CONSTANT("false", NULL, "");
   }
 }
 /*--------------------------------------------------------------------------*/
 Token* Token_UNARY::op(const Token* T1)const
-{ untested();
+{
   assert(T1);
   assert(dynamic_cast<const Token_CONSTANT*>(T1));
   assert(T1->data());
   
   const Base* b = 0;
-  if (name() == "-") { untested();
+  if (name() == "-") {
     b = (T1->data())->minus();
-  }else if (name() == "+") { untested();
+  }else if (name() == "+") {
     b = (T1->data())->plus();
-  }else if (name() == "!") { untested();
+  }else if (name() == "!") {
     b = (T1->data())->logic_not();
   }else{ untested();
     // op (name()) not one of those listed
     unreachable();
     return NULL;
   }
-  if (b) { untested();
-    if (T1->aRgs() == "") { untested();
+  if (b) {
+    if (T1->aRgs() == "") {
     }else{untested();
     }
     return new Token_CONSTANT(b->val_string(), b, (T1->aRgs()));
@@ -113,12 +113,12 @@ Token* Token_UNARY::op(const Token* T1)const
 }
 /*--------------------------------------------------------------------------*/
 void Token_SYMBOL::stack_op(Expression* E)const
-{ untested();
+{
   assert(E);
   // replace single token with its value
-  if (!E->is_empty() && dynamic_cast<const Token_PARLIST*>(E->back())) { untested();
+  if (!E->is_empty() && dynamic_cast<const Token_PARLIST*>(E->back())) {
     // has parameters (table or function)
-    if (FUNCTION* f = function_dispatcher[name()]) { untested();
+    if (FUNCTION* f = function_dispatcher[name()]) {
       const Token* T1 = E->back(); // arglist
       E->pop_back();
       CS cmd(CS::_STRING, T1->name());      
@@ -126,26 +126,26 @@ void Token_SYMBOL::stack_op(Expression* E)const
       const Float* v = new Float(value);
       E->push_back(new Token_CONSTANT(value, v, ""));
       delete T1;
-    }else{ untested();
+    }else{
       throw Exception_No_Match(name()); //BUG// memory leak
       unreachable();
       E->push_back(clone());
     }
-  }else{ untested();
+  }else{
     // has no parameters (scalar)
-    if (strchr("0123456789.", name()[0])) { untested();
+    if (strchr("0123456789.", name()[0])) {
       // a number
       Float* n = new Float(name());
       E->push_back(new Token_CONSTANT(name(), n, ""));
-    }else{ untested();
+    }else{
       // a name
       PARAMETER<double> p = (*(E->_scope->params()))[name()];
-      if (p.has_hard_value()) { untested();
+      if (p.has_hard_value()) {
 	// can find value - push value
 	double v = p.e_val(NOT_INPUT, E->_scope);
 	Float* n = new Float(v);
 	E->push_back(new Token_CONSTANT(n->val_string(), n, ""));
-      }else{ untested();
+      }else{
 	// no value - push name (and accept incomplete solution later)
 	String* s = new String(name());
 	E->push_back(new Token_CONSTANT(name(), s, ""));	
@@ -164,30 +164,30 @@ void Token_STRCONST::stack_op(Expression* E)const
 }
 /*--------------------------------------------------------------------------*/
 void Token_BINOP::stack_op(Expression* E)const
-{ untested();
+{
   assert(E);
   // replace 2 tokens (binop) with 1 (result)
   Token* t1 = E->back();
   E->pop_back();
   Token* t2 = E->back();
   E->pop_back();
-  if (dynamic_cast<Token_CONSTANT*>(t1)) { untested();
-    if (dynamic_cast<Token_CONSTANT*>(t2)) { untested();
+  if (dynamic_cast<Token_CONSTANT*>(t1)) {
+    if (dynamic_cast<Token_CONSTANT*>(t2)) {
       // have # # + .. becomes result (the usual)
       Token* t = op(t2, t1);
       assert(t);
-      if (t->data()) { untested();
+      if (t->data()) {
 	// success
 	E->push_back(t);
 	delete t2;
 	delete t1;
-      }else{ untested();
+      }else{
 	// fail - one arg is unknown, push back args
-	if (strchr("+*", name()[0]) && !dynamic_cast<const Float*>(t1->data())) { untested();
+	if (strchr("+*", name()[0]) && !dynamic_cast<const Float*>(t1->data())) {
 	  // change order to enable later optimization
 	  E->push_back(t1);
 	  E->push_back(t2);
-	}else{ untested();
+	}else{
 	  E->push_back(t2);
 	  E->push_back(t1);
 	}
@@ -195,19 +195,19 @@ void Token_BINOP::stack_op(Expression* E)const
 	delete t;
       }
     }else if (((*t2) == (*this)) && strchr("+*", name()[0])
-	      && dynamic_cast<Token_CONSTANT*>(E->back())) { untested();
+	      && dynamic_cast<Token_CONSTANT*>(E->back())) {
       // have # + # + .. becomes result + (previous unknown, try to optimize)
       Token* t3 = E->back();
       E->pop_back();
       Token* t = op(t3, t1);
       assert(t);
-      if (t->data()) { untested();
+      if (t->data()) {
 	// success
 	E->push_back(t);
 	E->push_back(t2);
 	delete t3;
 	delete t1;
-      }else{ untested();
+      }else{
 	// fail - push all
 	E->push_back(t3);
 	E->push_back(t2);
@@ -230,27 +230,27 @@ void Token_BINOP::stack_op(Expression* E)const
 }
 /*--------------------------------------------------------------------------*/
 void Token_STOP::stack_op(Expression* E)const
-{ untested();
+{
   assert(E);
   E->push_back(clone());
 }
 /*--------------------------------------------------------------------------*/
 void Token_PARLIST::stack_op(Expression* E)const
-{ untested();
+{
   assert(E);
   // replace multiple tokens of a PARLIST with a single token
   bool been_here = false;
   std::string tmp;//(")");
-  for (;;) { untested();
+  for (;;) {
     const Token* t = E->back();
     E->pop_back();
-    if (dynamic_cast<const Token_STOP*>(t)) { untested();
+    if (dynamic_cast<const Token_STOP*>(t)) {
       // tmp = "(" + tmp;
       break;
-    }else{ untested();
-      if (been_here) { untested();
+    }else{
+      if (been_here) {
 	tmp = ", " + tmp;
-      }else{ untested();
+      }else{
 	been_here = true;
       }
       tmp = t->name() + tmp;
@@ -261,15 +261,15 @@ void Token_PARLIST::stack_op(Expression* E)const
 }
 /*--------------------------------------------------------------------------*/
 void Token_UNARY::stack_op(Expression* E)const
-{ untested();
+{
   assert(E);
   // replace 1 token with 1 (result)
   Token* t1 = E->back();
   E->pop_back();
-  if (dynamic_cast<Token_CONSTANT*>(t1)) { untested();
+  if (dynamic_cast<Token_CONSTANT*>(t1)) {
     Token* t = op(t1);
     assert(t);
-    if (t->data()) { untested();
+    if (t->data()) {
       E->push_back(t);
       delete t1;
     }else{untested();
@@ -293,21 +293,21 @@ void Token_CONSTANT::stack_op(Expression* E)const
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void Expression::reduce_copy(const Expression& Proto)
-{ untested();
+{
   // The Proto._list is the expression in RPN.
   // Attempt to build a reduced _list here, hopefully with only one item.
-  for (const_iterator i = Proto.begin(); i != Proto.end(); ++i) { untested();
+  for (const_iterator i = Proto.begin(); i != Proto.end(); ++i) {
     (**i).stack_op(this);
   }
   if (is_empty()) {untested();
     assert(Proto.is_empty());
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
 Expression::Expression(const Expression& Proto, const CARD_LIST* Scope)
   :_scope(Scope)
-{ untested();
+{
   reduce_copy(Proto);
 }
 /*--------------------------------------------------------------------------*/
