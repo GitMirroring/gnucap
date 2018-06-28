@@ -61,7 +61,7 @@ private: // local
   void parse_ports(CS&, COMPONENT*, int minnodes, int start, int num_nodes, bool all_new);
 private: // compatibility hacks
   void parse_element_using_obsolete_callback(CS&, COMPONENT*);
-  void parse_logic_using_obsolete_callback(CS&, COMPONENT*);
+  void parse_logic_using_obsolete_callback(CS&, DEV_LOGIC*);
 
 private: // override virtual, called by print_item
   void print_paramset(OMSTREAM&, const MODEL_CARD*);
@@ -377,10 +377,10 @@ void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* 
   cmd.check(bDANGER, "what's this?");
 }
 /*--------------------------------------------------------------------------*/
-void LANG_SPICE_BASE::parse_logic_using_obsolete_callback(CS& cmd, COMPONENT* x)
+void LANG_SPICE_BASE::parse_logic_using_obsolete_callback(CS& cmd, DEV_LOGIC* x)
 {
   assert(x);
-  {
+  { untested();
     unsigned here = cmd.cursor();
     int num_nodes = count_ports(cmd, x->max_nodes(), x->min_nodes(), x->tail_size(), 0/*start*/);
     cmd.reset(here);
@@ -392,20 +392,30 @@ void LANG_SPICE_BASE::parse_logic_using_obsolete_callback(CS& cmd, COMPONENT* x)
   std::string modelname = cmd.ctos(TOKENTERM);
 
   COMMON_LOGIC* common = 0;
-  if      (cmd.umatch("and " )) {untested();common = new LOGIC_AND;}
-  else if (cmd.umatch("nand ")) {common = new LOGIC_NAND;}
-  else if (cmd.umatch("or "  )) {untested();common = new LOGIC_OR;}
-  else if (cmd.umatch("nor " )) {common = new LOGIC_NOR;}
-  else if (cmd.umatch("xor " )) {untested();common = new LOGIC_XOR;}
-  else if (cmd.umatch("xnor ")) {untested();common = new LOGIC_XNOR;}
-  else if (cmd.umatch("inv " )) {common = new LOGIC_INV;}
-  else {untested();
-    cmd.warn(bWARNING,"need and,nand,or,nor,xor,xnor,inv");
-    common=new LOGIC_NONE;
+  std::string devs[7]={"and", "nand", "or", "nor", "xor", "xnor", "inv" };
+
+  for(unsigned i=0; i<7; ++i){
+    if (cmd.umatch(devs[i] + " " )) { untested();
+      x->_evaluator = dynamic_cast<DEV_LOGIC*>(device_dispatcher[devs[i]]);
+      assert( x->_evaluator ); // for now.
+      break;
+    }else{
+    }
   }
-  
+
+  assert(x);
+  if(!x->_evaluator){
+    cmd.warn(bWARNING,"need and,nand,or,nor,xor,xnor,inv");
+  }else{
+  }
+  assert(x->common());
+  COMMON_COMPONENT* c=x->common()->clone();
+  common=dynamic_cast<COMMON_LOGIC*>(c);
+  if(common){
+  }else{
+  }
   assert(common);
-  common->incount = incount;
+//  common->incount = incount;
   common->set_modelname(modelname);
   x->attach_common(common);
 }
@@ -609,7 +619,7 @@ COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
     
     if (x->use_obsolete_callback_parse()) {
       parse_element_using_obsolete_callback(cmd, x);
-    }else if (DEV_LOGIC* xx = dynamic_cast<DEV_LOGIC*>(x)) {
+    }else if (DEV_LOGIC* xx = dynamic_cast<DEV_LOGIC*>(x)) { untested();
       parse_logic_using_obsolete_callback(cmd, xx);
     }else{
       {
@@ -861,7 +871,7 @@ class CMD_MODEL : public CMD {
 	delete(cl);
 	cmd.warn(bDANGER, here1, "model: base has incorrect type");
       }
-    }else{
+    }else{ untested();
       cmd.warn(bDANGER, here1, "model: \"" + base_name + "\" no match");
     }
   }

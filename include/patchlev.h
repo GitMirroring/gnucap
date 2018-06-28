@@ -1,1 +1,1 @@
-#define PATCHLEVEL "develop 2018.08.31"
+#define PATCHLEVEL "logic-2 2018.08.31"
