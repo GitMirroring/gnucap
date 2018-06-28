@@ -26,6 +26,7 @@
 #define D_LOGIC_H
 #include "e_model.h"
 #include "e_elemnt.h"
+#include <set>
 /*--------------------------------------------------------------------------*/
 enum {PORTS_PER_GATE = 10};
 /*--------------------------------------------------------------------------*/
@@ -39,22 +40,25 @@ private:
   smode_t	_oldgatemode;
   smode_t	_gatemode;
   static int	_count;
+protected:
   node_t	nodes[PORTS_PER_GATE];	/* PORTS_PER_GATE <= PORTSPERSUBCKT */
 public:
   explicit	DEV_LOGIC();
   explicit	DEV_LOGIC(const DEV_LOGIC& p);
-		~DEV_LOGIC()		{--_count;}
+		~DEV_LOGIC()		{untested();}
 private: // override virtuals
   char	   id_letter()const	{return 'U';}
   std::string value_name()const	{return "#";}
   bool	      print_type_in_spice()const {return true;}
-  std::string dev_type()const {assert(has_common());
-    return (common()->modelname() + " " + common()->name()).c_str();}
+//  std::string dev_type()const {assert(has_common());
+//    return (common()->modelname() + " " + common()->name()).c_str();}
+public: // lang_spice
   int	   tail_size()const	{return 2;}
   int	   max_nodes()const	{return PORTS_PER_GATE;}
   int	   min_nodes()const	{return BEGIN_IN+1;}
   int	   matrix_nodes()const	{return 2;}
   int	   net_nodes()const	{return _net_nodes;}
+private:
   CARD*	   clone()const		{return new DEV_LOGIC(*this);}
   void	   precalc_first() {ELEMENT::precalc_first(); if (subckt()) {subckt()->precalc_first();}}
   void	   expand();
@@ -89,37 +93,101 @@ private: // override virtuals
   COMPLEX  ac_amps()const		{unreachable(); return 0.;}
   XPROBE   ac_probe_ext(const std::string&)const;
 
-  std::string port_name(int)const {untested();
-    incomplete();
-    return "";
+  std::string port_name(int i)const { itested();
+    switch (i){
+      case 0:
+	return "out";
+      case 1:
+	return "gnd";
+      case 2:
+	return "vdd";
+      case 3:
+	return "en";
+      default:
+	  return "in"+to_string(i-3);
+    }
+  }
+protected:
+  unsigned incount() const{
+    trace1("incount", net_nodes());
+    assert(net_nodes()>=4);
+    return unsigned(net_nodes()-4);
   }
 public:
-  static int count()			{return _count;}
+//  static int count()			{return _count;}
 private:
+  // spice hack. was in common previously.
+  // now, gates are standalone COMPONENTS.
+  virtual LOGICVAL logic_eval(const node_t* n, unsigned incount)const{ untested();
+    assert(_evaluator);
+    return _evaluator->logic_eval(n, incount);
+  }
+  std::string	dev_type()const{ untested();
+    assert(_evaluator);
+    return _evaluator->dev_type();
+  }
+
+
   bool	   tr_eval_digital();
   bool	   want_analog()const;
   bool	   want_digital()const;
+public: // spice hack.
+  DEV_LOGIC const* _evaluator;
 };
 /*--------------------------------------------------------------------------*/
-class MODEL_LOGIC : public MODEL_CARD {
-private:
-  explicit	MODEL_LOGIC(const MODEL_LOGIC& p);
+class COMMON_LOGIC : public COMMON_COMPONENT {
+private: // types
+  struct less_logic{
+    bool operator()(COMMON_LOGIC const* a, COMMON_LOGIC const* b) {
+      assert(a);
+      assert(b);
+      return *a<*b;
+    }
+  };
+  typedef std::set<COMMON_LOGIC*, less_logic> container_type;
+  typedef container_type::iterator iterator;
+protected:
+  explicit COMMON_LOGIC(const COMMON_LOGIC& p);
+  explicit COMMON_LOGIC(int x)
+    : COMMON_COMPONENT(x),
+      delay(1e-9),
+      vmax(5.),
+      vmin(0.),
+      unknown((vmax+vmin)/2),
+      rise(delay / 2),
+      fall(delay / 2),
+      rs(100.),
+      rw(1e9),
+      th1(.75),
+      th0(.25),
+      mr(5.),
+      mf(5.),
+      over(.1),
+      range(vmax - vmin),
+      _deflated(false)
+  { untested();
+  }
+  ~COMMON_LOGIC(){ untested();
+    if(_deflated){ untested();
+      if(_commons.erase(this)){ untested();
+      }else{ untested();
+	unreachable();
+      }
+    }else{ untested();
+    }
+  }
 public:
-  explicit MODEL_LOGIC(const DEV_LOGIC*);
-	   ~MODEL_LOGIC()		{--_count;}
-private: // override virtuals
-  std::string	dev_type()const		{return "logic";}
-  CARD*		clone()const		{return new MODEL_LOGIC(*this);}
-  void		precalc_first();
-  void		set_param_by_index(int, std::string&, int);
-  bool		param_is_printable(int)const;
-  std::string	param_name(int)const;
-  std::string	param_name(int,int)const;
-  std::string	param_value(int)const;
-  int		param_count()const	{return (13 + MODEL_CARD::param_count());}
-public:
-  static int	count()			{return _count;}
-public:
+  COMMON_COMPONENT* deflate(){ untested();
+    _deflated = true;
+    std::pair<iterator, bool> i=_commons.insert(this);
+    _deflated = i.second;
+    COMMON_COMPONENT* ret=*i.first;
+    trace3("deflated", this, ret, _commons.size());
+    return ret;
+  }
+  bool operator==(const COMMON_COMPONENT&)const;
+  bool operator<(COMMON_LOGIC const&)const;
+public: // FIXME: move to BUILTIN_LOGIC
 			/* ----- digital mode ----- */
   PARAMETER<double> delay;	/* propagation delay */
 			/* -- conversion parameters both ways -- */
@@ -141,9 +209,35 @@ public:
 public: // calculated parameters
   double range;			/* vmax - vmin */
 private:
+  bool _deflated;
+  static container_type _commons;
+};
+/*--------------------------------------------------------------------------*/
+class BUILTIN_LOGIC : public COMMON_LOGIC {
+public:
+  explicit	BUILTIN_LOGIC(int x);
+private:
+  explicit	BUILTIN_LOGIC(const BUILTIN_LOGIC& p);
+private: // override virtuals
+  std::string	dev_type()const		{return "logic";}
+  void precalc_first(const CARD_LIST*);
+  void		set_param_by_index(int, std::string&, int);
+  bool		param_is_printable(int)const;
+  std::string	param_name(int)const;
+  std::string	param_name(int,int)const;
+  std::string	param_value(int)const;
+  int		param_count()const	{return (13 + COMMON_COMPONENT::param_count());}
+public:
+  COMMON_COMPONENT* clone()const {return new  BUILTIN_LOGIC(*this);}
+  static int	count()			{return _count;}
+  std::string name()const{ untested(); return "builtin"; }
+  const std::string long_label()const{ itested(); return "builtin"; }
+public: // FIXME: move parameters back here.
+private:
   static int _count;
 };
 /*--------------------------------------------------------------------------*/
+#if 0
 class INTERFACE COMMON_LOGIC : public COMMON_COMPONENT {
 protected:
   explicit	COMMON_LOGIC(int c=0)
@@ -160,16 +254,21 @@ public:
 protected:
   static int	_count;
 };
+#endif
 /*--------------------------------------------------------------------------*/
-class LOGIC_AND : public COMMON_LOGIC {
+class LOGIC_AND : public DEV_LOGIC {
+public: // HACK
+  explicit LOGIC_AND(const DEV_LOGIC& p) :DEV_LOGIC(p){untested();}
 private:
-  explicit LOGIC_AND(const LOGIC_AND& p) :COMMON_LOGIC(p){untested();++_count;}
-  COMMON_COMPONENT* clone()const {untested(); return new LOGIC_AND(*this);}
+  COMPONENT* clone()const {untested(); return new LOGIC_AND(*this);}
+//  void	   expand(){ untested();
+//    ELEMENT::expand();
+//  }
 public:
-  explicit LOGIC_AND(int c=0)		  :COMMON_LOGIC(c) {untested();}
-  LOGICVAL logic_eval(const node_t* n)const {untested();
+  explicit LOGIC_AND() : DEV_LOGIC() {untested();}
+  LOGICVAL logic_eval(const node_t* n, unsigned incount)const {itested();
     LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {untested();
+    for (unsigned ii=1; ii<incount; ++ii) {itested();
       out &= n[ii]->lv();
     }
     return out;
@@ -177,9 +276,10 @@ public:
   virtual std::string name()const	  {itested();return "and";}
 };
 /*--------------------------------------------------------------------------*/
-class LOGIC_NAND : public COMMON_LOGIC {
+#if 0 // later.
+class LOGIC_NAND : public DEV_LOGIC {
 private:
-  explicit LOGIC_NAND(const LOGIC_NAND&p):COMMON_LOGIC(p){++_count;}
+  explicit LOGIC_NAND(const LOGIC_NAND&p):DEV_LOGIC(p){++_count;}
   COMMON_COMPONENT* clone()const {return new LOGIC_NAND(*this);}
 public:
   explicit LOGIC_NAND(int c=0)		  :COMMON_LOGIC(c) {}
@@ -257,19 +357,28 @@ public:
   virtual std::string name()const	  {itested();return "xnor";}
 };
 /*--------------------------------------------------------------------------*/
-class LOGIC_INV : public COMMON_LOGIC {
+#endif
+class LOGIC_INV : public DEV_LOGIC {
+public: // lang_spice HACK
+  explicit LOGIC_INV(const DEV_LOGIC& p);
 private:
-  explicit LOGIC_INV(const LOGIC_INV& p) :COMMON_LOGIC(p){++_count;}
-  COMMON_COMPONENT* clone()const	{return new LOGIC_INV(*this);}
+  COMPONENT* clone()const {untested();
+              return new LOGIC_INV(*this);
+  }
+  std::string	dev_type()const		{return "inv";}
+//  void	   expand(){ untested();
+//    ELEMENT::expand();
+//  }
 public:
-  explicit LOGIC_INV(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n)const {
+  explicit LOGIC_INV() : DEV_LOGIC() {}
+  LOGICVAL logic_eval(const node_t* n, unsigned)const {
     return ~n[0]->lv();
   }
   virtual std::string name()const	  {return "inv";}
 };
+#if 0
 /*--------------------------------------------------------------------------*/
-class LOGIC_NONE : public COMMON_LOGIC {
+class LOGIC_NONE : public DEV_LOGIC {
 private:
   explicit LOGIC_NONE(const LOGIC_NONE&p):COMMON_LOGIC(p){itested();++_count;}
   COMMON_COMPONENT* clone()const {itested(); return new LOGIC_NONE(*this);}
@@ -280,7 +389,9 @@ public:
   }
   virtual std::string name()const	  {untested();return "error";}
 };
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
+
 // vim:ts=8:sw=2:noet:

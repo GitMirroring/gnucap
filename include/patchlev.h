@@ -1,1 +1,1 @@
-#define PATCHLEVEL "paramset-a3 2018.09.06"
+#define PATCHLEVEL "logic-3 2018.09.08"

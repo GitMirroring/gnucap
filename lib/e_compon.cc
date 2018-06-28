@@ -477,7 +477,7 @@ void COMPONENT::set_port_to_ground(int num)
 void COMPONENT::set_dev_type(const std::string& new_type)
 {
   if (common()) {
-    if (new_type != dev_type()) {
+    if (new_type != dev_type()) { untested();
       COMMON_COMPONENT* c = common()->clone();
       assert(c);
       c->set_modelname(new_type);
@@ -513,11 +513,12 @@ void COMPONENT::deflate_common()
 void COMPONENT::expand()
 {
   CARD::expand();
-  if (has_common()) {
+  if (has_common()) { untested();
     COMMON_COMPONENT* new_common = common()->clone();
     new_common->expand(this);
     COMMON_COMPONENT* deflated_common = new_common->deflate();
-    if (deflated_common != common()) {
+    trace2("COMPONENT::expand", deflated_common, common());
+    if (deflated_common != common()) { untested();
       attach_common(deflated_common);
     }else{untested();
     }
