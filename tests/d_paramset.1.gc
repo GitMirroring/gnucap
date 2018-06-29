@@ -1,0 +1,21 @@
+verilog
+options trace
+
+module testmodule(1,2,3);
+parameter a=1;
+endmodule
+
+paramset myresistor resistor;
+	.r=4;
+endparamset
+
+myresistor rr(2,3);
+resistor #(.r(1)) r2(2,3);
+
+list
+
+print dc ev(rr) ev(r2)
+dc
+
+
+end

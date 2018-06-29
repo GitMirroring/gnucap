@@ -771,8 +771,8 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
   assert(x);
   if (x->print_type_in_spice()) {
     o << "  " << x->dev_type();
-  }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {untested();
-    o << "  " << x->dev_type();
+  }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {
+    o << x->dev_type();
   }else{
     // don't print type
   }
@@ -802,7 +802,15 @@ void LANG_SPICE_BASE::print_args(OMSTREAM& o, const COMPONENT* x)
 void LANG_SPICE_BASE::print_label(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
-  o << x->short_label();
+  std::string l=x->short_label();
+  if(!x->id_letter()){
+  }else if(!l.size()){ untested();
+    unreachable();
+  }else if(fix_case(x->id_letter()) != fix_case(l[0])){ untested();
+    o << x->id_letter();
+  }else{
+  }
+  o << l;
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_ports(OMSTREAM& o, const COMPONENT* x)

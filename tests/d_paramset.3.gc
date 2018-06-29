@@ -1,0 +1,19 @@
+verilog
+options trace
+
+parameter globalr=1
+
+paramset myresistor resistor;
+	.r=globalr;
+endparamset
+
+list
+
+myresistor r2(2,0);
+vsource #(.dc(2)) v1(2,0);
+
+list
+print dc ev(r2) i(v1) v(r2) i(r2)
+dc
+
+end

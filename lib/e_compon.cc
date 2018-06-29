@@ -700,7 +700,7 @@ std::string COMPONENT::param_name(int i, int j)const
   }else{
     if (j == 0) {
       return param_name(i);
-    }else if (i >= CARD::param_count()) {untested();
+    }else if (i >= CARD::param_count()) {
       return "";
     }else{untested();
       return CARD::param_name(i,j);

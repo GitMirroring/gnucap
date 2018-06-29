@@ -1,0 +1,20 @@
+>>>>>module testmodule(1,2,3); 
+>>>>>parameter a=1; 
+>>>>>paramset myresistor resistor; 
+>>>>>list 
+module testmodule (1,2,3);
+parameter a={ 1.};
+endmodule // testmodule
+
+module myresistor (p,n);
+parameter r;
+resistor #() R_ (.p(p),.n(n));
+endmodule // myresistor
+
+myresistor #() rr (.p(2),.n(3));
+resistor #(.r(1)) r2 (.p(2),.n(3));
+>>>>>print dc ev(rr) ev(r2) 
+>>>>>dc 
+#           ev(rr)     ev(r2)    
+ 0.         4.         1.        
+>>>>>end 
