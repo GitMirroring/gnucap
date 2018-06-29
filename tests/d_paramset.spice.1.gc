@@ -1,0 +1,12 @@
+verilog
+
+resistor R1(1,2);
+paramset myresistor resistor;
+	.r=5
+endparamset
+
+myresistor Xrr(2,3);
+
+spice
+.list
+.end

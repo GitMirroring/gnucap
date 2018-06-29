@@ -479,7 +479,7 @@ void COMPONENT::set_dev_type(const std::string& new_type)
       attach_common(c);
     }else{
     }
-  }else{
+  }else{ untested();
     CARD::set_dev_type(new_type);
   }
 }
