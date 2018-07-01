@@ -61,7 +61,7 @@ private: // local
   void parse_ports(CS&, COMPONENT*, int minnodes, int start, int num_nodes, bool all_new);
 private: // compatibility hacks
   void parse_element_using_obsolete_callback(CS&, COMPONENT*);
-  void parse_logic_using_obsolete_callback(CS&, DEV_LOGIC*);
+  void parse_logic_using_obsolete_callback(CS&, COMPONENT*);
 
 private: // override virtual, called by print_item
   void print_paramset(OMSTREAM&, const MODEL_CARD*);
@@ -236,7 +236,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	break; // done.  have closing paren.
       }else if (index >= num_nodes) {
 	break; // done.  have maxnodes.
-      }else if (!cmd.more()) {untested();
+      }else if (!cmd.more()) {
 	break; // done.  premature end of line.
       }else if (OPT::keys_between_nodes &&
 		(cmd.umatch("poly ")
@@ -280,7 +280,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
   }catch (Exception& e) {untested();
     cmd.warn(bDANGER, here1, e.message());
   }
-  if (index < minnodes) {untested();
+  if (index < minnodes) {
     cmd.warn(bDANGER, "need " + to_string(minnodes-index) +" more nodes");
   }else{
   }
@@ -291,7 +291,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
   //assert(x->_net_nodes == index);
   
   // ground unused input nodes
-  for (int iii = index;  iii < minnodes;  ++iii) {untested();
+  for (int iii = index;  iii < minnodes;  ++iii) {
     x->set_port_to_ground(iii);
   }
   //assert(x->_net_nodes >= index);
@@ -347,7 +347,7 @@ void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* 
 
   unsigned here = cmd.cursor();
   c->parse_common_obsolete_callback(cmd); //BUG//callback
-  if (cmd.stuck(&here)) {untested();
+  if (cmd.stuck(&here)) {
     cmd.warn(bDANGER, "needs a value");
   }else{
   }
@@ -377,10 +377,10 @@ void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* 
   cmd.check(bDANGER, "what's this?");
 }
 /*--------------------------------------------------------------------------*/
-void LANG_SPICE_BASE::parse_logic_using_obsolete_callback(CS& cmd, DEV_LOGIC* x)
+void LANG_SPICE_BASE::parse_logic_using_obsolete_callback(CS& cmd, COMPONENT* x)
 {
   assert(x);
-  { untested();
+  {
     unsigned here = cmd.cursor();
     int num_nodes = count_ports(cmd, x->max_nodes(), x->min_nodes(), x->tail_size(), 0/*start*/);
     cmd.reset(here);
@@ -391,33 +391,34 @@ void LANG_SPICE_BASE::parse_logic_using_obsolete_callback(CS& cmd, DEV_LOGIC* x)
 
   std::string modelname = cmd.ctos(TOKENTERM);
 
-  COMMON_LOGIC* common = 0;
+  MODEL_LOGIC* common = 0;
   std::string devs[7]={"and", "nand", "or", "nor", "xor", "xnor", "inv" };
 
+  DEV_LOGIC* X=prechecked_cast<DEV_LOGIC*>(x);
+  assert(X);
   for(unsigned i=0; i<7; ++i){
-    if (cmd.umatch(devs[i] + " " )) { untested();
-      x->_evaluator = dynamic_cast<DEV_LOGIC*>(device_dispatcher[devs[i]]);
-      assert( x->_evaluator ); // for now.
+    if (cmd.umatch(devs[i] + " " )) {
+      X->_evaluator = dynamic_cast<DEV_LOGIC*>(device_dispatcher[devs[i]]);
+      assert( X->_evaluator ); // for now.
       break;
     }else{
     }
   }
 
-  assert(x);
-  if(!x->_evaluator){
+  if(!X->_evaluator){ untested();
     cmd.warn(bWARNING,"need and,nand,or,nor,xor,xnor,inv");
   }else{
   }
   assert(x->common());
   COMMON_COMPONENT* c=x->common()->clone();
-  common=dynamic_cast<COMMON_LOGIC*>(c);
+  common=dynamic_cast<MODEL_LOGIC*>(c);
   if(common){
-  }else{
+  }else{ untested();
   }
   assert(common);
-//  common->incount = incount;
-  common->set_modelname(modelname);
+  common->set_modelname(modelname); // this only happens in SPICE mode.
   x->attach_common(common);
+  trace2("spice parsed", x->long_label(), x->common()->modelname());
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::parse_type(CS& cmd, CARD* x)
@@ -510,7 +511,7 @@ void LANG_SPICE_BASE::parse_label(CS& cmd, CARD* x)
   std::string my_name;
   if (cmd >> my_name) {
     x->set_label(my_name);
-  }else{untested();
+  }else{
     x->set_label(x->id_letter() + std::string("_unnamed")); //BUG// not unique
     cmd.warn(bDANGER, "label required");
   }
@@ -619,7 +620,7 @@ COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
     
     if (x->use_obsolete_callback_parse()) {
       parse_element_using_obsolete_callback(cmd, x);
-    }else if (DEV_LOGIC* xx = dynamic_cast<DEV_LOGIC*>(x)) { untested();
+    }else if (DEV_LOGIC* xx = dynamic_cast<DEV_LOGIC*>(x)) {
       parse_logic_using_obsolete_callback(cmd, xx);
     }else{
       {
@@ -722,7 +723,7 @@ void LANG_SPICE_BASE::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
   o << '\n';
   
   for (CARD_LIST::const_iterator 
-	 ci = x->subckt()->begin(); ci != x->subckt()->end(); ++ci) {
+	 ci = x->subckt()->begin(); ci != x->subckt()->end(); ++ci) { itested();
     print_item(o, *ci);
   }
   
@@ -730,7 +731,7 @@ void LANG_SPICE_BASE::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_instance(OMSTREAM& o, const COMPONENT* x)
-{
+{ itested();
   print_label(o, x);
   print_ports(o, x);
   print_type(o, x);
@@ -739,49 +740,49 @@ void LANG_SPICE_BASE::print_instance(OMSTREAM& o, const COMPONENT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
-{
+{ itested();
   assert(x);
-  if (x->comment()[1] != '+') {
-    if (x->comment()[0] != '*') {
+  if (x->comment()[1] != '+') { itested();
+    if (x->comment()[0] != '*') { itested();
       o << "*";
-    }else{
+    }else{ itested();
     }
     o << x->comment() << '\n';
-  }else{
+  }else{ itested();
   }
   // Suppress printing of comment lines starting with "*+".
   // These are generated as a way to display calculated values.
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_command(OMSTREAM& o, const DEV_DOT* x)
-{untested();
+{itested();
   assert(x);
   o << x->s() << '\n';
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_args(OMSTREAM& o, const MODEL_CARD* x)
-{
+{ itested();
   assert(x);
-  if (x->use_obsolete_callback_print()) {
+  if (x->use_obsolete_callback_print()) { itested();
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
-  }else{
-    for (int ii = x->param_count() - 1;  ii >= x->param_count_dont_print();  --ii) {
-      if (x->param_is_printable(ii)) {
+  }else{ itested();
+    for (int ii = x->param_count() - 1;  ii >= x->param_count_dont_print();  --ii) { itested();
+      if (x->param_is_printable(ii)) { itested();
 	std::string arg = " " + x->param_name(ii) + "=" + x->param_value(ii);
 	o << arg;
-      }else{
+      }else{ itested();
       }
     }
   }
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
-{
+{ itested();
   assert(x);
-  if (x->print_type_in_spice()) {
+  if (x->print_type_in_spice()) { itested();
     o << "  " << x->dev_type();
-  }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {untested();
+  }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {
     o << "  " << x->dev_type();
   }else{
     // don't print type
@@ -795,7 +796,7 @@ void LANG_SPICE_BASE::print_args(OMSTREAM& o, const COMPONENT* x)
   if (x->use_obsolete_callback_print()) {
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
-    for (int ii = x->param_count() - 1;  ii >= x->param_count_dont_print();  --ii) {
+    for (int ii = x->param_count() - 1;  ii >= x->param_count_dont_print();  --ii) { itested();
       if (x->param_is_printable(ii)) {
 	if ((ii != x->param_count() - 1) || (x->param_name(ii) != x->value_name())) {
 	  // skip name if plain value
@@ -803,7 +804,7 @@ void LANG_SPICE_BASE::print_args(OMSTREAM& o, const COMPONENT* x)
 	}else{
 	}
 	o << x->param_value(ii);
-      }else{
+      }else{ itested();
       }
     }
   }
@@ -866,7 +867,7 @@ class CMD_MODEL : public CMD {
       }else{untested();
 	cmd.warn(bDANGER, here1, "model: base has incorrect type");
       }
-    }else{ untested();
+    }else{
       cmd.warn(bDANGER, here1, "model: \"" + base_name + "\" no match");
     }
   }
@@ -981,7 +982,7 @@ DISPATCHER<CMD>::INSTALL d33(&command_dispatcher, ".lib|lib", &p33);
 class CMD_INCLUDE : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)
-  {untested();
+  {
     getmerge(cmd, NO_HEADER, Scope);
   }
 } p3;

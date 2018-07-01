@@ -22,7 +22,6 @@
  * node probes
  */
 //testing=script,sparse 2006.07.11
-#define DO_TRACE
 #include "u_nodemap.h"
 #include "d_logic.h"
 #include "e_aux.h"
@@ -265,10 +264,10 @@ inline bool LOGIC_NODE::just_reached_stable()const
  * else set up: logic value (_lv) and quality.
  * Use and update _d_iter, _lastchange to keep track of what was done.
  */
-void LOGIC_NODE::to_logic(const COMMON_LOGIC*f)
+void LOGIC_NODE::to_logic(const MODEL_LOGIC*f)
 {
   assert(f);
-  if (process() && process() != f) {untested();
+  if (process() && process() != f) {
     set_bad_quality("logic process mismatch");
     error(bWARNING, "node " + long_label() 
 	  + " logic process mismatch\nis it " + process()->long_label() 
@@ -398,7 +397,7 @@ void LOGIC_NODE::to_logic(const COMMON_LOGIC*f)
   }
 }
 /*--------------------------------------------------------------------------*/
-double LOGIC_NODE::to_analog(const COMMON_LOGIC* f)
+double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)
 {
   assert(f);
   if (process() && process() != f) {untested();

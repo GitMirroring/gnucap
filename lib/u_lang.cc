@@ -71,7 +71,7 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
   }else{
     assert(!p);
     std::string s;
-    /* */if (Umatch(Name, "b{uild} "))      {untested(); s = "build";}
+    /* */if (Umatch(Name, "b{uild} "))      { s = "build";}
     else if (Umatch(Name, "del{ete} "))     {		 s = "delete";}
     else if (Umatch(Name, "fo{urier} "))    {untested(); s = "fourier";}
     else if (Umatch(Name, "gen{erator} "))  {		 s = "generator";}

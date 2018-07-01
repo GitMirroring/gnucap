@@ -1,0 +1,25 @@
+Uf ( 2f 0 8 8 1a )  fast inv 
+Us ( 2s 0 8 8 1b )  slow inv 
+.model fast logic ( delay=.8u vmax=NA( 5.) vmin=NA( 0.) unknown=NA( 2.5) rise=NA( 500.p) fall=NA( 500.p) rs=NA( 100.) rw=NA( 1.G) thh=NA( 0.75) thl=NA( 0.25) mr=NA( 5.) mf=NA( 5.) over=NA( 0.1) tnom=NA( 27.))
+.model slow logic ( delay=.8n vmax=NA( 5.) vmin=NA( 0.) unknown=NA( 2.5) rise=NA( 500.p) fall=NA( 500.p) rs=NA( 100.) rw=NA( 1.G) thh=NA( 0.75) thl=NA( 0.25) mr=NA( 5.) mf=NA( 5.) over=NA( 0.1) tnom=NA( 27.))
+Uf ( 2f 0 8 8 1a )  fast inv 
+Us ( 2s 0 8 8 1b )  slow inv 
+.model fast logic ( delay=.8u vmax=NA( 5.) vmin=NA( 0.) unknown=NA( 2.5) rise=NA( 500.p) fall=NA( 500.p) rs=NA( 100.) rw=NA( 1.G) thh=NA( 0.75) thl=NA( 0.25) mr=NA( 5.) mf=NA( 5.) over=NA( 0.1) tnom=NA( 27.))
+.model slow logic ( delay=.8n vmax=NA( 5.) vmin=NA( 0.) unknown=NA( 2.5) rise=NA( 500.p) fall=NA( 500.p) rs=NA( 100.) rw=NA( 1.G) thh=NA( 0.75) thl=NA( 0.25) mr=NA( 5.) mf=NA( 5.) over=NA( 0.1) tnom=NA( 27.))
+*.dc 
+Uf: can't find subckt: fastinv1, forcing digital
+Us: can't find subckt: slowinv1, forcing digital
+#Time       v(1a)      v(1b)      v(2f)      v(2s)      v(8)      
+ 0.         0.         0.         5.         5.         5.        
+ 1.n        5.         5.         5.         5.         5.        
+ 2.n        5.         5.         5.         0.         5.        
+ 801.n      5.         5.         0.         0.         5.        
+ 1.001u     5.         5.         0.         0.         5.        
+ 1.002u     0.         0.         0.         0.         5.        
+ 1.0024u    0.         0.         0.         5.         5.        
+ 1.0024u    0.         0.         0.         5.         5.        
+ 1.0024u    0.         0.         0.         5.         5.        
+ 1.0025u    0.         0.         0.         5.         5.        
+ 1.269u     0.         0.         0.         5.         5.        
+ 1.802u     0.         0.         5.         5.         5.        
+ 2.u        0.         0.         5.         5.         5.        

@@ -130,7 +130,7 @@ static void parse_args_instance(CS& cmd, CARD* x)
 	cmd >> ',';
 	try{
 	  x->set_param_by_name(name, value);
-	}catch (Exception_No_Match&) {untested();
+	}catch (Exception_No_Match&) {
 	  cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
 	}
       }
@@ -277,7 +277,7 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
       break;
     }else if (!cmd.more()) {
       cmd.get_line("verilog-paramset>");
-    }else{untested();
+    }else{
       cmd.check(bWARNING, "what's this?");
       break;
     }
@@ -505,7 +505,7 @@ class CMD_PARAMSET : public CMD {
 	assert(!new_card->owner());
 	lang_verilog.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);
-      }else{untested();
+      }else{
 	cmd.warn(bDANGER, here, "paramset: base has incorrect type");
       }
     }else{untested();

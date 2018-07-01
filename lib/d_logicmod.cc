@@ -29,16 +29,18 @@
 #include "globals.h"
 /*--------------------------------------------------------------------------*/
 BUILTIN_LOGIC::BUILTIN_LOGIC(int a)
-  : COMMON_LOGIC(a)
-{ untested();
+  : MODEL_LOGIC(a)
+{
   ++_count;
 }
 /*--------------------------------------------------------------------------*/
-BUILTIN_LOGIC::BUILTIN_LOGIC(const BUILTIN_LOGIC& p) : COMMON_LOGIC(p)
-{ untested();
+BUILTIN_LOGIC::BUILTIN_LOGIC(const BUILTIN_LOGIC& p) : MODEL_LOGIC(p)
+{
+ trace3("copying BIL", delay, delay.string(), double(delay));
+ trace2("copying BIL", p.modelname(), modelname());
 }
 /*--------------------------------------------------------------------------*/
-COMMON_LOGIC::COMMON_LOGIC(const COMMON_LOGIC& p)
+MODEL_LOGIC::MODEL_LOGIC(const MODEL_LOGIC& p)
   :COMMON_COMPONENT(p),
    delay  (p.delay),
    vmax   (p.vmax),
@@ -53,15 +55,15 @@ COMMON_LOGIC::COMMON_LOGIC(const COMMON_LOGIC& p)
    mr     (p.mr),
    mf     (p.mf),
    over   (p.over),
+   tnom   (p.tnom),
    range  (p.range),
    _deflated  (p._deflated)
-{ untested();
- // ++_count;
+{
 }
 /*--------------------------------------------------------------------------*/
 void BUILTIN_LOGIC::precalc_first(CARD_LIST const* par_scope)
-{ untested();
-  COMMON_LOGIC::precalc_first(par_scope);
+{
+  MODEL_LOGIC::precalc_first(par_scope);
 
 //  const CARD_LIST* par_scope = scope();
   assert(par_scope);
@@ -79,13 +81,16 @@ void BUILTIN_LOGIC::precalc_first(CARD_LIST const* par_scope)
   mr.e_val(5., par_scope);
   mf.e_val(5., par_scope);
   over.e_val(.1, par_scope);
+  tnom.e_val(27., par_scope);
 
   range = vmax - vmin;
+
+  trace3("precalc", delay, delay.string(), double(delay));
 }
 /*--------------------------------------------------------------------------*/
 void BUILTIN_LOGIC::set_param_by_index(int i, std::string& value, int offset)
-{ untested();
-  switch (BUILTIN_LOGIC::param_count() - 1 - i) {
+{
+  switch (param_count() - 1 - i) {
   case 0: delay = value; break;
   case 1: vmax = value; break;
   case 2: vmin = value; break;
@@ -99,12 +104,13 @@ void BUILTIN_LOGIC::set_param_by_index(int i, std::string& value, int offset)
   case 10: mr = value; break;
   case 11: mf = value; break;
   case 12: over = value; break;
-  default: COMMON_LOGIC::set_param_by_index(i, value, offset); break;
+  case 13: tnom = value; break;
+  default: MODEL_LOGIC::set_param_by_index(i, value, offset); break;
   }
 }
 /*--------------------------------------------------------------------------*/
 bool BUILTIN_LOGIC::param_is_printable(int i)const
-{ untested();
+{ itested();
   switch (param_count() - 1 - i) {
   case 0: 
   case 1: 
@@ -118,13 +124,14 @@ bool BUILTIN_LOGIC::param_is_printable(int i)const
   case 9: 
   case 10:
   case 11:
-  case 12: return true;
-  default: return COMMON_LOGIC::param_is_printable(i);
+  case 12:
+  case 13: return true;
+  default: return MODEL_LOGIC::param_is_printable(i);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string BUILTIN_LOGIC::param_name(int i)const
-{ untested();
+{ itested();
   switch (BUILTIN_LOGIC::param_count() - 1 - i) {
   case 0: return "delay";
   case 1: return "vmax";
@@ -139,23 +146,24 @@ std::string BUILTIN_LOGIC::param_name(int i)const
   case 10: return "mr";
   case 11: return "mf";
   case 12: return "over";
-  default: return COMMON_LOGIC::param_name(i);
+  case 13: return "tnom";
+  default: return MODEL_LOGIC::param_name(i);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string BUILTIN_LOGIC::param_name(int i, int j)const
-{ untested();
-  if (j == 0) { untested();
+{ itested();
+  if (j == 0) { itested();
     return param_name(i);
-  }else if (i >= COMMON_LOGIC::param_count()) { untested();
+  }else if (i >= MODEL_LOGIC::param_count()) { itested();
     return "";
   }else{ untested();
-    return COMMON_LOGIC::param_name(i, j);
+    return MODEL_LOGIC::param_name(i, j);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string BUILTIN_LOGIC::param_value(int i)const
-{ untested();
+{ itested();
   switch (param_count() - 1 - i) {
   case 0: return delay.string();
   case 1: return vmax.string();
@@ -170,18 +178,20 @@ std::string BUILTIN_LOGIC::param_value(int i)const
   case 10: return mr.string();
   case 11: return mf.string();
   case 12: return over.string();
-  default: return COMMON_LOGIC::param_value(i);
+  case 13: return tnom.string();
+  default: return MODEL_LOGIC::param_value(i);
   }
 }
 /*--------------------------------------------------------------------------*/
 namespace{
-// spice stuff. wrap BUILTIN_LOGIC (former MODEL_LOGIC) into a MODEL_CARD
+// spice stuff. wrap BUILTIN_LOGIC (former MODEL_LOGIC, now a COMMON_COMPONENT)
+// into a MODEL_CARD
 class MODEL_LOGIC : public MODEL_CARD {
 public:
   MODEL_LOGIC(BUILTIN_LOGIC* l)
     : MODEL_CARD(NULL), _logic(NULL)
-  { untested();
-    COMMON_COMPONENT::attach_common(l, &_logic);
+  {
+    COMMON_COMPONENT::attach_common(l->clone(), &_logic);
   }
   ~MODEL_LOGIC(){
     COMMON_COMPONENT::attach_common(NULL, &_logic);
@@ -189,18 +199,53 @@ public:
 private:
   MODEL_LOGIC(MODEL_LOGIC const& l)
     : MODEL_CARD(l), _logic(NULL)
-  { untested();
+  {
     COMMON_COMPONENT::attach_common(
 	prechecked_cast<COMMON_COMPONENT*>(l._logic->clone()), &_logic);
   }
-  virtual CARD*	 clone()const { itested();
+private: // overrides
+  virtual CARD*	 clone()const {
     return new MODEL_LOGIC(*this);
   }
   std::string  dev_type()const         {return "logic";}
-  int          param_count()const      {return ( _logic->param_count());}
+  bool is_valid(const COMPONENT* x)const {
+    return dynamic_cast<DEV_LOGIC const*>(x);
+  }
   void set_param_by_name(std::string n, std::string v){
+    trace2("spbn", n, v);
     assert(_logic);
-    _logic->set_param_by_name(n, v);
+    COMMON_COMPONENT* mc=_logic->clone();
+    mc->set_param_by_name(n, v);
+    COMMON_COMPONENT::attach_common(mc, &_logic);
+
+	auto l=prechecked_cast<BUILTIN_LOGIC*>(_logic);
+	assert(l);
+    trace1("", l->delay.string());
+  }
+  bool param_is_printable(int i)const{
+    assert(_logic);
+    return _logic->param_is_printable(i);
+  }
+  std::string param_name(int i)const{
+    assert(_logic);
+    return _logic->param_name(i);
+  }
+  std::string param_name(int i, int j)const{
+    assert(_logic);
+    return _logic->param_name(i, j);
+  }
+  std::string param_value(int i)const{
+    assert(_logic);
+    return _logic->param_value(i);
+  }
+  int param_count()const{
+    assert(_logic);
+    return _logic->param_count();
+  }
+private:
+  COMMON_COMPONENT* new_common() const{ incomplete();
+    assert(_logic);
+    return _logic;
   }
 private: // actual logic here.
   COMMON_COMPONENT* _logic;
