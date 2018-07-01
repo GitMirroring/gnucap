@@ -1,15 +1,15 @@
 verilog
 
-inv b(2,0,8,8,1);
-inv b(3,0,8,8,2);
+inv #(.delay(.3n)) i1(2,0,8,8,1);
+inv i2(3,0,8,8,2);
 
 list
 
 spice
-Vdd 8 0 dc 5.
+Vdd  8  0  dc 5.
 vpulse 1 0 pulse iv=0 pv=5 rise=1n fall=1n period=2u width=1u
 
 .print tran v nodes
-.tran 5u
+.tran 1u
 
 .end

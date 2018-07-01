@@ -63,7 +63,7 @@ void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
   assert(to);
   if (c == *to) {
     // The new and old are the same object.  Do nothing.
-  }else if (!c) {untested();
+  }else if (!c) {
     // There is no new common.  probably a simple element
     detach_common(to);
   }else if (!*to) {
@@ -472,7 +472,7 @@ void COMPONENT::set_port_to_ground(int num)
 void COMPONENT::set_dev_type(const std::string& new_type)
 {
   if (common()) {
-    if (new_type != dev_type()) { untested();
+    if (new_type != dev_type()) {
       COMMON_COMPONENT* c = common()->clone();
       assert(c);
       c->set_modelname(new_type);
@@ -508,14 +508,14 @@ void COMPONENT::deflate_common()
 void COMPONENT::expand()
 {
   CARD::expand();
-  if (has_common()) { untested();
+  if (has_common()) {
     COMMON_COMPONENT* new_common = common()->clone();
     new_common->expand(this);
     COMMON_COMPONENT* deflated_common = new_common->deflate();
     trace2("COMPONENT::expand", deflated_common, common());
-    if (deflated_common != common()) { untested();
+    if (deflated_common != common()) {
       attach_common(deflated_common);
-    }else{untested();
+    }else{
     }
   }else{
   }

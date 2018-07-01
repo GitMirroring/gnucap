@@ -1,0 +1,20 @@
+spice
+
+Uf   2f 0 8 8 1a fast inv
+Us   2s 0 8 8 1b slow inv
+
+.model fast logic ( delay= .8u )
+.model slow logic ( delay= .8n )
+
+.list
+*.dc
+.list
+
+Vdd  8  0  dc 5.
+vpulse 1b 0 pulse iv=0 pv=5 rise=1n fall=1n period=2u width=1u
+vpulse 1a 0 pulse iv=0 pv=5 rise=1n fall=1n period=2u width=1u
+
+.print tran v nodes
+.tran 2u
+
+.end

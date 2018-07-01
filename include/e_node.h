@@ -27,7 +27,7 @@
 #include "u_sim_data.h"
 #include "e_base.h"
 /*--------------------------------------------------------------------------*/
-class COMMON_LOGIC;
+class MODEL_LOGIC;
 /*--------------------------------------------------------------------------*/
 enum {
   OUT1 = 0,
@@ -62,7 +62,7 @@ public:
   LOGICVAL& operator=(const LOGICVAL& p) {_lv=p._lv; return *this;}
 
   LOGICVAL& operator&=(LOGICVAL p)
-	{untested(); _lv = and_truth[_lv][p._lv]; return *this;}
+	{ _lv = and_truth[_lv][p._lv]; return *this;}
   LOGICVAL& operator|=(LOGICVAL p)
 	{_lv = or_truth[_lv][p._lv]; return *this;}
   LOGICVAL  operator^=(LOGICVAL p)
@@ -135,7 +135,7 @@ extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
 class INTERFACE LOGIC_NODE : public NODE {
 private:
-  const COMMON_LOGIC *_family;	/* logic family */
+  const MODEL_LOGIC *_family;	/* logic family */
   int 	      _d_iter;		/* iteration of last update - digital */
   int 	      _a_iter;		/* iteration of last update - analog */
   double      _final_time;	/* time logic transition attains final state */
@@ -161,7 +161,7 @@ public: // raw data access (rvalues)
   int	   a_iter()const		{return _a_iter;}
   double   final_time()const		{return _final_time;}
   double   last_change_time()const	{return _lastchange;}
-  const COMMON_LOGIC* process()const	{return _family;}
+  const MODEL_LOGIC* process()const	{return _family;}
   double   old_last_change_time()const	{untested(); return _old_lastchange;}
   const LOGICVAL old_lv()const		{return _old_lv;}
 
@@ -185,7 +185,7 @@ public: // raw data access (lvalues)
   void	set_last_change_time()		{_lastchange = _sim->_time0;}
   void	set_last_change_time(double t)	{_lastchange = t;}
   void	set_lv(LOGICVAL v)		{_lv = v;}
-  void	set_process(const COMMON_LOGIC* f) {_family = f;}
+  void	set_process(const MODEL_LOGIC* f) {_family = f;}
 
   void  store_old_last_change_time()	{_old_lastchange = last_change_time();}
   void	store_old_lv()			{_old_lv = lv();}
@@ -214,8 +214,8 @@ public: // action, used by logic
   void	      set_event(double delay, LOGICVAL v);
   void	      force_initial_value(LOGICVAL v);
   void	      propagate();
-  double      to_analog(const COMMON_LOGIC*f);
-  void	      to_logic(const COMMON_LOGIC*f);
+  double      to_analog(const MODEL_LOGIC*f);
+  void	      to_logic(const MODEL_LOGIC*f);
 
 private: // inhibited
   explicit LOGIC_NODE(const LOGIC_NODE&):NODE(){incomplete();unreachable();}
@@ -235,7 +235,6 @@ private:
       unreachable();
     }else if (i > NODE::_sim->_total_nodes) {
       unreachable();
-      assert(false);
     }else{
     }
     return i>=0 && i<=NODE::_sim->_total_nodes;

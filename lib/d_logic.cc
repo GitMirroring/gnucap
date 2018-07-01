@@ -25,7 +25,6 @@
  * model:   .model mname LOGIC <args>
  */
 //testing=script,sparse 2006.07.17
-#define DO_TRACE
 #include "globals.h"
 #include "e_subckt.h"
 #include "u_xprobe.h"
@@ -40,6 +39,16 @@ static DEV_LOGIC p1;
 static DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "U|logic", &p1);
 static LOGIC_AND pand;
 static DISPATCHER<CARD>::INSTALL dand(&device_dispatcher, "and", &pand);
+static LOGIC_NAND pnand;
+static DISPATCHER<CARD>::INSTALL dnand(&device_dispatcher, "nand", &pnand);
+static LOGIC_OR por;
+static DISPATCHER<CARD>::INSTALL dor(&device_dispatcher, "or", &por);
+static LOGIC_NOR pnor;
+static DISPATCHER<CARD>::INSTALL dnor(&device_dispatcher, "nor", &pnor);
+static LOGIC_XOR pxor;
+static DISPATCHER<CARD>::INSTALL dxor(&device_dispatcher, "xor", &pxor);
+static LOGIC_INV pxnor;
+static DISPATCHER<CARD>::INSTALL dxnor(&device_dispatcher, "xnor", &pxnor);
 static LOGIC_INV pinv;
 static DISPATCHER<CARD>::INSTALL dinv(&device_dispatcher, "inv", &pinv);
 /*--------------------------------------------------------------------------*/
@@ -53,10 +62,9 @@ DEV_LOGIC::DEV_LOGIC()
    _failuremode("ok"),
    _oldgatemode(moUNKNOWN),
    _gatemode(moUNKNOWN)   
-{ untested();
+{ itested();
   attach_common(&p2);
   _n = nodes;
-  // ++_count;
 }
 /*--------------------------------------------------------------------------*/
 DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
@@ -66,56 +74,68 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
    _failuremode("ok"),
    _oldgatemode(moUNKNOWN),
    _gatemode(moUNKNOWN)   
-{ untested();
+{
   assert(max_nodes() == PORTS_PER_GATE);
   for (int ii = 0;  ii < max_nodes();  ++ii) { itested();
     nodes[ii] = p.nodes[ii];
   }
   _n = nodes;
-  // ++_count;
+  trace2("copy logic", common()->modelname(), dynamic_cast<BUILTIN_LOGIC const*>(common()));
+  trace1("copy logic", common()->has_model());
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::expand()
-{ untested();
-  trace2("DEV_LOGIC::expand", long_label(), common());
-  ELEMENT::expand();
-  const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
-  assert(c);
-
-  trace2("expand?", long_label(), common()->modelname());
+{ itested();
+  trace4("DEV_LOGIC::expand", long_label(), common()->modelname(), common()->has_model(), common());
+  trace3("expanded", long_label(), common()->modelname(), common());
 
   if(common()->modelname()==""){
-    // happens when instanciated from verilog.
-    incomplete();
+    ELEMENT::expand();
     return;
   }else{
+    // spice legacy stuff.
+    //
+    // keep modelname. use COMMON for logic.
+    _modelname=common()->modelname();
   }
+
+  // MODEL_LOGIC is actually a COMMON_COMPONENT. need to arrange things
+  const MODEL_LOGIC* c = prechecked_cast<const MODEL_LOGIC*>(common());
+  assert(c);
 
   attach_model();
 
-#if 0
-  const MODEL_LOGIC* m = dynamic_cast<const MODEL_LOGIC*>(c->model());
-  if (!m) { untested();
+#if 1
+  if (!common()->has_model()) { untested();
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
-  }else{ untested();
-    attach_common(model->_logic); // yikes.
+  }else if (!common()->model()->new_common()) {
+    throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
+  }else{
   }
 #endif
 #if 1
 
-  std::string subckt_name(c->modelname()+dev_type()+to_string(incount()));
-  try { untested();
+  std::string modelname=common()->modelname();
+  COMMON_COMPONENT* mc=common()->model()->new_common()->clone(); // zaps modelname .
+  trace2("attached new common", long_label(), common()->modelname());
+  mc->set_modelname("");
+  attach_common(mc);
+  precalc_first();
+  ELEMENT::expand(); // does the deflate trick.
+
+  std::string subckt_name(_modelname+name()+to_string(incount()));
+  try {
     const CARD* model = find_looking_out(subckt_name);
     
     if(!dynamic_cast<const BASE_SUBCKT*>(model)) {untested();
       error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
-    }else{ untested();
+    }else{
       _gatemode = OPT::mode;    
       renew_subckt(model, NULL/*&(c->_params)*/);    
       subckt()->expand();
     }
-  }catch (Exception_Cant_Find&) { untested();
+  }catch (Exception_Cant_Find&) {
     error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)), 
 	  long_label() + ": can't find subckt: " + subckt_name + ", forcing digital\n");
   }
@@ -125,22 +145,22 @@ void DEV_LOGIC::expand()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_iwant_matrix()
-{ untested();
-  if (subckt()) { untested();
+{
+  if (subckt()) {
     subckt()->tr_iwant_matrix();
-  }else{ untested();
+  }else{
   }
   tr_iwant_matrix_passive();
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_begin()
-{ untested();
+{
   ELEMENT::tr_begin();
-  if (!subckt()) { untested();
+  if (!subckt()) {
     _gatemode = moDIGITAL;
     _n[OUTNODE]->set_mode(_gatemode);
     _oldgatemode = _gatemode;
-  }else{ untested();
+  }else{
     _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
     _n[OUTNODE]->set_mode(_gatemode);
     _oldgatemode = _gatemode;
@@ -160,14 +180,14 @@ void DEV_LOGIC::tr_restore()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::dc_advance()
-{ untested();
+{
   ELEMENT::dc_advance();
 
   if (_gatemode != _oldgatemode) {untested();
     tr_unload();
     _n[OUTNODE]->set_mode(_gatemode);
     _oldgatemode = _gatemode;
-  }else{ untested();
+  }else{
   }
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
@@ -177,10 +197,10 @@ void DEV_LOGIC::dc_advance()
     subckt()->dc_advance();
     break;
   case moDIGITAL:
-    if (_n[OUTNODE]->in_transit()) { untested();
+    if (_n[OUTNODE]->in_transit()) {
       //q_eval(); evalq is not used for DC
       _n[OUTNODE]->propagate();
-    }else{ untested();
+    }else{
     }
     break;
   }
@@ -190,14 +210,14 @@ void DEV_LOGIC::dc_advance()
  * It sets up preconditions for the new time.
  */
 void DEV_LOGIC::tr_advance()
-{ untested();
+{
   ELEMENT::tr_advance();
 
-  if (_gatemode != _oldgatemode) { untested();
+  if (_gatemode != _oldgatemode) {
     tr_unload();
     _n[OUTNODE]->set_mode(_gatemode);
     _oldgatemode = _gatemode;
-  }else{ untested();
+  }else{
   }
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
@@ -207,14 +227,14 @@ void DEV_LOGIC::tr_advance()
     subckt()->tr_advance();
     break;
   case moDIGITAL: 
-    if (_n[OUTNODE]->in_transit()) { untested();
+    if (_n[OUTNODE]->in_transit()) {
       q_eval();
-      if (_sim->_time0 >= _n[OUTNODE]->final_time()) { untested();
+      if (_sim->_time0 >= _n[OUTNODE]->final_time()) {
 	_n[OUTNODE]->propagate();
       }else{
 	// not ready to propagate. overclocked?
       }
-    }else{ untested();
+    }else{
     }
     break;
   }
@@ -254,15 +274,15 @@ void DEV_LOGIC::tr_regress()
  * tran always returns false, already queued by tr_advance if needed
  */
 bool DEV_LOGIC::tr_needs_eval()const
-{ untested();
+{
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:   unreachable(); break;
   case moDIGITAL:
     //assert(!is_q_for_eval());
     if (_sim->analysis_is_restore()) {untested();
-    }else if (_sim->analysis_is_static()) { untested();
-    }else{ untested();
+    }else if (_sim->analysis_is_static()) {
+    }else{
     }
     return (_sim->analysis_is_static() || _sim->analysis_is_restore());
   case moANALOG:
@@ -276,7 +296,7 @@ bool DEV_LOGIC::tr_needs_eval()const
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_queue_eval()
-{ untested();
+{
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:	  unreachable(); break;
@@ -286,19 +306,19 @@ void DEV_LOGIC::tr_queue_eval()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::tr_eval_digital()
-{ untested();
+{
   assert(_gatemode == moDIGITAL);
   if (_sim->analysis_is_restore()) {untested();
-  }else if (_sim->analysis_is_static()) { untested();
-  }else{ untested();
+  }else if (_sim->analysis_is_static()) {
+  }else{
   }
-  if (_sim->analysis_is_static() || _sim->analysis_is_restore()) { untested();
+  if (_sim->analysis_is_static() || _sim->analysis_is_restore()) {
     tr_accept();
-  }else{ untested();
+  }else{
     assert(_sim->analysis_is_tran_dynamic());
   }
   
-  const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
+  const MODEL_LOGIC* c = prechecked_cast<const MODEL_LOGIC*>(common());
   assert(c);
   // const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
   // assert(m);
@@ -327,7 +347,7 @@ bool DEV_LOGIC::do_tr()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_load()
-{ untested();
+{
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:   unreachable(); break;
@@ -337,7 +357,7 @@ void DEV_LOGIC::tr_load()
 }
 /*--------------------------------------------------------------------------*/
 TIME_PAIR DEV_LOGIC::tr_review()
-{ untested();
+{
   // not calling ELEMENT::tr_review();
 
   q_accept();
@@ -356,9 +376,10 @@ TIME_PAIR DEV_LOGIC::tr_review()
  * It sets up and queues transitions, and sometimes determines logic states.
  */
 void DEV_LOGIC::tr_accept()
-{ untested();
+{
+  trace2("DEV_LOGIC::tr_accept", long_label(), _n[OUTNODE]->lv() );
   assert(_gatemode == moDIGITAL || _gatemode == moANALOG);
-  const COMMON_LOGIC* m = prechecked_cast<const COMMON_LOGIC*>(common());
+  const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(common());
   assert(m);
 //  const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
 //  assert(m);
@@ -366,7 +387,7 @@ void DEV_LOGIC::tr_accept()
   /* Check quality and get node info to local array. */
   /* side effect --- generate digital values for analog nodes */
   assert(PORTS_PER_GATE == max_nodes());
-  { untested();
+  {
     _n[OUTNODE]->to_logic(m);
     _quality = _n[OUTNODE]->quality();  /* the worst quality on this device */
     _failuremode = _n[OUTNODE]->failure_mode();    /* what is wrong with it? */
@@ -375,17 +396,17 @@ void DEV_LOGIC::tr_accept()
     trace0(long_label().c_str());
     trace2(_n[OUTNODE]->failure_mode().c_str(), OUTNODE, _n[OUTNODE]->quality());
     
-    for (int ii = BEGIN_IN;  ii < net_nodes();  ++ii) { untested();
+    for (int ii = BEGIN_IN;  ii < net_nodes();  ++ii) {
       _n[ii]->to_logic(m);
-      if (_n[ii]->quality() < _quality) { untested();
+      if (_n[ii]->quality() < _quality) {
 	_quality = _n[ii]->quality();
 	_failuremode = _n[ii]->failure_mode();
-      }else{ untested();
+      }else{
       }
-      if (_n[ii]->d_iter() >= lastchangeiter) { untested();
+      if (_n[ii]->d_iter() >= lastchangeiter) {
 	lastchangeiter = _n[ii]->d_iter();
 	_lastchangenode = ii;
-      }else{ untested();
+      }else{
       }
       trace2(_n[ii]->failure_mode().c_str(), ii, _n[ii]->quality());
     }
@@ -397,42 +418,42 @@ void DEV_LOGIC::tr_accept()
     trace3(_failuremode.c_str(), _lastchangenode, lastchangeiter, _quality);
   }
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */  
-  if (want_analog()) { untested();
+  if (want_analog()) {
     if (_gatemode == moDIGITAL) {untested();
       error(bTRACE, "%s:%u:%g switch to analog, %s\n", long_label().c_str(),
 	    _sim->iteration_tag(), _sim->_time0, _failuremode.c_str());
       _oldgatemode = _gatemode;
       _gatemode = moANALOG;
-    }else{ untested();
+    }else{
     }
     assert(_gatemode == moANALOG);
-  }else{ untested();
+  }else{
     assert(want_digital());
-    if (_gatemode == moANALOG) { untested();
+    if (_gatemode == moANALOG) {
       error(bTRACE, "%s:%u:%g switch to digital\n",
 	    long_label().c_str(), _sim->iteration_tag(), _sim->_time0);
       _oldgatemode = _gatemode;
       _gatemode = moDIGITAL;
-    }else{ untested();
+    }else{
     }
     assert(_gatemode == moDIGITAL);
     if (_sim->analysis_is_restore()) {untested();
-    }else if (_sim->analysis_is_static()) { untested();
-    }else{ untested();
+    }else if (_sim->analysis_is_static()) {
+    }else{
     }
     if (!_sim->_bypass_ok
 	|| _lastchangenode != OUTNODE
 	|| _sim->analysis_is_static()
-	|| _sim->analysis_is_restore()) { untested();
+	|| _sim->analysis_is_restore()) {
       LOGICVAL future_state = logic_eval(&_n[BEGIN_IN], incount());
       //		      ^^^^^^^^^^
       if ((_n[OUTNODE]->is_unknown()) &&
-	  (_sim->analysis_is_static() || _sim->analysis_is_restore())) { untested();
+	  (_sim->analysis_is_static() || _sim->analysis_is_restore())) {
 	_n[OUTNODE]->force_initial_value(future_state);
 	/* This happens when initial DC is digital.
 	 * Answers could be wrong if order in netlist is reversed 
 	 */
-      }else if (future_state != _n[OUTNODE]->lv()) { untested();
+      }else if (future_state != _n[OUTNODE]->lv()) {
 	assert(future_state != lvUNKNOWN);
 	switch (future_state) {
 	case lvSTABLE0:	/*nothing*/		break;
@@ -450,7 +471,7 @@ void DEV_LOGIC::tr_accept()
 	 */
 	assert(future_state.lv_old() == future_state.lv_future());
 	if (_n[OUTNODE]->lv() == lvUNKNOWN
-	    || future_state.lv_future() != _n[OUTNODE]->lv_future()) { untested();
+	    || future_state.lv_future() != _n[OUTNODE]->lv_future()) {
 	  _n[OUTNODE]->set_event(m->delay, future_state);
 	  _sim->new_event(_n[OUTNODE]->final_time());
 	  //assert(future_state == _n[OUTNODE].lv_future());
@@ -458,20 +479,20 @@ void DEV_LOGIC::tr_accept()
 	    unreachable();
 	    error(bDANGER, "%s:%u:%g non-event state change\n",
 		  long_label().c_str(), _sim->iteration_tag(), _sim->_time0);
-	  }else{ untested();
+	  }else{
 	  }
-	}else{ untested();
+	}else{
 	}
-      }else{ untested();
+      }else{
       }
-    }else{ untested();
+    }else{
     }
   }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_unload()
-{ untested();
-  if (subckt()) { untested();
+{
+  if (subckt()) {
     subckt()->tr_unload();
   }else{untested();
   }
@@ -479,10 +500,10 @@ void DEV_LOGIC::tr_unload()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::ac_iwant_matrix()
-{ untested();
-  if (subckt()) { untested();
+{
+  if (subckt()) {
     subckt()->ac_iwant_matrix();
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -496,7 +517,7 @@ void DEV_LOGIC::ac_begin()
 }
 /*--------------------------------------------------------------------------*/
 double DEV_LOGIC::tr_probe_num(const std::string& what)const
-{ untested();
+{
   return _n[OUTNODE]->tr_probe_num(what);
 }
 /*--------------------------------------------------------------------------*/
@@ -506,61 +527,79 @@ XPROBE DEV_LOGIC::ac_probe_ext(const std::string& what)const
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::want_analog()const
-{ untested();
+{
   return subckt() &&
     ((OPT::mode == moANALOG) || (OPT::mode == moMIXED && _quality != qGOOD));
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::want_digital()const
-{ untested();
+{
   return !subckt() ||
     ((OPT::mode == moDIGITAL) || (OPT::mode == moMIXED && _quality == qGOOD));
 }
 /*--------------------------------------------------------------------------*/
-COMMON_LOGIC::container_type COMMON_LOGIC::_commons;
+MODEL_LOGIC::container_type MODEL_LOGIC::_commons;
 /*--------------------------------------------------------------------------*/
-bool COMMON_LOGIC::operator==(const COMMON_COMPONENT& x)const
-{ untested();
-  const COMMON_LOGIC* p = dynamic_cast<const COMMON_LOGIC*>(&x);
+bool MODEL_LOGIC::operator==(const COMMON_COMPONENT& x)const
+{
+  const MODEL_LOGIC* p = dynamic_cast<const MODEL_LOGIC*>(&x);
+  trace3("ODEL_LOGIC::operator==", delay.string(), p->delay.string(), delay==p->delay);
   bool rv = p
     && _deflated == p->_deflated
+    && delay == p->delay
+    && vmax == p->vmax
+    && vmin == p->vmin
+    && unknown == p->unknown
     && rise == p->rise
     && fall == p->fall
-    // INCOMPLETE ...
+    && rs == p->rs
+    && rw == p->rw
+    && th1 == p->th1
+    && th0 == p->th0
+    && mr == p->mr
+    && mr == p->mf
+    && over == p->over
+    && tnom == p->tnom
     && COMMON_COMPONENT::operator==(x);
-  trace3("hmm", _deflated==p->_deflated, rv, COMMON_COMPONENT::operator==(x));
-  trace3("hmm", fall == p->fall, rise == p->rise, name());
   if (rv) { untested();
-  }else{ untested();
+  }else{
   }
   return rv;
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_LOGIC::operator<(const COMMON_LOGIC& p)const
+void CMP_lt(double x, double y){
+  if(x<y){
+    throw true;
+  }else if(y<x){
+    throw false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool MODEL_LOGIC::operator<(const MODEL_LOGIC& p)const
 { itested();
-  bool rv = true
-    && _deflated < p._deflated
-    && rise < p.rise
-    && fall < p.fall
-    // INCOMPLETE ...
-//    && COMMON_COMPONENT::operator<(x)
-    ;
-  if (rv) { untested();
-  }else{ untested();
+  trace3("operator<",delay.string(), p.delay.string(), delay<p.delay);
+  trace3("operator<",double(delay), double(p.delay), double(delay)<double(p.delay));
+  assert(_deflated);
+  assert(p._deflated);
+  try{
+    CMP_lt(delay, p.delay);
+    CMP_lt(vmax, p.vmax);
+    CMP_lt(vmin, p.vmin);
+    CMP_lt(unknown, p.unknown);
+    CMP_lt(rise, p.rise);
+    CMP_lt(fall, p.fall);
+    CMP_lt(rs, p.rs);
+    CMP_lt(rw, p.rw);
+    CMP_lt(th1, p.th1);
+    CMP_lt(th0, p.th0);
+    CMP_lt(mr, p.mr);
+    CMP_lt(mf, p.mf);
+    CMP_lt(over, p.over);
+    CMP_lt(tnom, p.tnom);
+  }catch(bool b){
+    return b;
   }
-  return rv;
-}
-/*--------------------------------------------------------------------------*/
-LOGIC_INV::LOGIC_INV(const DEV_LOGIC& p)
-  : DEV_LOGIC(p)
-{ untested();
-  _n = nodes;//?
-  untested();
-  if(!common()){ untested();
-    attach_common(&p2);
-  }else{ untested();
-  }
-  trace1("INV", long_label());
+  return modelname() < p.modelname(); // COMMON_COMPONENT::operator<(x)
 }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
