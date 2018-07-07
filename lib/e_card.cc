@@ -26,6 +26,8 @@
 #include "e_cardlist.h"
 #include "e_node.h"
 #include "e_card.h"
+#include "e_model.h"
+#include "globals.h"
 /*--------------------------------------------------------------------------*/
 const int POOLSIZE = 4;
 /*--------------------------------------------------------------------------*/
@@ -179,8 +181,14 @@ const CARD* CARD::find_looking_out(const std::string& name)const
       }else{
 	throw;
       }
-    }else{
-      throw;
+    }else{ untested();
+      if(CARD const* x=device_dispatcher[name]){ untested();
+	return x;
+      }else if(CARD const* m=model_dispatcher[name]){ untested();
+	return m;
+      }else{ untested();
+	throw;
+      }
     }
   }
 }
