@@ -770,7 +770,7 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
   if (x->print_type_in_spice()) {
-    o << x->dev_type();
+    o << "  " << x->dev_type();
   }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {untested();
     o << x->dev_type();
   }else{
@@ -806,7 +806,7 @@ void LANG_SPICE_BASE::print_label(OMSTREAM& o, const COMPONENT* x)
   if(!x->id_letter()){ untested();
   }else if(!l.size()){ untested();
     unreachable();
-  }else if(x->id_letter() != l[0]){ untested();
+  }else if(fix_case(x->id_letter()) != fix_case(l[0])){ untested();
     o << x->id_letter();
   }else{ untested();
   }
