@@ -581,6 +581,7 @@ class CMD_PARAMSET : public CMD {
 	Scope->push_back(new_card);
       }else if(/*COMPONENT* c=*/dynamic_cast<COMPONENT*>(cl)){ untested();
 	CARD* pcl=device_dispatcher.clone("paramset");
+	assert(pcl->subckt());
 	BASE_SUBCKT* ps=dynamic_cast<BASE_SUBCKT*>(pcl);
 	assert(ps);
 	// p->attach_proto(c); ??

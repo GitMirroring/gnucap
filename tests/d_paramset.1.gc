@@ -1,5 +1,4 @@
 verilog
-options trace
 
 module testmodule(1,2,3);
 parameter a=1;
@@ -9,12 +8,14 @@ paramset myresistor resistor;
 	.r=4;
 endparamset
 
-myresistor rr(2,3);
-resistor #(.r(1)) r2(2,3);
+myresistor rr(0,1);
+resistor #(.r(1)) r2(2,1);
+
+vsource #(.dc(1)) v1(2,0);
 
 list
 
-print dc ev(rr) ev(r2)
+print dc ev(rr) ev(r2) v(1)
 dc
 
 

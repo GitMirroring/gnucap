@@ -15,33 +15,36 @@ static COMMON_PARAMLIST Default_PARAMSET(CC_STATIC);
 // (does not work yet)
 class DEV_PARAMSET : public COMPONENT {
 private:
-  explicit	DEV_PARAMSET(const DEV_PARAMSET& p)
-    : COMPONENT(p), _comp(p._comp) { untested();
-		 attach_common(&Default_PARAMSET);
-  }
-  // maybe don't clone here..
+   explicit	DEV_PARAMSET(const DEV_PARAMSET& p)
+     : COMPONENT(p), _comp(p._comp) { untested();
+    	 attach_common(&Default_PARAMSET);
+   }
   explicit DEV_PARAMSET(COMPONENT const* x)
-    : COMPONENT(), _comp(prechecked_cast<COMPONENT*>(x->clone())) {
+    : COMPONENT(), _comp(prechecked_cast<COMPONENT*>(x->clone())) { untested();
       trace3("cloned", _comp, _comp->max_nodes(), _comp->port_name(0));
     assert(_comp);
 		 attach_common(&Default_PARAMSET);
-
-//    _comp->set_owner(this); // so it uses scope->params to resolve parameters
-//    _comp->set_owner(owner()); // so it connects ports properly
+		 _scopehack=nullptr;
+	  _comp->set_owner(this); // "this" needs a scope...
     _n = &_comp->n_(0);
+	  if(!subckt()){ untested();
+		  new_subckt();
+	  }
   }
 public:
   CARD_LIST* scope(){ untested();
-	  if( _scopehack){
+	  if( _scopehack){ untested();
 		  return _scopehack;
-	  }else{
+	  }else{ untested();
+		 // assert(owner());
+		  assert( CARD::scope() );
 		  return CARD::scope();
 	  }
   }
   CARD_LIST const* scope() const{ untested();
-	  if( _scopehack){
+	  if( _scopehack){ untested();
 		  return _scopehack;
-	  }else{
+	  }else{ untested();
 		  return CARD::scope();
 	  }
   }
@@ -51,22 +54,23 @@ public:
     : _dev_type(""),
 		_comp(NULL),
 	   _parent(NULL)
-  {
+  { untested();
 //    _n = &_comp->n_(0);
 //	 _n[0].new_node("foo", this);
 //	 trace1("portvalue", port_value(0));
   }
 		~DEV_PARAMSET()		{--_count;}
-  CARD*		clone()const		{untested(); return new DEV_PARAMSET(*this);}
-  CARD*	new_wrap(COMPONENT const* x)const{
+  CARD*		clone()const		{assert(false);untested(); return new DEV_PARAMSET(*this);}
+  CARD*	new_wrap(COMPONENT const* x)const{ untested();
     assert(x);
-    return new DEV_PARAMSET(x);
+    auto r=new DEV_PARAMSET(x);
+	 return r;
   }
 private: // override virtual
   char		id_letter()const	{ return '\0';}
   bool		print_type_in_spice()const { return false;}
   std::string   value_name()const	{ return "#";}
-  void   set_dev_type(std::string const& s) {
+  void   set_dev_type(std::string const& s) { untested();
     // not optimal. perhaps could use COMPONENT::set_dev_type...
     _dev_type = s;
     // TODO: check if that's what parent is...
@@ -79,12 +83,17 @@ private: // port overrides
     assert(_comp);
     return _comp->port_value(i);
   }
-  void set_port_by_index(int num, std::string& ext_name) {
+  void set_port_by_index(int num, std::string& ext_name) { untested();
     assert(_comp);
+	 _comp->set_owner(this); // ??!
+	 assert(scope());
+	 assert(_comp->scope());
+	 assert(_comp->owner());
+	 assert(scope());
     _comp->set_port_by_index(num, ext_name);
   }
   // necessary?
-  std::string port_name(int i)const{
+  std::string port_name(int i)const{ untested();
     trace3("port_name", i, _comp->dev_type(), _comp);
     assert(_comp);
     incomplete();
@@ -96,7 +105,7 @@ private: // port overrides
 private: // simulation stuff
   // skipping assert(_comp) here.
   void      tr_iwant_matrix(){ _comp->tr_iwant_matrix(); }
-  double    tr_probe_num(const std::string&s)const{
+  double    tr_probe_num(const std::string&s)const{ untested();
     return _comp->tr_probe_num(s);
   }
   void ac_iwant_matrix(){ _comp->ac_iwant_matrix(); }
@@ -117,14 +126,14 @@ private: // simulation stuff
   void ac_load()	{untested(); assert(_comp); _comp->ac_load();}
 private:
 
-  std::string dev_type() const{
+  std::string dev_type() const{ untested();
     return _dev_type;
   }
-  int max_nodes()const{
+  int max_nodes()const{ untested();
     assert(_comp);
     return(_comp->max_nodes());
   }
-  int min_nodes()const{
+  int min_nodes()const{ untested();
     assert(_comp);
     return(_comp->min_nodes());
   }
@@ -132,7 +141,7 @@ private:
     assert(_comp);
     return(_comp->matrix_nodes());
   }
-  int net_nodes()const{
+  int net_nodes()const{ untested();
     assert(_comp);
     return(_comp->net_nodes());
   }
@@ -143,22 +152,22 @@ private:
 	  PARAM_LIST const* p=_parent->subckt()->params();
 	  assert(p);
 
-	  if (subckt()) {
+	  if (subckt()) { untested();
 		 COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
 		 assert(c);
 		 subckt()->attach_params(&(c->_params), scope());
 		 subckt()->precalc_first();
 
 //	  need to evaluate _comp parameters but in subckt()->scope()
-	  //for (PARAM_LIST::const_iterator ci=p->begin(); ci!=p->end(); ++ci) {
+	  //for (PARAM_LIST::const_iterator ci=p->begin(); ci!=p->end(); ++ci) { untested();
 	  //   _comp->set_param_by_name(ci->first, ci->second.string());
 	  //}
 	  assert(_comp);
 	  assert(scope());
 	  assert(subckt());
+	  _comp->set_owner(this); // "this" needs a scope...
 
 	  untested();
-	  _comp->set_owner(this); // "this" needs a scope...
 	  assert(_comp->scope());
 	  assert(_comp->owner());
 	  assert(_comp->owner()->scope());
@@ -166,7 +175,7 @@ private:
 	  _comp->precalc_first();
 	  _scopehack = nullptr;
 //	  _comp->set_owner(owner());
-	  }else{
+	  }else{ untested();
 	  }
   }
   bool makes_own_scope()const  {untested(); return false;}
@@ -176,15 +185,15 @@ private:
 //	  _instance_params.set(n,v);
 //  }
 
-  void expand(){
-	  if(!subckt()){
+  void expand(){ untested();
+	  if(!subckt()){ untested();
 		  new_subckt();
 	  }
     assert(_comp);
     return(_comp->expand());
   }
 private:
-  void precalc_last(){
+  void precalc_last(){ untested();
     assert(_comp);
 	  _scopehack = subckt();
     return(_comp->precalc_last());
@@ -210,14 +219,14 @@ class PARAMSET : public BASE_SUBCKT {
 private:
   explicit	PARAMSET(const PARAMSET&p)
     : BASE_SUBCKT(p), _comp(p._comp)
-  {
+  { untested();
     new_subckt();
 	 set_label("dontknow");
   }
 public:
   explicit PARAMSET()
     : BASE_SUBCKT(), _comp(NULL)
-  {
+  { untested();
     new_subckt();
 	 set_label("dontknow");
   }
@@ -235,7 +244,7 @@ private: // override virtual
 
   bool		print_type_in_spice()const {unreachable(); return true;}
   std::string   value_name()const	{untested();incomplete(); return "";}
-  void set_dev_type(std::string const& s) {
+  void set_dev_type(std::string const& s) { untested();
 	  // why is this called twice??
     trace2("PARAMSET::set_dev_type", dev_type(), s);
     //CARD const* p = LANGUAGE::find_proto(s, NULL); // Scope?
@@ -247,10 +256,10 @@ private: // override virtual
     assert(c);  //for now.
     _comp = prechecked_cast<COMPONENT*>(c->clone());
 
-	 if(subckt()->begin() == subckt()->end()){
+	 if(subckt()->begin() == subckt()->end()){ untested();
 		 _comp->set_label(std::string(1,_comp->id_letter())+"_");
 		 subckt()->push_back(_comp); // will be picked up here for spice "netlisting"
-	 }else{
+	 }else{ untested();
 		 incomplete();
 	 }
 
@@ -258,21 +267,21 @@ private: // override virtual
     _n = &_comp->n_(0);
 
 
-	 for(unsigned i=0; i<net_nodes(); ++i){
+	 for(unsigned i=0; i<net_nodes(); ++i){ untested();
 		 // spice "list" needs this.
 		 _n[i].new_node(_comp->port_name(i), this);
 	 }
-	 if(scope()->is_empty()){
+	 if(scope()->is_empty()){ untested();
 		 // yuck. clone?
 		 trace2("PARAMSET::set_dev_type proto", c->net_nodes(), c->id_letter());
 		 CARD* cl=c->clone();
-		 if(cl->id_letter()){
+		 if(cl->id_letter()){ untested();
 			 cl->set_label(std::string(1, cl->id_letter()) + "_");
-		 }else{
+		 }else{ untested();
 			 cl->set_label("_");
 		 }
 		 scope()->push_back(cl);
-	 }else{
+	 }else{ untested();
 		 // why?
 	 }
 
@@ -285,8 +294,8 @@ private: // override virtual
   int		max_nodes()const	{incomplete(); return 0;}
   //int		min_nodes()const	{incomplete(); return 0;}
   //int		matrix_nodes()const	{incomplete(); untested();return 0;}
-  int net_nodes()const{
-    if(_comp){
+  int net_nodes()const{ untested();
+    if(_comp){ untested();
 		 return(_comp->net_nodes());
 	 }else{ incomplete();
 		 return 0;
@@ -318,9 +327,9 @@ private: // no-ops for prototype. same as DEV_SUBCKT_PROTO
   void tr_queue_eval(){}
   std::string port_name(int i)const{ untested();
     trace3("port_name", i, _comp->dev_type(), _comp);
-    if(_comp){
+    if(_comp){ untested();
 		 return "AAA"; // _comp->port_name(i);
-	 }else{
+	 }else{ untested();
 		 incomplete();
 		 return "";
 	 }
@@ -339,12 +348,12 @@ CARD* PARAMSET::clone_instance()const{ untested();
   assert(_comp);
   DEV_PARAMSET* new_instance = dynamic_cast<DEV_PARAMSET*>(p1.new_wrap(_comp));
   // COMPONENT* new_instance = dynamic_cast<COMPONENT*>(_comp->clone());
-  assert(!new_instance->subckt());
+  //assert(!new_instance->subckt());
 
   if (this == &pm){ incomplete();
     // cloning from static, empty model
     // look out for _parent in expand
-  }else{
+  }else{ untested();
     new_instance->_parent = this;
   }
 
