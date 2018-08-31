@@ -40,7 +40,6 @@
 namespace{
 /*--------------------------------------------------------------------------*/
 static COMMON_PARAMLIST Default_SUBCKT(CC_STATIC);
-#define PORTS_PER_SUBCKT 100
 //BUG// fixed limit on number of ports
 /*--------------------------------------------------------------------------*/
 class DEV_SUBCKT : public BASE_SUBCKT {
@@ -55,8 +54,40 @@ private: // override virtual
   char		id_letter()const	{return 'X';}
   bool		print_type_in_spice()const {return true;}
   std::string   value_name()const	{return "#";}
-  int		max_nodes()const	{return PORTS_PER_SUBCKT;}
+  int		max_nodes()const	{
+    // INT_MAX results in arithmetic overflow in lang_spice
+    return INT_MAX/2;
+  }
+
+  void set_port_by_index(int Index, std::string& Value){
+    _nodes.resize(std::max(size_t(Index)+1, _nodes.size()));
+    _n = _nodes.data();
+    trace3("resized", long_label(), Index, _nodes.capacity());
+
+    BASE_SUBCKT::set_port_by_index(Index, Value);
+  }
+
+  // override. the base class does not know about _parent.
+  void set_port_by_name(std::string& int_name, std::string& ext_name) {
+    int max = max_nodes();
+    if(_parent){ untested();
+      CARD const* p=prechecked_cast<CARD const*>(_parent);
+      max = p->net_nodes();
+    }else{ untested();
+    }
+
+    for (int i=0; i<max; ++i) {
+      if (int_name == port_name(i)) {
+	set_port_by_index(i, ext_name);
+	return;
+      }else{
+      }
+    }
+    untested();
+    throw Exception_No_Match(int_name);
+  }
   int		min_nodes()const	{return 0;}
+  int    	ext_nodes()const	{ /* 0?? */  return net_nodes();}
   int		matrix_nodes()const	{return 0;}
   int		net_nodes()const	{return _net_nodes;}
   void		precalc_first();
@@ -74,7 +105,7 @@ public:
 protected:
   const BASE_SUBCKT* _parent;
 private:
-  node_t	_nodes[PORTS_PER_SUBCKT];
+  std::vector<node_t> _nodes;
   static int	_count;
 } p1;
 int DEV_SUBCKT::_count = -1;
@@ -91,7 +122,7 @@ public: // override virtual
   bool		print_type_in_spice()const {unreachable(); return false;}
   std::string   value_name()const	{untested();incomplete(); return "";}
   std::string   dev_type()const		{untested(); return "";}
-  int		max_nodes()const	{return PORTS_PER_SUBCKT;}
+  int	ext_nodes()const	{ untested(); /* 0?? */  return net_nodes();}
   int		min_nodes()const	{return 0;}
   int		matrix_nodes()const	{untested();return 0;}
   int		net_nodes()const	{return _net_nodes;}
@@ -156,7 +187,6 @@ DEV_SUBCKT::DEV_SUBCKT()
    _parent(NULL)
 {
   attach_common(&Default_SUBCKT);
-  _n = _nodes;
   ++_count;
 }
 /*--------------------------------------------------------------------------*/
@@ -165,10 +195,8 @@ DEV_SUBCKT::DEV_SUBCKT(const DEV_SUBCKT& p)
    _parent(p._parent)
 {
   //strcpy(modelname, p.modelname); in common
-  for (int ii = 0;  ii < max_nodes();  ++ii) {
-    _nodes[ii] = p._nodes[ii];
-  }
-  _n = _nodes;
+  _nodes = p._nodes;
+  _n = _nodes.data();
   assert(!subckt());
   ++_count;
 }
@@ -213,6 +241,13 @@ void DEV_SUBCKT::expand()
   PARAM_LIST* pl = const_cast<PARAM_LIST*>(_parent->subckt()->params());
   assert(pl);
   c->_params.set_try_again(pl);
+
+  {
+    // some of these are used in debug mode in map_subckt_nodes
+    // make valgrind happy..
+    _nodes.resize(prechecked_cast<CARD const*>(_parent)->net_nodes());
+    _n = _nodes.data();
+  }
 
   renew_subckt(_parent, &(c->_params));
   subckt()->expand();
