@@ -87,9 +87,9 @@ int CARD::connects_to(const node_t& node)const
 /*--------------------------------------------------------------------------*/
 CARD_LIST* CARD::scope()
 {
-  if (owner()) {
+  if (owner()) { untested();
     return owner()->subckt();	// normal element, owner determines scope
-  }else{
+  }else{ untested();
     return &(CARD_LIST::card_list);	// root circuit
   }
 }

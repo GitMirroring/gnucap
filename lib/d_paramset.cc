@@ -1,12 +1,15 @@
 
+#define DO_TRACE
 #include "e_compon.h"
 #include "e_subckt.h"
 #include "globals.h"
 #include "u_lang.h"
 #include "u_opt.h"
 #include "e_node.h"
+#include "e_paramlist.h"
 // apps/paramset.cc?
 namespace{
+static COMMON_PARAMLIST Default_PARAMSET(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 // similar to DEV_SUBCKT, but just forward to nested COMPONENT
 // (does not work yet)
@@ -14,19 +17,35 @@ class DEV_PARAMSET : public COMPONENT {
 private:
   explicit	DEV_PARAMSET(const DEV_PARAMSET& p)
     : COMPONENT(p), _comp(p._comp) { untested();
+		 attach_common(&Default_PARAMSET);
   }
   // maybe don't clone here..
   explicit DEV_PARAMSET(COMPONENT const* x)
     : COMPONENT(), _comp(prechecked_cast<COMPONENT*>(x->clone())) {
       trace3("cloned", _comp, _comp->max_nodes(), _comp->port_name(0));
     assert(_comp);
-    _comp->set_owner(owner());
-    // yikes. needed for port_value
-    // maybe with this hack, some of the other overrides are not needed...
+		 attach_common(&Default_PARAMSET);
+
+//    _comp->set_owner(this); // so it uses scope->params to resolve parameters
+//    _comp->set_owner(owner()); // so it connects ports properly
     _n = &_comp->n_(0);
-//	 _n[0].new_node("foo", this);
-//	 trace1("portvalue", port_value(0));
   }
+public:
+  CARD_LIST* scope(){ untested();
+	  if( _scopehack){
+		  return _scopehack;
+	  }else{
+		  return CARD::scope();
+	  }
+  }
+  CARD_LIST const* scope() const{ untested();
+	  if( _scopehack){
+		  return _scopehack;
+	  }else{
+		  return CARD::scope();
+	  }
+  }
+
 public:
   explicit	DEV_PARAMSET()
     : _dev_type(""),
@@ -117,28 +136,59 @@ private:
     assert(_comp);
     return(_comp->net_nodes());
   }
-  void precalc_first(){
+  void precalc_first(){ untested();
+	  COMPONENT::precalc_first(); // mfactor...
 	  assert(_parent);
 	  assert(_parent->subckt());
 	  PARAM_LIST const* p=_parent->subckt()->params();
 	  assert(p);
 
-	  for (PARAM_LIST::const_iterator ci=p->begin(); ci!=p->end(); ++ci) {
-		  _comp->set_param_by_name(ci->first, ci->second.string());
-	  }
+	  if (subckt()) {
+		 COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
+		 assert(c);
+		 subckt()->attach_params(&(c->_params), scope());
+		 subckt()->precalc_first();
+
+//	  need to evaluate _comp parameters but in subckt()->scope()
+	  //for (PARAM_LIST::const_iterator ci=p->begin(); ci!=p->end(); ++ci) {
+	  //   _comp->set_param_by_name(ci->first, ci->second.string());
+	  //}
 	  assert(_comp);
-	  return(_comp->precalc_first());
+	  assert(scope());
+	  assert(subckt());
+
+	  untested();
+	  _comp->set_owner(this); // "this" needs a scope...
+	  assert(_comp->scope());
+	  assert(_comp->owner());
+	  assert(_comp->owner()->scope());
+	  _scopehack = subckt();
+	  _comp->precalc_first();
+	  _scopehack = nullptr;
+//	  _comp->set_owner(owner());
+	  }else{
+	  }
   }
   bool makes_own_scope()const  {untested(); return false;}
 
+  // use common
+//  void set_param_by_name(std::string n, std::string v){ untested();
+//	  _instance_params.set(n,v);
+//  }
+
   void expand(){
+	  if(!subckt()){
+		  new_subckt();
+	  }
     assert(_comp);
     return(_comp->expand());
   }
 private:
   void precalc_last(){
     assert(_comp);
+	  _scopehack = subckt();
     return(_comp->precalc_last());
+	  _scopehack = nullptr;
   }
   int param_count_dont_print()const {return common()->COMMON_COMPONENT::param_count();}
 public:
@@ -147,8 +197,11 @@ private:
   std::string _dev_type;
   COMPONENT* _comp;
   static int _count; // todo.
+
+  CARD_LIST* _scopehack;
 public:
   BASE_SUBCKT const* _parent;
+  PARAM_LIST _instance_params;
 } p1; // DEV_PARAMSET
 int DEV_PARAMSET::_count;
 /*--------------------------------------------------------------------------*/
@@ -159,20 +212,23 @@ private:
     : BASE_SUBCKT(p), _comp(p._comp)
   {
     new_subckt();
+	 set_label("dontknow");
   }
 public:
   explicit PARAMSET()
     : BASE_SUBCKT(), _comp(NULL)
   {
     new_subckt();
+	 set_label("dontknow");
   }
   ~PARAMSET(){}
 private: // override virtual
-  void set_param_by_name(std::string n, std::string v){
-    trace2("PARAMSET::set_param_by_name", n, v);
-    PARAM_LIST* pl = scope()->params();
-    assert(pl);
-    pl->set(n, v);
+  void set_param_by_name(std::string n, std::string v){ untested();
+	  trace3("PARAMSET::set_param_by_name", n, v, _comp);
+	  PARAM_LIST* pl = scope()->params();
+	  assert(pl);
+	  assert(_comp);
+	  _comp->set_param_by_name(n, v);
   }
   char		id_letter()const	{untested();return 'y';}
   CARD*		clone_instance()const;
@@ -181,7 +237,7 @@ private: // override virtual
   std::string   value_name()const	{untested();incomplete(); return "";}
   void set_dev_type(std::string const& s) {
 	  // why is this called twice??
-    trace1("PARAMSET::set_dev_type", s);
+    trace2("PARAMSET::set_dev_type", dev_type(), s);
     //CARD const* p = LANGUAGE::find_proto(s, NULL); // Scope?
     //CARD const* p = find_looking_out(s);
 	 assert(OPT::language);
@@ -189,7 +245,15 @@ private: // override virtual
 
     COMPONENT const* c=dynamic_cast<COMPONENT const*>(p);
     assert(c);  //for now.
-    _comp = c;
+    _comp = prechecked_cast<COMPONENT*>(c->clone());
+
+	 if(subckt()->begin() == subckt()->end()){
+		 _comp->set_label(std::string(1,_comp->id_letter())+"_");
+		 subckt()->push_back(_comp); // will be picked up here for spice "netlisting"
+	 }else{
+		 incomplete();
+	 }
+
     // yikes. needed for port_value. used in lang_spice
     _n = &_comp->n_(0);
 
@@ -266,12 +330,12 @@ private: // no-ops for prototype. same as DEV_SUBCKT_PROTO
   }
 private:
   std::string _dev_type;
-  COMPONENT const* _comp;
+  COMPONENT* _comp;
 } pm;
 /*--------------------------------------------------------------------------*/
 DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "paramset", &pm);
 /*--------------------------------------------------------------------------*/
-CARD* PARAMSET::clone_instance()const{
+CARD* PARAMSET::clone_instance()const{ untested();
   assert(_comp);
   DEV_PARAMSET* new_instance = dynamic_cast<DEV_PARAMSET*>(p1.new_wrap(_comp));
   // COMPONENT* new_instance = dynamic_cast<COMPONENT*>(_comp->clone());

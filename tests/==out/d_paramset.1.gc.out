@@ -6,10 +6,9 @@ module testmodule (1,2,3);
 parameter a={ 1.};
 endmodule // testmodule
 
-module myresistor (p,n);
-parameter r;
-resistor #() R_ (.p(p),.n(n));
-endmodule // myresistor
+paramset myresistor;
+ .r=4;
+endparamset; // myresistor
 
 myresistor #() rr (.p(2),.n(3));
 resistor #(.r(1)) r2 (.p(2),.n(3));

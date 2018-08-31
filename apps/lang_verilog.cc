@@ -513,9 +513,22 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
     o << "paramset " <<  x->short_label() << ";\n";
     // print_args_paramset(o, x);
     for (PARAM_LIST::const_iterator ci=p->begin(); ci!=p->end(); ++ci) { untested();
-      o << "." << ci->first << "={" << ci->second.string() << "};\n";
+      o << "parameter " << ci->first << "={" << ci->second.string() << "};\n";
     }
+    CARD_LIST::const_iterator ci = x->subckt()->begin();
+    CARD* proto=*ci;
+    assert(++ci == x->subckt()->end());
+
+    for (int ii = proto->param_count() - 1;  ii >= 0;  --ii) { untested();
+      if (proto->param_is_printable(ii)) { untested();
+	std::string arg = " ." + proto->param_name(ii) + "=" + proto->param_value(ii) + ";\n";
+	o << arg;
+      }else{ untested();
+      }
+    }
+
     o << "endparamset; // " << x->short_label() << "\n\n";
+
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -556,8 +569,10 @@ class CMD_PARAMSET : public CMD {
     unsigned here = cmd.cursor();    
     cmd >> base_name;
 
+
     //const MODEL_CARD* p = model_dispatcher[base_name];
     const CARD* p = lang_verilog.find_proto(base_name, NULL); // Scope?
+    trace2("cmd_paramset", base_name, p);
     if (p) { untested();
       CARD* cl = p->clone();
       if (MODEL_CARD* new_card=dynamic_cast<MODEL_CARD*>(cl)) { untested();
@@ -565,11 +580,12 @@ class CMD_PARAMSET : public CMD {
 	lang_verilog.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);
       }else if(/*COMPONENT* c=*/dynamic_cast<COMPONENT*>(cl)){ untested();
-	BASE_SUBCKT* ps=dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("paramset"));
+	CARD* pcl=device_dispatcher.clone("paramset");
+	BASE_SUBCKT* ps=dynamic_cast<BASE_SUBCKT*>(pcl);
 	assert(ps);
 	// p->attach_proto(c); ??
+//	assert(cl->dev_type() == base_name);
 	delete cl; // for now.
-	ps->set_dev_type(base_name);
 	lang_verilog.parse_paramset_(cmd, ps);
 	Scope->push_back(ps);
       }else{untested();

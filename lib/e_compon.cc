@@ -523,14 +523,14 @@ void COMPONENT::expand()
 void COMPONENT::precalc_first()
 {
   CARD::precalc_first();
-  if (has_common()) {
+  if (has_common()) { untested();
     try {
       mutable_common()->precalc_first(scope());
     }catch (Exception_Precalc& e) {untested();
       error(bWARNING, long_label() + ": " + e.message());
     }
     _mfactor = common()->mfactor();
-  }else{
+  }else{ untested();
   }
 
   //BUG//  _mfactor must be in precalc_first

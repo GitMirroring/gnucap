@@ -1,12 +1,15 @@
 verilog
 
-resistor R1(1,2);
+resistor #(.r(2)) R1(1,2);
 paramset myresistor resistor;
-	.r=5
+parameter a=2
+	.r=a
 endparamset
 
 myresistor Xrr(2,3);
 
 spice
+
+* TODO: print parameters.
 .list
 .end

@@ -1,2 +1,21 @@
 >>>>>parameter globalr=1 
 >>>>>paramset myresistor resistor; 
+>>>>>list 
+paramset myresistor;
+ .r=globalr;
+endparamset; // myresistor
+
+>>>>>list 
+paramset myresistor;
+ .r=globalr;
+endparamset; // myresistor
+
+myresistor #() r2 (.p(2),.n(0));
+vsource #(.dc(2)) v1 (.p(2),.n(0));
+>>>>>print dc ev(r2) i(v1) v(r2) i(r2) 
+>>>>>dc 
+parameter globalr not specified, using default
+#           ev(r2)     i(v1)      v(r2)      i(r2)     
+r2.: short circuit
+ 0.         10.u      -100.K      1.         100.K     
+>>>>>end 

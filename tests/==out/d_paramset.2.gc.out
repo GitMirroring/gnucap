@@ -1,0 +1,10 @@
+paramset myresistor;
+parameter a={ 1.};
+ .r=a+3;
+endparamset; // myresistor
+
+myresistor #(.a(2.)) rr (.p(2),.n(3));
+print dc ev(rr) ev(r2) 
+                   ^ ? no match
+#           ev(rr)    
+ 0.         5.        

@@ -3,6 +3,7 @@ options trace
 
 parameter globalr=1
 
+// does not seem to work
 paramset myresistor resistor;
 	.r=globalr;
 endparamset

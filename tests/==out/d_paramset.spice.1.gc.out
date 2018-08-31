@@ -1,0 +1,5 @@
+R1 ( 1 2 ) 
+.subckt myresistor ( p n )
+ ( p n )resistor 5
+.ends myresistor
+Xrr ( 2 3 )myresistor 
