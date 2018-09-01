@@ -27,7 +27,6 @@
 #include "e_node.h"
 #include "u_nodemap.h"
 #include "e_model.h"
-#define DO_TRACE
 #include "io_trace.h"
 /*--------------------------------------------------------------------------*/
 #define trace_func_comp() trace0((__func__ + (":" + (**ci).long_label())).c_str())
@@ -99,7 +98,7 @@ CARD_LIST::const_iterator CARD_LIST::find_again(const std::string& short_name,
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST::iterator CARD_LIST::find_(IString const& short_name)
-{ untested();
+{
   trace1("find", short_name);
   auto x=_map.find(short_name);
   if(x==_map.end()){
@@ -110,7 +109,7 @@ CARD_LIST::iterator CARD_LIST::find_(IString const& short_name)
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST::const_iterator CARD_LIST::find_(IString const& short_name) const
-{ untested();
+{
   trace1("find const", short_name);
   auto x=_map.find(short_name);
   if(x==_map.end()){
@@ -151,13 +150,13 @@ void CARD_LIST::map_insert(CARD_LIST::iterator i)
   assert(*i);
   IString label((*i)->short_label());
   trace1("map_insert", label);
-  if(label==UNDEFINED_LABEL){
-    unreachable();
-  }else{
+  if((*i)->has_label()){
     bool old=OPT::case_insensitive;
     OPT::case_insensitive = false;
     _map.insert(std::make_pair(label, i));
     OPT::case_insensitive = old;
+  }else{
+    // skip
   }
 }
 /*--------------------------------------------------------------------------*/

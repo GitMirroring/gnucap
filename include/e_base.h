@@ -26,7 +26,7 @@
 #define E_BASE_H
 #include "l_istring.h"
 /*--------------------------------------------------------------------------*/
-#define UNDEFINED_LABEL "*// UNDEFINED //*"
+static const std::string UNDEFINED_LABEL("*// UNDEFINED //*");
 /*--------------------------------------------------------------------------*/
 // external
 class XPROBE;
@@ -80,6 +80,9 @@ public: // label
   void	set_label(const std::string& s) {
     assert(_label==UNDEFINED_LABEL || _label==s);
     _label = s;
+  }
+  bool has_label() const{
+    return _label!=UNDEFINED_LABEL;
   }
 };
 /*--------------------------------------------------------------------------*/
