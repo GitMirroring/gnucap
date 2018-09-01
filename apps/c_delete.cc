@@ -48,7 +48,7 @@ private:
       std::string dev_name  = name.substr(dotplace+1, std::string::npos);
       std::string container = name.substr(0, dotplace);
       // container name must be exact match
-      CARD_LIST::iterator i = Scope->find_(container);
+      CARD_LIST::iterator i = Scope->find_(IString(container));
       if (i == Scope->end()) {
 	// can't find "container" (probably .subckt) - no match
 	// try reverse
@@ -56,7 +56,7 @@ private:
 	container = name.substr(dotplace+1, std::string::npos);
 	dev_name  = name.substr(0, dotplace);
 	// container name must be exact match
-	i = Scope->find_(container);
+	i = Scope->find_(IString(container));
       }else{
       }
       if (i == Scope->end()) {
@@ -89,7 +89,7 @@ private:
 	return didit;
       }else{
 	// no wild card.  fast search for one exact match
-	CARD_LIST::iterator i = Scope->find_(name);
+	CARD_LIST::iterator i = Scope->find_(IString(name));
 	if (i != Scope->end()) {
 	  Scope->erase(i);
 	  return true;

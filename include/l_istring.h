@@ -165,6 +165,9 @@ struct ichar_traits : std::char_traits<Ichar_>{
 class IString_;
 inline std::ostream& operator<< (std::ostream& o, IString_ const& s);
 /*--------------------------------------------------------------------------*/
+class IString_;
+inline std::ostream& operator<< (std::ostream& o, IString_ const& s);
+/*--------------------------------------------------------------------------*/
 class IString_ : public std::basic_string<Ichar_, detail::ichar_traits> {
 private:
   typedef std::basic_string<Ichar_, detail::ichar_traits> base;

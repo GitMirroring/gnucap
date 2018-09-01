@@ -38,21 +38,62 @@ class LANGUAGE;
 class TIME_PAIR;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CARD_LIST {
+public: // types
+  typedef std::list<CARD*> list_t;
+  typedef list_t::iterator list_iterator;
+  typedef list_t::const_iterator list_const_iterator;
+  typedef std::multimap<IString, list_t::iterator> map_t;
+  typedef map_t::iterator map_iterator;
+  typedef map_t::const_iterator map_const_iterator;
+
+#if 1
+  typedef list_iterator iterator;
+  typedef list_const_iterator const_iterator;
+#else
+  // behave like list_iterator but carry a map iterator to make find_again work
+  // not clear if this is needed at all.
+  class iterator : public list_iterator{
+  public:
+    iterator(list_iterator const& l)
+      : list_iterator(l)
+    {
+    }
+  private:
+  public: // BUG
+    map_iterator _m;
+  public:
+    friend class const_iterator;
+  };
+  typedef iterator iTerator;
+  class const_iterator : public list_const_iterator{
+  public:
+    const_iterator(iTerator i)
+      : list_const_iterator(i), _m(i._m)
+    {
+    }
+  public:
+    const_iterator(list_const_iterator const& l)
+      : list_const_iterator(l)
+    {
+    }
+  private:
+    map_const_iterator _m;
+  };
+#endif
 private:
   const CARD_LIST* _parent;
   mutable NODE_MAP* _nm;
   mutable PARAM_LIST* _params;
-  std::list<CARD*> _cl;
+  list_t _cl;
+  map_t _map;
 public:
   // internal types
-  typedef std::list<CARD*>::iterator iterator;
-  typedef std::list<CARD*>::const_iterator const_iterator;
   class fat_iterator {
   private:
     CARD_LIST* _list;
     iterator   _iter;
   private:
-    explicit	  fat_iterator()	{unreachable();}
+    explicit	  fat_iterator() = delete;
   public:
 		  fat_iterator(const fat_iterator& p)
 			: _list(p._list), _iter(p._iter) {}
@@ -74,16 +115,22 @@ public:
     void	  insert(CARD* c)	{list()->insert(iter(),c);}
   };
 
-  // status queries
+private: // implementation details
+  void map_insert(CARD_LIST::iterator i);
+  map_const_iterator find_in_map(CARD const*) const;
+
+public: // status queries
   bool is_empty()const			{return _cl.empty();}
   const CARD_LIST* parent()const	{return _parent;}
 
   // return an iterator
   iterator begin()			{return _cl.begin();}
   iterator end()			{return _cl.end();}
+private: // obsolete?
+  // better way: wrap multimap::equal_range
   iterator find_again(const std::string& short_name, iterator);
-  iterator find_(const std::string& short_name)
-					{return find_again(short_name, begin());}
+public:
+  iterator find_(IString const& short_name);
 
   // wrappers.
   iterator find_again(const IString& s, iterator i)
@@ -94,9 +141,10 @@ public:
   // return a const_iterator
   const_iterator begin()const		{return _cl.begin();}
   const_iterator end()const		{return _cl.end();}
+private:
   const_iterator find_again(const std::string& short_name, const_iterator)const;
-  const_iterator find_(const std::string& short_name)const
-					{return find_again(short_name, begin());}
+public:
+  const_iterator find_(IString const& short_name)const;
 
   // const wrappers.
   const_iterator find_again(const IString& s, const_iterator i)const
@@ -106,10 +154,9 @@ public:
 
 
   // add to it
-  CARD_LIST& push_front(CARD* c)	{_cl.push_front(c); return *this;}
-  CARD_LIST& push_back(CARD* c)		{_cl.push_back(c);  return *this;}
-  CARD_LIST& insert(CARD_LIST::iterator i, CARD* c)
-					{_cl.insert(i, c);  return *this;}
+  CARD_LIST& push_front(CARD* c);
+  CARD_LIST& push_back(CARD* c);
+  CARD_LIST& insert(CARD_LIST::iterator i, CARD* c);
 
   // take things out
   CARD_LIST& erase(iterator i);

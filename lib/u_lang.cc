@@ -52,7 +52,7 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
       assert(!p);
     }
   }else{
-    CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(Name);
+    CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(IString(Name));
     if (i != CARD_LIST::card_list.end()) {
       p = *i;
     }else{
