@@ -203,6 +203,7 @@ static void make_dev_expand_one_element(std::ofstream& out, const Element& e)
     "        const CARD* p = device_dispatcher[\"" << e.dev_type() << "\"];\n"
     "        assert(p);\n"
     "        _" << e.name() << " = dynamic_cast<COMPONENT*>(p->clone());\n"
+    "        _" << e.name() << "->set_label(\"" << e.name() << "\");\n"
     "        assert(_" << e.name() << ");\n"
     "        subckt()->push_front(_" << e.name() << ");\n"
     "      }else{\n"
