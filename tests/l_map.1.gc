@@ -1,0 +1,36 @@
+spice
+
+.subckt aX 1
+.ends
+
+
+.subckt bX 1
+v1 1 0 2
+.ends
+.subckt bX 1
+v1 1 0 2
+.ends
+.subckt bX 1
+v1 1 0 2
+.ends
+
+.subckt BX 1
+v1 1 0 1
+.ends
+.subckt BX 1
+v1 1 0 1
+.ends
+.subckt BX 1
+v1 1 0 1
+.ends
+
+.subckt cX 1
+.ends
+
+.options noinsensitive
+X1 1 BX
+
+.print op v(1)
+.op
+.list
+.end

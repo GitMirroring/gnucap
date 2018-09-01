@@ -132,7 +132,7 @@ const CARD* CARD::find_in_my_scope(const std::string& name)const
   assert(name != "");
   assert(scope());
 
-  CARD_LIST::const_iterator i = scope()->find_(name);
+  CARD_LIST::const_iterator i = scope()->find_(IString(name));
   if (i == scope()->end()) {
     throw Exception_Cant_Find(long_label(), name,
 			      ((owner()) ? owner()->long_label() : "(root)"));
@@ -152,7 +152,7 @@ const CARD* CARD::find_in_parent_scope(const std::string& name)const
   assert(name != "");
   const CARD_LIST* p_scope = (scope()->parent()) ? scope()->parent() : scope();
 
-  CARD_LIST::const_iterator i = p_scope->find_(name);
+  CARD_LIST::const_iterator i = p_scope->find_(IString(name));
   if (i == p_scope->end()) {
     throw Exception_Cant_Find(long_label(), name);
   }else{
@@ -173,7 +173,7 @@ const CARD* CARD::find_looking_out(const std::string& name)const
       return owner()->find_looking_out(name);
     }else if (makes_own_scope()) {
       // probably a subckt or "module"
-      CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(name);
+      CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(IString(name));
       if (i != CARD_LIST::card_list.end()) {
 	return *i;
       }else{

@@ -1,0 +1,60 @@
+spice
+
+.include file
+.include file
+.include file
+.include file
+.include file
+.include file
+.include file
+.include file
+.include file
+.include file
+.include file
+.include file
+.include file
+
+X1 0 1 ddd
+X1 0 1 ddd
+X1 0 1 ddd
+X1 0 1 ddd
+X1 0 1 ddd
+X1 0 1 ddd
+X1 0 1 ddd
+X1 0 1 ddd
+X1 0 1 ddd
+
+.subckt r 1 2
+.ends
+
+.subckt t 1 2
+X1 1 2 r
+X1 1 2 r
+X1 1 2 r
+X1 1 2 r
+.ends
+
+.subckt ddd 1 2
+
+X1 1 2 s
+X1 1 2 s
+X1 1 2 s
+X1 1 2 s
+X1 1 2 s
+X1 1 2 s
+
+.subckt s 1 2
+X1 1 2 t
+X1 1 2 t
+X1 1 2 t
+X1 1 2 t
+X1 1 2 t
+X1 1 2 t
+.ends
+
+.ends
+
+.print
+.status
+
+.end

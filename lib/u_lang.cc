@@ -52,7 +52,7 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
       assert(!p);
     }
   }else{
-    CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(Name);
+    CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(IString(Name));
     if (i != CARD_LIST::card_list.end()) {
       p = *i;
     }else{
@@ -101,13 +101,15 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
 /*--------------------------------------------------------------------------*/
 void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope)
 {
-  if (cmd.is_end()) {untested();
+  if (cmd.is_end()) {
     // nothing
   }else{
     std::string type(find_type_in_string(cmd));
     if (const CARD* proto = find_proto(type, owner)) {
       if (CARD* new_instance = proto->clone_instance()) {
 	new_instance->set_owner(owner);
+	new_instance->unset_label(); // control set_label calls.
+	                             // must not be called after Scope->push_back
 	CARD* x = parse_item(cmd, new_instance);
 	if (x) {
 	  assert(Scope);

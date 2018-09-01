@@ -27,6 +27,7 @@
 #include "e_node.h"
 #include "u_nodemap.h"
 #include "e_model.h"
+#include "io_trace.h"
 /*--------------------------------------------------------------------------*/
 #define trace_func_comp() trace0((__func__ + (":" + (**ci).long_label())).c_str())
 /*--------------------------------------------------------------------------*/
@@ -35,6 +36,8 @@ CARD_LIST::CARD_LIST()
    _nm(new NODE_MAP),
    _params(NULL)
 {
+  assert(begin()==end());
+  assert(find_(IString("bla"))==end());
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
@@ -43,6 +46,8 @@ CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
    _nm(new NODE_MAP),
    _params(NULL)
 {
+  assert(begin()==end());
+  assert(find_(IString("bla"))==end());
   assert(model);
   assert(model->subckt());
   assert(owner);
@@ -96,16 +101,106 @@ CARD_LIST::const_iterator CARD_LIST::find_again(const std::string& short_name,
   return notstd::find_ptr(Begin, end(), IString(short_name));
 }
 /*--------------------------------------------------------------------------*/
+CARD_LIST::iterator CARD_LIST::find_(std::string const& short_name)
+{
+  CARD_LIST::map_iterator x=_map.find(IString(short_name));
+
+  if(x==_map.end()){
+    return _cl.end();
+  }else{
+    return *x;
+  }
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST::const_iterator CARD_LIST::find_(std::string const& short_name) const
+{
+  map_const_iterator x=_map.find(IString(short_name));
+  if(x==_map.end()){
+    return _cl.end();
+  }else{
+    return *x;
+  }
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::push_front(CARD* c)
+{
+  _cl.push_front(c);
+  // set insensitive?!
+  map_insert(_cl.begin());
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::push_back(CARD* c)
+{
+  _cl.push_back(c);
+  iterator last=_cl.end();
+  --last;
+
+  map_insert(last);
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::insert(CARD_LIST::iterator i, CARD* c)
+{ untested();
+  iterator j=_cl.insert(i, c);
+  // set insensitive?!
+  map_insert(j);
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+void CARD_LIST::map_insert(CARD_LIST::iterator i)
+{
+  assert(*i);
+  IString label((*i)->short_label());
+  trace1("map_insert", label);
+  if((*i)->has_label()){
+    _map.insert(i);
+  }else{
+    // skip
+  }
+}
+/*--------------------------------------------------------------------------*/
+#if 0
+CARD_LIST::map_const_iterator CARD_LIST::find_in_map(CARD const* c) const
+{
+  assert(c);
+  // it must be one of those with this name.
+  // do a linear search...
+  IString name(c->short_label());
+
+  std::pair <map_const_iterator, map_const_iterator> range;
+  range = _map.equal_range(name);
+
+  for(map_const_iterator it=range.first; it!=range.second; ++it){
+    if(c==*(it->second)){
+      return it;
+    }else{ untested();
+    }
+  }
+  unreachable();
+  return range.first;
+}
+#endif
+/*--------------------------------------------------------------------------*/
 CARD_LIST& CARD_LIST::erase(iterator ci)
 {
   assert(ci != end());
+
+  map_iterator mi=_map.find(ci);
+  assert(ci==*mi);
+  _map.erase(mi);
+
   delete *ci;
   _cl.erase(ci);
   return *this;
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST& CARD_LIST::erase(CARD* c)
-{
+{ untested();
+  assert(c);
+  map_iterator mi=_map.find(c);
+  _map.erase(mi);
+
   delete c;
   _cl.remove(c);
   return *this;

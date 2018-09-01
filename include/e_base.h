@@ -26,6 +26,8 @@
 #define E_BASE_H
 #include "l_istring.h"
 /*--------------------------------------------------------------------------*/
+static const std::string UNDEFINED_LABEL("");
+/*--------------------------------------------------------------------------*/
 // external
 class XPROBE;
 class WAVE;
@@ -42,7 +44,7 @@ public:
   static PROBE_LISTS* _probe_lists;
   //--------------------------------------------------------------------
 protected: // create and destroy
-  explicit CKT_BASE()			  :_probes(0), _label() {}
+  explicit CKT_BASE()			  :_probes(0), _label(UNDEFINED_LABEL) {}
 // not yet.
 //  explicit CKT_BASE(const IString& s) :_probes(0), _label(s.to_string()) {}
   explicit CKT_BASE(const std::string& s) :_probes(0), _label(s) {}
@@ -75,7 +77,16 @@ public: // label
   }
   virtual const std::string long_label()const;
   const std::string&  short_label()const {return _label;}
-  void	set_label(const std::string& s) {_label = s;}
+  void	set_label(const std::string& s) {
+    assert(_label==UNDEFINED_LABEL || _label==s);
+    _label = s;
+  }
+  void unset_label(){
+    _label = UNDEFINED_LABEL;
+  }
+  bool has_label() const{
+    return _label!=UNDEFINED_LABEL;
+  }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
