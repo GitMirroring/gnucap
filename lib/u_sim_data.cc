@@ -57,7 +57,6 @@ SIM_DATA::SIM_DATA()
    _vt1(NULL),
    _ac(NULL),
    _nstat(NULL),
-   _vdc(NULL),
    _aa(),
    _lu(),
    _acx(),
@@ -109,9 +108,10 @@ SIM_DATA::~SIM_DATA()
     _nstat = NULL;
   }else{
   }
-  if (_vdc) {unreachable();
-    delete [] _vdc;
-    _vdc = NULL;
+  if (_vdcstack.size()) {untested();
+    delete [] _vdcstack.top();
+    _vdcstack.pop();
+    assert(_vdcstack.empty());
   }else{
   }
   //assert(_eq.empty()); //not empty means an analysis ended with an unhandled event
@@ -161,9 +161,12 @@ void SIM_DATA::clear_limit()
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::keep_voltages()
 {
-  if (!_freezetime) {
-    for (int ii = 1;  ii <= _total_nodes;  ++ii) {
-      _vdc[ii] = _v0[ii];
+  trace1("SIM_DATA::keep_voltages", _freezetime);
+  assert(_vdcstack.size());
+  double* vdc = _vdcstack.top();
+  if (!_freezetime){
+    for (int ii=1;  ii <= _total_nodes;  ++ii) {
+      vdc[ii] = _v0[ii];
     }
     _last_time = (_time0 > 0.) ? _time0 : 0.;
   }else{untested();
@@ -172,16 +175,42 @@ void SIM_DATA::keep_voltages()
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::restore_voltages()
-{
+{ untested();
+  trace1("SIM_DATA::restore_voltages", _freezetime);
+  assert(!_vdcstack.empty());
+
+  double* vdc = _vdcstack.top();
   for (int ii = 1;  ii <= _total_nodes;  ++ii) {
-    _vt1[ii] = _v0[ii] = _vdc[ii];
+    _vt1[ii] = _v0[ii] = vdc[ii];
+    //_nstat[_nm[ii]].set_last_change_time(0);
+    //_nstat[_nm[ii]].store_old_last_change_time();
+    //_nstat[_nm[ii]].set_final_time(0);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void SIM_DATA::push_voltages()
+{ untested();
+  double* vdc =  new double[_total_nodes+1]();
+  _vdcstack.push(vdc);
+}
+/*--------------------------------------------------------------------------*/
+void SIM_DATA::pop_voltages()
+{ untested();
+  trace1("SIM_DATA::pop_voltages", _vdcstack.size());
+  delete[] _vdcstack.top();
+  _vdcstack.pop();
+  if(_vdcstack.empty()){ unreachable();
+    assert(0);
+    return;
   }
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::zero_voltages()
 {
+  assert(_vdcstack.size());
+  double* vdc=_vdcstack.top();
   for (int ii = 1;  ii <= _total_nodes;  ++ii) {
-    _vt1[ii] = _v0[ii] = _vdc[ii] = _i[ii] = 0.;
+    _vt1[ii] = _v0[ii] = vdc[ii] = _i[ii] = 0.;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -279,12 +308,10 @@ void SIM_DATA::alloc_hold_vectors()
     _nstat[_nm[ii]].set_user_number(ii);
   }
 
-  assert(!_vdc);
-  _vdc = new double[_total_nodes+1];
-  std::fill_n(_vdc, _total_nodes+1, 0);
+  assert(_vdcstack.empty());
+  push_voltages();
 
   assert(_nstat);
-  assert(_vdc);
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_vectors:
@@ -331,12 +358,13 @@ void SIM_DATA::unalloc_vectors()
  */
 void SIM_DATA::uninit()
 {
-  if (_vdc) {
+  if (_vdcstack.size()) {
     _acx.reinit(0);
     _lu.reinit(0);
     _aa.reinit(0);
-    delete [] _vdc;
-    _vdc = NULL;
+    double* vdc = _vdcstack.top();
+    delete [] vdc;
+    _vdcstack.pop();
     delete [] _nstat;
     _nstat = NULL;
     delete [] _nm;
