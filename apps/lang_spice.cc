@@ -497,10 +497,11 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 void LANG_SPICE_BASE::parse_label(CS& cmd, CARD* x)
 {
   assert(x);
+  assert(!x->has_label());
   std::string my_name;
-  if (cmd >> my_name) {
+  if (cmd >> my_name) { untested();
     x->set_label(my_name);
-  }else{untested();
+  }else{ untested();
     x->set_label(x->id_letter() + std::string("_unnamed")); //BUG// not unique
     cmd.warn(bDANGER, "label required");
   }
