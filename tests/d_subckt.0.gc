@@ -1,0 +1,17 @@
+verilog
+options trace
+
+module a( 1  2  3  4  5  6  7  8  9 10 );
+resistor #(.r(1)) r(1,2)
+endmodule
+
+a my_a( 0,1,2,3,4,5,6,7,8,9);
+
+vsource #(.dc(1)) v(0,1);
+
+list
+print op v(1)
+op
+delete a
+op
+end

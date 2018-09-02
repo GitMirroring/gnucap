@@ -25,10 +25,11 @@
 #ifndef D_SUBCKT_H
 #define D_SUBCKT_H
 #include "e_compon.h"
+#include "e_subckt.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_PARAMLIST : public COMMON_COMPONENT {
-private:
+protected:
   explicit COMMON_PARAMLIST(const COMMON_PARAMLIST& p)
     :COMMON_COMPONENT(p), _params(p._params) {++_count;}
 public:

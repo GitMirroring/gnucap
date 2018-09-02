@@ -26,6 +26,8 @@
 #include "d_logic.h"
 #include "e_aux.h"
 #include "u_xprobe.h"
+#define DO_TRACE
+#include "io_trace.h"
 /*--------------------------------------------------------------------------*/
 const _LOGICVAL LOGICVAL::or_truth[lvNUM_STATES][lvNUM_STATES] = {
   {lvSTABLE0, lvRISING,  lvFALLING, lvSTABLE1, lvUNKNOWN},
@@ -507,15 +509,18 @@ void node_t::set_to_ground(CARD* d)
 /* new_node: a raw new node, as when a netlist is parsed
  */
 void node_t::new_node(const std::string& node_name, const CARD* d)
-{
+{ untested();
   //assert(!_nnn); //BUG// fails on MUTUAL_L::expand after clone
   assert(d);
+  assert(d->scope());
 
   NODE_MAP* Map = d->scope()->nodes();
+  trace3("bef", Map->how_many(), d, d->scope());
   assert(Map);
   _nnn = Map->new_node(node_name);
   _ttt = _nnn->user_number();
   assert(_nnn);
+  trace3("aft", Map->how_many(), d, d->scope());
 }
 /*--------------------------------------------------------------------------*/
 /* new_model_node: a mapped new node, produced through model expansion.

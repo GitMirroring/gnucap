@@ -186,7 +186,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	    if (x->node_is_grounded(index)) { untested();
 	      cmd.warn(bDANGER, here, "node 0 not allowed here");
 	    }else if (x->subckt() && x->subckt()->nodes()->how_many() != index+1) { untested();
-	      cmd.warn(bDANGER, here, "duplicate port name, skipping");
+	      cmd.warn(bDANGER, here, "duplicate port name, skipping "+to_string(index));
 	    }else{ untested();
 	      ++index;
 	    }

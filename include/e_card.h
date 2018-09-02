@@ -111,8 +111,8 @@ public: // owner, scope
   void		set_owner(CARD* o) {assert(!_owner||_owner==o); _owner=o;}
   //--------------------------------------------------------------------
 public: // subckt
-  CARD_LIST*	     subckt()		{return _subckt;}
-  const CARD_LIST*   subckt()const	{return _subckt;}
+  virtual /*hack*/ CARD_LIST*	     subckt()		{return _subckt;}
+  virtual /*hack*/ const CARD_LIST*   subckt()const	{return _subckt;}
   void	  new_subckt();
   void	  new_subckt(const CARD* model, PARAM_LIST* p);
   void	  renew_subckt(const CARD* model, PARAM_LIST* p);

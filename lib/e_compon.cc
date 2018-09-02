@@ -442,13 +442,13 @@ void COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_port_by_index(int num, std::string& ext_name)
-{
-  if (num < max_nodes()) {
+{ untested();
+  if (num < max_nodes()) { untested();
     _n[num].new_node(ext_name, this);
-    if (num+1 > _net_nodes) {
+    if (num+1 > _net_nodes) { untested();
       // make the list bigger
       _net_nodes = num+1;
-    }else{
+    }else{ untested();
       // it's already big enough, probably assigning out of order
     }
   }else{
