@@ -108,6 +108,8 @@ void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope)
     if (const CARD* proto = find_proto(type, owner)) {
       if (CARD* new_instance = proto->clone_instance()) {
 	new_instance->set_owner(owner);
+	new_instance->unset_label(); // control set_label calls.
+	                             // must not be called after Scope->push_back
 	CARD* x = parse_item(cmd, new_instance);
 	if (x) {
 	  assert(Scope);

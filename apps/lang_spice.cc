@@ -497,11 +497,14 @@ void LANG_SPICE_BASE::parse_args(CS& cmd, CARD* x)
 void LANG_SPICE_BASE::parse_label(CS& cmd, CARD* x)
 {
   assert(x);
-  assert(!x->has_label());
   std::string my_name;
-  if (cmd >> my_name) { untested();
-    x->set_label(my_name);
-  }else{ untested();
+  if(cmd >> my_name) {
+    if(x->has_label()){
+      assert(my_name==x->short_label());
+    }else{
+      x->set_label(my_name);
+    }
+  }else{
     x->set_label(x->id_letter() + std::string("_unnamed")); //BUG// not unique
     cmd.warn(bDANGER, "label required");
   }
@@ -857,6 +860,7 @@ class CMD_MODEL : public CMD {
       MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(cl);
       if (new_card) {
 	assert(!new_card->owner());
+	new_card->unset_label();
 	lang_spice.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);
       }else{untested();
@@ -875,6 +879,7 @@ class CMD_SUBCKT : public CMD {
   {
     BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("subckt"));
     assert(new_module);
+    new_module->unset_label();
     assert(!new_module->owner());
     assert(new_module->subckt());
     assert(new_module->subckt()->is_empty());
@@ -978,7 +983,7 @@ DISPATCHER<CMD>::INSTALL d33(&command_dispatcher, ".lib|lib", &p33);
 class CMD_INCLUDE : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)
-  {untested();
+  {
     getmerge(cmd, NO_HEADER, Scope);
   }
 } p3;

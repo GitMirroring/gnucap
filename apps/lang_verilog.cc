@@ -228,7 +228,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
       if (!(x->node_is_connected(iii))) {
 	cmd.warn(bDANGER, x->port_name(iii) + ": port unconnected, grounding");
 	x->set_port_to_ground(iii);
-      }else{
+      }else{ untested();
 	unreachable();
       }
     }
@@ -504,6 +504,7 @@ class CMD_PARAMSET : public CMD {
     const CARD* p = lang_verilog.find_proto(base_name, NULL);
     if (p) {
       CARD* cl = p->clone();
+      cl->unset_label();
       MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(cl);
       if (new_card) {
 	assert(!new_card->owner());
@@ -525,6 +526,7 @@ class CMD_MODULE : public CMD {
   {
     BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("subckt"));
     assert(new_module);
+    new_module->unset_label();
     assert(!new_module->owner());
     assert(new_module->subckt());
     assert(new_module->subckt()->is_empty());

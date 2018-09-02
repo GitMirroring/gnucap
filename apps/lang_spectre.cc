@@ -95,6 +95,7 @@ static void parse_args(CS& cmd, CARD* x)
 static void parse_label(CS& cmd, CARD* x)
 {
   assert(x);
+  x->unset_label(); // BUG? this is only allowed before pushing into cardlist.
   std::string my_name;
   if (cmd >> my_name) {
     x->set_label(my_name);
@@ -420,6 +421,7 @@ class CMD_MODEL : public CMD {
     const CARD* p = lang_spectre.find_proto(base_name, NULL);
     if (p) {
       CARD* cl = p->clone();
+      cl->unset_label();
       MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(cl);
       if (new_card) {
 	assert(!new_card->owner());
