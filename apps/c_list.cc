@@ -115,9 +115,12 @@ DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "list", &p1);
 class CMD_SAVE : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)
-  {itested();
+  {
     cmd.reset(); /* back up to beginning of input line */
+    cmd.skip1('.'); // spice hack.
     OMSTREAM out; // = IO::mstdout;
+
+    trace2("save", cmd.tail(), cmd.fullstring());
     list_save(cmd, *outset(cmd,&out), Scope);
   }
 } p2;

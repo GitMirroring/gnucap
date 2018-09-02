@@ -1,0 +1,11 @@
+spice
+
+Ra1 1 2 3
+Ra2 2 3 4
+Rb1 1 2 3
+Rb2 2 3 4
+
+.verilog
+
+save /dev/stdout
+save /dev/stdout Ra*

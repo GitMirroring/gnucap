@@ -1,0 +1,8 @@
+
+resistor #(.r( 3.)) Ra1 (.p(1),.n(2));
+resistor #(.r( 4.)) Ra2 (.p(2),.n(3));
+resistor #(.r( 3.)) Rb1 (.p(1),.n(2));
+resistor #(.r( 4.)) Rb2 (.p(2),.n(3));
+
+resistor #(.r( 3.)) Ra1 (.p(1),.n(2));
+resistor #(.r( 4.)) Ra2 (.p(2),.n(3));
