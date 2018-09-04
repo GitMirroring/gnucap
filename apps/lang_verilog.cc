@@ -505,6 +505,9 @@ class CMD_PARAMSET : public CMD {
     if (p) {
       CARD* cl = p->clone();
       MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(cl);
+      if (!new_card) {
+	new_card = new MODEL_CARD(dynamic_cast<const COMPONENT*>(cl));
+      }
       if (new_card) {
 	assert(!new_card->owner());
 	lang_verilog.parse_paramset(cmd, new_card);
