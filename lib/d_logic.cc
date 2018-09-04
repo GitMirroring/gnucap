@@ -37,11 +37,11 @@ static LOGIC_NONE Default_LOGIC(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 static DEV_LOGIC p1;
 static DISPATCHER<CARD>::INSTALL
-d1(&device_dispatcher, "U|logic", &p1);
+d1(&device_dispatcher, "U|logic|logicdev", &p1);
 /*--------------------------------------------------------------------------*/
 static MODEL_LOGIC p2(&p1);
 static DISPATCHER<MODEL_CARD>::INSTALL
-d2(&model_dispatcher, "logic", &p2);
+d2(&model_dispatcher, "logic|logicmod", &p2);
 /*--------------------------------------------------------------------------*/
 DEV_LOGIC::DEV_LOGIC()
   :ELEMENT(),

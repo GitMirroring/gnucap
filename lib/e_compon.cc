@@ -397,7 +397,7 @@ COMPONENT::COMPONENT(const COMPONENT& p)
 {
   if (_sim) {
     _sim->uninit();
-  }else{untested();
+  }else{
   }
   attach_common(p._common);
   assert(_common == p._common);

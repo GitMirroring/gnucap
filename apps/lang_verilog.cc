@@ -503,17 +503,17 @@ class CMD_PARAMSET : public CMD {
     //const MODEL_CARD* p = model_dispatcher[base_name];
     const CARD* p = lang_verilog.find_proto(base_name, NULL);
     if (p) {
-      CARD* cl = p->clone();
-      MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(cl);
-      if (!new_card) {
-	new_card = new MODEL_CARD(dynamic_cast<const COMPONENT*>(cl));
+      MODEL_CARD* new_card = NULL;
+      if (dynamic_cast<const MODEL_CARD*>(p)) {
+	new_card = prechecked_cast<MODEL_CARD*>(p->clone());
+      }else{
+	new_card = new MODEL_CARD(dynamic_cast<const COMPONENT*>(p));
       }
       if (new_card) {
 	assert(!new_card->owner());
 	lang_verilog.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);
-      }else{
-	delete(cl);
+      }else{untested();
 	cmd.warn(bDANGER, here, "paramset: base has incorrect type");
       }
     }else{untested();

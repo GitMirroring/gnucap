@@ -53,7 +53,7 @@ public:
 public: // override virtuals
   char	id_letter()const	{untested();return '\0';}
   std::string dev_type()const {return (_component_proto) ? _component_proto->dev_type() : "";}
-  CARD* clone()const		{untested(); return new MODEL_CARD(*this);}
+  CARD* clone()const		{return new MODEL_CARD(*this);}
   CARD*	clone_instance()const
 		{return (_component_proto) ? _component_proto->clone_instance() : NULL;}
   void	precalc_first();

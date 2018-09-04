@@ -27,9 +27,14 @@
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::MODEL_CARD(const COMPONENT* p)
   :CARD(),
-   _component_proto(const_cast<COMPONENT*>(p)),
+   _component_proto(NULL),
    _tnom_c(NOT_INPUT)
 {
+  if (p) {
+    _component_proto = p->clone();
+  }else{
+    assert(!_component_proto);
+  }
   if (_sim) {
     _sim->uninit();
   }else{
@@ -38,9 +43,14 @@ MODEL_CARD::MODEL_CARD(const COMPONENT* p)
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::MODEL_CARD(const MODEL_CARD& p)
   :CARD(p),
-   _component_proto(p._component_proto),
+   _component_proto(NULL),
    _tnom_c(p._tnom_c)
 {
+  if (p._component_proto) {
+    _component_proto = p._component_proto->clone();
+  }else{
+    assert(!_component_proto);
+  }
   if (_sim) {
     _sim->uninit();
   }else{untested();
@@ -49,6 +59,11 @@ MODEL_CARD::MODEL_CARD(const MODEL_CARD& p)
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::~MODEL_CARD()
 {
+  if (_component_proto) {
+    delete _component_proto;
+    _component_proto = NULL;
+  }else{
+  }
   if (_sim) {
     _sim->uninit();
   }else{
