@@ -278,7 +278,7 @@ public:
   LOGICVAL logic_eval(const node_t*)const {untested();
     return lvUNKNOWN;
   }
-  virtual std::string name()const	  {untested();return "error";}
+  virtual std::string name()const	  {return "error";}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

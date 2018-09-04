@@ -247,16 +247,16 @@ bool COMMON_COMPONENT::param_is_printable(int i)const
 std::string COMMON_COMPONENT::param_name(int i)const
 {
   switch (i) {
-  case 0:untested();  return "tnom";
-  case 1:untested();  return "dtemp";
-  case 2:untested();  return "temp";
+  case 0:  return "tnom";
+  case 1:  return "dtemp";
+  case 2:  return "temp";
   case 3:  return "m";
   default:untested(); return "";
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_COMPONENT::param_name(int i, int j)const
-{untested();
+{
   return (j==0) ? param_name(i) : "";
 }
 /*--------------------------------------------------------------------------*/
@@ -695,12 +695,12 @@ std::string COMPONENT::param_name(int i)const
 /*--------------------------------------------------------------------------*/
 std::string COMPONENT::param_name(int i, int j)const
 {
-  if (has_common()) {untested();
+  if (has_common()) {
     return common()->param_name(i,j);
   }else{
     if (j == 0) {
       return param_name(i);
-    }else if (i >= CARD::param_count()) {untested();
+    }else if (i >= CARD::param_count()) {
       return "";
     }else{untested();
       return CARD::param_name(i,j);

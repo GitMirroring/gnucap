@@ -110,7 +110,7 @@ static void parse_args_paramset(CS& cmd, MODEL_CARD* x)
     try{
       cmd >> name >> '=' >> value >> ';';
       x->set_param_by_name(name, value);
-    }catch (Exception_No_Match&) {untested();
+    }catch (Exception_No_Match&) {
       cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
     }
   }
@@ -130,7 +130,7 @@ static void parse_args_instance(CS& cmd, CARD* x)
 	cmd >> ',';
 	try{
 	  x->set_param_by_name(name, value);
-	}catch (Exception_No_Match&) {untested();
+	}catch (Exception_No_Match&) {
 	  cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
 	}
       }
@@ -277,7 +277,7 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
       break;
     }else if (!cmd.more()) {
       cmd.get_line("verilog-paramset>");
-    }else{untested();
+    }else{
       cmd.check(bWARNING, "what's this?");
       break;
     }
@@ -494,11 +494,45 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
 class PARAMSET : public MODEL_CARD{
 public:
   PARAMSET(COMPONENT const*c):MODEL_CARD(c) {}
-  ~PARAMSET(){ untested();
+  ~PARAMSET(){
     delete _component_proto;
   }
-private:
-  CARD* clone() const{ incomplete(); return NULL; }
+private: // overrides
+  CARD* clone()const{untested();
+    return new PARAMSET(*this);
+  }
+  CARD*	clone_instance()const{
+    assert(_component_proto);
+    return _component_proto->clone_instance();
+  }
+  std::string dev_type()const {
+    assert(_component_proto);
+    return _component_proto->dev_type();
+  }
+  int param_count()const {
+    assert(_component_proto);
+    return _component_proto->param_count();
+  }
+  void set_param_by_index(int i, std::string& value, int offset){
+    assert(_component_proto);
+    _component_proto->set_param_by_index(i, value, offset);
+  }
+  bool param_is_printable(int i)const{
+    assert(_component_proto);
+    return _component_proto->param_is_printable(i);
+  }
+  std::string param_name(int i)const{
+    assert(_component_proto);
+    return _component_proto->param_name(i);
+  }
+  std::string param_name(int i, int j)const{
+    assert(_component_proto);
+    return _component_proto->param_name(i, j);
+  }
+  std::string param_value(int i)const{
+    assert(_component_proto);
+    return _component_proto->param_value(i);
+  }
 };
 /*--------------------------------------------------------------------------*/
 class CMD_PARAMSET : public CMD {
