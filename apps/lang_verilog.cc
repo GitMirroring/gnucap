@@ -491,6 +491,16 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+class PARAMSET : public MODEL_CARD{
+public:
+  PARAMSET(COMPONENT const*c):MODEL_CARD(c) {}
+  ~PARAMSET(){ untested();
+    delete _component_proto;
+  }
+private:
+  CARD* clone() const{ incomplete(); return NULL; }
+};
+/*--------------------------------------------------------------------------*/
 class CMD_PARAMSET : public CMD {
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
@@ -506,7 +516,7 @@ class CMD_PARAMSET : public CMD {
       CARD* cl = p->clone();
       MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(cl);
       if (!new_card) {
-	new_card = new MODEL_CARD(dynamic_cast<const COMPONENT*>(cl));
+	new_card = new PARAMSET(dynamic_cast<const COMPONENT*>(cl));
       }
       if (new_card) {
 	assert(!new_card->owner());
