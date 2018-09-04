@@ -1,0 +1,12 @@
+verilog
+
+paramset error mos8;
+	.vth0=1;
+endparamset
+
+list
+
+spice
+
+.list
+.end

@@ -69,6 +69,7 @@ public:
   virtual bool parse_params_obsolete_callback(CS&) {unreachable(); return false;}
   virtual bool is_valid(const COMPONENT*)const {return true;}
   const CARD* component_proto()const {untested(); return _component_proto;}
+
 protected:
   CARD* _component_proto;
 public:

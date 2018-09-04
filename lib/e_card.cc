@@ -167,13 +167,13 @@ const CARD* CARD::find_in_parent_scope(const std::string& name)const
  * throws exception if can't find.
  */
 const CARD* CARD::find_looking_out(const std::string& name)const
-{
-  try {
+{ untested();
+  try { untested();
     return find_in_parent_scope(name);
-  }catch (Exception_Cant_Find&) {
-    if (owner()) {
+  }catch (Exception_Cant_Find&) { untested();
+    if (owner()) { untested();
       return owner()->find_looking_out(name);
-    }else if (makes_own_scope()) {
+    }else if (makes_own_scope()) { untested();
       // probably a subckt or "module"
       CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(name);
       if (i != CARD_LIST::card_list.end()) {

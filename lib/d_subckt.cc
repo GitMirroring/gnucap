@@ -198,9 +198,9 @@ void DEV_SUBCKT::expand()
     // get here when instanciating X, then set modelname
     assert(c->modelname()!="");
     const CARD* model = find_looking_out(c->modelname());
-    if(!dynamic_cast<const BASE_SUBCKT*>(model)) {
+    if(!dynamic_cast<const BASE_SUBCKT*>(model)) { untested();
       throw Exception_Type_Mismatch(long_label(), c->modelname(), "subckt");
-    }else{
+    }else{ untested();
       _parent = prechecked_cast<const BASE_SUBCKT*>(model);
     }
   }else{

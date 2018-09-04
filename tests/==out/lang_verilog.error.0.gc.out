@@ -1,0 +1,6 @@
+paramset error mos8; 
+               ^ ? paramset: no match
+.vth0=1; 
+^ ? .vth0: no match
+endparamset 
+^ ? endparamset: no match

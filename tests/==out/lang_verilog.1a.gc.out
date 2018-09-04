@@ -3,10 +3,13 @@ paramset zz npn;\
 endparamset
 
 module dumb_resistor (a,b);
+parameter r={ 10.K};
 resistor #(.r(r)) R1 (.p(a),.n(b));
 endmodule // dumb_resistor
 
 module foo (vcc,in,out);
+parameter r;
+parameter z={ 10.K};
 resistor #(.r(z)) Rc (.p(c),.n(vcc));
 zz #(.area(NA( 1.))) q1 (.c(c),.b(b),.e(e));
 dumb_resistor #(.r(abs(-z)/10)) Re (.a(e),.b(0));
