@@ -109,7 +109,7 @@ void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::attach_model(const COMPONENT* d)const
-{ untested();
+{
   assert(d);
   _model = d->find_model(modelname());
   assert(_model);
