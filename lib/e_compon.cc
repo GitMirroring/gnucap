@@ -412,6 +412,11 @@ COMPONENT::~COMPONENT()
   }
 }
 /*--------------------------------------------------------------------------*/
+MODEL_CARD* COMPONENT::clone_model()const
+{
+  return new MODEL_CARD(this);
+}
+/*--------------------------------------------------------------------------*/
 bool COMPONENT::node_is_grounded(int i)const 
 {
   assert(_n);

@@ -2,7 +2,7 @@ verilog
 
 // does not work yet. logic "model" is inaccessible from verilog
 // paramset must support COMPONENTS...
-paramset mos logicmod;
+paramset mos logic;
    .delay= 1n;
    .rise= 1n;
    .fall= 1n;

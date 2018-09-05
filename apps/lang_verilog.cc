@@ -500,16 +500,8 @@ class CMD_PARAMSET : public CMD {
     unsigned here = cmd.cursor();    
     cmd >> base_name;
 
-    //const MODEL_CARD* p = model_dispatcher[base_name];
-    const CARD* p = lang_verilog.find_proto(base_name, NULL);
-    if (p) {
-      MODEL_CARD* new_card = NULL;
-      if (dynamic_cast<const MODEL_CARD*>(p)) {
-	new_card = prechecked_cast<MODEL_CARD*>(p->clone());
-      }else{
-	new_card = new MODEL_CARD(dynamic_cast<const COMPONENT*>(p));
-      }
-      if (new_card) {
+    if (const CARD* p = lang_verilog.find_proto(base_name, NULL)) {
+      if (MODEL_CARD* new_card = p->clone_model()) {
 	assert(!new_card->owner());
 	lang_verilog.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);

@@ -163,6 +163,8 @@ protected: // create and destroy.
   explicit   COMPONENT();
   explicit   COMPONENT(const COMPONENT& p);
 	     ~COMPONENT();
+public:
+  MODEL_CARD*	clone_model()const;
   //--------------------------------------------------------------------
 public:	// "elaborate"
   void	precalc_first();

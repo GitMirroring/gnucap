@@ -416,17 +416,12 @@ class CMD_MODEL : public CMD {
     unsigned here = cmd.cursor();    
     cmd >> base_name;
 
-    //const MODEL_CARD* p = model_dispatcher[base_name];
-    const CARD* p = lang_spectre.find_proto(base_name, NULL);
-    if (p) {
-      CARD* cl = p->clone();
-      MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(cl);
-      if (new_card) {
+    if (const CARD* p = lang_spectre.find_proto(base_name, NULL)) {
+      if (MODEL_CARD* new_card = p->clone_model()) {
 	assert(!new_card->owner());
 	lang_spectre.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);
       }else{untested();
-	delete(cl);
 	cmd.warn(bDANGER, here, "model: base has incorrect type");
       }
     }else{untested();

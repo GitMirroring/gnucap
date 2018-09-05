@@ -32,6 +32,7 @@ class CARD;
 // external
 class node_t;
 class CARD_LIST;
+class MODEL_CARD;
 class PARAM_LIST;
 class LANGUAGE;
 class TIME_PAIR;
@@ -60,6 +61,7 @@ public:
   virtual  ~CARD();
   virtual CARD*	 clone()const = 0;
   virtual CARD*	 clone_instance()const  {return clone();}
+  virtual MODEL_CARD*	clone_model()const	{untested(); return NULL;}
   //--------------------------------------------------------------------
 public:	// "elaborate"
   virtual void	 precalc_first()	{}

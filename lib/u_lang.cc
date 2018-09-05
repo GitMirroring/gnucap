@@ -64,9 +64,9 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
     return p;
   }else if ((command_dispatcher[Name])) {
     return new DEV_DOT;	//BUG// memory leak
-  }else if ((p = device_dispatcher[Name])) {
-    return p;
   }else if ((p = model_dispatcher[Name])) {
+    return p;
+  }else if ((p = device_dispatcher[Name])) {
     return p;
   }else{
     assert(!p);
