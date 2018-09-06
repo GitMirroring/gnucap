@@ -163,6 +163,16 @@ public: // commons
   double   _time[OPT::_keep_time_steps];
   FPOLY1   _y1;		// iteration parameters, 1 iter ago
   FPOLY1   _y[OPT::_keep_time_steps]; /* charge or flux, and deriv.	*/
+
+private:
+  std::string dev_type() const{ return _dev_type;}
+protected:
+  void set_dev_type(const std::string& new_type){
+    _dev_type=new_type;
+    COMPONENT::set_dev_type(new_type);
+  }
+private:
+  std::string _dev_type;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

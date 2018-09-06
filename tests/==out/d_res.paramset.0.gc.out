@@ -1,0 +1,9 @@
+paramset myresistor resistor;\
+ .r=4;\
+endparmset
+
+myresistor #(.r(4)) rr (.p(0),.n(1));
+resistor #(.r(1)) r2 (.p(2),.n(1));
+vsource #(.dc(1)) v1 (.p(2),.n(0));
+#           ev(rr)     ev(r2)     v(1)      
+ 0.         4.         1.         0.8       

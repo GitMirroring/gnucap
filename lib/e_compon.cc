@@ -22,6 +22,7 @@
  * Base class for elements of a circuit
  */
 //testing=script 2014.07.04
+#define DO_TRACE
 #include "u_lang.h"
 #include "e_model.h"
 #include "e_elemnt.h"
@@ -476,15 +477,16 @@ void COMPONENT::set_port_to_ground(int num)
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_dev_type(const std::string& new_type)
 {
-  if (common()) {
-    if (new_type != dev_type()) {
+  if (common()) { untested();
+    if (new_type != dev_type()) { untested();
       COMMON_COMPONENT* c = common()->clone();
       assert(c);
       c->set_modelname(new_type);
       attach_common(c);
     }else{
     }
-  }else{
+  }else{ untested();
+    trace1("COMPONENT::set_dev_type", new_type);
     CARD::set_dev_type(new_type);
   }
 }

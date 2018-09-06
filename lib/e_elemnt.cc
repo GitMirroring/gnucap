@@ -36,7 +36,8 @@ ELEMENT::ELEMENT()
    _loss1(0.),
    _acg(0.),
    _ev(0.),
-   _dt(0.)
+   _dt(0.),
+   _dev_type("incomplete")
 {
   _n = _nodes;
   assert(_y[0].x == 0. && _y[0].f0 == 0. && _y[0].f1 == 0.);
@@ -54,7 +55,8 @@ ELEMENT::ELEMENT(const ELEMENT& p)
    _loss1(p._loss1),
    _acg(0.),
    _ev(0.),
-   _dt(0.)
+   _dt(0.),
+   _dev_type(p._dev_type)
 {
   trace0(long_label().c_str());
   _n = _nodes;

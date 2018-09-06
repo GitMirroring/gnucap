@@ -1,0 +1,20 @@
+verilog
+
+paramset myresistor resistor;
+	.r=4;
+endparamset
+
+myresistor rr(0,1);
+resistor #(.r(1)) r2(2,1);
+
+vsource #(.dc(1)) v1(2,0);
+
+list
+
+print dc ev(rr) ev(r2) v(1)
+dc
+
+spice
+* not yet.
+* .list
+.end

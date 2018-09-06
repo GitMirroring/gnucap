@@ -33,11 +33,11 @@ class DEV_RESISTANCE : public ELEMENT {
 private:
   explicit DEV_RESISTANCE(const DEV_RESISTANCE& p) :ELEMENT(p) {}
 public:
-  explicit DEV_RESISTANCE()	:ELEMENT() {}
+  explicit DEV_RESISTANCE()	:ELEMENT() { set_dev_type("resistor"); }
 private: // override virtual
   char	   id_letter()const	{return 'R';}
   std::string value_name()const {return "r";}
-  std::string dev_type()const	{return "resistor";}
+//  std::string dev_type()const	{return "resistor";}
   int	   max_nodes()const	{return 2;}
   int	   min_nodes()const	{return 2;}
   int	   matrix_nodes()const	{return 2;}
