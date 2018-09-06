@@ -22,7 +22,6 @@
  * Base class for elements of a circuit
  */
 //testing=script 2014.07.04
-#define DO_TRACE
 #include "u_lang.h"
 #include "e_model.h"
 #include "e_elemnt.h"

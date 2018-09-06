@@ -20,6 +20,7 @@
  * 02110-1301, USA.
  */
 //testing=script 2016.09.10
+#define DO_TRACE
 #include "u_nodemap.h"
 #include "globals.h"
 #include "c_comand.h"
@@ -263,25 +264,55 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
 //BUG// no paramset_item_declaration, falls back to spice mode
 
 MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
-{
+{ untested();
   assert(x);
   cmd.reset();
   cmd >> "paramset ";
   parse_label(cmd, x);
+  bool args_allowed=true;
   parse_type(cmd, x);
   cmd >> ';';
 
-  for (;;) {
-    parse_args_paramset(cmd, x);
-    if (cmd >> "endparamset ") {
+  PARAM_LIST* pl=new PARAM_LIST;
+
+  trace2("parse enter", cmd.fullstring(), cmd.tail());
+  for (;;) { untested();
+    if(args_allowed){ untested();
+      trace1("parse_args_paramset", cmd.tail());
+      parse_args_paramset(cmd, x);
+    }else{ untested();
+    }
+
+    trace2("parse", cmd.fullstring(), cmd.tail());
+    unsigned here=cmd.cursor();
+    if (cmd >> "endparamset ") { untested();
       break;
-    }else if (!cmd.more()) {
+    }else if (cmd.umatch("param{eter} ")) { untested();
+      args_allowed = false;
+
+      if(!x->subckt()){
+	x->new_subckt();
+      }
+      trace1("parse?", cmd.tail());
+      pl->parse(cmd);
+      trace1("parsed?", cmd.tail());
+      //new__instance(cmd, NULL, x->subckt());
+      cmd >> ";";
+
+    }else if (!cmd.more()) { untested();
       cmd.get_line("verilog-paramset>");
-    }else{untested();
+    }else{ untested();
       cmd.check(bWARNING, "what's this?");
       break;
     }
   }
+
+  CARD* o=x->owner();
+  CARD_LIST* s=&CARD_LIST::card_list;
+  if(o){
+    s=o->scope();
+  }
+  x->subckt()->attach_params(pl, s);
   return x;
 }
 /*--------------------------------------------------------------------------*/
@@ -442,6 +473,13 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
   _mode = mPARAMSET;
   o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\\\n";
   print_args(o, x);
+
+  if( x->subckt()){
+    for(auto i : *x->subckt()->params()){
+      o << "parameter " << i.first << "=";
+      o << i.second << ";";
+    }
+  }
   o << "\\\n"
     "endparmset\n\n";
   _mode = mDEFAULT;
