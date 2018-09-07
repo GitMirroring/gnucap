@@ -294,7 +294,7 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
 	x->new_subckt();
       }
       trace1("parse?", cmd.tail());
-      pl->parse(cmd);
+      x->subckt()->params()->parse(cmd);
       trace1("parsed?", cmd.tail());
       //new__instance(cmd, NULL, x->subckt());
       cmd >> ";";
@@ -312,7 +312,7 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
   if(o){
     s=o->scope();
   }
-  x->subckt()->attach_params(pl, s);
+//  x->subckt()->attach_params(pl, s);
   return x;
 }
 /*--------------------------------------------------------------------------*/
@@ -474,11 +474,12 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
   o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\\\n";
   print_args(o, x);
 
-  if( x->subckt()){
+  if( x->subckt()){ untested();
     for(auto i : *x->subckt()->params()){
       o << "parameter " << i.first << "=";
       o << i.second << ";";
     }
+  }else{ untested();
   }
   o << "\\\n"
     "endparmset\n\n";

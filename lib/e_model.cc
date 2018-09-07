@@ -24,6 +24,7 @@
 //testing=script 2006.07.12
 #include "e_compon.h"
 #include "e_model.h"
+#include "e_paramlist.h"
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::MODEL_CARD(const COMPONENT* p)
   :CARD(),
@@ -119,6 +120,41 @@ void MODEL_CARD::precalc_first()
     _component_proto->precalc_first();
   }else{
     CARD::precalc_first();
+  }
+}
+/*--------------------------------------------------------------------------*/
+class COMMON_PARAMSET : public COMMON_PARAMLIST{
+public:
+  explicit  COMMON_PARAMSET() : COMMON_PARAMLIST(){}
+  COMMON_PARAMSET( const COMMON_PARAMSET& p) : COMMON_PARAMLIST(0){}
+private:
+  COMMON_PARAMLIST* clone()const {incomplete(); return new COMMON_PARAMSET(*this); }
+  std::string name()const{incomplete(); return "";}
+
+};
+/*--------------------------------------------------------------------------*/
+CARD* MODEL_CARD::clone_instance()const
+{ untested();
+  if (_component_proto) { untested();
+    CARD* x = _component_proto->clone_instance();
+
+    if(!subckt()){ untested();
+    // }else if(!x->subckt()){ untested();
+    }else if(COMPONENT* c=dynamic_cast<COMPONENT*>(x)){ untested();
+
+      CARD* o=x->owner();
+      CARD_LIST* s=&CARD_LIST::card_list;
+      if(o){
+	s=o->scope();
+      }
+      //x->subckt()->attach_params(subckt()->params(), s);
+
+      COMMON_COMPONENT* foo=new COMMON_PARAMSET;
+      c->attach_common(foo);
+    }
+    return x;
+  }else{
+    return NULL;
   }
 }
 /*--------------------------------------------------------------------------*/
