@@ -52,10 +52,11 @@ public:
 
 public: // override virtuals
   char	id_letter()const	{untested();return '\0';}
-  std::string dev_type()const {return (_component_proto) ? _component_proto->dev_type() : "";}
+  std::string dev_type()const 
+	{return (_component_proto) ? _component_proto->dev_type() : "";}
   CARD* clone()const		{return new MODEL_CARD(*this);}
   CARD*	clone_instance()const
-		{return (_component_proto) ? _component_proto->clone_instance() : NULL;}
+	{return (_component_proto) ? _component_proto->clone_instance() : NULL;}
   MODEL_CARD* clone_model()const	{return prechecked_cast<MODEL_CARD*>(clone());}
   void	precalc_first();
   void	set_param_by_index(int, std::string&, int);
@@ -65,7 +66,7 @@ public: // override virtuals
   std::string param_name(int,int)const;
   std::string param_value(int)const;
   int param_count()const 
-  {return (_component_proto) ? _component_proto->param_count() : (1 + CARD::param_count());}
+	{return (_component_proto) ? _component_proto->param_count() : CARD::param_count();}
 public:
   virtual void	tr_eval(COMPONENT*)const{unreachable();}
   virtual void	ac_eval(COMPONENT*)const{unreachable();}
@@ -76,8 +77,6 @@ public:
   const CARD* component_proto()const {untested(); return _component_proto;}
 protected:
   CARD* _component_proto;
-public:
-  PARAMETER<double> _tnom_c;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

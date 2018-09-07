@@ -27,8 +27,7 @@
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::MODEL_CARD(const COMPONENT* p)
   :CARD(),
-   _component_proto(NULL),
-   _tnom_c(NOT_INPUT)
+   _component_proto(NULL)
 {
   if (p) {
     _component_proto = p->clone();
@@ -43,8 +42,7 @@ MODEL_CARD::MODEL_CARD(const COMPONENT* p)
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::MODEL_CARD(const MODEL_CARD& p)
   :CARD(p),
-   _component_proto(NULL),
-   _tnom_c(p._tnom_c)
+   _component_proto(NULL)
 {
   if (p._component_proto) {
     _component_proto = p._component_proto->clone();
@@ -74,11 +72,8 @@ void MODEL_CARD::set_param_by_index(int i, std::string& value, int offset)
 {
   if (_component_proto) {
     _component_proto->set_param_by_index(i, value, offset);
-  }else{
-    switch (MODEL_CARD::param_count() - 1 - i) {
-    case 0: _tnom_c = value; break;
-    default: CARD::set_param_by_index(i, value, offset); break;
-    }
+  }else{untested();
+    CARD::set_param_by_index(i, value, offset);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -86,11 +81,8 @@ bool MODEL_CARD::param_is_printable(int i)const
 {
   if (_component_proto) {
     return _component_proto->param_is_printable(i);
-  }else{
-    switch (MODEL_CARD::param_count() - 1 - i) {
-    case 0: return true;
-    default: return CARD::param_is_printable(i);
-    }
+  }else{untested();
+    return CARD::param_is_printable(i);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -98,11 +90,8 @@ std::string MODEL_CARD::param_name(int i)const
 {
   if (_component_proto) {
     return _component_proto->param_name(i);
-  }else{
-    switch (MODEL_CARD::param_count() - 1 - i) {
-    case 0: return "tnom\0";
-    default: return CARD::param_name(i);
-    }
+  }else{untested();
+    return CARD::param_name(i);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -111,13 +100,7 @@ std::string MODEL_CARD::param_name(int i, int j)const
   if (_component_proto) {
     return _component_proto->param_name(i, j);
   }else{untested();
-    if (j == 0) {
-      return param_name(i);
-    }else if (i >= CARD::param_count()) {
-      return "";
-    }else{
-      return MODEL_CARD::param_name(i, j);
-    }
+    return CARD::param_name(i, j);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -125,18 +108,18 @@ std::string MODEL_CARD::param_value(int i)const
 {
   if (_component_proto) {
     return _component_proto->param_value(i);
-  }else{
-    switch (MODEL_CARD::param_count() - 1 - i) {
-    case 0: return _tnom_c.string();
-    default: return CARD::param_value(i);
-    }
+  }else{untested();
+    return CARD::param_value(i);
   }
 }
 /*--------------------------------------------------------------------------*/
 void MODEL_CARD::precalc_first()
 {
-  CARD::precalc_first();
-  _tnom_c.e_val(OPT::tnom_c, scope());
+  if (_component_proto) {
+    _component_proto->precalc_first();
+  }else{
+    CARD::precalc_first();
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

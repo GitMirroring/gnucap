@@ -92,6 +92,8 @@ public:
   PARAMETER<double> _defw;
   PARAMETER<double> _tc1;
   PARAMETER<double> _tc2;
+  PARAMETER<double> _tnom_c;
+
 private:
   static double const _default_narrow;
   static double const _default_defw;
@@ -109,7 +111,7 @@ protected: // override virtual
   std::string	param_name(int)const;
   std::string	param_name(int,int)const;
   std::string	param_value(int)const;
-  int param_count()const {return (4 + MODEL_CARD::param_count());}
+  int param_count()const {return (5 + MODEL_CARD::param_count());}
 };
 /*--------------------------------------------------------------------------*/
 class MODEL_SEMI_CAPACITOR : public MODEL_SEMI_BASE {
@@ -373,7 +375,8 @@ MODEL_SEMI_BASE::MODEL_SEMI_BASE()
    _narrow(_default_narrow),
    _defw(_default_defw),
    _tc1(_default_tc1),
-   _tc2(_default_tc2)
+   _tc2(_default_tc2),
+   _tnom_c(NOT_INPUT)
 {
 }
 /*--------------------------------------------------------------------------*/
@@ -382,7 +385,8 @@ MODEL_SEMI_BASE::MODEL_SEMI_BASE(const MODEL_SEMI_BASE& p)
    _narrow(p._narrow),
    _defw(p._defw),
    _tc1(p._tc1),
-   _tc2(p._tc2)
+   _tc2(p._tc2),
+   _tnom_c(p._tnom_c)
 {
 }
 /*--------------------------------------------------------------------------*/
@@ -393,6 +397,7 @@ void MODEL_SEMI_BASE::set_param_by_index(int i, std::string& value, int offset)
   case 1: _defw = value; break;
   case 2: _tc1 = value; break;
   case 3: _tc2 = value; break;
+  case 4: _tnom_c = value; break;
   default: MODEL_CARD::set_param_by_index(i, value, offset); break;
   }
 }
@@ -404,6 +409,7 @@ bool MODEL_SEMI_BASE::param_is_printable(int i)const
   case 1: return true;
   case 2: return true;
   case 3: return true;
+  case 4: return true;
   default: return MODEL_CARD::param_is_printable(i);
   }
 }
@@ -415,6 +421,7 @@ std::string MODEL_SEMI_BASE::param_name(int i)const
   case 1: return "defw";
   case 2: return "tc1";
   case 3: return "tc2";
+  case 4: return "tnom";
   default: return MODEL_CARD::param_name(i);
   }
 }
@@ -437,6 +444,7 @@ std::string MODEL_SEMI_BASE::param_value(int i)const
   case 1: return _defw.string();
   case 2: return _tc1.string();
   case 3: return _tc2.string();
+  case 4: return _tnom_c.string();
   default: return MODEL_CARD::param_value(i);
   }
 }
@@ -452,6 +460,7 @@ void MODEL_SEMI_BASE::precalc_first()
   _defw.e_val(_default_defw, s);
   _tc1.e_val(_default_tc1, s);
   _tc2.e_val(_default_tc2, s);
+  _tnom_c.e_val(OPT::tnom_c, s);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

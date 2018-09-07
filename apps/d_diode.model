@@ -372,9 +372,10 @@ model BUILT_IN_DIODE {
   }
   independent {
     override {
-      double _tnom_c "" name=TNOM default=OPT::tnom_c;
     }
     raw_parameters {
+      double _tnom_c "nominal or reference temperature"
+	name=TNOM default=OPT::tnom_c;
       double js "= is, saturation current (per area)"
 	name=IS positive default=1e-14;
       double rs "ohmic resistance (per area)"
