@@ -25,6 +25,7 @@
 #include "u_lang.h"
 #include "e_model.h"
 #include "e_elemnt.h"
+#include "e_paramlist.h"
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
   :CKT_BASE(p),
@@ -926,6 +927,22 @@ double COMPONENT::volts_limited(const node_t & n1, const node_t & n2)
   }
 
   return dn_diff(v1,v2);
+}
+#define DO_TRACE
+#include "io_trace.h"
+/*--------------------------------------------------------------------------*/
+CARD_LIST* COMPONENT::scope()
+{
+  if(dynamic_cast<COMMON_PARAMLIST const*>(common())){ untested();
+    trace1("COMPONENT::scope", long_label());
+  }else{ itested();
+  }
+  return CARD::scope();
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST const* COMPONENT::scope() const
+{
+  return const_cast<COMPONENT*>(this)->scope();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

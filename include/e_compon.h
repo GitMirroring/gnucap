@@ -283,6 +283,10 @@ public:	// obsolete -- do not use in new code
   bool use_obsolete_callback_print()const;
   void print_args_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
   void obsolete_move_parameters_from_common(const COMMON_COMPONENT*);
+
+public: // HACK need to figure out
+  CARD_LIST* scope();
+  CARD_LIST const* scope() const;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -149,8 +149,10 @@ CARD* MODEL_CARD::clone_instance()const
       }
       //x->subckt()->attach_params(subckt()->params(), s);
 
-      COMMON_COMPONENT* foo=new COMMON_PARAMSET;
-      c->attach_common(foo);
+      COMMON_PARAMSET* foo=new COMMON_PARAMSET;
+ //     foo->_params.eval_copy(*subckt()->params(), s);
+      c->attach_common(foo); // intercept set_param_by_name on x
+      // need to hack c->scope()
     }
     return x;
   }else{
