@@ -5,14 +5,14 @@ paramset myresistor resistor;
 	parameter a=2;
 endparamset
 
-myresistor #(.a(3)) rr(0,1);
-resistor #(.r(1)) r2(2,1);
+myresistor #(.a(3) .b(2)) rr1(0,1);
+myresistor #(.b(2)) rr2(0,1);
 
 vsource #(.dc(1)) v1(2,0);
 
 list
 
-print dc ev(rr) ev(r2) v(1)
+print dc ev(rr*)
 dc
 
 spice
