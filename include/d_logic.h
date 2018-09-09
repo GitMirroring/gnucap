@@ -48,8 +48,10 @@ private: // override virtuals
   char	   id_letter()const	{return 'U';}
   std::string value_name()const	{return "#";}
   bool	      print_type_in_spice()const {return true;}
-  std::string dev_type()const {assert(has_common());
-    return (common()->modelname() + " " + common()->name()).c_str();}
+  std::string dev_type()const
+		{assert(has_common()); return (common()->modelname() + " " + common()->name());}
+  std::string dev_type_key()const
+		{assert(has_common()); return (common()->modelname() + " " + common()->name());}
   int	   tail_size()const	{return 2;}
   int	   max_nodes()const	{return PORTS_PER_GATE;}
   int	   min_nodes()const	{return BEGIN_IN+1;}

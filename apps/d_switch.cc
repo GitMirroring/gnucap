@@ -63,7 +63,8 @@ protected:
   explicit	SWITCH_BASE(const SWITCH_BASE& p);
 protected: // override virtual
   std::string value_name()const	{return "";}
-  std::string dev_type()const {assert(common()); return common()->modelname().c_str();}
+  std::string dev_type()const {assert(common()); return common()->modelname();}
+  std::string dev_type_key()const {assert(common()); return common()->modelname();}
   bool	   print_type_in_spice()const {return true;}
   int	   tail_size()const	{return 1;}
   int	   max_nodes()const	= 0;
@@ -161,7 +162,7 @@ public:
   explicit	MODEL_SWITCH(const SWITCH_BASE*);
 private: // override virtual
   void		set_dev_type(const std::string& nt);
-  std::string	dev_type()const;
+  std::string	dev_type_key()const;
   CARD*		clone()const	{return new MODEL_SWITCH(*this);}
   void		precalc_first();
   void		set_param_by_index(int, std::string&, int);
@@ -284,7 +285,7 @@ void MODEL_SWITCH::precalc_first()
   voff.e_val(vt - vh, par_scope);
 }
 /*--------------------------------------------------------------------------*/
-std::string MODEL_SWITCH::dev_type()const
+std::string MODEL_SWITCH::dev_type_key()const
 {
   switch (type) {
   case VOLTAGE:

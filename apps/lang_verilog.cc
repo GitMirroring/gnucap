@@ -390,7 +390,7 @@ void LANG_VERILOG::print_args(OMSTREAM& o, const COMPONENT* x)
 static void print_type(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
-  o << x->dev_type();
+  o << x->dev_type_key();
 }
 /*--------------------------------------------------------------------------*/
 static void print_label(OMSTREAM& o, const COMPONENT* x)
@@ -440,7 +440,7 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
   assert(x);
   _mode = mPARAMSET;
-  o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\\\n";
+  o << "paramset " << x->short_label() << ' ' << x->dev_type_key() << ";\\\n";
   print_args(o, x);
   o << "\\\n"
     "endparmset\n\n";

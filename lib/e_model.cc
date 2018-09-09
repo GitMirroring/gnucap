@@ -31,6 +31,8 @@ MODEL_CARD::MODEL_CARD(const COMPONENT* p)
 {
   if (p) {
     _component_proto = p->clone();
+    assert(!_component_proto->owner());
+    _component_proto->set_owner(this);
   }else{
     assert(!_component_proto);
   }
@@ -46,6 +48,8 @@ MODEL_CARD::MODEL_CARD(const MODEL_CARD& p)
 {
   if (p._component_proto) {
     _component_proto = p._component_proto->clone();
+    assert(!_component_proto->owner());
+    _component_proto->set_owner(this);
   }else{
     assert(!_component_proto);
   }
@@ -110,15 +114,6 @@ std::string MODEL_CARD::param_value(int i)const
     return _component_proto->param_value(i);
   }else{untested();
     return CARD::param_value(i);
-  }
-}
-/*--------------------------------------------------------------------------*/
-void MODEL_CARD::precalc_first()
-{
-  if (_component_proto) {
-    _component_proto->precalc_first();
-  }else{
-    CARD::precalc_first();
   }
 }
 /*--------------------------------------------------------------------------*/

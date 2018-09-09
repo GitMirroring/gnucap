@@ -329,7 +329,7 @@ void LANG_SPECTRE::print_args(OMSTREAM& o, const CARD* x)
 static void print_type(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
-  o << ' ' << x->dev_type();
+  o << ' ' << x->dev_type_key();
 }
 /*--------------------------------------------------------------------------*/
 static void print_label(OMSTREAM& o, const COMPONENT* x)
@@ -359,7 +359,7 @@ static void print_ports(OMSTREAM& o, const COMPONENT* x)
 void LANG_SPECTRE::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
   assert(x);
-  o << "model " << x->short_label() << ' ' << x->dev_type() << ' ';
+  o << "model " << x->short_label() << ' ' << x->dev_type_key() << ' ';
   print_args(o, x);
   o << "\n\n";
 }

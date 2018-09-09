@@ -214,7 +214,7 @@ static void make_model_copy_constructor(std::ofstream& out, const Model& m)
 /*--------------------------------------------------------------------------*/
 static void make_model_dev_type(std::ofstream& out, const Model& m)
 {
-  out << "std::string MODEL_" << m.name() << "::dev_type()const\n";
+  out << "std::string MODEL_" << m.name() << "::dev_type_key()const\n";
   if (!m.public_key_list().is_empty() || !m.private_key_list().is_empty()) {
     out << 
       "{\n"

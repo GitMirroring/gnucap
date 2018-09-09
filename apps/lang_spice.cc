@@ -697,7 +697,7 @@ static char fix_case(char c)
 void LANG_SPICE_BASE::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
   assert(x);
-  o << ".model " << x->short_label() << ' ' << x->dev_type() << " (";
+  o << ".model " << x->short_label() << ' ' << x->dev_type_key() << " (";
   print_args(o, x);
   o << ")\n";
 }
@@ -770,9 +770,9 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
 {
   assert(x);
   if (x->print_type_in_spice()) {
-    o << "  " << x->dev_type();
+    o << "  " << x->dev_type_key();
   }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {untested();
-    o << "  " << x->dev_type();
+    o << "  " << x->dev_type_key();
   }else{
     // don't print type
   }

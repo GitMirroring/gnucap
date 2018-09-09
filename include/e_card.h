@@ -42,6 +42,7 @@ private:
   mutable int	_evaliter;	// model eval iteration number
   CARD_LIST*	_subckt;
   CARD* 	_owner;
+  const CARD*	_parent;
   bool		_constant;	// eval stays the same every iteration
 protected:
   node_t*	_n;
@@ -122,6 +123,7 @@ public: // subckt
   //void     renew_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
   //--------------------------------------------------------------------
 public:	// type
+  virtual std::string dev_type_key()const;
   virtual std::string dev_type()const	{unreachable(); return "";}
   virtual void set_dev_type(const std::string&);
   //--------------------------------------------------------------------

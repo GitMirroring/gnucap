@@ -104,7 +104,7 @@ static void make_model(std::ofstream& out, const Model& m)
     "  explicit " << class_name << "(const BASE_SUBCKT*);\n"
     "  ~" << class_name << "() {--_count;}\n"
     "public: // override virtual\n"
-    "  std::string dev_type()const;\n"
+    "  std::string dev_type_key()const;\n"
     "  void      set_dev_type(const std::string& nt);\n"
     "  CARD*     clone()const {return new " << class_name << "(*this);}\n"
     "  void      precalc_first();\n"

@@ -53,12 +53,11 @@ public:
 public: // override virtuals
   char	id_letter()const	{untested();return '\0';}
   std::string dev_type()const 
-	{return (_component_proto) ? _component_proto->dev_type() : "";}
+	{return (_component_proto) ? _component_proto->dev_type() : "6";}
   CARD* clone()const		{return new MODEL_CARD(*this);}
   CARD*	clone_instance()const
 	{return (_component_proto) ? _component_proto->clone_instance() : NULL;}
   MODEL_CARD* clone_model()const	{return prechecked_cast<MODEL_CARD*>(clone());}
-  void	precalc_first();
   void	set_param_by_index(int, std::string&, int);
   bool  param_is_printable(int)const;
   std::string value_name()const {untested();return "";}

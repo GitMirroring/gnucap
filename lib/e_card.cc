@@ -34,6 +34,7 @@ CARD::CARD()
    _evaliter(-100),
    _subckt(0),
    _owner(0),
+   _parent(0),
    _constant(false),
    _n(0),
    _net_nodes(0)
@@ -45,6 +46,7 @@ CARD::CARD(const CARD& p)
    _evaliter(-100),
    _subckt(0), //BUG// isn't this supposed to copy????
    _owner(0),
+   _parent(&p),
    _constant(p._constant),
    _n(0),
    _net_nodes(p._net_nodes)
@@ -234,6 +236,19 @@ void CARD::set_param_by_name(std::string Name, std::string Value)
     }
   }
   throw Exception_No_Match(Name);
+}
+/*--------------------------------------------------------------------------*/
+std::string CARD::dev_type_key()const
+{
+  if (!_parent) {
+    return dev_type();
+  }else if (_parent->short_label() != "") {
+    return _parent->short_label();
+  }else if (_parent->owner()) {
+    return _parent->owner()->short_label();
+  }else{
+    return _parent->dev_type();
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* set_dev_type: Attempt to change the type of an existing device.

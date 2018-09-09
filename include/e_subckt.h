@@ -36,6 +36,7 @@ protected:
 protected: // override virtual
   //char  id_letter()const		//CARD/null
   std::string dev_type()const {assert(common()); return common()->modelname();}
+  std::string dev_type_key()const {assert(common()); return common()->modelname();}
   int	  tail_size()const		{return 1;}
   //int	  max_nodes()const		//COMPONENT/null
   //int	  num_nodes()const		//COMPONENT/null

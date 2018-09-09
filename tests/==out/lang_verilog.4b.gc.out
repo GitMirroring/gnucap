@@ -1,0 +1,13 @@
+#           v(1)       v(2)      
+ 27.        1.         0.75      
+paramset bob resistor;\
+ .r=10k;\
+endparmset
+
+paramset zap bob;\
+ .r=30k;\
+endparmset
+
+bob #(.r(10k)) r1 (.p(1),.n(2));
+zap #(.r(30k)) r2 (.p(2),.n(0));
+vsource #(.dc(1)) v1 (.p(1),.n(0));
