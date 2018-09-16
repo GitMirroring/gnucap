@@ -26,6 +26,8 @@
 #define E_CARDLIST_H
 #include "md.h"
 #include "l_istring.h"
+#include "e_card.h"
+#include "l_multimap.h"
 /*--------------------------------------------------------------------------*/
 // defined here
 class CARD_LIST;
@@ -37,12 +39,16 @@ class NODE_MAP;
 class LANGUAGE;
 class TIME_PAIR;
 /*--------------------------------------------------------------------------*/
+// template<>
+// struct card_sens_compare<void>;
+
+/*--------------------------------------------------------------------------*/
 class INTERFACE CARD_LIST {
 public: // types
   typedef std::list<CARD*> list_t;
   typedef list_t::iterator list_iterator;
   typedef list_t::const_iterator list_const_iterator;
-  typedef std::multimap<IString, list_t::iterator> map_t;
+  typedef MULTIMAP</* IString, */ list_iterator> map_t;
   typedef map_t::iterator map_iterator;
   typedef map_t::const_iterator map_const_iterator;
 

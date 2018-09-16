@@ -101,7 +101,7 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
 /*--------------------------------------------------------------------------*/
 void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope)
 {
-  if (cmd.is_end()) {untested();
+  if (cmd.is_end()) {
     // nothing
   }else{
     std::string type(find_type_in_string(cmd));

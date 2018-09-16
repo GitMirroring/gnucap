@@ -36,6 +36,8 @@ CARD_LIST::CARD_LIST()
    _nm(new NODE_MAP),
    _params(NULL)
 {
+  assert(begin()==end());
+  assert(find_(IString("bla"))==end());
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
@@ -44,6 +46,8 @@ CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
    _nm(new NODE_MAP),
    _params(NULL)
 {
+  assert(begin()==end());
+  assert(find_(IString("bla"))==end());
   assert(model);
   assert(model->subckt());
   assert(owner);
@@ -100,22 +104,23 @@ CARD_LIST::const_iterator CARD_LIST::find_again(const std::string& short_name,
 CARD_LIST::iterator CARD_LIST::find_(IString const& short_name)
 {
   trace1("find", short_name);
-  auto x=_map.find(short_name);
+  CARD_LIST::map_iterator x=_map.find(short_name);
+
   if(x==_map.end()){
     return _cl.end();
   }else{
-    return x->second;
+    return *x;
   }
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST::const_iterator CARD_LIST::find_(IString const& short_name) const
 {
   trace1("find const", short_name);
-  auto x=_map.find(short_name);
+  map_const_iterator x=_map.find(short_name);
   if(x==_map.end()){
     return _cl.end();
   }else{
-    return x->second;
+    return *x;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -153,13 +158,14 @@ void CARD_LIST::map_insert(CARD_LIST::iterator i)
   if((*i)->has_label()){
     bool old=OPT::case_insensitive;
     OPT::case_insensitive = false;
-    _map.insert(std::make_pair(label, i));
+    _map.insert(i);
     OPT::case_insensitive = old;
   }else{
     // skip
   }
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 CARD_LIST::map_const_iterator CARD_LIST::find_in_map(CARD const* c) const
 {
   assert(c);
@@ -179,12 +185,14 @@ CARD_LIST::map_const_iterator CARD_LIST::find_in_map(CARD const* c) const
   unreachable();
   return range.first;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 CARD_LIST& CARD_LIST::erase(iterator ci)
 {
   assert(ci != end());
 
-  map_const_iterator mi=find_in_map(*ci);
+  map_iterator mi=_map.find(ci);
+  assert(ci==*mi);
   _map.erase(mi);
 
   delete *ci;
@@ -195,7 +203,7 @@ CARD_LIST& CARD_LIST::erase(iterator ci)
 CARD_LIST& CARD_LIST::erase(CARD* c)
 { untested();
   assert(c);
-  map_const_iterator mi=find_in_map(c);
+  map_iterator mi=_map.find(c);
   _map.erase(mi);
 
   delete c;
