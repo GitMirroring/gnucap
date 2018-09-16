@@ -101,7 +101,8 @@ struct ichar_traits : std::char_traits<Ichar>{
   // result multiplied by two if tie break is not required.
   //
   // e.g. compare("v", "V") returns 1, "v" is weakly greater than "V"
-  static int compare (const char_type* i, const char_type* j, size_t n)
+  static int compare (const char_type* i, const char_type* j, size_t n,
+      bool insens=OPT::case_insensitive)
   {
     typedef enum{
       lt  =-1,
@@ -144,10 +145,20 @@ struct ichar_traits : std::char_traits<Ichar>{
       }
     }
 
-    return (OPT::case_insensitive)? same : try_ord;
+    assert(try_ord==-1 || try_ord==0 || try_ord==1);
+    if(!insens){
+      return try_ord;
+      // give the full answer.
+    }else{
+      // truncate, i.e. map +-1 to zero. leave +-2
+      return (try_ord/2)*2;
+    }
   }
-};
-}
+}; // ichar_traits
+} // detail
+/*--------------------------------------------------------------------------*/
+class IString;
+inline std::ostream& operator<< (std::ostream& o, IString const& s);
 /*--------------------------------------------------------------------------*/
 class IString : public std::basic_string<Ichar, detail::ichar_traits> {
 private:
@@ -221,27 +232,29 @@ public: // explicit conversion
   {
     return reinterpret_cast<std::string const&>(*this);
   }
+private: // cleanup later.
 public: // more compare logic
-  int compare(const IString& str) const
-  { itested();
+  int compare(const IString& str, bool insens=OPT::case_insensitive) const { itested();
     const size_type tsize = this->size();
     const size_type osize = str.size();
     const size_type len = std::min(tsize, osize);
 
-    int r = traits_type::compare(data(), str.data(), len);
+    int r=traits_type::compare(data(), str.data(), len, insens);
+
     trace1("strcmp", *this);
     trace3("strcmp", str, len, r);
     if (r == 2 || r == -2){
       // traits_type::compare is really sure
       return r;
-    }else if(tsize == osize){
+    }else if(tsize < osize){
+      return -2;
+    }else if(tsize > osize){
+      return 2;
+    }else{
+      assert(tsize == osize);
+      assert(!insens || r==0);
       // same length, use tie break
       return r;
-    }else if(tsize < osize){
-      return -1;
-    }else{
-      assert(tsize > osize);
-      return 1;
     }
   }
 }; // IString
@@ -284,11 +297,19 @@ inline std::string operator+(std::string x, IString s)
   return x + s.to_string();
 }
 /*--------------------------------------------------------------------------*/
+inline std::ostream& operator<< (std::ostream& o, IString const& s)
+{
+  o << s.to_string();
+  return o;
+}
+/*--------------------------------------------------------------------------*/
+#if 0
 inline std::ostream& operator<< (std::ostream& o, IString s)
 {
   o << s.to_string();
   return o;
 }
+#endif
 /*--------------------------------------------------------------------------*/
 inline OMSTREAM& operator<< (OMSTREAM& o, IString s)
 {
