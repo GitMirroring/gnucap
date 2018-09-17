@@ -252,9 +252,9 @@ public: // more compare logic
       // traits_type::compare is really sure
       return r;
     }else if(tsize < osize){
-      return -2;
+      return -1;
     }else if(tsize > osize){
-      return 2;
+      return 1;
     }else{
       assert(tsize == osize);
       assert(!insens || r==0);
