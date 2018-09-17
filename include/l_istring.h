@@ -105,9 +105,11 @@ struct ichar_traits : std::char_traits<Ichar>{
       bool insens=OPT::case_insensitive)
   {
     typedef enum{
+      llt =-2,
       lt  =-1,
-      same=0,
-      gt  =1
+      same= 0,
+      gt  = 1,
+      ggt = 2
     }ord_t;
 
     ord_t try_ord = same;
@@ -138,14 +140,16 @@ struct ichar_traits : std::char_traits<Ichar>{
 	++i;
 	++j;
       }else if (*i < *j) {
-	return 2*lt;
+	try_ord = llt;
+	break;
       }else{
 	assert (*i > *j);
-	return 2*gt;
+	try_ord = ggt;
+	break;
       }
     }
 
-    assert(try_ord==-1 || try_ord==0 || try_ord==1);
+    // assert(try_ord==-1 || try_ord==0 || try_ord==1);
     if(!insens){
       return try_ord;
       // give the full answer.
