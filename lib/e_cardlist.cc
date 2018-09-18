@@ -156,10 +156,7 @@ void CARD_LIST::map_insert(CARD_LIST::iterator i)
   IString label((*i)->short_label());
   trace1("map_insert", label);
   if((*i)->has_label()){
-    bool old=OPT::case_insensitive;
-    OPT::case_insensitive = false;
     _map.insert(i);
-    OPT::case_insensitive = old;
   }else{
     // skip
   }

@@ -29,6 +29,7 @@
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// comparison function for outer map. (values are INNER)
 template<class INNER>
 struct insensitive_compare{
   using is_transparent=std::true_type;
@@ -62,42 +63,74 @@ struct insensitive_compare{
 template<class V>
 class MULTIMAP{
 public:
+  class lookup{
+  public:
+    explicit lookup(IString const& s) : _key(s) {
+    }
+    IString const& s()const{return _key;}
+  private:
+    IString const& _key;
+  };
 private: // internal types
   struct card_compare{
     typedef V value_type;
     using is_transparent=std::true_type;
+    bool operator()(IString const& a, IString const& b) const{
+      // internal ordering is sensitive
+      return a.compare(b, false) < 0;
+    }
+    bool operator()(lookup const& a, IString const& b) const{
+      // lookup ordering depends on OPT::case_insensitive
+      return a.s().compare(b) < 0;
+    }
+    bool operator()(IString const& a, lookup const& b) const{
+      // lookup ordering depends on OPT::case_insensitive
+      return a.compare(b.s()) < 0;
+    }
     bool operator()(V a, V b) const{
       assert(*a);
       IString x((*a)->short_label());
-
       return (*this)(x, b);
     }
     bool operator()(CARD const* a, CARD const* b) const{
       assert(a);
       IString x(a->short_label());
-
       return (*this)(x, b);
     }
     bool operator()(IString const& s, CARD const* b) const{
       assert(b);
       IString y(b->short_label());
-      return s.compare(y /*, OPT::insensitive */) < 0;
+      return (*this)(s, y);
+    }
+    bool operator()(lookup const& s, CARD const* b) const{ untested();
+      assert(b);
+      IString y(b->short_label());
+      return (*this)(s, y);
     }
     bool operator()(CARD const* a, IString const& s) const{
       assert(a);
       IString x(a->short_label());
-      return x.compare(s /*, OPT::insensitive */) < 0;
+      return (*this)(x, s);
+    }
+    bool operator()(lookup const& s, std::_List_iterator<CARD*> const& b) const{ untested();
+      assert(*b);
+      IString y((*b)->short_label());
+      return (*this)(s, y);
     }
     bool operator()( IString const& s, std::_List_iterator<CARD*> const& b) const{
       assert(*b);
       IString y((*b)->short_label());
-      return s.compare(y /*, OPT::insensitive */) < 0;
+      return (*this)(s, y);
+    }
+    bool operator()( std::_List_iterator<CARD*> const& a, const lookup& y) const{ untested();
+      assert(*a);
+      IString x((*a)->short_label());
+      return (*this)(x, y);
     }
     bool operator()( std::_List_iterator<CARD*> const& a, const IString& y) const{
       assert(*a);
       IString x((*a)->short_label());
-      return x.compare(y /*, OPT::insensitive */) < 0;
-
+      return (*this)(x, y);
     }
   };
   class INNER{
@@ -140,11 +173,17 @@ private: // internal types
     const_iterator end() const{
       return _m.end();
     }
-    iterator find(IString const& k){
-      return _m.find(k);
+    iterator find(IString const& k){ untested();
+      for(auto i : _m){
+	std::cerr << (*i)->short_label() << "\n";
+      }
+      return _m.find(lookup(k));
     }
-    const_iterator find(IString const& k) const{
-      return _m.find(k);
+    const_iterator find(IString const& k) const{ untested();
+      for(auto i : _m){
+	std::cerr << (*i)->short_label() << "\n";
+      }
+      return _m.find(lookup(k));
     }
     iterator insert(V v){
 	_m.insert(v);
