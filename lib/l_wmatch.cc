@@ -28,6 +28,15 @@
  */
 //testing=script 2006.07.13
 #include "l_istring.h"
+#include <cctype>
+#include "u_opt.h"
+#include "l_lib.h"
+/*--------------------------------------------------------------------------*/
+static char fix_case(char c)
+{
+  trace2("wm", c, OPT::case_insensitive);
+  return ((OPT::case_insensitive) ? (static_cast<char>(tolower(c))) : (c));
+}
 /*--------------------------------------------------------------------------*/
 bool wmatch_by_ptr(const char *s2, const char *s1)
 {
@@ -35,7 +44,8 @@ bool wmatch_by_ptr(const char *s2, const char *s1)
     return true;
   }else if (!*s2 || !*s1) {		// ends don't match
     return false;
-  }else if (Ichar(*s2) == Ichar(*s1)) { // one char matches - move on
+  }else if (fix_case(Ichar(*s2)) == fix_case(Ichar(*s1))) {
+    // one char matches - move on
     return wmatch_by_ptr(s2+1, s1+1);
   }else if (*s1 == '?') {		// ? wild card match - move on
     return wmatch_by_ptr(s2+1, s1+1);
@@ -52,7 +62,7 @@ bool wmatch_by_ptr(const char *s2, const char *s1)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool wmatch(const std::string& s1, const std::string& s2)
+bool wmatch(const std::string& s1,const std::string& s2)
 {
   return wmatch_by_ptr(s1.c_str(), s2.c_str());
 }

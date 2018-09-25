@@ -133,7 +133,7 @@ void Token_SYMBOL::stack_op(Expression* E)const
     }
   }else{
     // has no parameters (scalar)
-    if (strchr("0123456789.", name()[0].to_char())) {
+    if (strchr("0123456789.", name()[0] /*.to_char()*/)) {
       // a number
       Float* n = new Float(name());
       E->push_back(new Token_CONSTANT(name(), n, IString()));
@@ -174,7 +174,7 @@ void Token_BINOP::stack_op(Expression* E)const
 	delete t1;
       }else{
 	// fail - one arg is unknown, push back args
-	if (strchr("+*", name()[0].to_char())
+	if (strchr("+*", name()[0] /* .to_char() */ )
 	    && !dynamic_cast<const Float*>(t1->data())) {
 	  // change order to enable later optimization
 	  E->push_back(t1);
@@ -186,7 +186,7 @@ void Token_BINOP::stack_op(Expression* E)const
 	E->push_back(clone()); //op
 	delete t;
       }
-    }else if (((*t2) == (*this)) && strchr("+*", name()[0].to_char())
+    }else if (((*t2) == (*this)) && strchr("+*", name()[0] /*.to_char()*/)
 	      && dynamic_cast<Token_CONSTANT*>(E->back())) {
       // have # + # + .. becomes result + (previous unknown, try to optimize)
       Token* t3 = E->back();

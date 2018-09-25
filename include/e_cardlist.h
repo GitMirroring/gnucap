@@ -25,6 +25,7 @@
 #ifndef E_CARDLIST_H
 #define E_CARDLIST_H
 #include "md.h"
+#include "l_istring.h"
 /*--------------------------------------------------------------------------*/
 // defined here
 class CARD_LIST;
@@ -84,12 +85,25 @@ public:
   iterator find_(const std::string& short_name)
 					{return find_again(short_name, begin());}
 
+  // wrappers.
+  iterator find_again(const IString& s, iterator i)
+                                        { return find_again(s.to_string(), i); }
+  iterator find_(const IString& short_name)
+                                        { return find_(short_name.to_string()); }
+
   // return a const_iterator
   const_iterator begin()const		{return _cl.begin();}
   const_iterator end()const		{return _cl.end();}
   const_iterator find_again(const std::string& short_name, const_iterator)const;
   const_iterator find_(const std::string& short_name)const
 					{return find_again(short_name, begin());}
+
+  // const wrappers.
+  const_iterator find_again(const IString& s, const_iterator i)const
+                                        { return find_again(s.to_string(), i); }
+  const_iterator find_(const IString& short_name) const
+                                        { return find_(short_name.to_string()); }
+
 
   // add to it
   CARD_LIST& push_front(CARD* c)	{_cl.push_front(c); return *this;}

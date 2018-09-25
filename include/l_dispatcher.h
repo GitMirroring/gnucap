@@ -62,6 +62,12 @@ public:
   CKT_BASE* operator[](IString s) {
     assert(_map);
     CKT_BASE* rv = (*_map)[s];
+    if (!rv && OPT::case_insensitive) {
+      // yikes. is this really optimised out unless IString is legacy_string?
+      notstd::to_lower(&s);
+      rv = (*_map)[s];
+    }else{
+    }
     return rv;
   }
 
@@ -149,7 +155,7 @@ public:
 	for (int ii = 0; (*_map)[save_name]; ++ii) {untested();
 	  save_name = name + ":" + to_string(ii);
 	}
-	(*_map)[save_name] = (*_map)[name];	
+	(*_map)[save_name] = (*_map)[name];
 	error(bWARNING, "stashing as " + save_name + "\n");
       }else{
 	// it's new, just put it in
@@ -161,6 +167,13 @@ public:
   TT* operator[](IString const& s) {
     assert(_map);
     CKT_BASE* rv = (*_map)[s];
+    if (!rv && OPT::case_insensitive) {
+      // optimised out unless legacy_string?
+      IString sl(s);
+      notstd::to_lower(&sl);
+      rv = (*_map)[sl];
+    }else{
+    }
     return prechecked_cast<TT*>(rv);
   }
   TT* operator[](std::string s) {

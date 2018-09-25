@@ -40,8 +40,10 @@ public:
 
   typedef _container::iterator	     iterator;
   typedef _container::const_iterator const_iterator;
-  void	   listing(const std::string&)const;
   void	   listing(const IString&)const;
+  void     listing(const std::string& label)const {
+    listing(IString(label));
+  }
   void     clear();
 
   void	   remove_list(CS&);

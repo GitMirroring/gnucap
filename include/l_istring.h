@@ -27,11 +27,12 @@
 #define L_ISTRING_H
 /*--------------------------------------------------------------------------*/
 #include "u_opt.h"
+#include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
-struct Ichar{
-  Ichar() : _c('\0') {}
-  Ichar(const Ichar& c) : _c(c._c) {}
-  explicit Ichar(char c) : _c(c) {}
+struct Ichar_{
+  Ichar_() : _c('\0') {}
+  Ichar_(const Ichar_& c) : _c(c._c) {}
+  explicit Ichar_(char c) : _c(c) {}
   bool operator==(char o) const {
     if(OPT::case_insensitive){
       return tolower(_c)==tolower(o);
@@ -41,7 +42,7 @@ struct Ichar{
       return false;
     }
   }
-  bool operator==(Ichar o) const {
+  bool operator==(Ichar_ o) const {
     if(OPT::case_insensitive){
       return tolower(_c)==tolower(o._c);
     }else{
@@ -51,14 +52,14 @@ struct Ichar{
   bool operator!=(char o) const {
     return(!operator==(o));
   }
-  bool operator!=(Ichar o) const {
+  bool operator!=(Ichar_ o) const {
     return(!operator==(o));
   }
-  bool operator<(const Ichar& o) const {
+  bool operator<(const Ichar_& o) const {
     return((!OPT::case_insensitive && tolower(_c)==tolower(o._c))
       ? _c<o._c : tolower(_c)<tolower(o._c));
   }
-  bool operator>(const Ichar& o) const {
+  bool operator>(const Ichar_& o) const {
     return((!OPT::case_insensitive && tolower(_c)==tolower(o._c))
       ? _c>o._c : tolower(_c)>tolower(o._c));
   }
@@ -75,24 +76,24 @@ private:
   char _c;
 };
 /*--------------------------------------------------------------------------*/
-inline std::ostream& operator<<(std::ostream& o, const Ichar* s)
+inline std::ostream& operator<<(std::ostream& o, const Ichar_* s)
 {untested();
   o << (char const*) s;
   return o;
 }
 /*--------------------------------------------------------------------------*/
 namespace detail{
-struct ichar_traits : std::char_traits<Ichar>{
+struct ichar_traits : std::char_traits<Ichar_>{
   typedef char_traits<char> base;
-  typedef Ichar char_type;
+  typedef Ichar_ char_type;
   typedef int int_type;
   typedef std::streamoff off_type;
   typedef std::streampos pos_type;
   // inherited
-  // static bool lt(const Ichar& a, const Ichar& b);
-  // static bool eq(const Ichar& a, const Ichar& b);
-  // static void copy(Ichar* x, const Ichar* y, size_t s);
-  // static size_t length(const Ichar* x);
+  // static bool lt(const Ichar_& a, const Ichar_& b);
+  // static bool eq(const Ichar_& a, const Ichar_& b);
+  // static void copy(Ichar_* x, const Ichar_* y, size_t s);
+  // static size_t length(const Ichar_* x);
 
   // compare needs to be different. default to insensitive order.
   // if enabled, use sensitive order as a tie break.
@@ -161,38 +162,38 @@ struct ichar_traits : std::char_traits<Ichar>{
 }; // ichar_traits
 } // detail
 /*--------------------------------------------------------------------------*/
-class IString;
-inline std::ostream& operator<< (std::ostream& o, IString const& s);
+class IString_;
+inline std::ostream& operator<< (std::ostream& o, IString_ const& s);
 /*--------------------------------------------------------------------------*/
-class IString : public std::basic_string<Ichar, detail::ichar_traits> {
+class IString_ : public std::basic_string<Ichar_, detail::ichar_traits> {
 private:
-  typedef std::basic_string<Ichar, detail::ichar_traits> base;
+  typedef std::basic_string<Ichar_, detail::ichar_traits> base;
 public: // construct
-  IString() {}
-  IString(const IString& s) : base(s) {}
-  IString(const base& s) : base(s) {}
-  explicit IString(const char* s) : base((const Ichar*)s) {}
-//  IString(const char* s, size_type t) : base((const Ichar*)s, t) {}
-  explicit IString(const std::string& s) :
-    base((const Ichar*)s.data(), s.size()) {}
+  IString_() {}
+  IString_(const IString_& s) : base(s) {}
+  IString_(const base& s) : base(s) {}
+  explicit IString_(const char* s) : base((const Ichar_*)s) {}
+//  IString_(const char* s, size_type t) : base((const Ichar_*)s, t) {}
+  explicit IString_(const std::string& s) :
+    base((const Ichar_*)s.data(), s.size()) {}
 public: // ops
-  IString& operator=(Ichar s){ untested();
+  IString_& operator=(Ichar_ s){ untested();
     base::operator=(s);
     return *this;
   }
-  IString& operator=(const std::string& s){
-    base::operator=(IString(s));
+  IString_& operator=(const std::string& s){
+    base::operator=(IString_(s));
     return *this;
   }
-  IString& operator=(const char* s){
-    base::operator=((Ichar const*)s);
+  IString_& operator=(const char* s){
+    base::operator=((Ichar_ const*)s);
     return *this;
   }
-  bool operator==(const IString& s) const{
+  bool operator==(const IString_& s) const{
     return base(*this)==base(s);
   }
-  IString& operator+=(const std::string& s){
-    base::operator+=(IString(s));
+  IString_& operator+=(const std::string& s){
+    base::operator+=(IString_(s));
     return *this;
   }
   bool operator==(char c) const {untested();
@@ -202,7 +203,7 @@ public: // ops
     return !(*this==c);
   }
   bool operator==(char const* c) const {
-    return (*this==IString(c));
+    return (*this==IString_(c));
   }
   bool operator!=(char const* c) const {
     return !(operator==(c));
@@ -223,13 +224,13 @@ public: // ops
 /*--------------------------------------------------------------------------*/
 public: // more conventional type bridge
   size_type find(char x, size_type y) const {
-    return base::find(Ichar(x), y);
+    return base::find(Ichar_(x), y);
   }
   size_type find(char x) const {
-    return base::find(Ichar(x));
+    return base::find(Ichar_(x));
   }
   size_type find_first_of(char const* x) const {
-    return base::find_first_of((Ichar const*)x);
+    return base::find_first_of((Ichar_ const*)x);
   }
 public: // explicit conversion
   std::string const& to_string() const
@@ -238,7 +239,7 @@ public: // explicit conversion
   }
 private: // cleanup later.
 public: // more compare logic
-  int compare(const IString& str, bool insens=OPT::case_insensitive) const { itested();
+  int compare(const IString_& str, bool insens=OPT::case_insensitive) const { itested();
     const size_type tsize = this->size();
     const size_type osize = str.size();
     const size_type len = std::min(tsize, osize);
@@ -261,110 +262,122 @@ public: // more compare logic
       return r;
     }
   }
-}; // IString
+}; // IString_
 /*--------------------------------------------------------------------------*/
-inline bool operator<(const IString& lhs, const IString& rhs)
+inline bool operator<(const IString_& lhs, const IString_& rhs)
 { itested();
   return lhs.compare(rhs) < 0;
 }
 /*--------------------------------------------------------------------------*/
 template<typename CharT>
-inline bool operator<(const IString lhs, const CharT* rhs)
+inline bool operator<(const IString_ lhs, const CharT* rhs)
 { untested();
   return lhs.compare(rhs) < 0;
 }
 /*--------------------------------------------------------------------------*/
-inline bool operator>(const IString& lhs, const IString& rhs)
+inline bool operator>(const IString_& lhs, const IString_& rhs)
 { untested();
   return lhs.compare(rhs) > 0;
 }
 /*--------------------------------------------------------------------------*/
 template<typename CharT>
-inline bool operator>(const IString lhs, const CharT* rhs)
+inline bool operator>(const IString_ lhs, const CharT* rhs)
 { untested();
   return lhs.compare(rhs) > 0;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-inline std::string operator+(char x, IString s)
+inline std::string operator+(char x, IString_ s)
 {
   return x + s.to_string();
 }
 /*--------------------------------------------------------------------------*/
-inline std::string operator+(const char* x, IString s)
+inline std::string operator+(const char* x, IString_ s)
 {
     return x + s.to_string();
 }
 /*--------------------------------------------------------------------------*/
-inline std::string operator+(std::string x, IString s)
+inline std::string operator+(std::string x, IString_ s)
 {
   return x + s.to_string();
 }
 /*--------------------------------------------------------------------------*/
-inline std::ostream& operator<< (std::ostream& o, IString const& s)
+inline std::ostream& operator<< (std::ostream& o, IString_ const& s)
 {
   o << s.to_string();
   return o;
 }
 /*--------------------------------------------------------------------------*/
-#if 0
-inline std::ostream& operator<< (std::ostream& o, IString s)
-{
-  o << s.to_string();
-  return o;
-}
-#endif
-/*--------------------------------------------------------------------------*/
-inline OMSTREAM& operator<< (OMSTREAM& o, IString s)
+inline OMSTREAM& operator<< (OMSTREAM& o, IString_ s)
 {
   o << s.to_string();
   return o;
 }
 /*--------------------------------------------------------------------------*/
-// no implicit conversion, need *match wrappers.
-inline bool Umatch(const char*s, const std::string&t)
-{
-  return Umatch(std::string(s), t);
-}
-/*--------------------------------------------------------------------------*/
-inline bool Umatch(const IString&s, const std::string&t)
+inline bool Umatch(const IString_&s, const std::string&t)
 {
   return Umatch(s.to_string(), t);
 }
 /*--------------------------------------------------------------------------*/
-inline bool wmatch(const std::string& s1, const IString& s2)
+inline bool wmatch(const std::string& s1, const IString_& s2)
 {
   return wmatch(s1, s2.to_string());
 }
 /*--------------------------------------------------------------------------*/
-inline bool wmatch(const IString& s1, const std::string& s2)
+inline bool wmatch(const IString_& s1, const std::string& s2)
 {
   return wmatch(s1.to_string(), s2);
 }
 /*--------------------------------------------------------------------------*/
-inline bool wmatch(const IString& s1, const IString& s2)
+inline bool wmatch(const IString_& s1, const IString_& s2)
 {
   return wmatch(s1.to_string(), s2.to_string());
 }
 /*--------------------------------------------------------------------------*/
-inline bool wmatch(const std::string& s1, const char* s2)
+/*--------------------------------------------------------------------------*/
+// implement legacy behaviour, but can't just use std::string.
+class legacy_string : public std::string{
+public:
+  typedef std::string base;
+  legacy_string(const std::string& s="") : base(s) {}
+public:
+  legacy_string& operator=(const std::string& s){
+    base::operator=(s);
+    return *this;
+  }
+  std::string const& to_string() const{ return *this; }
+};
+/*--------------------------------------------------------------------------*/
+inline const char* strchr(const char *s, Ichar_ const& c)
 {
-  return wmatch(s1, IString(s2));
+  return strchr(s, c.to_char());
 }
 /*--------------------------------------------------------------------------*/
-template<class MAP>
-inline typename MAP::const_iterator find_in_map(MAP const&d, IString const& k)
+inline Ichar_ fix_case(Ichar_ c)
 {
-  // later: report close misses and ambiguous matches
-  return d.find(k);
+  return c;
 }
 /*--------------------------------------------------------------------------*/
-template<class MAP>
-inline typename MAP::const_iterator find_in_map(MAP const&d, std::string const& k)
-{ untested();
-  return find_in_map(d, reinterpret_cast<const IString&>(k));
+inline int tolower(Ichar_ c)
+{
+  return c.to_char();
 }
+/*--------------------------------------------------------------------------*/
+namespace notstd{
+/*--------------------------------------------------------------------------*/
+inline void to_lower(IString_*) { }
+/*--------------------------------------------------------------------------*/
+} // nostd
+/*--------------------------------------------------------------------------*/
+#if 1
+typedef IString_ IString;
+typedef Ichar_ Ichar;
+#else
+typedef legacy_string IString;
+typedef char Ichar;
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif // guard
 // vim:ts=8:sw=2:noet:
+

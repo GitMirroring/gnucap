@@ -444,7 +444,7 @@ void COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
 void COMPONENT::set_port_by_index(int num, std::string& ext_name)
 {
   if (num < max_nodes()) {
-    _n[num].new_node(ext_name, this);
+    _n[num].new_node(IString(ext_name), this);
     if (num+1 > _net_nodes) {
       // make the list bigger
       _net_nodes = num+1;

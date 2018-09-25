@@ -121,8 +121,8 @@ NODE::NODE(const NODE* p)
 /*--------------------------------------------------------------------------*/
 /* usual initializing constructor : name and index
  */
-NODE::NODE(const std::string& s, int n)
-  :CKT_BASE(s),
+NODE::NODE(const IString& s, int n)
+  :CKT_BASE(s.to_string()),
    _user_number(n)
    //_flat_number(n)
    //_matrix_number(INVALID_NODE)
@@ -506,7 +506,7 @@ void node_t::set_to_ground(CARD* d)
 /*--------------------------------------------------------------------------*/
 /* new_node: a raw new node, as when a netlist is parsed
  */
-void node_t::new_node(const std::string& node_name, const CARD* d)
+void node_t::new_node(const IString& node_name, const CARD* d)
 {
   //assert(!_nnn); //BUG// fails on MUTUAL_L::expand after clone
   assert(d);
@@ -524,7 +524,7 @@ void node_t::new_node(const std::string& node_name, const CARD* d)
  * Supposedly equivalent to new_node() then map_subckt_node()
  * but it does it without building a map
  */
-void node_t::new_model_node(const std::string& node_name, CARD* d)
+void node_t::new_model_node(const IString& node_name, CARD* d)
 {
   new_node(node_name, d);
   _ttt = CKT_BASE::_sim->newnode_model();

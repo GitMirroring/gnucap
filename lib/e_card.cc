@@ -113,7 +113,7 @@ CARD* CARD::find_in_my_scope(const std::string& name)
   assert(name.size());
   assert(scope());
 
-  CARD_LIST::iterator i = scope()->find_(name);
+  CARD_LIST::iterator i = scope()->find_(IString(name));
   if (i == scope()->end()) {
     throw Exception_Cant_Find(long_label(), name,
 			      ((owner()) ? owner()->long_label() : "(root)"));

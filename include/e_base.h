@@ -62,19 +62,19 @@ public: // probes
 	  void	      inc_probes()const	{++_probes;}
 	  void	      dec_probes()const	{assert(_probes>0); --_probes;}
 	  bool	      has_probes()const	{return _probes > 0;}
-  static  double      probe(const CKT_BASE*, const std::string&);
+  static  double      probe(const CKT_BASE*,const std::string&);
   static  WAVE*	      find_wave(const std::string& probe_name);
   //--------------------------------------------------------------------
 public: // label
+  bool operator!=(const std::string& n)const {
+    unreachable(); // unless legacy
+    return strcasecmp(_label.c_str(),n.c_str())!=0;
+  }
   bool operator!=(const IString& n)const {
     return IString(_label) != n;
   }
-  // legacy
-  bool operator!=(const std::string& n)const {
-    return IString(_label) != IString(n);
-  }
   virtual const std::string long_label()const;
-  const std::string& short_label()const {return _label;}
+  const std::string&  short_label()const {return _label;}
   void	set_label(const std::string& s) {_label = s;}
 };
 /*--------------------------------------------------------------------------*/

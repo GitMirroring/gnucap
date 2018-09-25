@@ -29,12 +29,10 @@
  */
 CS& CS::umatch(const std::string& s)
 {
-  trace1("umatch", s);
   unsigned start = cursor();
   skipbl();
   unsigned begin_match = cursor();
   const Ichar* str2 = (Ichar const*)s.c_str();
-  trace1("umatchhuh", s.c_str());
   bool optional = 0;
 
   for (;;) {
@@ -56,6 +54,10 @@ CS& CS::umatch(const std::string& s)
       skipbl();
       ++str2;
     }else if (Ichar(peek()) == *str2) {
+      skip();
+      ++str2;
+    }else if ((OPT::case_insensitive) && (tolower(peek()) == tolower(*str2))) {
+      // obsolete/unreachable with istring.
       skip();
       ++str2;
     }else if (optional) {

@@ -25,7 +25,7 @@
 #include "e_node.h"
 #include "u_nodemap.h"
 /*--------------------------------------------------------------------------*/
-NODE ground_node("0",0);
+NODE ground_node(IString("0"),0);
 /*--------------------------------------------------------------------------*/
 NODE_MAP::NODE_MAP()
   : _node_map()
@@ -66,28 +66,31 @@ NODE_MAP::~NODE_MAP()
 /* return a pointer to a node given a string
  * returns NULL pointer if no match
  */
-NODE* NODE_MAP::operator[](IString s)
+NODE* NODE_MAP::operator[](IString /* const & ? */ s)
 {
-  const_iterator i = find_in_map(_node_map, s);
+  const_iterator i = _node_map.find(s);
   if (i != _node_map.end()) {
     return i->second;
+  }else if (OPT::case_insensitive) {
+    notstd::to_lower(&s);
+    i = _node_map.find(s);
   }else{
     return NULL;
   }
-}
-/*--------------------------------------------------------------------------*/
-// legacy interface.
-NODE* NODE_MAP::operator[](std::string s)
-{ untested();
-  return operator[](IString(s));
+  return (i != _node_map.end()) ? i->second : NULL;
 }
 /*--------------------------------------------------------------------------*/
 /* return a pointer to a node given a string
  * creates a new one if it isn't already there.
  */
-NODE* NODE_MAP::new_node(std::string s)
+NODE* NODE_MAP::new_node(IString s)
 {
-  NODE* node = _node_map[IString(s)];
+  if (OPT::case_insensitive) {
+    // no-op unless legacy_string
+    notstd::to_lower(&s);
+  }else{
+  }
+  NODE* node = _node_map[s];
 
   // increments how_many() when lookup fails (new s)  
   if (!node) {

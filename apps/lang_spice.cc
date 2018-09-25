@@ -236,7 +236,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	break; // done.  have closing paren.
       }else if (index >= num_nodes) {
 	break; // done.  have maxnodes.
-      }else if (!cmd.more()) {untested();
+      }else if (!cmd.more()) {
 	break; // done.  premature end of line.
       }else if (OPT::keys_between_nodes &&
 		(cmd.umatch("poly ")
@@ -280,7 +280,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
   }catch (Exception& e) {untested();
     cmd.warn(bDANGER, here1, e.message());
   }
-  if (index < minnodes) {untested();
+  if (index < minnodes) {
     cmd.warn(bDANGER, "need " + to_string(minnodes-index) +" more nodes");
   }else{
   }
@@ -291,7 +291,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
   //assert(x->_net_nodes == index);
   
   // ground unused input nodes
-  for (int iii = index;  iii < minnodes;  ++iii) {untested();
+  for (int iii = index;  iii < minnodes;  ++iii) {
     x->set_port_to_ground(iii);
   }
   //assert(x->_net_nodes >= index);
@@ -347,7 +347,7 @@ void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* 
 
   unsigned here = cmd.cursor();
   c->parse_common_obsolete_callback(cmd); //BUG//callback
-  if (cmd.stuck(&here)) {untested();
+  if (cmd.stuck(&here)) {
     cmd.warn(bDANGER, "needs a value");
   }else{
   }
@@ -689,6 +689,11 @@ void LANG_SPICE::parse_top_item(CS& cmd, CARD_LIST* Scope)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+static char fix_case(char c)
+{
+  return ((OPT::case_insensitive) ? (static_cast<char>(tolower(c))) : (c));
+}
+/*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 {
   assert(x);
@@ -766,7 +771,8 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
   assert(x);
   if (x->print_type_in_spice()) {
     o << "  " << x->dev_type();
-  }else if (Ichar(x->short_label()[0]) != Ichar(x->id_letter())) {untested();
+  }else if (fix_case(Ichar(x->short_label()[0]))
+         != fix_case(Ichar(x->id_letter()))) {untested();
     o << "  " << x->dev_type();
   }else{
     // don't print type

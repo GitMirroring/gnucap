@@ -42,7 +42,9 @@ void copy_n(InputIter first, Size count, OutputIter result)
 template <class InputIterator, class T>
 InputIterator find_ptr(InputIterator first,InputIterator last,const T& value)
 {
+  trace1("find", value);
   while (first != last && **first != value) {
+    trace1("find?", (*first)->short_label());
     ++first;
   }
   return first;

@@ -53,11 +53,6 @@ void PROBELIST::listing(const IString& label)const
   IO::mstdout << '\n';
 }
 /*--------------------------------------------------------------------------*/
-void PROBELIST::listing(const std::string& label)const
-{
-  listing(IString(label));
-}
-/*--------------------------------------------------------------------------*/
 void PROBELIST::clear(void)
 {
   erase(begin(), end());
@@ -222,6 +217,7 @@ bool PROBELIST::add_branches(const IString& device,
 			     const IString& param,
 			     const CARD_LIST* scope)
 {
+  trace2("add_braches", device, param);
   assert(scope);
   bool found_something = false;
 
@@ -246,6 +242,7 @@ bool PROBELIST::add_branches(const IString& device,
       dotplace = device.find_last_of(Ichar('.'));
       IString container = device.substr(dotplace+1, IString::npos);
       IString dev = device.substr(0, dotplace);
+      trace1("add", device);
       for (CARD_LIST::const_iterator
 	     i = scope->begin();  i != scope->end();  ++i) {
 	CARD* card = *i;
@@ -269,6 +266,7 @@ bool PROBELIST::add_branches(const IString& device,
 	  if (i->first != "0") {
 	    NODE* node = i->second;
 	    assert (node);
+	    trace1("wm", device);
 	    if (wmatch(node->short_label(), device)) {
 	      push_new_probe(param, node);
 	      found_something = true;
@@ -282,6 +280,7 @@ bool PROBELIST::add_branches(const IString& device,
 	for (CARD_LIST::const_iterator 
 	     i = scope->begin();  i != scope->end();  ++i) {
 	  CARD* card = *i;
+	  trace1("wm2", device);
 	  if (wmatch(card->short_label(), device)) {
 	    push_new_probe(param, card);
 	    found_something = true;
@@ -300,7 +299,9 @@ bool PROBELIST::add_branches(const IString& device,
 	}
       }
       { //components
-	CARD_LIST::const_iterator i = scope->find_(reinterpret_cast<std::string const&>(device));
+	trace1("comp", device);
+	//CARD_LIST::const_iterator i = scope->find_(reinterpret_cast<std::string const&>(device));
+	CARD_LIST::const_iterator i = scope->find_(device);
 	if (i != scope->end()) {
 	  push_new_probe(param, *i);
 	  found_something = true;

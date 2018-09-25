@@ -44,6 +44,10 @@ void PARAM_LIST::parse(CS& cmd)
       break;
     }else{
     }
+    if (OPT::case_insensitive) {
+      notstd::to_lower(&Name);
+    }else{
+    }
     _pl[Name] = Value;
   }
   cmd.check(bDANGER, "syntax error");
@@ -118,6 +122,11 @@ void PARAM_LIST::eval_copy(PARAM_LIST& p, const CARD_LIST* scope)
 const PARAMETER<double>& PARAM_LIST::deep_lookup(std::string Name_)const
 {
   IString Name(Name_);
+  if (OPT::case_insensitive) {
+    // no-op unless legacy string
+    notstd::to_lower(&Name);
+  }else{
+  }
   // hmm, report close misses and ambiguities?
   PARAMETER<double> & rv = _pl[Name];
   if (rv.has_hard_value()) {
@@ -125,7 +134,7 @@ const PARAMETER<double>& PARAM_LIST::deep_lookup(std::string Name_)const
     return rv;
   }else if (_try_again) {
     // didn't find one, look in enclosing scope
-    return _try_again->deep_lookup(Name_);
+    return _try_again->deep_lookup(Name.to_string());
   }else{
     // no enclosing scope to look in
     // really didn't find it, give up
@@ -136,6 +145,11 @@ const PARAMETER<double>& PARAM_LIST::deep_lookup(std::string Name_)const
 /*--------------------------------------------------------------------------*/
 void PARAM_LIST::set(IString Name, const IString& Value)
 {
+  if (OPT::case_insensitive) {
+    // no-op unless legacy string
+    notstd::to_lower(&Name);
+  }else{
+  }
   _pl[Name] = Value;
 }
 /*--------------------------------------------------------------------------*/
