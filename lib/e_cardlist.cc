@@ -101,10 +101,9 @@ CARD_LIST::const_iterator CARD_LIST::find_again(const std::string& short_name,
   return notstd::find_ptr(Begin, end(), IString(short_name));
 }
 /*--------------------------------------------------------------------------*/
-CARD_LIST::iterator CARD_LIST::find_(IString const& short_name)
+CARD_LIST::iterator CARD_LIST::find_(std::string const& short_name)
 {
-  trace1("find", short_name);
-  CARD_LIST::map_iterator x=_map.find(short_name);
+  CARD_LIST::map_iterator x=_map.find(IString(short_name));
 
   if(x==_map.end()){
     return _cl.end();
@@ -113,10 +112,9 @@ CARD_LIST::iterator CARD_LIST::find_(IString const& short_name)
   }
 }
 /*--------------------------------------------------------------------------*/
-CARD_LIST::const_iterator CARD_LIST::find_(IString const& short_name) const
+CARD_LIST::const_iterator CARD_LIST::find_(std::string const& short_name) const
 {
-  trace1("find const", short_name);
-  map_const_iterator x=_map.find(short_name);
+  map_const_iterator x=_map.find(IString(short_name));
   if(x==_map.end()){
     return _cl.end();
   }else{

@@ -136,7 +136,7 @@ private: // obsolete?
   // better way: wrap multimap::equal_range
   iterator find_again(const std::string& short_name, iterator);
 public:
-  iterator find_(IString const& short_name);
+  iterator find_(std::string const& short_name);
 
   // wrappers.
   iterator find_again(const IString& s, iterator i)
@@ -150,7 +150,7 @@ public:
 private:
   const_iterator find_again(const std::string& short_name, const_iterator)const;
 public:
-  const_iterator find_(IString const& short_name)const;
+  const_iterator find_(std::string const& short_name)const;
 
   // const wrappers.
   const_iterator find_again(const IString& s, const_iterator i)const

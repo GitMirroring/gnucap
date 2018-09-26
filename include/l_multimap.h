@@ -174,15 +174,9 @@ private: // internal types
       return _m.end();
     }
     iterator find(IString const& k){ untested();
-      for(auto i : _m){
-	std::cerr << (*i)->short_label() << "\n";
-      }
       return _m.find(lookup(k));
     }
     const_iterator find(IString const& k) const{ untested();
-      for(auto i : _m){
-	std::cerr << (*i)->short_label() << "\n";
-      }
       return _m.find(lookup(k));
     }
     iterator insert(V v){
