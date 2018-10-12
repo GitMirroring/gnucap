@@ -64,10 +64,11 @@ int main(int argc, char** argv)
     }else{untested();
       throw Exception("no input files");
     }
-  }catch (Exception e) {
+  }catch (Exception const& e) {
     std::cout << e.message() << '\n';
   }
   return errorcount;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:et
