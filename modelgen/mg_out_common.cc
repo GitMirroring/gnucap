@@ -133,8 +133,8 @@ void make_common_param_names(std::ofstream& out, const Device& d)
 {
   make_tag();
   out <<
-    "COMMON_" << d.name() << "::map_type COMMON_" << d.name() << "::_param_dict\n"
-    "  = { \n";
+    "const COMMON_" << d.name() << "::map_type COMMON_" << d.name() << "::_param_dict\n"
+    " = { \n";
   for (Parameter_List::const_iterator
        p = d.common().override().begin();
        p != d.common().override().end();
@@ -166,8 +166,14 @@ void make_common_set_param_by_name(std::ofstream& out, const Device& d)
     "void COMMON_" << d.name() << "::set_param_by_name(std::string Name, std::string Value)\n"
     "{\n"
     "  IString n(Name);\n"
-    "  PARA_BASE COMMON_" << d.name() << "::* x = \n (_param_dict[n]);\n"
-    "  if(x) { PARA_BASE* p = &(this->*x); *p = Value; return; }\n"
+    "  auto d = _param_dict.find(n);\n"
+    "  if(d!=_param_dict.end()) {\n"
+    "    PARA_BASE COMMON_" << d.name() << "::* x=d->second;\n"
+    "    PARA_BASE& p = this->*x;\n"
+    "    p = Value\n;"
+    "    return;\n"
+    "  }else{\n"
+    "  }\n"
     "  COMMON_COMPONENT::set_param_by_name(Name, Value);\n"
     "}\n"
     "/*--------------------------------------------------------------------------*/\n";

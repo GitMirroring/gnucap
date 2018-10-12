@@ -189,7 +189,7 @@ static void make_common(std::ofstream& out, const Device& d)
     "  bool     has_sdp()const {untested();return _sdp;}\n"
     "  static int  count() {return _count;}\n"
     "private: // strictly internal\n"
-	 "  static map_type _param_dict;\n"
+	 "  static const map_type _param_dict;\n"
     "  static int _count;\n"
     "public: // input parameters\n";
   for (Parameter_List::const_iterator
