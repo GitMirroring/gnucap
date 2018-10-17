@@ -1,0 +1,11 @@
+verilog
+meter m1 (1 0 2 0);
+spice
+
+v1 1 0 ac 2 phase=30
+v2 2 0 ac 1
+
+.print ac gain(m1) gainp(m1) gainm(m1) gainr(m1) gaini(m1)
+
+.ac 1k
+.end
