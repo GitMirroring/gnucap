@@ -2,10 +2,12 @@ verilog
 meter m1 (1 0 2 0);
 spice
 
-v1 1 0 ac 2 phase=30
-v2 2 0 ac 1
+v1 1 0 ac 2 phase=30 dc 2
+v2 2 0 ac 1 dc 1
 
-.print ac gain(m1) gainp(m1) gainm(m1) gainr(m1) gaini(m1)
+.print op gain(m1) gainp(m1) gainm(m1) gainr(m1) gaini(m1) gaindb(m1) gainrdb(m1)
+.print ac gain(m1) gainp(m1) gainm(m1) gainr(m1) gaini(m1) gaindb(m1) gainrdb(m1)
 
+.op
 .ac 1k
 .end

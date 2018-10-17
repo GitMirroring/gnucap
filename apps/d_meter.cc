@@ -25,8 +25,15 @@
 #include "globals.h"
 #include "e_elemnt.h"
 #include "u_xprobe.h"
+#include "u_opt.h"
+#include "constant.h"
 /*--------------------------------------------------------------------------*/
 namespace {
+/*--------------------------------------------------------------------------*/
+static char fix_case(char c)
+{
+  return ((OPT::case_insensitive) ? (static_cast<char>(tolower(c))) : (c));
+}
 /*--------------------------------------------------------------------------*/
 class DEV : public ELEMENT {
 private:
@@ -48,8 +55,7 @@ private: // override virtual
   double   tr_involts()const	{return dn_diff(_n[IN1].v0(), _n[IN2].v0());}
   double   tr_involts_limited()const {return tr_involts();}
   COMPLEX  ac_involts()const	{return _n[IN1]->vac() - _n[IN2]->vac();}
-  double   tr_probe_num(const std::string&)const;
-  XPROBE   ac_probe_ext(const std::string&)const;
+  PROBE_BASE const*   new_probe(const std::string&)const;
 
   std::string port_name(int i)const {
     assert(i >= 0);
@@ -67,21 +73,64 @@ void DEV::precalc_last()
   set_converged();
 }
 /*--------------------------------------------------------------------------*/
-double DEV::tr_probe_num(const std::string& x)const
-{
-  if (Umatch(x, "gain ")) {
-    return tr_outvolts() / tr_involts();
-  }else{
-    return ELEMENT::tr_probe_num(x);
+class gain_probe : public PROBE_BASE{
+public:
+  explicit gain_probe(std::string const& what, DEV const* d)
+      : PROBE_BASE(what, d)
+  {
+    // essentially CKT_BASE::ac_probe_num
+
+    size_t length = what.length();
+    _modifier = mtNONE;
+    _dbscale = 0.;
+    char parameter[BUFLEN+1];
+    strcpy(parameter, what.c_str());
+
+    if (length > 2  &&  Umatch(&parameter[length-2], "db ")) {
+      _dbscale = 20.;
+      length -= 2;
+    }
+    if (length > 1) { // selects modifier based on last letter of parameter
+      switch (fix_case(parameter[length-1])) {
+	case 'm': _modifier = mtMAG;   length--;	break;
+	case 'p': _modifier = mtPHASE; length--;	break;
+	case 'r': _modifier = mtREAL;  length--;	break;
+	case 'i': _modifier = mtIMAG;  length--;	break;
+	default:  _modifier = mtNONE;		break;
+      }
+    }
+    parameter[length] = '\0'; // chop
   }
-}
+
+  double value() const{
+    ELEMENT const* d=prechecked_cast<ELEMENT const*>(brh());
+    if(brh()->_sim->analysis_is_ac()){ untested();
+      return xvalue(d->ac_outvolts() / d->ac_involts());
+    }else if(_modifier){ untested();
+      // "ac mode"
+      return NOT_VALID;
+    }else{
+      return d->tr_outvolts() / d->tr_involts();
+    }
+  }
+
+private:
+  double xvalue(COMPLEX c) const{
+    XPROBE xp(c, _modifier? _modifier:mtMAG, _dbscale );
+    return xp(_modifier, _dbscale);
+  }
+
+private:
+  mod_t   _modifier; // default
+  double  _dbscale;  // 20 for voltage, 10 for power, etc.
+};
 /*--------------------------------------------------------------------------*/
-XPROBE DEV::ac_probe_ext(const std::string& x)const
+PROBE_BASE const* DEV::new_probe(const std::string& x) const
 {
-  if (Umatch(x, "gain ")) {
-    return XPROBE(ac_outvolts() / ac_involts());
+  if (Umatch(x, "gain")) {
+    return new gain_probe(x, this);
   }else{
-    return ELEMENT::ac_probe_ext(x);
+    return ELEMENT::new_probe(x);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -91,3 +140,4 @@ DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "meter", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet

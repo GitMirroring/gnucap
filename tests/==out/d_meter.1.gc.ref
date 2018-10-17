@@ -9,5 +9,7 @@ See the file "COPYING" for details.
 main version: output-18 2018.10.17
 core-lib version: output-18 2018.10.17
 default plugins: output-18 2018.10.17
-#Freq       gain(m1)   gainp(m1)  gainm(m1)  gainr(m1)  gaini(m1) 
- 1.K        2.         30.        2.         1.7321     1.        
+#           gain(m1)   gainp(m1)  gainm(m1)  gainr(m1)  gaini(m1)  gaindb(m1)
+ 27.        2.         ??         ??         ??         ??         ??        
+#Freq       gain(m1)   gainp(m1)  gainm(m1)  gainr(m1)  gaini(m1)  gaindb(m1)
+ 1.K        2.         30.        2.         1.7321     1.         ??        
