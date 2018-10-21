@@ -751,7 +751,8 @@ double COMPONENT::tr_probe_num(const std::string& x)const
   }else if (Umatch(x, "event{time} ")) {
     return (_time_by._event < BIGBIG) ? _time_by._event : 0;
   }else{
-    return CARD::tr_probe_num(x);
+//    throw Exception_Cant_Find(x, long_label());
+    return CARD::tr_probe_num(x); // legacy probe..
   }
 }
 /*--------------------------------------------------------------------------*/

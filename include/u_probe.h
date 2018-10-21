@@ -28,6 +28,7 @@
 #include "e_base.h"
 #include "l_compar.h" // inorder
 #include "l_lib.h" // wmatch
+#include "constant.h" // NOT_VALID
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_BASE : public CKT_BASE {
@@ -81,6 +82,7 @@ public:
   }
   virtual void set_param_by_index(int, double);
 //  virtual std::string label() const;
+  virtual COMPLEX cvalue()const{unreachable(); return COMPLEX(NOT_VALID);}
   virtual double value()const = 0;
   std::string const& label() const{return short_label();}
 public: // compare probes.

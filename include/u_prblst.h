@@ -30,7 +30,7 @@
 class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBELIST : public CKT_BASE {
-private:
+public:
   typedef std::vector<PROBE_BASE const*> container_type;
 public:
   typedef container_type::iterator iterator;

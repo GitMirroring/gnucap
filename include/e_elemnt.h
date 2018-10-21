@@ -28,8 +28,78 @@
 #include "m_cpoly.h"
 #include "l_denoise.h"
 #include "e_compon.h"
+#include "u_xprobe.h"
+/*--------------------------------------------------------------------------*/
+// obsolete (IString)
+static char fix_case(char c)
+{
+  return ((OPT::case_insensitive) ? (static_cast<char>(tolower(c))) : (c));
+}
 /*--------------------------------------------------------------------------*/
 class INTERFACE ELEMENT : public COMPONENT {
+private:
+  class ELT_PROBE : public PROBE_BASE{
+  public:
+    explicit ELT_PROBE(std::string const& what, ELEMENT const* d,
+	double (ELEMENT::*r)() const,
+	COMPLEX (ELEMENT::*i)() const)
+	: PROBE_BASE(what, d), _r(r), _i(i)
+    { untested();
+      // essentially CKT_BASE::ac_probe_num
+      return; // not here. element shall not know about probe modifiers.
+              // unless... only ELEMENT probes have these modifiers (?)
+
+      size_t length = what.length();
+      _modifier = mtNONE;
+      _dbscale = 0.;
+      char parameter[BUFLEN+1];
+      strcpy(parameter, what.c_str());
+
+      if (length > 2  &&  Umatch(&parameter[length-2], "db ")) {
+	_dbscale = 20.;
+	length -= 2;
+      }
+      if (length > 1) { // selects modifier based on last letter of parameter
+	switch (fix_case(parameter[length-1])) {
+	  case 'm': _modifier = mtMAG;   length--;	break;
+	  case 'p': _modifier = mtPHASE; length--;	break;
+	  case 'r': _modifier = mtREAL;  length--;	break;
+	  case 'i': _modifier = mtIMAG;  length--;	break;
+	  default:  _modifier = mtNONE;		break;
+	}
+      }
+      parameter[length] = '\0'; // chop
+    }
+
+  private: // value overrides
+    double value() const{
+      ELEMENT const* e=prechecked_cast<ELEMENT const*>(brh());
+      assert(e);
+      if (_sim->analysis_is_ac()) { untested();
+	unreachable();
+	return xvalue((e->*_i)());
+      }else{ untested();
+	return (e->*_r)();
+      }
+    }
+    COMPLEX cvalue() const{
+      ELEMENT const* e=prechecked_cast<ELEMENT const*>(brh());
+      assert(e);
+      return (e->*_i)();
+    }
+
+  private:
+    double xvalue(COMPLEX c) const{ untested();
+      XPROBE xp(c, _modifier? _modifier:mtMAG, _dbscale );
+      return xp(_modifier, _dbscale);
+    }
+
+  private:
+    mod_t   _modifier; // default
+    double  _dbscale;  // 20 for voltage, 10 for power, etc.
+    double (ELEMENT::*_r)() const;
+    COMPLEX (ELEMENT::*_i)() const;
+  }; // ELT_PROBE
 protected:
   explicit ELEMENT();
   explicit ELEMENT(const ELEMENT& p);
@@ -63,6 +133,7 @@ public: // override virtual
   //void   map_nodes();
   void	   tr_iwant_matrix() = 0;
   void	   ac_iwant_matrix() = 0;
+  PROBE_BASE const* new_probe(std::string const&) const;
   double   tr_probe_num(const std::string&)const;
   XPROBE   ac_probe_ext(const std::string&)const;
 
@@ -131,7 +202,7 @@ public:
   double   tr_review_trunc_error(const FPOLY1* q);
   double   tr_review_check_and_convert(double timestep);
 
-  double   tr_outvolts()const	{return dn_diff(_n[OUT1].v0(), _n[OUT2].v0());}
+  double   tr_outvolts()const	{ untested(); return dn_diff(_n[OUT1].v0(), _n[OUT2].v0());}
   double   tr_outvolts_limited()const{return volts_limited(_n[OUT1],_n[OUT2]);}
   COMPLEX  ac_outvolts()const	{return _n[OUT1]->vac() - _n[OUT2]->vac();}
 

@@ -41,6 +41,7 @@
 #include "u_prblst.h"
 #include "globals.h"
 #include "io_error.h"
+#include "u_xprobe.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 PROBE_LISTS::~PROBE_LISTS()
@@ -299,11 +300,114 @@ void PROBELIST::add_list(CS& cmd)
   }
 }
 /*--------------------------------------------------------------------------*/
+// obsolete, IString...
+static char fix_case(char c)
+{
+  return ((OPT::case_insensitive) ? (static_cast<char>(tolower(c))) : (c));
+}
+/*--------------------------------------------------------------------------*/
+class PROBE_X : public PROBE_BASE{
+public:
+  explicit PROBE_X(PROBE_BASE const* brh, std::string const& what, mod_t modifier,
+                   double dbscale)
+      : PROBE_BASE(what, brh), _modifier(modifier), _dbscale(dbscale)
+  {
+    std::string m="";
+      switch (_modifier){
+	case mtMAG: m="m";  break;
+	case mtPHASE:m="p"; break;
+	case mtREAL: m="r";  break;
+	case mtIMAG: m="i";  break;
+	case mtNONE: m="";  break;
+      }
+    set_label(m +"("+brh->label()+")");
+  }
+
+  double value() const{
+    if(!brh()->_sim->analysis_is_ac()){ untested();
+      unreachable();
+      return NOT_VALID;
+    }else{
+      PROBE_BASE const* b=prechecked_cast<PROBE_BASE const*>(brh());
+      assert(b);
+      COMPLEX x=b->cvalue();
+      return xvalue(x);
+    }
+  }
+  COMPLEX cvalue() const{
+    PROBE_BASE const* b=prechecked_cast<PROBE_BASE const*>(brh());
+    assert(b);
+    return b->cvalue();
+  }
+
+private:
+  double xvalue(COMPLEX c) const{
+    XPROBE xp(c, _modifier? _modifier:mtMAG, _dbscale );
+    return xp(_modifier, _dbscale);
+  }
+
+private:
+  mod_t   _modifier; // default
+  double  _dbscale;  // 20 for voltage, 10 for power, etc.
+};
+/*--------------------------------------------------------------------------*/
+// try and find probes with ac modifiers
+// smells like legacy. put it here for now.
+// only activate in ac mode?
+// only in ELEMENT...?
+static void push_ac_probe(const std::string& param_in, CKT_BASE const* obj,
+                          PROBELIST::container_type& bag)
+{ untested();
+  size_t length = param_in.length();
+  double dbscale=0.;
+  std::string param = param_in;
+  mod_t modifier=mtNONE;
+
+  if (length < 3){ untested();
+    param = param_in;
+  }else if(Umatch(param_in.substr(length-2, length), "db ")) { untested();
+    dbscale = 20.;
+    param = param_in.substr(0, param_in.size()-2);
+  }
+
+  try{ untested();
+    PROBE_BASE const* n=obj->new_probe(param);
+    PROBE_BASE* x=new PROBE_X(n, param, modifier, dbscale);
+    bag.push_back(x);
+  }catch (Exception_Cant_Find const&){
+    if (length > 1) { untested();
+      // select modifier based on last letter of parameter
+      switch (fix_case(param.back())) {
+	case 'm': untested(); modifier = mtMAG;   break;
+	case 'p': untested(); modifier = mtPHASE; break;
+	case 'r': untested(); modifier = mtREAL;  break;
+	case 'i': untested(); modifier = mtIMAG;  break;
+	default:  throw Exception_Cant_Find(obj->long_label(), param);
+      }
+      param.resize(length-1); // chop
+    }else{ untested();
+      throw Exception_Cant_Find(obj->long_label(), param);
+    }
+
+    PROBE_BASE const* n=obj->new_probe(param);
+    // chain it.
+    //
+    // move all of this into PROBE_X constructor?
+    PROBE_BASE* x=new PROBE_X(n, param, modifier, dbscale);
+    bag.push_back(x);
+  }
+}
+/*--------------------------------------------------------------------------*/
 void PROBELIST::push_new_probe(const std::string& param, CKT_BASE const* obj)
 {
   assert(obj);
-  PROBE_BASE const* n=obj->new_probe(param);
-  bag.push_back(n);
+
+  try{ untested();
+    PROBE_BASE const* n=obj->new_probe(param);
+    bag.push_back(n);
+  }catch(Exception_Cant_Find const&){ untested();
+    push_ac_probe(param, obj, bag);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void PROBELIST::add_all_nodes(const std::string& what)

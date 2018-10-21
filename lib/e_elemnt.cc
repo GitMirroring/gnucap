@@ -289,13 +289,22 @@ double ELEMENT::tr_amps()const
   		 _m0.c0);
 }
 /*--------------------------------------------------------------------------*/
+PROBE_BASE const* ELEMENT::new_probe(const std::string& x) const
+{
+  if (Umatch(x, "v{out} ")) { untested();
+    return new ELT_PROBE(x, this, &ELEMENT::tr_outvolts, &ELEMENT::ac_outvolts);
+  }else if (Umatch(x, "vi{n} ")) { untested();
+    return new ELT_PROBE(x, this, &ELEMENT::tr_involts, &ELEMENT::ac_involts);
+  }else if (Umatch(x, "vp ")) { untested();
+    throw Exception_Cant_Find("..", "..");
+  }else{ untested();
+    return COMPONENT::new_probe(x);
+  }
+}
+/*--------------------------------------------------------------------------*/
 double ELEMENT::tr_probe_num(const std::string& x)const
 {
-  if (Umatch(x, "v{out} ")) {
-    return tr_outvolts();
-  }else if (Umatch(x, "vi{n} ")) {
-    return tr_involts();
-  }else if (Umatch(x, "i ")) {
+  if (Umatch(x, "i ")) {
     return tr_amps();
   }else if (Umatch(x, "p ")) {
     return tr_amps() * tr_outvolts();
@@ -364,11 +373,7 @@ XPROBE ELEMENT::ac_probe_ext(const std::string& x)const
 {
   COMPLEX admittance = (is_source()) ? _loss0 : _acg+_loss0;
 
-  if (Umatch(x, "v{out} ")) {			/* volts (out) */
-    return XPROBE(ac_outvolts());
-  }else if (Umatch(x, "vin ")) {		/* volts (in) */
-    return XPROBE(ac_involts());
-  }else if (Umatch(x, "i ")) {			/* amps */
+  if (Umatch(x, "i ")) {			/* amps */
     return XPROBE(ac_amps());
   }else if (Umatch(x, "p ")) {			/* complex "power" */
     return XPROBE(ac_outvolts() * conj(ac_amps()), mtREAL, 10.);
