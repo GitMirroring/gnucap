@@ -1,0 +1,9 @@
+load models/ngspice17/bjt.so
+
+spice
+
+.model foo npn(tf=0.1ns ptf=120)
+q1 0 0 0 0 foo
+
+.tran 1
+.end
