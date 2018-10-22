@@ -6,4 +6,7 @@ spice
 q1 0 0 0 0 foo
 
 .tran 1
+.mark
+.tran 2
+.tran 2
 .end
