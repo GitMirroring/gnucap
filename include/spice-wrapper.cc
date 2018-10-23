@@ -1182,7 +1182,7 @@ bool DEV_SPICE::do_tr()
   assert_model_localized();
 
   if (_sim->analysis_is_tran_dynamic()) {
-    if (_time[1] == 0) {
+    if (_time[1] == _time[2]) {
       ckt()->CKTmode = MODETRAN | MODEINITTRAN;
     }else{
       ckt()->CKTmode = MODETRAN | MODEINITFLOAT;
