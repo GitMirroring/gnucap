@@ -180,7 +180,7 @@ void SIM::set_flags()
     _sim->set_inc_mode_no();
   }else if (_sim->inc_mode_is_bad()) {
     _sim->set_inc_mode_no();
-  }else if (_sim->is_iteration_number(OPT::itl[OPT::TRLOW])) {
+  }else if (!((_sim->iteration_number() + 1) % OPT::itl[OPT::TRLOW])) {
     _sim->set_inc_mode_no();
   }else if (_sim->is_iteration_number(0)) {
     // leave it as is
