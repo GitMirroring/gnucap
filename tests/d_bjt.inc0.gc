@@ -1,0 +1,152 @@
+* the cook thing
+
+* load ./bjt.so
+
+* options noincmode
+
+verilog
+parameter pnp=-1
+
+module BJT(b, c, e, s);
+	parameter Area;
+	parameter Type;
+	parameter Temp;
+	parameter Is="3.834e-14";
+	parameter Nf="1.008";
+	parameter Nr="1.005";
+	parameter Ikf="0.08039";
+	parameter Ikr="0.047";
+	parameter Vaf="21.11";
+	parameter Var="32.02";
+	parameter Ise="1.219e-14";
+	parameter Ne="1.528";
+	parameter Isc="2.852e-13";
+	parameter Nc="1.28";
+	parameter Bf="344.4";
+	parameter Br="14.84";
+	parameter Rbm="1";
+	parameter Irb="1e-06";
+	parameter Rc="0.5713";
+	parameter Re="0.6202";
+	parameter Rb="1";
+	parameter Cje="1.23e-11";
+	parameter Vje="0.6106";
+	parameter Mje="0.378";
+	parameter Cjc="1.084e-11";
+	parameter Vjc="0.1022";
+	parameter Mjc="0.3563";
+	parameter Xcjc="0.6288";
+	parameter Cjs="0";
+	parameter Vjs="0.75";
+	parameter Mjs="0.333";
+	parameter Fc="0.8027";
+	parameter Tf="5.595e-10";
+	parameter Xtf="3.414";
+	parameter Vtf="5.23";
+	parameter Itf="0.1483";
+	parameter Tr="1e-32";
+	parameter Kf="0";
+	parameter Af="1";
+	parameter Ffe="1";
+	parameter Kb="0";
+	parameter Ab="1";
+	parameter Fb="1";
+	parameter Ptf="0";
+	parameter Xtb="0";
+	parameter Xti="3";
+	parameter Eg="1.11";
+
+	paramset mypnp pnp;
+		.is=  Is;
+		.nf=  Nf;
+		.nr=  Nr;
+		.ikf= Ikf;
+		.ikr= Ikr;
+		.vaf= Vaf;
+		.var= Var;
+		.ise= Ise;
+		.ne=  Ne;
+		.isc= Isc;
+		.nc=  Nc;
+		.bf=  Bf;
+		.br=  Br;
+		.rbm= Rbm;
+		.irb= Irb;
+		.rc=  Rc;
+		.re=  Re;
+		.rb=  Rb;
+		.cje= Cje;
+		.vje= Vje;
+		.mje= Mje;
+		.cjc= Cjc;
+		.vjc= Vjc;
+		.mjc= Mjc;
+		.xcjc=Xcjc
+		.cjs= Cjs;
+		.vjs= Vjs;
+		.mjs= Mjs;
+		.fc=  Fc;
+		.tf=  Tf;
+		.xtf= Xtf;
+		.vtf= Vtf;
+		.itf= Itf;
+		.tr=  Tr;
+		.kf=  Kf;
+		.af=  Af;
+		.ptf= Ptf;
+		.xtb= Xtb;
+		.xti= Xti;
+		.eg=  Eg;
+	endparamset
+	
+	mypnp #(.area(Area*(1.-Type)*.5+1e-20) .temp(Temp)) p(c, b, e, s);
+endmodule // BJT
+
+parameter on=1
+parameter off=0
+spice
+.options noinsensitive
+* Switch:S1 _net0 _net1 init="off" time="[1 ms]" Ron="0" Roff="1e12" Temp="26.85" MaxDuration="1e-6" Transition="spline"
+*
+.subckt Switch(1 2);
+.parameter init=1
+.parameter time=1m
+.parameter Roff=1e12
+.parameter Ron=0
+V1 c 0 pulse rise={2*time} pv={2-6*init} iv={2*init}
+.model  sss  sw  ( vt=0  vh=1  ron={Ron+1e-10}  roff=Roff)
+S1 1 2 c 0 sss
+
+.ends
+
+.verilog
+
+module Vdc(p n);
+	parameter U=1m
+	vsource #(.dc(U)) v(p n);
+endmodule
+
+
+Switch #(.MaxDuration(1e-6),.Roff(1e12),.Ron(0),.Temp(26.85),.init(on),.time(.2ms)) S4 (.1(_net0),.2(_net1));
+
+resistor #(.r(180)) R1 (.p(0),.n(_net2));
+Vdc #(.U(3.7)) V1 (.p(_net3),.n(0));
+// VProbe #() Pr1 (.p(_net2),.n(0));
+resistor #(.r(12k)) R2 (.p(_net1),.n(_net4));
+BJT #(.Ab(1),.Af(1),.Area(1),.Bf(344.4),.Br(14.84),.Cjc(1.084e-11),.Cje(1.23e-11),.Cjs(0),.Eg(1.11),.Fb(1),.Fc(0.8027),.Ffe(1),.Ikf(0.08039),.Ikr(0.047),.Irb(1e-06),.Is(3.834e-14),.Isc(2.852e-13),.Ise(1.219e-14),.Itf(0.1483),.Kb(0),.Kf(0),.Mjc(0.3563),.Mje(0.378),.Mjs(0.333),.Nc(1.28),.Ne(1.528),.Nf(1.008),.Nr(1.005),.Ptf(0),.Rb(1),.Rbm(1),.Rc(0.5713),.Re(0.6202),.Temp(26.85),.Tf(5.595e-10),.Tnom(26.85),.Tr(1e-32),.Type(pnp),.Vaf(21.11),.Var(32.02),.Vjc(0.1022),.Vje(0.6106),.Vjs(0.75),.Vtf(5.23),.Xcjc(0.6288),.Xtb(0),.Xtf(3.414),.Xti(3)) BC557B_1 (.b(_net4),.c(_net2),.e(_net3),.s(_net2));
+Switch #(.MaxDuration(1e-6),.Roff(1e12),.Ron(0),.Temp(26.85),.init(off),.time(0.1ms)) S3 (.1(_net0),.2(0));
+
+// fixit?
+// resistor #(.r(1000k)) R1 (.p(0),.n(_net1));
+
+list
+
+print dc v nodes
+print tran v nodes
+
+dc
+tran .2m basic
+
+status notime
+
+end
