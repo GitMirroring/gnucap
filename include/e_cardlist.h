@@ -103,6 +103,8 @@ public:
   CARD_LIST& erase_all();
 
   // operations on the whole list
+  CARD_LIST& keep_state();
+  CARD_LIST& restore_state();
   CARD_LIST& set_owner(CARD* owner);
   CARD_LIST& set_slave();
   CARD_LIST& precalc_first();

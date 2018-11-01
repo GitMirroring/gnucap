@@ -286,11 +286,8 @@ void DEV_INDUCTANCE::tr_iwant_matrix()
     assert(_n[OUT2].m_() != INVALID_NODE);
     assert(_n[IN1].m_() != INVALID_NODE);
     
-    _sim->_aa.iwant(_n[OUT1].m_(),_n[IN1].m_());
-    _sim->_aa.iwant(_n[OUT2].m_(),_n[IN1].m_());
-    
-    _sim->_lu.iwant(_n[OUT1].m_(),_n[IN1].m_());
-    _sim->_lu.iwant(_n[OUT2].m_(),_n[IN1].m_());
+    _sim->tr_iwant(_n[OUT1].m_(),_n[IN1].m_());
+    _sim->tr_iwant(_n[OUT2].m_(),_n[IN1].m_());
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -485,8 +482,8 @@ void DEV_INDUCTANCE::ac_iwant_matrix()
     assert(_n[OUT2].m_() != INVALID_NODE);
     assert(_n[IN1].m_() != INVALID_NODE);
     
-    _sim->_acx.iwant(_n[OUT1].m_(),_n[IN1].m_());
-    _sim->_acx.iwant(_n[OUT2].m_(),_n[IN1].m_());
+    _sim->ac_iwant(_n[OUT1].m_(),_n[IN1].m_());
+    _sim->ac_iwant(_n[OUT2].m_(),_n[IN1].m_());
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -150,12 +150,16 @@ void SIM::advance_time(void)
   static double last_iter_time;
   if (_sim->_time0 > 0) {
     if (_sim->_time0 > last_iter_time) {	/* moving forward */
-      notstd::copy_n(_sim->_v0, _sim->_total_nodes+1, _sim->_vt1);
+      for(unsigned ii=0; ii<=unsigned(_sim->_aa.size()); ++ii) {
+	_sim->_nstat[ii].tr_advance();
+      }
       CARD_LIST::card_list.tr_advance();
     }else{				/* moving backward */
       /* don't save voltages.  They're wrong! */
       /* instead, restore a clean start for iteration */
-      notstd::copy_n(_sim->_vt1, _sim->_total_nodes+1, _sim->_v0);
+      for(unsigned ii=0; ii<=unsigned(_sim->_aa.size()); ++ii) {
+	_sim->_nstat[ii].tr_regress();
+      }
       CARD_LIST::card_list.tr_regress();
     }
   }else{
@@ -262,7 +266,7 @@ void SIM::solve_equations()
   ::status.lud.stop();
 
   ::status.back.start();
-  _sim->_lu.fbsub(_sim->_v0, _sim->_i, _sim->_v0);
+  _sim->_lu.fbsub(_sim->v0(), _sim->_i, _sim->v0());
   ::status.back.stop();
   
   if (_sim->_nstat) {
@@ -270,9 +274,9 @@ void SIM::solve_equations()
     for (int ii = _sim->_lu.size(); ii >= 1; --ii) {
       _sim->_nstat[ii].set_a_iter();
     }
-  }else{
+  }else{ untested();
     // pure analog
-    untested();
+    incomplete();
   }
 }
 /*--------------------------------------------------------------------------*/

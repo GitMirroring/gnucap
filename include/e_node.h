@@ -97,8 +97,8 @@ public: // raw data access (rvalues)
   int	user_number()const	{return _user_number;}
   //int	flat_number()const	{itested();return _flat_number;}
 public: // simple calculated data access (rvalues)
-  int	matrix_number()const	{return _sim->_nm[_user_number];}
-  int	m_()const		{return matrix_number();}
+  unsigned matrix_number()const    {return _sim->_nm[_user_number];}
+  unsigned m_()const	{ return matrix_number(); }
 public: // maniputation
   NODE&	set_user_number(int n)	{_user_number = n; return *this;}
   //NODE& set_flat_number(int n) {itested();_flat_number = n; return *this;}
@@ -107,8 +107,9 @@ public: // virtuals
   double	tr_probe_num(const std::string&)const;
   XPROBE	ac_probe_ext(const std::string&)const;
 
+#if 0
   double      v0()const	{
-    assert(m_() >= 0);
+    // assert(m_() >= 0);
     assert(m_() <= _sim->_total_nodes);
     return _sim->_v0[m_()];
   }
@@ -124,13 +125,10 @@ public: // virtuals
   }
   //double      vdc()const		{untested();return _vdc[m_()];}
 
-  //double&     i()	{untested();return _i[m_()];}  /* lvalues */
-  COMPLEX&    iac() {
-    assert(m_() >= 0);
-    assert(m_() <= _sim->_total_nodes);
-    return _sim->_ac[m_()];
-  }
-};
+//  double&     i()	{untested();return _sim->_i[m_()];}  /* lvalues */
+#endif
+  COMPLEX&    iac();
+}; // NODE
 extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
 class INTERFACE LOGIC_NODE : public NODE {
@@ -146,6 +144,11 @@ private:
   LOGICVAL    _old_lv;		/* in case it rejects a step */
   int	      _quality;		/* quality of digital mode */
   std::string _failure_mode;
+  double _v0;
+  double _vt1;
+  double _vdc;
+  COMPLEX _ac; // both i and v
+  unsigned _matrix_number;
 
   // so it is not pure virtual
   //const	      std::string long_label()const;
@@ -217,6 +220,36 @@ public: // action, used by logic
   double      to_analog(const MODEL_LOGIC*f);
   void	      to_logic(const MODEL_LOGIC*f);
 
+public: // keep/restore
+  void keep_state() { _vdc = _v0; }
+  void restore_state() { _v0 = _vt1 = _vdc; }
+  void zero_state() { _vdc = _vt1 = _v0 = 0.; }
+
+public: // continuous (not here?) let's see.
+  LOGIC_NODE& set_matrix_number(unsigned n){untested();
+    _matrix_number = n;
+    return *this;
+  }
+  unsigned matrix_number()const { untested();
+    return _matrix_number;
+  }
+  double const& v0()const{ return _v0; }
+  double& v0_rw(){ return _v0; }
+
+  double const& vt1()const { return _vt1; }
+
+  COMPLEX const& vac()const { return _ac; }
+  COMPLEX& vac_rw(){ return _ac; }
+
+  COMPLEX& iac_rw() { return _ac; }
+
+  void tr_advance(){
+    _vt1 = _v0;
+  }
+  void tr_regress(){
+    _v0 = _vt1;
+  }
+
 private: // inhibited
   explicit LOGIC_NODE(const LOGIC_NODE&):NODE(){incomplete();unreachable();}
 public: // general use
@@ -225,33 +258,31 @@ public: // general use
 
 public: // matrix
   LOGIC_NODE&	set_a_iter()	{_a_iter = _sim->iteration_tag(); return *this;}
-};
+}; // LOGIC_NODE
 /*--------------------------------------------------------------------------*/
 class INTERFACE node_t {
 private:
   static bool node_is_valid(int i) {
     if (i == INVALID_NODE) {
-    }else if (i < 0) {
-      unreachable();
     }else if (i > NODE::_sim->_total_nodes) {
       unreachable();
     }else{
     }
-    return i>=0 && i<=NODE::_sim->_total_nodes;
+    return i<=NODE::_sim->_total_nodes;
   }
-  static int  to_internal(int n) {
+  static int to_internal(int n) {
     assert(node_is_valid(n));
     assert(NODE::_sim->_nm);
-    return NODE::_sim->_nm[n];
+    return int(NODE::_sim->_nm[n]);
   }
 
 private:
-  NODE* _nnn;
+  NODE* _nnn; // the reason for this node?
   int _ttt;		// m == nm[t] if properly set up
   int _m;		// mapped, after reordering
 
 public:
-  int	      m_()const	{return _m;}
+  unsigned m_()const{return unsigned(_m);}
 
   int	      t_()const {
     //assert(_nnn);
@@ -273,14 +304,14 @@ public:
   void	new_model_node(const std::string& n, CARD* d);
   void	map_subckt_node(int* map_array, const CARD* d);
   bool	is_grounded()const {return (e_() == 0);}
-  bool	is_connected()const {return (e_() != INVALID_NODE);}
+  bool	is_connected()const {return (e_() != int(INVALID_NODE));}
 
   node_t&     map() {
-    if (t_() != INVALID_NODE) {
+    if (t_() != int(INVALID_NODE)) {
       assert(_nnn);
-      _m=to_internal(t_());
+      _m = to_internal(t_());
     }else{
-      assert(_m == INVALID_NODE);
+      assert(_m == int(INVALID_NODE));
     }
     return *this;
   } // e_compon.cc:COMPONENT::map_nodes:522
@@ -304,27 +335,27 @@ public:
 
 public:
   double      v0()const {
-    assert(m_() >= 0);
-    assert(m_() <= NODE::_sim->_total_nodes);
+//    assert(m_() >= 0);
+  //  assert(m_() <= NODE::_sim->_total_nodes);
     assert(n_());
     //assert(n_()->m_() == m_());
     //assert(n_()->v0() == NODE::_sim->_v0[m_()]);
-    return NODE::_sim->_v0[m_()];
+    return data().v0();
   }
   
   COMPLEX     vac()const {
-    assert(m_() >= 0);
-    assert(m_() <= NODE::_sim->_total_nodes);
+    assert(m_() <= unsigned(NODE::_sim->_total_nodes));
     assert(n_());
     //assert(n_()->m_() == m_());
     //assert(n_()->vac() == NODE::_ac[m_()]);
-    return NODE::_sim->_ac[m_()];
+    return data().vac();
   }
   
   double&     i() {
-    assert(m_() >= 0);
-    assert(m_() <= NODE::_sim->_total_nodes);
+    assert(m_() <= unsigned(NODE::_sim->_total_nodes));
+//    return data().i();
     return NODE::_sim->_i[m_()];
+
   }
 #if 0
   COMPLEX&    iac() {untested();
@@ -339,6 +370,24 @@ public:
 /*--------------------------------------------------------------------------*/
 INTERFACE double volts_limited(const node_t& n1, const node_t& n2);
 /*--------------------------------------------------------------------------*/
+inline double& SIM_DATA::V_ACCESS::operator[](unsigned i) const{
+  return _nstat[i].v0_rw();
+}
+/*--------------------------------------------------------------------------*/
+inline SIM_DATA::AC_ACCESS& SIM_DATA::AC_ACCESS::operator++()
+{
+  ++_nstat; return *this;
+}
+/*--------------------------------------------------------------------------*/
+inline COMPLEX& SIM_DATA::AC_ACCESS::operator[](unsigned i) const{
+  return _nstat[i].vac_rw();
+}
+/*--------------------------------------------------------------------------*/
+inline COMPLEX& NODE::iac(){
+  assert(m_() != unsigned(INVALID_NODE));
+  assert(m_() <= unsigned(_sim->_total_nodes));
+  return _sim->_nstat[m_()].iac_rw();
+}
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:

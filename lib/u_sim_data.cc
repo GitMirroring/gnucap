@@ -51,13 +51,8 @@ SIM_DATA::SIM_DATA()
    _inc_mode(tsNO),
    //_mode(),
    //_phase(),
-   _nm(NULL),
    _i(NULL),
-   _v0(NULL),
-   _vt1(NULL),
-   _ac(NULL),
    _nstat(NULL),
-   _vdc(NULL),
    _aa(),
    _lu(),
    _acx(),
@@ -89,29 +84,9 @@ SIM_DATA::~SIM_DATA()
     _i = NULL;
   }else{
   }
-  if (_v0) {unreachable();
-    delete [] _v0;
-    _v0 = NULL;
-  }else{
-  }
-  if (_vt1) {unreachable();
-    delete [] _vt1;
-    _vt1 = NULL;
-  }else{
-  }
-  if (_ac) {unreachable();
-    delete [] _ac;
-    _ac = NULL;
-  }else{
-  }
   if (_nstat) {unreachable();
     delete [] _nstat;
     _nstat = NULL;
-  }else{
-  }
-  if (_vdc) {unreachable();
-    delete [] _vdc;
-    _vdc = NULL;
   }else{
   }
   //assert(_eq.empty()); //not empty means an analysis ended with an unhandled event
@@ -137,7 +112,7 @@ SIM_DATA::~SIM_DATA()
 void SIM_DATA::set_limit()
 {
   for (int ii = 1;  ii <= _total_nodes;  ++ii) {
-    set_limit(_v0[ii]);
+    set_limit(_nstat[ii].v0());
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -163,8 +138,9 @@ void SIM_DATA::keep_voltages()
 {
   if (!_freezetime) {
     for (int ii = 1;  ii <= _total_nodes;  ++ii) {
-      _vdc[ii] = _v0[ii];
+      _nstat[ii].keep_state();
     }
+    CARD_LIST::card_list.keep_state();
     _last_time = (_time0 > 0.) ? _time0 : 0.;
   }else{untested();
     //BUG// probably incorrect
@@ -173,15 +149,21 @@ void SIM_DATA::keep_voltages()
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::restore_voltages()
 {
+  //_vt1[ii] = _v0[ii] = _vdc[ii];
   for (int ii = 1;  ii <= _total_nodes;  ++ii) {
-    _vt1[ii] = _v0[ii] = _vdc[ii];
+    _nstat[ii].restore_state();
   }
+  CARD_LIST::card_list.restore_state();
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::zero_voltages()
 {
   for (int ii = 1;  ii <= _total_nodes;  ++ii) {
-    _vt1[ii] = _v0[ii] = _vdc[ii] = _i[ii] = 0.;
+    // _vt1[ii] = _v0[ii] =
+    _i[ii] = 0.;
+  }
+  for (int ii = 1;  ii <= _total_nodes;  ++ii) {
+    _nstat[ii].zero_state();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -192,7 +174,7 @@ void SIM_DATA::zero_voltages()
  */
 void SIM_DATA::map__nodes()
 {
-  _nm = new int[_total_nodes+1];
+  assert(_nstat);
   ::status.order.reset().start();
   switch (OPT::order) {
   default:       unreachable();
@@ -210,9 +192,13 @@ void SIM_DATA::map__nodes()
  */
 void SIM_DATA::order_reverse()
 {
+//  _nstat[0].set_matrix_number(0);
+//  for (int ii=1; ii<=_total_nodes;  ++ii) {
+//    _nstat[ii].set_matrix_number(unsigned(_total_nodes - ii) +1);
+//  }
   _nm[0] = 0;
   for (int node = 1;  node <= _total_nodes;  ++node) {
-    _nm[node] = _total_nodes - node + 1;
+    _nm[node] = unsigned(_total_nodes - node) + 1;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -222,7 +208,7 @@ void SIM_DATA::order_reverse()
 void SIM_DATA::order_forward()
 {
   _nm[0] = 0;
-  for (int node = 1;  node <= _total_nodes;  ++node) {
+  for (unsigned node=1; node<=unsigned(_total_nodes);  ++node) {
     _nm[node] = node;
   }
 }
@@ -232,10 +218,7 @@ void SIM_DATA::order_forward()
  */
 void SIM_DATA::order_auto()
 {
-  _nm[0] = 0;
-  for (int node = 1;  node <= _total_nodes;  ++node) {
-    _nm[node] = _total_nodes - node + 1;
-  }
+  order_reverse();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -248,13 +231,29 @@ void SIM_DATA::init()
     uninit();
     init_node_count(CARD_LIST::card_list.nodes()->how_many(), 0, 0);
     CARD_LIST::card_list.expand();
-    map__nodes();
-    CARD_LIST::card_list.map_nodes();
+
+    // create a matrix ordering user_number->matrix_number
+    // link nodes in devices to matrix numbers
+
+   _nm = new unsigned[_total_nodes+1];
+  //  map__nodes();
+
+   order_reverse();
+   //order_forward();
     alloc_hold_vectors();
-    _aa.reinit(_total_nodes);
-    _lu.reinit(_total_nodes);
-    _acx.reinit(_total_nodes);
+
+  for (unsigned ii=0; ii<=unsigned(_total_nodes); ++ii) {
+    _nstat[ii].set_matrix_number(ii);
+  }
+
+
+    CARD_LIST::card_list.map_nodes();
+
+    _aa.reinit(unsigned(_total_nodes));
+    _lu.reinit(unsigned(_total_nodes));
+    _acx.reinit(unsigned(_total_nodes));
     CARD_LIST::card_list.tr_iwant_matrix();
+    _lu.iwant(_aa);
     CARD_LIST::card_list.ac_iwant_matrix();
     _last_time = 0;
   }else{
@@ -275,16 +274,13 @@ void SIM_DATA::alloc_hold_vectors()
 
   assert(!_nstat);
   _nstat = new LOGIC_NODE[_total_nodes+1];
+//  _nodes = new node_t[_total_nodes+1];
   for (int ii=0;  ii <= _total_nodes;  ++ii) {
     _nstat[_nm[ii]].set_user_number(ii);
+//    _nodes[ii] = node_t(_nstat+ii);
   }
 
-  assert(!_vdc);
-  _vdc = new double[_total_nodes+1];
-  std::fill_n(_vdc, _total_nodes+1, 0);
-
   assert(_nstat);
-  assert(_vdc);
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_vectors:
@@ -296,19 +292,13 @@ void SIM_DATA::alloc_vectors()
   assert(_evalq2.empty());
   assert(_evalq != _evalq_uc);
 
-  assert(!_ac);
   assert(!_i);
-  assert(!_v0);
-  assert(!_vt1);
 
-  _ac = new COMPLEX[_total_nodes+1];
   _i   = new double[_total_nodes+1];
-  _v0  = new double[_total_nodes+1];
-  _vt1 = new double[_total_nodes+1];
-  std::fill_n(_ac, _total_nodes+1, 0);
   std::fill_n(_i,  _total_nodes+1, 0);
-  std::fill_n(_v0, _total_nodes+1, 0);
-  std::fill_n(_vt1,_total_nodes+1, 0);
+  for (int ii = 1;  ii <= _total_nodes;  ++ii) {
+    _nstat[ii].zero_state();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::unalloc_vectors()
@@ -317,12 +307,6 @@ void SIM_DATA::unalloc_vectors()
   _evalq2.clear();
   delete [] _i;
   _i = NULL;
-  delete [] _v0;
-  _v0 = NULL;
-  delete [] _vt1;
-  _vt1 = NULL;
-  delete [] _ac;
-  _ac = NULL;
 }
 /*--------------------------------------------------------------------------*/
 /* uninit: undo all the allocation associated with any simulation
@@ -331,12 +315,10 @@ void SIM_DATA::unalloc_vectors()
  */
 void SIM_DATA::uninit()
 {
-  if (_vdc) {
+  if (_nstat) {
     _acx.reinit(0);
     _lu.reinit(0);
     _aa.reinit(0);
-    delete [] _vdc;
-    _vdc = NULL;
     delete [] _nstat;
     _nstat = NULL;
     delete [] _nm;

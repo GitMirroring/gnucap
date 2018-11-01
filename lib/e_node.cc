@@ -82,7 +82,12 @@ LOGIC_NODE::LOGIC_NODE()
    _lv(),
    _old_lv(),
    _quality(qBAD),
-   _failure_mode("initial")
+   _failure_mode("initial"),
+   _v0(0.),
+   _vt1(0.),
+   _vdc(0.),
+   _ac(0.),
+   _matrix_number(INVALID_NODE)
 {
 }
 /*--------------------------------------------------------------------------*/
@@ -145,7 +150,7 @@ node_t::node_t(const node_t& p)
 node_t::node_t(NODE* n)
   :_nnn(n),
    _ttt(n->user_number()),
-   _m(to_internal(n->user_number()))
+   _m(int(to_internal(n->user_number())))
 {
   //assert(_ttt == _nnn->flat_number());
 }
@@ -155,7 +160,7 @@ node_t& node_t::operator=(const node_t& p)
     //assert(p._ttt == p._nnn->flat_number());
   }else{
     assert(p._ttt == INVALID_NODE);
-    assert(p._m   == INVALID_NODE);
+    assert(p._m  == INVALID_NODE);
   }
   _nnn   = p._nnn;
   _ttt = p._ttt;
@@ -171,11 +176,11 @@ LOGIC_NODE& node_t::data()const
 /*--------------------------------------------------------------------------*/
 double NODE::tr_probe_num(const std::string& x)const
 {
-  if (Umatch(x, "v ")) {
+  if (Umatch(x, "v ")) { untested();
     // return v0(); denoised
-    return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
+    return floor(_sim->_nstat[m_()].v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {
-    return port_impedance(node_t(const_cast<NODE*>(this)), node_t(&ground_node), _sim->_lu, 0.);
+    return _sim->port_impedance(node_t(const_cast<NODE*>(this)), node_t(&ground_node), 0.);
   }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) {
     assert(_sim->_nstat);
     return _sim->_nstat[matrix_number()].tr_probe_num(x);
@@ -228,7 +233,7 @@ double LOGIC_NODE::tr_probe_num(const std::string& x)const
 XPROBE NODE::ac_probe_ext(const std::string& x)const
 {
   if (Umatch(x, "v ")) {
-    return XPROBE(vac());
+    return XPROBE(_sim->_nstat[m_()].vac());
   }else if (Umatch(x, "z ")) {
     return XPROBE(port_impedance(node_t(const_cast<NODE*>(this)),
 				 node_t(&ground_node), _sim->_acx, COMPLEX(0.)));

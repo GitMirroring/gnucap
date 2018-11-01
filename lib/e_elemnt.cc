@@ -59,7 +59,7 @@ ELEMENT::ELEMENT(const ELEMENT& p)
   trace0(long_label().c_str());
   _n = _nodes;
   if (p._n == p._nodes) {
-    for (int ii = 0;  ii < NODES_PER_BRANCH;  ++ii) {
+    for (unsigned ii=0;  ii<NODES_PER_BRANCH;  ++ii) {
       _n[ii] = p._n[ii];
     }
   }else{
@@ -200,8 +200,7 @@ void ELEMENT::tr_iwant_matrix_passive()
   assert(_n[OUT2].m_() != INVALID_NODE);
   //BUG// assert can fail as a result of some parse errors
 
-  _sim->_aa.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_lu.iwant(_n[OUT1].m_(),_n[OUT2].m_());
+  _sim->tr_iwant(_n[OUT1].m_(),_n[OUT2].m_());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_iwant_matrix_active()
@@ -217,18 +216,11 @@ void ELEMENT::tr_iwant_matrix_active()
   //BUG// assert can fail as a result of some parse errors
 
   //_sim->_aa.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_aa.iwant(_n[OUT1].m_(),_n[IN1].m_());
-  _sim->_aa.iwant(_n[OUT1].m_(),_n[IN2].m_());
-  _sim->_aa.iwant(_n[OUT2].m_(),_n[IN1].m_());
-  _sim->_aa.iwant(_n[OUT2].m_(),_n[IN2].m_());
+  _sim->tr_iwant(_n[OUT1].m_(),_n[IN1].m_());
+  _sim->tr_iwant(_n[OUT1].m_(),_n[IN2].m_());
+  _sim->tr_iwant(_n[OUT2].m_(),_n[IN1].m_());
+  _sim->tr_iwant(_n[OUT2].m_(),_n[IN2].m_());
   //_sim->_aa.iwant(_n[IN1].m_(),_n[IN2].m_());
-
-  //_sim->_lu.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_lu.iwant(_n[OUT1].m_(),_n[IN1].m_());
-  _sim->_lu.iwant(_n[OUT1].m_(),_n[IN2].m_());
-  _sim->_lu.iwant(_n[OUT2].m_(),_n[IN1].m_());
-  _sim->_lu.iwant(_n[OUT2].m_(),_n[IN2].m_());
-  //_sim->_lu.iwant(_n[IN1].m_(),_n[IN2].m_());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_iwant_matrix_extended()
@@ -238,10 +230,9 @@ void ELEMENT::tr_iwant_matrix_extended()
   assert(ext_nodes() + int_nodes() == matrix_nodes());
 
   for (int ii = 0;  ii < matrix_nodes();  ++ii) {
-    if (_n[ii].m_() >= 0) {
+    if (_n[ii].m_() != INVALID_NODE) {
       for (int jj = 0;  jj < ii ;  ++jj) {
-	_sim->_aa.iwant(_n[ii].m_(),_n[jj].m_());
-	_sim->_lu.iwant(_n[ii].m_(),_n[jj].m_());
+	_sim->tr_iwant(_n[ii].m_(),_n[jj].m_());
       }
     }else{itested();
       // node 1 is grounded or invalid
@@ -252,16 +243,16 @@ void ELEMENT::tr_iwant_matrix_extended()
 void ELEMENT::ac_iwant_matrix_passive()
 {
   trace2(long_label().c_str(), _n[OUT1].m_(), _n[OUT2].m_());
-  _sim->_acx.iwant(_n[OUT1].m_(),_n[OUT2].m_());
+  _sim->ac_iwant(_n[OUT1].m_(),_n[OUT2].m_());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::ac_iwant_matrix_active()
 {
   //_sim->_acx.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_acx.iwant(_n[OUT1].m_(),_n[IN1].m_());
-  _sim->_acx.iwant(_n[OUT1].m_(),_n[IN2].m_());
-  _sim->_acx.iwant(_n[OUT2].m_(),_n[IN1].m_());
-  _sim->_acx.iwant(_n[OUT2].m_(),_n[IN2].m_());
+  _sim->ac_iwant(_n[OUT1].m_(),_n[IN1].m_());
+  _sim->ac_iwant(_n[OUT1].m_(),_n[IN2].m_());
+  _sim->ac_iwant(_n[OUT2].m_(),_n[IN1].m_());
+  _sim->ac_iwant(_n[OUT2].m_(),_n[IN2].m_());
   //_sim->_acx.iwant(_n[IN1].m_(),_n[IN2].m_());
 }
 /*--------------------------------------------------------------------------*/
@@ -272,9 +263,9 @@ void ELEMENT::ac_iwant_matrix_extended()
   assert(ext_nodes() + int_nodes() == matrix_nodes());
 
   for (int ii = 0;  ii < matrix_nodes();  ++ii) {
-    if (_n[ii].m_() >= 0) {
+    if (_n[ii].m_() != INVALID_NODE) {
       for (int jj = 0;  jj < ii ;  ++jj) {
-	_sim->_acx.iwant(_n[ii].m_(),_n[jj].m_());
+	_sim->ac_iwant(_n[ii].m_(),_n[jj].m_());
       }
     }else{itested();
       // node 1 is grounded or invalid
@@ -346,9 +337,9 @@ double ELEMENT::tr_probe_num(const std::string& x)const
   }else if (Umatch(x, "r ")) {
     return (_m0.c1!=0.) ? 1/_m0.c1 : MAXDBL;
   }else if (Umatch(x, "z ")) {
-    return port_impedance(_n[OUT1], _n[OUT2], _sim->_lu, mfactor()*(_m0.c1+_loss0));
+    return _sim->port_impedance(_n[OUT1], _n[OUT2], mfactor()*(_m0.c1+_loss0));
   }else if (Umatch(x, "zraw ")) {
-    return port_impedance(_n[OUT1], _n[OUT2], _sim->_lu, 0.);
+    return _sim->port_impedance(_n[OUT1], _n[OUT2], 0.);
   }else{
     return COMPONENT::tr_probe_num(x);
   }

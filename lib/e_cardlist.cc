@@ -112,6 +112,26 @@ CARD_LIST& CARD_LIST::erase(CARD* c)
   return *this;
 }
 /*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::keep_state()
+{
+// later. need to call keep_state more 
+//  for (iterator ci=begin(); ci!=end(); ++ci) {
+//    trace_func_comp();
+//    (**ci).keep_state(owner);
+//  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::restore_state()
+{
+// later.
+//  for (iterator ci=begin(); ci!=end(); ++ci) {
+//    trace_func_comp();
+//    (**ci).restore_state(owner);
+//  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
 /* erase_all: empty the list, destroy contents
  * Beware: something else may be pointing to them, leaving dangling ptr.
  */

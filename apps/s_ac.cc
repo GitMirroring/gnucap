@@ -28,6 +28,7 @@
 #include "u_parameter.h"
 #include "u_prblst.h"
 #include "s__.h"
+#include "e_node.h" // AC_ACCESS
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -229,7 +230,7 @@ void AC::setup(CS& Cmd)
 void AC::solve()
 {
   _sim->_acx.zero();
-  std::fill_n(_sim->_ac, _sim->_total_nodes+1, 0.);
+  std::fill_n(_sim->ac(), _sim->_total_nodes+1, 0.);
 
   ::status.load.start();
   _sim->count_iterations(iTOTAL);
@@ -242,7 +243,7 @@ void AC::solve()
   ::status.lud.stop();
 
   ::status.back.start();
-  _sim->_acx.fbsub(_sim->_ac);
+  _sim->_acx.fbsub(_sim->ac());
   ::status.back.stop();
 }
 /*--------------------------------------------------------------------------*/

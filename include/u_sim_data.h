@@ -33,10 +33,39 @@
 class WAVE;
 class CARD;
 class LOGIC_NODE;
+class node_t;
 /*--------------------------------------------------------------------------*/
 enum TRI_STATE {tsNO=0, tsYES=1, tsBAD=-1};
 /*--------------------------------------------------------------------------*/
+template <class T>
+T port_impedance(const node_t& n1, const node_t& n2,
+    BSMATRIX<T>& mat, const T& parallel);
+/*--------------------------------------------------------------------------*/
 struct INTERFACE SIM_DATA {
+  class V_ACCESS{
+  public:
+    V_ACCESS(LOGIC_NODE* n) : _nstat(n){}
+    double& operator[](unsigned i) const;
+  private:
+    LOGIC_NODE* _nstat;
+  };
+  class AC_ACCESS{
+  public:
+    AC_ACCESS(LOGIC_NODE* n) : _nstat(n){}
+    COMPLEX& operator[](unsigned i) const;
+    COMPLEX& operator*(){ return (*this)[0u]; }
+    AC_ACCESS& operator++();
+  private:
+    LOGIC_NODE* _nstat;
+  };
+
+  V_ACCESS v0(){
+    return V_ACCESS(_nstat);
+  }
+  AC_ACCESS ac(){
+    return AC_ACCESS(_nstat);
+  }
+
   double _time0;	/* time now */
   double _freq;		/* AC frequency to analyze at (Hertz) */
   double _temp_c;	/* ambient temperature, actual */
@@ -60,16 +89,21 @@ struct INTERFACE SIM_DATA {
   TRI_STATE _inc_mode;	/* flag: make incremental changes (3 state) */
   SIM_MODE _mode;	/* simulation type (AC, DC, ...) */
   SIM_PHASE _phase;	/* phase of simulation (iter, init-dc,) */
-  int	*_nm;		/* node map (external to internal)	*/
+  unsigned *_nm;	/* node map (external to internal)	*/
   double *_i;		/* dc-tran current (i) vector		*/
-  double *_v0;		/* dc-tran voltage, new			*/
-  double *_vt1;		/* dc-tran voltage, 1 time ago		*/
-			/*  used to restore after rejected step	*/
-  COMPLEX *_ac;		/* ac right side			*/
-  LOGIC_NODE* _nstat;	/* digital data				*/
-  double *_vdc;		/* saved dc voltages			*/
+  LOGIC_NODE* _nstat;	/* digital data, not all needed?        */
   BSMATRIX<double> _aa;	/* raw matrix for DC & tran */
-  BSMATRIX<double> _lu;	/* decomposed matrix for DC & tran */
+// private: hmmm
+  BSMATRIX<double> _lu;	/* decomposed matrix for DC & tran, used in port_impedance */
+
+public:
+  template <class T>
+  T port_impedance(const node_t& n1, const node_t& n2,
+      const T& parallel){
+    return ::port_impedance(n1, n2, _lu, parallel);
+  }
+
+public:
   BSMATRIX<COMPLEX> _acx;/* raw & decomposed matrix for AC */
   std::priority_queue<double, std::vector<double> > _eq; /*event queue*/
   std::vector<CARD*> _loadq;
@@ -83,8 +117,14 @@ struct INTERFACE SIM_DATA {
   SIM_MODE _has_op;
   SIM_DATA();
   ~SIM_DATA();
+  void tr_iwant(unsigned a, unsigned b){
+    _aa.iwant(a, b);
+  }
+  void ac_iwant(unsigned a, unsigned b){
+    _acx.iwant(a, b);
+  }
   bool is_first_expand() {return !_nstat;}
-  void alloc_hold_vectors(); /* s__init.cc */
+  void alloc_hold_vectors();
   void alloc_vectors();
   void unalloc_vectors();
   void init();
