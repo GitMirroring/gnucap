@@ -28,6 +28,7 @@
 #include "l_compar.h"
 #include "u_opt.h"
 #include "m_matrix.h"
+#include "m_nodemap.h"
 /*--------------------------------------------------------------------------*/
 // external
 class WAVE;
@@ -89,7 +90,7 @@ struct INTERFACE SIM_DATA {
   TRI_STATE _inc_mode;	/* flag: make incremental changes (3 state) */
   SIM_MODE _mode;	/* simulation type (AC, DC, ...) */
   SIM_PHASE _phase;	/* phase of simulation (iter, init-dc,) */
-  unsigned *_nm;	/* node map (external to internal)	*/
+  NODEMAPPER _nm;	/* node map (external to internal)	*/
   double *_i;		/* dc-tran current (i) vector		*/
   LOGIC_NODE* _nstat;	/* digital data, not all needed?        */
   BSMATRIX<double> _aa;	/* raw matrix for DC & tran */

@@ -272,7 +272,6 @@ private:
   }
   static int to_internal(int n) {
     assert(node_is_valid(n));
-    assert(NODE::_sim->_nm);
     return int(NODE::_sim->_nm[n]);
   }
 

@@ -27,6 +27,7 @@
 #include "u_nodemap.h"
 #include "e_cardlist.h"
 #include "u_status.h"
+#include "m_nodemap.h"
 /*--------------------------------------------------------------------------*/
 SIM_DATA::SIM_DATA()
   :_time0(0.),
@@ -51,6 +52,7 @@ SIM_DATA::SIM_DATA()
    _inc_mode(tsNO),
    //_mode(),
    //_phase(),
+   _nm(*this),
    _i(NULL),
    _nstat(NULL),
    _aa(),
@@ -74,11 +76,6 @@ SIM_DATA::SIM_DATA()
 /*--------------------------------------------------------------------------*/
 SIM_DATA::~SIM_DATA()
 {
-  if (_nm) {unreachable();
-    delete [] _nm;
-    _nm = NULL;
-  }else{
-  }
   if (_i) {unreachable();
     delete [] _i;
     _i = NULL;
@@ -196,10 +193,11 @@ void SIM_DATA::order_reverse()
 //  for (int ii=1; ii<=_total_nodes;  ++ii) {
 //    _nstat[ii].set_matrix_number(unsigned(_total_nodes - ii) +1);
 //  }
-  _nm[0] = 0;
-  for (int node = 1;  node <= _total_nodes;  ++node) {
-    _nm[node] = unsigned(_total_nodes - node) + 1;
-  }
+ incomplete();
+ // _nm[0] = 0;
+ // for (int node = 1;  node <= _total_nodes;  ++node) {
+ //   _nm[node] = unsigned(_total_nodes - node) + 1;
+ // }
 }
 /*--------------------------------------------------------------------------*/
 /* order_forward: use user ordering, with subcircuits added to end
@@ -207,10 +205,11 @@ void SIM_DATA::order_reverse()
  */
 void SIM_DATA::order_forward()
 {
-  _nm[0] = 0;
-  for (unsigned node=1; node<=unsigned(_total_nodes);  ++node) {
-    _nm[node] = node;
-  }
+ incomplete();
+ // _nm[0] = 0;
+ // for (unsigned node=1; node<=unsigned(_total_nodes);  ++node) {
+ //   _nm[node] = node;
+ // }
 }
 /*--------------------------------------------------------------------------*/
 /* order_auto: full automatic ordering
@@ -235,7 +234,7 @@ void SIM_DATA::init()
     // create a matrix ordering user_number->matrix_number
     // link nodes in devices to matrix numbers
 
-   _nm = new unsigned[_total_nodes+1];
+   _nm.reinit(unsigned(_total_nodes));
   //  map__nodes();
 
    order_reverse();
@@ -321,14 +320,13 @@ void SIM_DATA::uninit()
     _aa.reinit(0);
     delete [] _nstat;
     _nstat = NULL;
-    delete [] _nm;
-    _nm = NULL;
+    _nm.uninit();
   }else{
     assert(_acx.size() == 0);
     assert(_lu.size() == 0);
     assert(_aa.size() == 0);
     assert(!_nstat);
-    assert(!_nm);
+    assert(_nm.empty());
   }
   _has_op = s_NONE;
 }
