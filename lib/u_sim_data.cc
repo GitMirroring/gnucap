@@ -52,12 +52,12 @@ SIM_DATA::SIM_DATA()
    _inc_mode(tsNO),
    //_mode(),
    //_phase(),
-   _nm(*this),
    _i(NULL),
    _nstat(NULL),
    _aa(),
    _lu(),
    _acx(),
+   _nm(_aa, _acx),
    _eq(),
    _loadq(),
    _acceptq(),
@@ -233,18 +233,12 @@ void SIM_DATA::init()
 
     // create a matrix ordering user_number->matrix_number
     // link nodes in devices to matrix numbers
-
-   _nm.reinit(unsigned(_total_nodes));
-  //  map__nodes();
-
-   order_reverse();
-   //order_forward();
+    _nm.reinit(unsigned(_total_nodes));
     alloc_hold_vectors();
 
-  for (unsigned ii=0; ii<=unsigned(_total_nodes); ++ii) {
-    _nstat[ii].set_matrix_number(ii);
-  }
-
+    for (unsigned ii=0; ii<=unsigned(_total_nodes); ++ii) {
+      _nstat[ii].set_matrix_number(ii);
+    }
 
     CARD_LIST::card_list.map_nodes();
 
@@ -273,10 +267,8 @@ void SIM_DATA::alloc_hold_vectors()
 
   assert(!_nstat);
   _nstat = new LOGIC_NODE[_total_nodes+1];
-//  _nodes = new node_t[_total_nodes+1];
   for (int ii=0;  ii <= _total_nodes;  ++ii) {
     _nstat[_nm[ii]].set_user_number(ii);
-//    _nodes[ii] = node_t(_nstat+ii);
   }
 
   assert(_nstat);
@@ -296,7 +288,7 @@ void SIM_DATA::alloc_vectors()
   _i   = new double[_total_nodes+1];
   std::fill_n(_i,  _total_nodes+1, 0);
   for (int ii = 1;  ii <= _total_nodes;  ++ii) {
-    _nstat[ii].zero_state();
+    _nstat[ii].zero_some();
   }
 }
 /*--------------------------------------------------------------------------*/

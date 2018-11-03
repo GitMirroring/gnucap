@@ -90,7 +90,6 @@ struct INTERFACE SIM_DATA {
   TRI_STATE _inc_mode;	/* flag: make incremental changes (3 state) */
   SIM_MODE _mode;	/* simulation type (AC, DC, ...) */
   SIM_PHASE _phase;	/* phase of simulation (iter, init-dc,) */
-  NODEMAPPER _nm;	/* node map (external to internal)	*/
   double *_i;		/* dc-tran current (i) vector		*/
   LOGIC_NODE* _nstat;	/* digital data, not all needed?        */
   BSMATRIX<double> _aa;	/* raw matrix for DC & tran */
@@ -106,6 +105,7 @@ public:
 
 public:
   BSMATRIX<COMPLEX> _acx;/* raw & decomposed matrix for AC */
+  NODEMAPPER _nm;	/* node map (external to internal)	*/
   std::priority_queue<double, std::vector<double> > _eq; /*event queue*/
   std::vector<CARD*> _loadq;
   std::vector<CARD*> _acceptq;
@@ -119,10 +119,10 @@ public:
   SIM_DATA();
   ~SIM_DATA();
   void tr_iwant(unsigned a, unsigned b){
-    _aa.iwant(a, b);
+    _nm.tr_iwant(a, b);
   }
   void ac_iwant(unsigned a, unsigned b){
-    _acx.iwant(a, b);
+    _nm.ac_iwant(a, b);
   }
   bool is_first_expand() {return !_nstat;}
   void alloc_hold_vectors();

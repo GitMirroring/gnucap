@@ -224,6 +224,7 @@ public: // keep/restore
   void keep_state() { _vdc = _v0; }
   void restore_state() { _v0 = _vt1 = _vdc; }
   void zero_state() { _vdc = _vt1 = _v0 = 0.; }
+  void zero_some() { _ac = _vt1 = _v0 = 0.; }
 
 public: // continuous (not here?) let's see.
   LOGIC_NODE& set_matrix_number(unsigned n){untested();

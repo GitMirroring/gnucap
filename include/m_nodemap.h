@@ -24,13 +24,16 @@
 #ifndef M_NODEMAP_H
 #define M_NODEMAP_H
 
-template<class T>
-class BSMATRIX;
-class SIM_DATA;
+#include "m_matrix.h"
+
+// template<class T>
+// class BSMATRIX;
+// class SIM_DATA;
 /*--------------------------------------------------------------------------*/
 class NODEMAPPER{
 public: // construct
-  explicit NODEMAPPER(SIM_DATA const& s) : _sim(s)
+  explicit NODEMAPPER(BSMATRIX<double>& tr, BSMATRIX<COMPLEX>& ac)
+    : _aa(tr), _acx(ac)
   {
   }
 public:
@@ -40,6 +43,7 @@ public:
   void reinit(unsigned total_nodes){
     _nm.resize(total_nodes+1);
 
+    _nm[0] = 0;
     for (unsigned node = 1; node<=total_nodes; ++node) {
       _nm[node] = unsigned(total_nodes - node) + 1;
     }
@@ -50,13 +54,20 @@ public:
   bool empty() const{
     return _nm.empty();
   }
+  void tr_iwant(unsigned a, unsigned b){
+    _aa.iwant(a, b);
+  }
+  void ac_iwant(unsigned a, unsigned b){
+    _acx.iwant(a, b);
+  }
 
 public:
   unsigned const& operator[](int x) const{ return _nm[size_t(x)]; }
   unsigned const& operator[](unsigned x) const{ return _nm[x]; }
 
 private:
-  SIM_DATA const& _sim;
+  BSMATRIX<double>& _aa;
+  BSMATRIX<COMPLEX>& _acx;
   std::vector<unsigned> _nm; // nm 0...total_nodes
 };
 /*--------------------------------------------------------------------------*/
