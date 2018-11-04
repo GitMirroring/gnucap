@@ -28,6 +28,7 @@
 /*--------------------------------------------------------------------------*/
 class CS;
 class LANGUAGE;
+class ORDERING;
 /*--------------------------------------------------------------------------*/
 /* integration method selector -- not all methods are implemented */
 enum method_t {meUNKNOWN=0,	// no method set
@@ -43,12 +44,6 @@ enum method_t {meUNKNOWN=0,	// no method set
 inline OMSTREAM& operator<<(OMSTREAM& o, method_t t) {
   const std::string s[] = {"unknown", "euler", "euleronly", "trap", "traponly",
 		     "gear2", "gear2only", "trapgear", "trapeuler"};
-  return (o << s[t]);
-}
-/*--------------------------------------------------------------------------*/
-enum order_t {oREVERSE=1, oFORWARD, oAUTO};
-inline OMSTREAM& operator<<(OMSTREAM& o, order_t t) {
-  const std::string s[] = {"", "reverse", "forward", "auto"};
   return (o << s[t]);
 }
 /*--------------------------------------------------------------------------*/
@@ -125,7 +120,7 @@ public:
   static unsigned outwidth; // width of output devices
   static double ydivisions; // plot divisions, y axis
   static phase_t phase;	    // how to print phase (degrees or radians)
-  static order_t order;	    // ordering method
+  static ORDERING const* order; // ordering method
   static smode_t mode;	    // mixed-mode mode preference
   static int transits;	    // number of good transitions for digital
   static bool dupcheck;	    // check for duplicates on read

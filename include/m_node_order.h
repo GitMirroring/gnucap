@@ -21,43 +21,37 @@
  *------------------------------------------------------------------
  * nodemapper
  */
-#ifndef M_NODEMAP_H
-#define M_NODEMAP_H
-
+#ifndef M_NODE_PERM_H
+#define M_NODE_PERM_H
 #include "m_matrix.h"
 
 // template<class T>
 // class BSMATRIX;
 // class SIM_DATA;
+class ORDERING;
 /*--------------------------------------------------------------------------*/
-class NODEMAPPER{
+class NODE_ORDER{
 public: // construct
-  explicit NODEMAPPER(BSMATRIX<double>& tr, BSMATRIX<COMPLEX>& ac)
-    : _aa(tr), _acx(ac)
+  explicit NODE_ORDER(BSMATRIX<double>& tr, BSMATRIX<COMPLEX>& ac)
+    : _aa(tr), _acx(ac), _order(NULL)
   {
   }
 public:
-  void uninit(){
+  void uninit(){ untested();
     _nm.resize(0);
   }
-  void reinit(unsigned total_nodes){
-    _nm.resize(total_nodes+1);
+  void reinit(unsigned total_nodes);
 
-    _nm[0] = 0;
-    for (unsigned node = 1; node<=total_nodes; ++node) {
-      _nm[node] = unsigned(total_nodes - node) + 1;
-    }
-  }
-  size_t size() const{
+  size_t size() const{ untested();
     return _nm.size()-1;
   }
   bool empty() const{
     return _nm.empty();
   }
-  void tr_iwant(unsigned a, unsigned b){
+  void tr_iwant(unsigned a, unsigned b){ untested();
     _aa.iwant(a, b);
   }
-  void ac_iwant(unsigned a, unsigned b){
+  void ac_iwant(unsigned a, unsigned b){ untested();
     _acx.iwant(a, b);
   }
 
@@ -69,6 +63,9 @@ private:
   BSMATRIX<double>& _aa;
   BSMATRIX<COMPLEX>& _acx;
   std::vector<unsigned> _nm; // nm 0...total_nodes
+  ORDERING* _order;
+
+friend class ORDERING;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

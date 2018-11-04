@@ -35,6 +35,7 @@ class CKT_BASE;
 class PROBELIST;
 
 extern INTERFACE DISPATCHER<CMD> command_dispatcher;
+extern INTERFACE DISPATCHER<CMD> order_dispatcher;
 extern INTERFACE DISPATCHER<COMMON_COMPONENT> bm_dispatcher;
 extern INTERFACE DISPATCHER<MODEL_CARD> model_dispatcher;
 extern INTERFACE DISPATCHER<CARD> device_dispatcher;

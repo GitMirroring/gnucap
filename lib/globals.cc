@@ -39,6 +39,7 @@ const char* lib_version()
 // and destructed after.
 RUN_MODE ENV::run_mode = rPRE_MAIN;
 DISPATCHER<CMD> command_dispatcher;
+DISPATCHER<CMD> order_dispatcher;
 DISPATCHER<COMMON_COMPONENT> bm_dispatcher;
 DISPATCHER<MODEL_CARD> model_dispatcher;
 DISPATCHER<CARD> device_dispatcher;

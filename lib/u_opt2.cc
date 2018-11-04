@@ -27,6 +27,7 @@
 #include "u_lang.h"
 #include "l_compar.h"
 #include "ap.h"
+#include "u_node_order.h"
 /*--------------------------------------------------------------------------*/
 void OPT::command(CS& cmd)
 {
@@ -115,12 +116,7 @@ bool OPT::set_values(CS& cmd)
 	   || Set(cmd, "-d{egrees}", &phase,	pN_DEGREES)
 	   || Set(cmd, "r{adians}",  &phase,	pRADIANS)
 	   || cmd.warn(bWARNING, "need degrees or radians")))
-      || (cmd.umatch("order {=}") &&
-	  (ONE_OF
-	   || Set(cmd, "r{everse}", &order,	oREVERSE)
-	   || Set(cmd, "f{orward}", &order,	oFORWARD)
-	   || Set(cmd, "a{uto}",    &order,	oAUTO)
-	   || cmd.warn(bWARNING, "need reverse, forward, or auto")))
+      || (Get(cmd, "order", &order))
       || (cmd.umatch("mode {=}") &&
 	  (ONE_OF
 	   || Set(cmd, "a{nalog}",  &mode,	moANALOG)

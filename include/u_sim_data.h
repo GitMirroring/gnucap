@@ -28,7 +28,8 @@
 #include "l_compar.h"
 #include "u_opt.h"
 #include "m_matrix.h"
-#include "m_nodemap.h"
+#include "m_node_order.h"
+#include "u_node_order.h"
 /*--------------------------------------------------------------------------*/
 // external
 class WAVE;
@@ -105,7 +106,8 @@ public:
 
 public:
   BSMATRIX<COMPLEX> _acx;/* raw & decomposed matrix for AC */
-  NODEMAPPER _nm;	/* node map (external to internal)	*/
+  NODE_ORDER _nm;	/* node map (external to internal)	*/
+  ORDERING* _order; /* users choice */
   std::priority_queue<double, std::vector<double> > _eq; /*event queue*/
   std::vector<CARD*> _loadq;
   std::vector<CARD*> _acceptq;

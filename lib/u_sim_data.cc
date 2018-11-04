@@ -27,7 +27,7 @@
 #include "u_nodemap.h"
 #include "e_cardlist.h"
 #include "u_status.h"
-#include "m_nodemap.h"
+#include "m_node_order.h"
 /*--------------------------------------------------------------------------*/
 SIM_DATA::SIM_DATA()
   :_time0(0.),
@@ -172,16 +172,14 @@ void SIM_DATA::zero_voltages()
 void SIM_DATA::map__nodes()
 {
   assert(_nstat);
-  ::status.order.reset().start();
-  switch (OPT::order) {
-  default:       unreachable();
-    error(bWARNING, "invalid order spec: %d\n", OPT::order);
-    // fall through
-  case oAUTO:    order_auto();    break;
-  case oREVERSE: order_reverse(); break;
-  case oFORWARD: order_forward(); break;
-  }
-  ::status.order.stop();
+ // switch (OPT::order) {
+ // default:       unreachable();
+ //   error(bWARNING, "invalid order spec: %d\n", OPT::order);
+ //   // fall through
+ // case oAUTO:    order_auto();    break;
+ // case oREVERSE: order_reverse(); break;
+ // case oFORWARD: order_forward(); break;
+ // }
 }
 /*--------------------------------------------------------------------------*/
 /* order_reverse: force ordering to reverse of user ordering
@@ -235,6 +233,9 @@ void SIM_DATA::init()
     // link nodes in devices to matrix numbers
     _nm.reinit(unsigned(_total_nodes));
     alloc_hold_vectors();
+
+  ::status.order.reset().start();
+  ::status.order.stop();
 
     for (unsigned ii=0; ii<=unsigned(_total_nodes); ++ii) {
       _nstat[ii].set_matrix_number(ii);

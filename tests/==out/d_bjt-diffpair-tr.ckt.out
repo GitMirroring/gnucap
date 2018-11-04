@@ -1,6 +1,6 @@
 difpair ckt - simple differential pair 
 .option method=gear order=1 
-                          ^ ? need reverse, forward, or auto
+                          ^ ? need an order (auto default forward reverse )
 .option method=gear order=1 
                           ^ ? what's this?
 #           ccs(q1)    ccs(q2)    ccs(q3)    ccs(q4)    ccs(qnl)  
