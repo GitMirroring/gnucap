@@ -74,7 +74,7 @@ measure_integral.cc measure_average.cc measure_rms.cc measure_at.cc
 
 # other stuff
 OTHER_SRCS = \
-signon.cc
+signon.cc order.cc
 #------------------------------------------------------------------------
 RAW_SRCS = \
 $(D_SRCS) \

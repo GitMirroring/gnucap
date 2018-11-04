@@ -151,7 +151,7 @@ node_t::node_t(NODE* n)
   :_nnn(n),
    _ttt(n->user_number()),
    _m(int(to_internal(n->user_number())))
-{
+{ untested();
   //assert(_ttt == _nnn->flat_number());
 }
 node_t& node_t::operator=(const node_t& p)
@@ -176,7 +176,7 @@ LOGIC_NODE& node_t::data()const
 /*--------------------------------------------------------------------------*/
 double NODE::tr_probe_num(const std::string& x)const
 {
-  if (Umatch(x, "v ")) { untested();
+  if (Umatch(x, "v ")) {
     // return v0(); denoised
     return floor(_sim->_nstat[m_()].v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {

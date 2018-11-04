@@ -227,7 +227,7 @@ public: // keep/restore
   void zero_some() { _ac = _vt1 = _v0 = 0.; }
 
 public: // continuous (not here?) let's see.
-  LOGIC_NODE& set_matrix_number(unsigned n){untested();
+  LOGIC_NODE& set_matrix_number(unsigned n){
     _matrix_number = n;
     return *this;
   }

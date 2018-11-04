@@ -71,7 +71,7 @@ private: // override virtual
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void DEV_VS::precalc_last()
-{ untested();
+{
   //ELEMENT::precalc_last();	//BUG// skip
   COMPONENT::precalc_last();
   set_constant(!has_tr_eval());
@@ -80,7 +80,7 @@ void DEV_VS::precalc_last()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_VS::tr_begin()
-{ untested();
+{
   ELEMENT::tr_begin();
   _y[0].x  = 0.;
   _y[0].f1 = value();
@@ -98,19 +98,19 @@ void DEV_VS::tr_begin()
     }else{ untested();
       //BUG// don't set limit
     }
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_VS::do_tr()
-{ untested();
+{
   assert(_m0.x == 0.);
-  if (using_tr_eval()) { untested();
+  if (using_tr_eval()) {
     _y[0].x = _sim->_time0;
     tr_eval();
-    if (_n[OUT2].m_() == 0) { untested();
+    if (_n[OUT2].m_() == 0) {
       _sim->set_limit(_y[0].f1);
-    }else if (_n[OUT1].m_() == 0) { untested();
+    }else if (_n[OUT1].m_() == 0) {
       _sim->set_limit(-_y[0].f1);
     }else{ untested();
       //BUG// don't set limit
@@ -134,8 +134,8 @@ bool DEV_VS::do_tr()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_VS::do_ac()
-{ untested();
-  if (using_ac_eval()) { untested();
+{
+  if (using_ac_eval()) {
     ac_eval();
     _acg = -_loss0 * _ev;
   }else{itested();

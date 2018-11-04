@@ -28,7 +28,6 @@
 #include "l_compar.h"
 #include "u_opt.h"
 #include "m_matrix.h"
-#include "m_node_order.h"
 #include "u_node_order.h"
 /*--------------------------------------------------------------------------*/
 // external
@@ -121,10 +120,10 @@ public:
   SIM_DATA();
   ~SIM_DATA();
   void tr_iwant(unsigned a, unsigned b){
-    _nm.tr_iwant(a, b);
+    _nm.tr_iwant(a, b, _aa);
   }
   void ac_iwant(unsigned a, unsigned b){
-    _nm.ac_iwant(a, b);
+    _nm.ac_iwant(a, b, _acx);
   }
   bool is_first_expand() {return !_nstat;}
   void alloc_hold_vectors();

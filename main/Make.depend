@@ -4,7 +4,6 @@ main.o: main.cc config.h ../include/globals.h ../include/l_dispatcher.h \
  ../include/mode.h ../include/io_.h ../include/l_lib.h ../include/ap.h \
  ../include/u_prblst.h ../include/u_probe.h ../include/l_compar.h \
  ../include/u_sim_data.h ../include/constant.h ../include/m_matrix.h \
- ../include/m_node_order.h ../include/u_node_order.h \
- ../include/c_comand.h ../include/e_card.h ../include/e_cardlist.h \
- ../include/u_lang.h ../include/ap.h ../include/patchlev.h \
- ../include/c_comand.h ../include/declare.h
+ ../include/u_node_order.h ../include/c_comand.h ../include/e_card.h \
+ ../include/e_cardlist.h ../include/u_lang.h ../include/ap.h \
+ ../include/patchlev.h ../include/c_comand.h ../include/declare.h
