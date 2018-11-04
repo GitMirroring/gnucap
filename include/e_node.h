@@ -269,7 +269,7 @@ private:
       unreachable();
     }else{
     }
-    return i<=NODE::_sim->_total_nodes;
+    return i!=INVALID_NODE && i<=NODE::_sim->_total_nodes;
   }
   static int to_internal(int n) {
     assert(node_is_valid(n));

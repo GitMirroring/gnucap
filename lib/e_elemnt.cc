@@ -196,8 +196,8 @@ void ELEMENT::tr_iwant_matrix_passive()
   //assert(!subckt()); ok for subckt to exist for logic
   trace2(long_label().c_str(), _n[OUT1].m_(), _n[OUT2].m_());
 
-  assert(_n[OUT1].m_() != INVALID_NODE);
-  assert(_n[OUT2].m_() != INVALID_NODE);
+  assert(_n[OUT1].m_() != unsigned(INVALID_NODE));
+  assert(_n[OUT2].m_() != unsigned(INVALID_NODE));
   //BUG// assert can fail as a result of some parse errors
 
   _sim->tr_iwant(_n[OUT1].m_(),_n[OUT2].m_());
@@ -209,10 +209,10 @@ void ELEMENT::tr_iwant_matrix_active()
   assert(is_device());
   assert(!subckt());
 
-  assert(_n[OUT1].m_() != INVALID_NODE);
-  assert(_n[OUT2].m_() != INVALID_NODE);
-  assert(_n[IN1].m_() != INVALID_NODE);
-  assert(_n[IN2].m_() != INVALID_NODE);
+  assert(_n[OUT1].m_() != unsigned(INVALID_NODE));
+  assert(_n[OUT2].m_() != unsigned(INVALID_NODE));
+  assert(_n[IN1].m_() != unsigned(INVALID_NODE));
+  assert(_n[IN2].m_() != unsigned(INVALID_NODE));
   //BUG// assert can fail as a result of some parse errors
 
   //_sim->_aa.iwant(_n[OUT1].m_(),_n[OUT2].m_());
@@ -230,7 +230,7 @@ void ELEMENT::tr_iwant_matrix_extended()
   assert(ext_nodes() + int_nodes() == matrix_nodes());
 
   for (int ii = 0;  ii < matrix_nodes();  ++ii) {
-    if (_n[ii].m_() != INVALID_NODE) {
+    if (_n[ii].m_() != unsigned(INVALID_NODE)) {
       for (int jj = 0;  jj < ii ;  ++jj) {
 	_sim->tr_iwant(_n[ii].m_(),_n[jj].m_());
       }
@@ -263,7 +263,7 @@ void ELEMENT::ac_iwant_matrix_extended()
   assert(ext_nodes() + int_nodes() == matrix_nodes());
 
   for (int ii = 0;  ii < matrix_nodes();  ++ii) {
-    if (_n[ii].m_() != INVALID_NODE) {
+    if (_n[ii].m_() != unsigned(INVALID_NODE)) {
       for (int jj = 0;  jj < ii ;  ++jj) {
 	_sim->ac_iwant(_n[ii].m_(),_n[jj].m_());
       }

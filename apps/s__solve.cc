@@ -271,7 +271,7 @@ void SIM::solve_equations()
   
   if (_sim->_nstat) {
     // mixed mode
-    for (int ii = _sim->_lu.size(); ii >= 1; --ii) {
+    for (unsigned ii=_sim->_lu.size(); ii>=1; --ii) {
       _sim->_nstat[ii].set_a_iter();
     }
   }else{ untested();

@@ -61,7 +61,7 @@ private: // override virtual
   COMPLEX  ac_involts()const	{return 0.;}
   COMPLEX  ac_amps()const	{return (_acg + ac_outvolts()*_loss0);}
 
-  std::string port_name(int i)const {
+  std::string port_name(int i)const { untested();
     assert(i >= 0);
     assert(i < 2);
     static std::string names[] = {"p", "n"};
@@ -71,7 +71,7 @@ private: // override virtual
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void DEV_VS::precalc_last()
-{
+{ untested();
   //ELEMENT::precalc_last();	//BUG// skip
   COMPONENT::precalc_last();
   set_constant(!has_tr_eval());
@@ -80,7 +80,7 @@ void DEV_VS::precalc_last()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_VS::tr_begin()
-{
+{ untested();
   ELEMENT::tr_begin();
   _y[0].x  = 0.;
   _y[0].f1 = value();
@@ -90,36 +90,36 @@ void DEV_VS::tr_begin()
   _m0.c0 = -_loss0 * _y[0].f1;
   _m0.c1 = 0.;
   _m1 = _m0;    
-  if (!using_tr_eval()) {
-    if (_n[OUT2].m_() == 0) {
+  if (!using_tr_eval()) { untested();
+    if (_n[OUT2].m_() == 0) { untested();
       _sim->set_limit(value());
-    }else if (_n[OUT1].m_() == 0) {
+    }else if (_n[OUT1].m_() == 0) { untested();
       _sim->set_limit(-value());
-    }else{
+    }else{ untested();
       //BUG// don't set limit
     }
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_VS::do_tr()
-{
+{ untested();
   assert(_m0.x == 0.);
-  if (using_tr_eval()) {
+  if (using_tr_eval()) { untested();
     _y[0].x = _sim->_time0;
     tr_eval();
-    if (_n[OUT2].m_() == 0) {
+    if (_n[OUT2].m_() == 0) { untested();
       _sim->set_limit(_y[0].f1);
-    }else if (_n[OUT1].m_() == 0) {
+    }else if (_n[OUT1].m_() == 0) { untested();
       _sim->set_limit(-_y[0].f1);
-    }else{
+    }else{ untested();
       //BUG// don't set limit
     }
     store_values();
     q_load();
     _m0.c0 = -_loss0 * _y[0].f1;
     assert(_m0.c1 == 0.);
-  }else{
+  }else{ untested();
     assert(conchk(_loss0, 1./OPT::shortckt));
     assert(_y[0].x == 0.);
     assert(_y[0].f0 == 0.);
@@ -134,8 +134,8 @@ bool DEV_VS::do_tr()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_VS::do_ac()
-{
-  if (using_ac_eval()) {
+{ untested();
+  if (using_ac_eval()) { untested();
     ac_eval();
     _acg = -_loss0 * _ev;
   }else{itested();

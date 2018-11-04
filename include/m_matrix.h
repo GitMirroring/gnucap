@@ -362,7 +362,7 @@ void BSMATRIX<T>::allocate()
 
   {
     T* point = _space;
-    for (int ii = 0;   ii <= size();   ++ii) {
+    for (unsigned ii=0; ii<=size(); ++ii) {
       _colptr[ii] = point - int(_lownode[ii]);
       _rowptr[ii] = _colptr[ii] + 2*ii;
       _diaptr[ii] = _colptr[ii] + ii;
