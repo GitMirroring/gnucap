@@ -11,8 +11,8 @@ void NODE_ORDER::reinit(unsigned total_nodes)
 	}
 
 	if(!OPT::order){ untested();
-		assert(order_dispatcher["default"]);
-		ORDERING const* od=prechecked_cast<ORDERING*>(order_dispatcher["default"]);
+		assert(order_dispatcher["auto"]);
+		ORDERING const* od=prechecked_cast<ORDERING*>(order_dispatcher["auto"]);
 		assert(od);
 		OPT::order = od;
 	}else{ untested();

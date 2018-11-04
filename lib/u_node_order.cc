@@ -64,9 +64,10 @@ namespace {
 /*--------------------------------------------------------------------------*/
 class ORDER_REVERSE : public ORDERING{
 public:
+  explicit ORDER_REVERSE(std::string name="reverse") : _name(name) {}
 private: //override
   ORDERING* clone()const{return new ORDER_REVERSE(*this);}
-  std::string name() const{return "reverse";}
+  std::string name() const{return _name;}
   void init(unsigned total_nodes, NODE_ORDER& no){ untested();
     std::vector<unsigned>& n=nm(no);
 
@@ -76,12 +77,16 @@ private: //override
       n[node] = unsigned(total_nodes - node) + 1;
     }
   }
+private:
+  std::string _name;
 }ro;
-DISPATCHER<CMD>::INSTALL roi(&order_dispatcher, "reverse|auto|default", &ro);
+DISPATCHER<CMD>::INSTALL roi(&order_dispatcher, "reverse|default", &ro);
+ORDER_REVERSE ro2("auto");
+DISPATCHER<CMD>::INSTALL roi2(&order_dispatcher, "auto", &ro2);
 /*--------------------------------------------------------------------------*/
 struct set_default_order{
   set_default_order(){
-    OPT::order=&ro;
+    OPT::order=&ro2;
   }
 }d;
 /*--------------------------------------------------------------------------*/
