@@ -50,14 +50,12 @@ public:
     return _nm.empty();
   }
   void tr_iwant(unsigned a, unsigned b){ untested();
-    _aa.iwant(a, b);
     assert(_order);
-    _order->tr_iwant(a, b);
+    _order->iwant(a, b, _aa);
   }
   void ac_iwant(unsigned a, unsigned b){ untested();
-    _acx.iwant(a, b);
     assert(_order);
-    _order->tr_iwant(a, b);
+    _order->iwant(a, b, _acx);
   }
 
 public:

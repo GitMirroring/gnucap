@@ -112,45 +112,60 @@
 /*--------------------------------------------------------------------------*/
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
-template <class T>
-class BSMATRIX {
+class BSMATRIX_LAYOUT{
 private:
+  BSMATRIX_LAYOUT(const BSMATRIX_LAYOUT&){unreachable();}
+protected:
+  explicit BSMATRIX_LAYOUT(unsigned ss)
+    : _changed(NULL),
+   _lownode(NULL),
+   _nzcount(0),
+   _size(ss){}
+  explicit BSMATRIX_LAYOUT(){}
+protected:
   mutable bool* _changed;// flag: this node changed value
   unsigned* _lownode;	// lowest node connecting to this one
-  T*	_space;		// ptr to actual memory space used
-  T**	_rowptr;	// ptrs to col 0 of every row
-  T**	_colptr;	// ptrs to row 0 of every col
-  T**	_diaptr;	// ptrs to diagonal
   int	_nzcount;	// count of non-zero elements
   unsigned _size;	// # of rows and columns
-  T	_zero;		// always 0 but not const
-  T	_trash;		// depository for row and col 0, write only
-  T	_min_pivot;	// minimum pivot value
-private:
-  explicit	BSMATRIX(const BSMATRIX<T>&) {incomplete();unreachable();}
-  void		uninit();
-  void		init(unsigned s=0);
-  T&		subtract_dot_product(unsigned r, unsigned c, unsigned d);
-  T&		subtract_dot_product(unsigned r, unsigned c, unsigned d, const T& in);
+public:
+  unsigned size()const	{return _size;}
+  void		iwant(unsigned, unsigned);
+  void		iwant(const BSMATRIX_LAYOUT&m);
+protected:
   unsigned	lownode(unsigned i)const{return _lownode[i];}
   bool		is_changed(unsigned n)const {return _changed[n];}
   void		set_changed(int n, bool x = true)const {_changed[n] = x;}
   void		set_changed(unsigned n, bool x = true)const {_changed[n] = x;}
+};
+/*--------------------------------------------------------------------------*/
+template <class T>
+class BSMATRIX : public BSMATRIX_LAYOUT {
+private:
+  T*	_space;		// ptr to actual memory space used
+  T**	_rowptr;	// ptrs to col 0 of every row
+  T**	_colptr;	// ptrs to row 0 of every col
+  T**	_diaptr;	// ptrs to diagonal
+  T	_zero;		// always 0 but not const
+  T	_trash;		// depository for row and col 0, write only
+  T	_min_pivot;	// minimum pivot value
+private:
+  explicit	BSMATRIX(const BSMATRIX<T>&l) : BSMATRIX_LAYOUT(l)
+                          {incomplete();unreachable();}
+  void		uninit();
+  void		init(unsigned s=0);
+  T&		subtract_dot_product(unsigned r, unsigned c, unsigned d);
+  T&		subtract_dot_product(unsigned r, unsigned c, unsigned d, const T& in);
 public:
   explicit	BSMATRIX(unsigned ss=0);
   		~BSMATRIX()		{uninit();}
   void		reinit(unsigned ss=0)	{uninit(); init(ss);}
   //void	clone(const BSMATRIX<T>&);
-  void		iwant(unsigned, unsigned);
-  template<class TT>
-  void		iwant(const BSMATRIX<TT>&m);
   void		unallocate();
   void		allocate();
   void		reallocate()		{unallocate(); allocate();}
   void		set_min_pivot(double x)	{_min_pivot = x;}
   void		zero();
   void		dezero(T& o);
-  unsigned	size()const		{return _size;}
   double 	density();
   T 	d(unsigned r, unsigned  )const;
   T     s(unsigned r, unsigned c)const;
@@ -261,14 +276,11 @@ T& BSMATRIX<T>::subtract_dot_product(unsigned rr, unsigned cc, unsigned dd,
 /*--------------------------------------------------------------------------*/
 template <class T>
 BSMATRIX<T>::BSMATRIX(unsigned ss)
-  :_changed(NULL),
-   _lownode(NULL),
+  :BSMATRIX_LAYOUT(ss),
    _space(NULL),
    _rowptr(NULL),
    _colptr(NULL),
    _diaptr(NULL),
-   _nzcount(0),
-   _size(ss),
    _zero(0.),
    _trash(0.),
    _min_pivot(0.)
@@ -292,8 +304,7 @@ void BSMATRIX<T>::clone(const BSMATRIX<T> & aa)
 /*--------------------------------------------------------------------------*/
 /* iwant: indicate that "iwant" to allocate this spot in the matrix
  */
-template <class T>
-void BSMATRIX<T>::iwant(unsigned node1, unsigned node2)
+inline void BSMATRIX_LAYOUT::iwant(unsigned node1, unsigned node2)
 {
   assert(_lownode);
   assert(node1 <= size());
@@ -310,10 +321,7 @@ void BSMATRIX<T>::iwant(unsigned node1, unsigned node2)
   }
 }
 /*--------------------------------------------------------------------------*/
-// replicate another matrix layout
-template <class T>
-template <class TT>
-void BSMATRIX<T>::iwant(BSMATRIX<TT> const& o)
+inline void BSMATRIX_LAYOUT::iwant(BSMATRIX_LAYOUT const& o)
 {
   assert(size()==o.size());
   assert(_lownode);;

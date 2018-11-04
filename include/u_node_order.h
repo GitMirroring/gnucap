@@ -25,6 +25,7 @@
 //#include "m_node_order.h"
 #include "c_comand.h"
 #include "io_trace.h"
+#include "m_matrix.h"
 /*--------------------------------------------------------------------------*/
 class NODE_ORDER;
 /*--------------------------------------------------------------------------*/
@@ -33,8 +34,9 @@ public:
   virtual void init(unsigned total_nodes, NODE_ORDER&)=0;
   virtual ORDERING* clone() const=0;
   virtual std::string name() const=0;
-  virtual void tr_iwant(unsigned, unsigned){} // pass to _aa?
-  virtual void ac_iwant(unsigned, unsigned){}
+  virtual void iwant(unsigned a, unsigned b, BSMATRIX_LAYOUT& m){untested();
+    m.iwant(a,b);
+  }
 private: // overrides
   virtual void do_it(CS&, CARD_LIST*){ untested();
     incomplete();

@@ -99,8 +99,8 @@ u_nodemap.o: u_nodemap.cc ../include/e_node.h ../include/u_sim_data.h \
 m_node_order.o: m_node_order.cc ../include/m_node_order.h \
  ../include/m_matrix.h ../include/l_stlextra.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h ../include/u_node_order.h \
- ../include/m_node_order.h ../include/c_comand.h ../include/e_card.h \
- ../include/e_base.h ../include/u_opt.h ../include/mode.h \
+ ../include/c_comand.h ../include/e_card.h ../include/e_base.h \
+ ../include/u_node_order.h ../include/u_opt.h ../include/mode.h \
  ../include/io_.h ../include/l_lib.h ../include/globals.h \
  ../include/l_dispatcher.h ../include/u_opt.h ../include/ap.h
 u_opt1.o: u_opt1.cc ../include/u_opt.h ../include/mode.h ../include/io_.h \
@@ -112,7 +112,7 @@ u_opt2.o: u_opt2.cc ../include/globals.h ../include/l_dispatcher.h \
  ../include/mode.h ../include/io_.h ../include/l_lib.h ../include/ap.h \
  ../include/c_comand.h ../include/e_card.h ../include/u_lang.h \
  ../include/l_compar.h ../include/ap.h ../include/u_node_order.h \
- ../include/m_node_order.h ../include/m_matrix.h ../include/c_comand.h
+ ../include/c_comand.h
 u_parameter.o: u_parameter.cc ../include/l_stlextra.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h ../include/u_parameter.h \
  ../include/u_opt.h ../include/mode.h ../include/io_.h ../include/l_lib.h \
@@ -336,8 +336,9 @@ u_node_order.o: u_node_order.cc ../include/ap.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h ../include/globals.h \
  ../include/l_dispatcher.h ../include/e_base.h ../include/l_stlextra.h \
  ../include/u_opt.h ../include/mode.h ../include/io_.h ../include/l_lib.h \
- ../include/ap.h ../include/u_node_order.h ../include/m_node_order.h \
- ../include/m_matrix.h ../include/c_comand.h ../include/e_card.h
+ ../include/ap.h ../include/u_node_order.h ../include/c_comand.h \
+ ../include/e_card.h ../include/m_node_order.h ../include/m_matrix.h \
+ ../include/u_node_order.h
 findbr.o: findbr.cc ../include/l_lib.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h ../include/constant.h \
  ../include/e_cardlist.h ../include/ap.h ../include/e_card.h \
