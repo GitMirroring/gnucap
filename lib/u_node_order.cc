@@ -24,6 +24,7 @@
 #include "ap.h"
 #include "globals.h"
 #include "u_node_order.h"
+#include "m_node_order.h"
 /*--------------------------------------------------------------------------*/
 bool Get(CS& cmd_, const std::string& key, ORDERING const** val)
 {

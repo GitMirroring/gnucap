@@ -22,7 +22,7 @@
 #ifndef U_NODE_ORDER_H
 #define U_NODE_ORDER_H
 /*--------------------------------------------------------------------------*/
-#include "m_node_order.h"
+//#include "m_node_order.h"
 #include "c_comand.h"
 #include "io_trace.h"
 /*--------------------------------------------------------------------------*/
@@ -38,12 +38,11 @@ private: // overrides
     incomplete();
   }
 protected: // friend access
-  std::vector<unsigned>& nm(NODE_ORDER& x) const{ untested();
-    return x._nm;
-  }
+  std::vector<unsigned>& nm(NODE_ORDER& x) const;
 };
 /*--------------------------------------------------------------------------*/
 bool Get(CS&, const std::string& key, ORDERING const** val);
 OMSTREAM& operator<<(OMSTREAM& o, ORDERING const* x);
+/*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:

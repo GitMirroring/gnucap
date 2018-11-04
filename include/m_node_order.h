@@ -24,6 +24,7 @@
 #ifndef M_NODE_PERM_H
 #define M_NODE_PERM_H
 #include "m_matrix.h"
+#include "u_node_order.h"
 
 // template<class T>
 // class BSMATRIX;
@@ -66,8 +67,11 @@ private:
   ORDERING* _order;
 
 friend class ORDERING;
-};
+}; // NODE_ORDER
 /*--------------------------------------------------------------------------*/
+inline std::vector<unsigned>& ORDERING::nm(NODE_ORDER& x) const{ untested();
+  return x._nm;
+}
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:
