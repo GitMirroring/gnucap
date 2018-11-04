@@ -51,9 +51,13 @@ public:
   }
   void tr_iwant(unsigned a, unsigned b){ untested();
     _aa.iwant(a, b);
+    assert(_order);
+    _order->tr_iwant(a, b);
   }
   void ac_iwant(unsigned a, unsigned b){ untested();
     _acx.iwant(a, b);
+    assert(_order);
+    _order->tr_iwant(a, b);
   }
 
 public:

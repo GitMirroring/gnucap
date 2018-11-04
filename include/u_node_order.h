@@ -33,6 +33,8 @@ public:
   virtual void init(unsigned total_nodes, NODE_ORDER&)=0;
   virtual ORDERING* clone() const=0;
   virtual std::string name() const=0;
+  virtual void tr_iwant(unsigned, unsigned){} // pass to _aa?
+  virtual void ac_iwant(unsigned, unsigned){}
 private: // overrides
   virtual void do_it(CS&, CARD_LIST*){ untested();
     incomplete();
