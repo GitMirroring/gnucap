@@ -31,7 +31,9 @@ class ORDER_REVERSE : public ORDERING{
 public:
   explicit ORDER_REVERSE(std::string name="reverse") : _name(name) {}
 private: //override
+  explicit ORDER_REVERSE(ORDER_REVERSE const& p) : ORDERING(p) {}
   ORDERING* clone()const{return new ORDER_REVERSE(*this);}
+private:
   std::string name() const{return _name;}
   void init(unsigned total_nodes, NODE_ORDER& no){
     std::vector<unsigned>& n=nm(no);
@@ -57,8 +59,12 @@ struct set_default_order{
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class ORDER_FORWARD : public ORDERING{
+public:
+  explicit ORDER_FORWARD() : ORDERING() {}
 private: //override
+  explicit ORDER_FORWARD(ORDER_FORWARD const& p) : ORDERING(p) {}
   ORDERING* clone()const{return new ORDER_FORWARD(*this);}
+private:
   std::string name() const{return "backward";}
   void init(unsigned total_nodes, NODE_ORDER& no){ untested();
     std::vector<unsigned>& n=nm(no);

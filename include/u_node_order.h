@@ -32,12 +32,24 @@
 class NODE_ORDER;
 /*--------------------------------------------------------------------------*/
 class ORDERING : public CMD{
-public:
-  virtual void init(unsigned total_nodes, NODE_ORDER&)=0;
+public: // construct
+  explicit ORDERING() : CMD() {}
   virtual ORDERING* clone() const=0;
+  virtual ~ORDERING(){}
+protected:
+  ORDERING( const ORDERING& o) : CMD(o) {}
+public: // ordering stuff
+  // create initial ordering (incidence not known yet)
+  virtual void init(unsigned total_nodes, NODE_ORDER&)=0;
   virtual std::string name() const=0;
   virtual void iwant(unsigned a, unsigned b, BSMATRIX_LAYOUT& m){
-    m.iwant(a,b);
+    // plugins could collect it on their own ..
+    // (legacy: just bump spikes).
+    m.iwant(a, b);
+  }
+  virtual void apply(BSMATRIX_LAYOUT&){
+    // compute a new ordering, apply to m.
+    // (legacy: spikes already bumped)
   }
 private: // overrides
   virtual void do_it(CS&, CARD_LIST*){ untested();
@@ -72,6 +84,10 @@ public: // forward to virtual functions
   void iwant(unsigned a, unsigned b, BSMATRIX_LAYOUT& aa){
     assert(_order);
     _order->iwant(a, b, aa);
+  }
+  virtual void apply(BSMATRIX_LAYOUT& m){
+    assert(_order);
+    _order->apply(m);
   }
 
 public:

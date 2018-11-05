@@ -1,5 +1,6 @@
 /*$Id: u_sim_data.cc 2016/03/23 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
+ *               2018 Felix Salfelder <felix@salfelder.org>
  * Author: Albert Davis <aldavis@gnu.org>
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
@@ -171,12 +172,21 @@ void SIM_DATA::zero_voltages()
  */
 void SIM_DATA::map__nodes()
 {
-  // create a matrix ordering user_number->matrix_number
+  _aa.reinit(unsigned(_total_nodes));
+  _acx.reinit(unsigned(_total_nodes));
+  // create an initial matrix ordering user_number->matrix_number
   _nm.reinit(unsigned(_total_nodes));
 
-  // link nodes in devices to matrix numbers
+  // link nodes in devices to initial matrix numbers
   CARD_LIST::card_list.map_nodes();
 
+  // populate incidence graph, or bump spikes
+  CARD_LIST::card_list.tr_iwant_matrix();
+  CARD_LIST::card_list.ac_iwant_matrix();
+
+  // possibly, compute new ordering, and apply
+  _nm.apply(_aa);
+  _nm.apply(_acx);
 }
 /*--------------------------------------------------------------------------*/
 /* order_reverse: force ordering to reverse of user ordering
@@ -227,11 +237,6 @@ void SIM_DATA::init()
     CARD_LIST::card_list.expand();
 
     map__nodes();
-
-    _aa.reinit(unsigned(_total_nodes));
-    _acx.reinit(unsigned(_total_nodes));
-    CARD_LIST::card_list.tr_iwant_matrix();
-    CARD_LIST::card_list.ac_iwant_matrix();
 
     _lu.reinit(unsigned(_total_nodes));
     _lu.iwant(_aa);
