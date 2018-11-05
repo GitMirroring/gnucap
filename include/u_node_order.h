@@ -60,8 +60,6 @@ public:
   void uninit(){
     _nm.resize(0);
   }
-  void reinit(unsigned total_nodes);
-
   size_t size() const{ untested();
     return _nm.size()-1;
   }
@@ -70,13 +68,10 @@ public:
   }
 
 public: // forward to virtual functions
-  void tr_iwant(unsigned a, unsigned b, BSMATRIX_LAYOUT& aa){
+  void reinit(unsigned total_nodes); // u_node_order.cc
+  void iwant(unsigned a, unsigned b, BSMATRIX_LAYOUT& aa){
     assert(_order);
     _order->iwant(a, b, aa);
-  }
-  void ac_iwant(unsigned a, unsigned b, BSMATRIX_LAYOUT& acx){
-    assert(_order);
-    _order->iwant(a, b, acx);
   }
 
 public:

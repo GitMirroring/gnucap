@@ -120,10 +120,10 @@ public:
   SIM_DATA();
   ~SIM_DATA();
   void tr_iwant(unsigned a, unsigned b){
-    _nm.tr_iwant(a, b, _aa);
+    _nm.iwant(a, b, _aa);
   }
   void ac_iwant(unsigned a, unsigned b){
-    _nm.ac_iwant(a, b, _acx);
+    _nm.iwant(a, b, _acx);
   }
   bool is_first_expand() {return !_nstat;}
   void alloc_hold_vectors();
