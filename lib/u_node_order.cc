@@ -61,25 +61,32 @@ OMSTREAM& operator<<(OMSTREAM& o, ORDERING const* x)
 /*--------------------------------------------------------------------------*/
 void NODE_ORDER::reinit(unsigned total_nodes)
 { untested();
-	if(_order){ untested();
-		incomplete();
-	}else{
-	}
+  if(_order){ untested();
+    incomplete();
+  }else{
+  }
 
-	if(!OPT::order){ itested();
-		// default order is overriden in default_plugins.
-		assert(order_dispatcher["default"]);
-		ORDERING const* od=prechecked_cast<ORDERING*>(order_dispatcher["default"]);
-		assert(od);
-		OPT::order = od;
-	}else{ untested();
-	}
+  if(!OPT::order){ itested();
+    // default order is overriden in default_plugins.
+    assert(order_dispatcher["default"]);
+    ORDERING const* od=prechecked_cast<ORDERING*>(order_dispatcher["default"]);
+    assert(od);
+    OPT::order = od;
+  }else{ untested();
+  }
 
-	_order = OPT::order->clone();
-	assert(_order);
-	::status.order.reset().start();
-	_order->init(total_nodes, *this);
-	::status.order.stop();
+  _order = OPT::order->clone();
+  assert(_order);
+  ::status.order.reset().start();
+  _order->init(total_nodes, *this);
+  ::status.order.stop();
+}
+/*--------------------------------------------------------------------------*/
+void NODE_ORDER::bump(BSMATRIX_LAYOUT& m){
+  assert(_order);
+  ::status.order.start();
+  _order->bump(m, *this);
+  ::status.order.stop();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

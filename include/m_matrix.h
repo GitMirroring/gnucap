@@ -237,7 +237,7 @@ T& BSMATRIX<T>::subtract_dot_product(unsigned rr, unsigned cc, unsigned dd)
 {
   assert(_lownode);
   unsigned kk = std::max(_lownode[rr], _lownode[cc]);
-  int len = dd - kk;
+  int len = int(dd) - int(kk);
   T& dot = m(rr, cc);
   if (len > 0) {
     T const* row = &(l(rr,kk));
@@ -718,7 +718,7 @@ void BSMATRIX<T>::lu_decomp()
 	/* (m(ii,mm) -= dot(ii,mm,ii)) /= d(ii,ii); */
 	subtract_dot_product(ii,mm,ii) /= d(ii,ii);
       }
-      for (int jj = bn+1;  jj<mm;  jj++) {
+      for (unsigned jj = bn+1;  jj<mm;  jj++) {
 	/* m(mm,jj) -= dot(mm,jj,jj); */
 	subtract_dot_product(mm,jj,jj);
       }
