@@ -179,7 +179,6 @@ void SIM_DATA::map__nodes()
 
   // link nodes in devices to initial matrix numbers
   CARD_LIST::card_list.map_nodes();
-
 }
 /*--------------------------------------------------------------------------*/
 /* order_reverse: force ordering to reverse of user ordering
@@ -198,26 +197,6 @@ void SIM_DATA::order_reverse()
  // }
 }
 /*--------------------------------------------------------------------------*/
-/* order_forward: use user ordering, with subcircuits added to end
- * results in border at the top (worst possible if lots of subcircuits)
- */
-void SIM_DATA::order_forward()
-{
- incomplete();
- // _nm[0] = 0;
- // for (unsigned node=1; node<=unsigned(_total_nodes);  ++node) {
- //   _nm[node] = node;
- // }
-}
-/*--------------------------------------------------------------------------*/
-/* order_auto: full automatic ordering
- * reverse, for now
- */
-void SIM_DATA::order_auto()
-{
-  order_reverse();
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /* init: allocate, set up, etc ... for any type of simulation
  * also called by status and probe for access to internals and subckts
@@ -230,18 +209,15 @@ void SIM_DATA::init()
     CARD_LIST::card_list.expand();
 
     map__nodes();
-    alloc_hold_vectors(); // sets user numbers in _nstat
 
     // populate incidence graph, or bump spikes
     CARD_LIST::card_list.tr_iwant_matrix();
     CARD_LIST::card_list.ac_iwant_matrix();
 
-    // compute an ordering.
-    _nm.compute();
+    // possibly compute a new ordering.
+    _nm.remap();
 
-  CARD_LIST::card_list.map_nodes();
-
-    // possibly, compute new ordering, and apply
+    // apply new ordering.
     _nm.bump(_aa);
     _nm.bump(_acx);
 
@@ -249,10 +225,7 @@ void SIM_DATA::init()
     _lu.iwant(_aa);
     _last_time = 0;
 
-    for (unsigned ii=0; ii<=unsigned(_total_nodes); ++ii) {
-      _nstat[ii].set_matrix_number(ii);
-      _nstat[_nm[ii]].set_user_number(int(ii));
-    }
+    alloc_hold_vectors(); // set user numbers in _nstat
   }else{
     CARD_LIST::card_list.precalc_first();
   }
@@ -264,6 +237,7 @@ void SIM_DATA::init()
  * must be done BEFORE deciding what array elements to allocate,
  * but after mapping
  * if they already exist, leave them alone to save data
+   TODO: separate LOGIC, matrix nodes as needed.
  */
 void SIM_DATA::alloc_hold_vectors()
 {
@@ -273,6 +247,7 @@ void SIM_DATA::alloc_hold_vectors()
   _nstat = new LOGIC_NODE[_total_nodes+1];
   for (int ii=0;  ii <= _total_nodes;  ++ii) {
     _nstat[_nm[ii]].set_user_number(ii);
+    _nstat[ii].set_matrix_number(unsigned(ii));
   }
 
   assert(_nstat);

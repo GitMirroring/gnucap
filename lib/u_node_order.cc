@@ -65,6 +65,7 @@ void NODE_ORDER::reinit(unsigned total_nodes)
     incomplete();
   }else{
   }
+  _nm.resize(total_nodes+1);
 
   if(!OPT::order){ itested();
     // default order is overriden in default_plugins.
@@ -80,6 +81,23 @@ void NODE_ORDER::reinit(unsigned total_nodes)
   ::status.order.reset().start();
   _order->init(total_nodes, *this);
   ::status.order.stop();
+}
+/*--------------------------------------------------------------------------*/
+void NODE_ORDER::remap(){ untested();
+  assert(_order);
+  _order->remap(*this);
+#ifndef NDEBUG
+  size_t size=_nm.size();
+  std::vector<bool> check(size);
+  for(unsigned i=0; i<size; ++i){
+    check[_nm[i]] = true;
+  }
+
+  for(unsigned i=0; i<size; ++i){
+    assert(check[i]);
+  }
+
+#endif
 }
 /*--------------------------------------------------------------------------*/
 void NODE_ORDER::bump(BSMATRIX_LAYOUT& m){

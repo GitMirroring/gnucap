@@ -47,7 +47,7 @@ public: // ordering stuff
     // (legacy: just bump spikes).
     m.iwant(a, b);
   }
-  virtual void compute(NODE_ORDER&){ }
+  virtual void remap(NODE_ORDER&){ }
   virtual void bump(BSMATRIX_LAYOUT&, NODE_ORDER const&){
     // compute a new ordering, apply to m.
     // (legacy: spikes already bumped)
@@ -86,10 +86,7 @@ public: // forward to virtual functions
     assert(_order);
     _order->iwant(a, b, aa);
   }
-  void compute(){
-    assert(_order);
-    _order->compute(*this);
-  }
+  void remap();
   virtual void bump(BSMATRIX_LAYOUT& m);
 
 public:

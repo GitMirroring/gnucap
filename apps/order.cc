@@ -38,7 +38,6 @@ private:
   void init(unsigned total_nodes, NODE_ORDER& no){
     std::vector<unsigned>& n=nm(no);
 
-    n.resize(total_nodes+1);
     n[0] = 0;
     for (unsigned node = 1; node<=total_nodes; ++node) {
       n[node] = unsigned(total_nodes - node) + 1;
@@ -58,6 +57,9 @@ struct set_default_order{
 }d;
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+/* order_forward: use user ordering, with subcircuits added to end
+ * results in border at the top (worst possible if lots of subcircuits)
+ */
 class ORDER_FORWARD : public ORDERING{
 public:
   explicit ORDER_FORWARD() : ORDERING() {}
