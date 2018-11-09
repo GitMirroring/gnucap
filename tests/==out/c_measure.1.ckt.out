@@ -94,3 +94,8 @@ t3= 1.55000001461538n
 frequency=-1.E+9
 tvmax= 1.7n
 tvmax= 1.7n
+Gnucap   System status
+iterations: op=0, dc=0, tran=308, fourier=0, total=385
+transient timesteps: accepted=71, rejected=6, total=77
+nodes: user=2, subckt=0, model=0, total=2
+dctran density=100.0%, ac density=100.0%

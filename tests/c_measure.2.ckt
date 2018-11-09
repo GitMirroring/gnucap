@@ -9,4 +9,5 @@ V1 (1 0) sin(freq=1k ampl=1 peak zero)
 .measure a2=integral("v(1)", begin=0 end=.0015)
 .measure m2=mean("v(1)", begin=0 end=.0015)
 .measure r2=rms("v(1)", begin=0 end=.0015)
+.status notime
 .end

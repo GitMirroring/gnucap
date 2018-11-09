@@ -44,5 +44,5 @@ s2 0 0 1 0 s02
 .measure tvmax = max(probe="v(1)" arg)
 .measure tvmax = max(probe="v(1)" last arg)
 
-
+.status notime
 .end

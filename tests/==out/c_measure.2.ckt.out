@@ -49,3 +49,8 @@ r1= 0.713091276688152
 a2= 313.098848505665u
 m2= 0.208732565670443
 r2= 0.712354678159851
+Gnucap   System status
+iterations: op=0, dc=0, tran=128, fourier=0, total=171
+transient timesteps: accepted=43, rejected=0, total=43
+nodes: user=1, subckt=0, model=0, total=1
+dctran density=100.0%, ac density=100.0%

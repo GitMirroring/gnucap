@@ -491,3 +491,8 @@ V1 ( 1 0 ) sffm offset= 0. amplitude= 1. carrier= 10.K modindex= 0.1 signal= 1.K
 V2 ( 2 0 ) sffm offset= 0. amplitude= 1. carrier= 10.K modindex= 1. signal= 1.K
 V3 ( 3 0 ) sin offset=NA( 0.) amplitude=NA( 1.) frequency= 10.K delay=NA( 0.) damping=NA( 0.)
 V4 ( 4 0 ) sffm offset= 0. amplitude= 1. carrier= 10.K modindex= 2.4 signal= 1.K
+Gnucap   System status
+iterations: op=0, dc=0, tran=1898, fourier=473, total=3162
+transient timesteps: accepted=791, rejected=0, total=791
+nodes: user=4, subckt=0, model=0, total=4
+dctran density=25.0%, ac density=25.0%
