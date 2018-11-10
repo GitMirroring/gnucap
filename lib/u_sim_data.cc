@@ -179,6 +179,13 @@ void SIM_DATA::map__nodes()
 
   // link nodes in devices to initial matrix numbers
   CARD_LIST::card_list.map_nodes();
+
+  // populate incidence graph, or bump spikes
+  CARD_LIST::card_list.tr_iwant_matrix();
+  CARD_LIST::card_list.ac_iwant_matrix();
+
+  // possibly compute a new ordering.
+  _nm.remap();
 }
 /*--------------------------------------------------------------------------*/
 /* order_reverse: force ordering to reverse of user ordering
@@ -206,16 +213,12 @@ void SIM_DATA::init()
   if (is_first_expand()) {
     uninit();
     init_node_count(CARD_LIST::card_list.nodes()->how_many(), 0, 0);
+
+
     CARD_LIST::card_list.expand();
 
     map__nodes();
 
-    // populate incidence graph, or bump spikes
-    CARD_LIST::card_list.tr_iwant_matrix();
-    CARD_LIST::card_list.ac_iwant_matrix();
-
-    // possibly compute a new ordering.
-    _nm.remap();
 
     // apply new ordering.
     _nm.bump(_aa);

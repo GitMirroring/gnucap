@@ -568,12 +568,16 @@ void COMPONENT::map_nodes()
   assert(net_nodes() <= max_nodes());
   //assert(ext_nodes() + int_nodes() == matrix_nodes());
 
+ // the other nodes must have already been sorted when we get here.
+ //
   for (int ii = 0; ii < ext_nodes()+int_nodes(); ++ii) {
-    _n[ii].map();
+    _n[ii].map(); // external connections these will end up last?
+                  // set matrix number, based on user number.
+		  // where does the user number come from?
   }
 
   if (subckt()) {
-    subckt()->map_nodes();
+    subckt()->map_nodes(); // call map_nodes on all components there.
   }else{
   }
 }

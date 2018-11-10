@@ -208,6 +208,7 @@ void CARD::new_subckt(const CARD* Model, PARAM_LIST* Params)
 void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)
 {
   if (_sim->is_first_expand()) {
+    // shallow copy in in stuff from Model. perhaps here, the user numbers are assigned.
     new_subckt(Model, Params);
   }else{untested();
     assert(subckt());

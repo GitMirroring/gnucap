@@ -64,7 +64,10 @@ protected: // override virtual
   void	  ac_begin()	{assert(subckt()); subckt()->ac_begin();}
   void	  do_ac()	{assert(subckt()); subckt()->do_ac();}
   void	  ac_load()	{assert(subckt()); subckt()->ac_load();}
-};
+
+public:
+  virtual void finish(){}
+}; // BASE_SUBCKT
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

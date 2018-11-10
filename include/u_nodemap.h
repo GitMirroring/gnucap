@@ -30,7 +30,7 @@ class NODE;
 /*--------------------------------------------------------------------------*/
 class NODE_MAP {
 private:
-  std::map<const std::string, NODE*> _node_map;
+  std::map<std::string, NODE*> _node_map;
   explicit  NODE_MAP(const NODE_MAP&);
 
 public:
@@ -39,12 +39,15 @@ public:
   NODE*     operator[](std::string);
   NODE*     new_node(std::string);
 
-  typedef std::map<const std::string, NODE*>::iterator iterator;
-  typedef std::map<const std::string, NODE*>::const_iterator const_iterator;
+  typedef std::map<std::string, NODE*>::iterator iterator;
+  typedef std::map<std::string, NODE*>::const_iterator const_iterator;
 
   const_iterator begin()const		{return _node_map.begin();}
   const_iterator end()const		{return _node_map.end();}
   int		 how_many()const	{return static_cast<int>(_node_map.size()-1);}
+
+public:
+  void permute(unsigned* p);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

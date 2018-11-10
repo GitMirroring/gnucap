@@ -27,6 +27,7 @@
 #include "e_node.h"
 #include "u_nodemap.h"
 #include "e_model.h"
+#include "e_subckt.h" // finish
 /*--------------------------------------------------------------------------*/
 #define trace_func_comp() trace0((__func__ + (":" + (**ci).long_label())).c_str())
 /*--------------------------------------------------------------------------*/
@@ -37,6 +38,7 @@ CARD_LIST::CARD_LIST()
 {
 }
 /*--------------------------------------------------------------------------*/
+// pull in a subcircuit, pre-expand?
 CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
 		     const CARD_LIST* scope, PARAM_LIST* p)
   :_parent(NULL),
@@ -95,6 +97,22 @@ CARD_LIST::const_iterator CARD_LIST::find_again(const std::string& short_name,
 						CARD_LIST::const_iterator Begin)const
 {
   return notstd::find_ptr(Begin, end(), short_name);
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST& CARD_LIST::push_front(CARD* c)
+{
+  _cl.push_front(c); return *this;
+}
+/*--------------------------------------------------------------------------*/
+// happens after a subckt prototype is parsed.
+// c is the prototype.
+// need to rewire the nodes somewhere between parse and taking instances.
+CARD_LIST& CARD_LIST::push_back(CARD* c)
+{
+  if(BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(c)){
+    s->finish();
+  }
+  _cl.push_back(c);  return *this;
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST& CARD_LIST::erase(iterator ci)

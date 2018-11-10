@@ -62,6 +62,7 @@ private: // override virtual
   void		precalc_first();
   bool		makes_own_scope()const  {return false;}
 
+  void          finish();
   void		expand();
 private:
   void		precalc_last();
@@ -216,7 +217,7 @@ void DEV_SUBCKT::expand()
 
   renew_subckt(_parent, &(c->_params));
   subckt()->expand();
-}
+} // DEV_SUBCKT::expand
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT::precalc_first()
 {
@@ -274,6 +275,129 @@ double DEV_SUBCKT::tr_probe_num(const std::string& x)const
     return COMPONENT::tr_probe_num(x);
   }
   /*NOTREACHED*/
+}
+/*--------------------------------------------------------------------------*/
+}
+// #define DO_TRACE
+#include "io_trace.h"
+#include "u_nodemap.h"
+
+#include <boost/graph/cuthill_mckee_ordering.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graph_utility.hpp>
+namespace{
+
+// reorder nodes
+// by degree: need degrees of each node.
+//  === MEANT TO BE OPTIONAL/PLUGIN SPACE ===
+void DEV_SUBCKT::finish()
+{ untested();
+  if(subckt()!=scope()){
+    // not building netlist.
+    return;
+  }
+//  there should be nodes in _n. these are the ports.
+//  more nodes are in scope()->nodes()
+//  these need to be sorted somehow.
+  size_t how_many=size_t(subckt()->nodes()->how_many());
+  trace2("finish", net_nodes(), subckt()->nodes()->how_many());
+
+  for(auto n: *subckt()->nodes()){
+    trace3("finish", n.first, n.second->long_label(), n.second->user_number());
+  }
+  unsigned n=0;
+  for(; n<unsigned(net_nodes()); ++n){
+    trace2("user number", n, _n[n].t_());
+  }
+  for(; n<how_many; ++n){
+    trace1("user number", n);
+  }
+
+  int internal_nodes=subckt()->nodes()->how_many()-net_nodes();
+
+  boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
+    boost::property<boost::vertex_degree_t,int> > g(
+      size_t(internal_nodes+1)); // 1 dummy node for external ports.
+
+  for(auto i : *scope()){
+    trace2("user number", i->long_label(), i->net_nodes());
+    // create a clique for each set of ports
+    // this is an overapproximation, exact looks pretty expensive and perhaps
+    // make no difference (in most cases)
+    for(int j=0; j<i->net_nodes(); ++j){
+      trace1("connectto", i->n_(j).e_());
+      for(int k=0; k<j; ++k){
+      	int n1 = i->n_(j).e_();
+      	int n2 = i->n_(k).e_();
+	if(!n1){
+	  // gnd. ignore.
+	}else if(!n2){
+	  // gnd. ignore.
+	}else{
+	  n1 = std::max(0, n1-net_nodes());
+	  n2 = std::max(0, n2-net_nodes());
+
+	  if(n1!=n2){
+	    boost::add_edge(unsigned(n1), unsigned(n2), g);
+	  }else{
+	  }
+	}
+      }
+    }
+  }
+
+  n = boost::num_vertices(g);
+  auto id=boost::get(boost::vertex_index, g);
+
+  std::vector<unsigned> inv_perm(n, -1u);
+  std::vector<unsigned> color(n, 0);
+
+  auto colormap=boost::make_iterator_property_map(&color[0], id, color[0]);
+  auto degreemap=boost::get(boost::vertex_degree, g);
+
+    auto start=*(boost::vertices(g).first); // fix port supernode
+    cuthill_mckee_ordering(g, start, inv_perm.begin(), colormap, degreemap);
+
+#ifdef DO_TRACE
+  boost::print_graph(g);
+#endif
+
+  for (int c = 0; c<n; ++c){
+    trace3("cmk", c, id[inv_perm[c]], colormap[c]);
+  }
+
+  std::vector<unsigned> o(how_many + 1, -1u); // include gnd.
+
+  for (int c = 0; c <=net_nodes(); ++c){
+    o[c]=c; // gnd and external ports cannot be moved.
+    trace1("fix", c);
+  }
+
+  assert(id[inv_perm[0]]==0); // external supernode fixed.
+
+  unsigned uncolored=0;
+  for (int c = 1; c != inv_perm.size(); ++c){
+
+    if(id[inv_perm[c]]!=-1u){
+      assert(id[inv_perm[c]]+net_nodes() < o.size());
+	  
+      trace2("map", id[inv_perm[c]]+net_nodes(), c + net_nodes());
+      o[id[inv_perm[c]]+net_nodes()] = c + net_nodes();
+    }else{
+      while(colormap[++uncolored]);
+      trace2("not mapped", c, uncolored);
+      o[uncolored+net_nodes()] = c + net_nodes();
+    }
+  }
+
+  trace1("o", o.size());
+  for( auto idx : o ){
+    trace1("o", idx);
+  }
+
+
+  // create a permutation p of [0 ... how_many], but fix <net_nodes
+  subckt()->nodes()->permute(o.data()); // change user numbers.
 }
 } // namespace
 /*--------------------------------------------------------------------------*/

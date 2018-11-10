@@ -1,0 +1,11 @@
+.subckt test ( a b )
+R1 ( a c )  1.
+R2 ( b c )  1.
+.ends test
+.subckt zzz ( a b d )
+R1 ( a b )  1.
+r5 ( c d )  1.
+X1 ( a d )  test 
+.ends zzz
+#          
+ 27.       

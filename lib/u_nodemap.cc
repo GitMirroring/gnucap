@@ -101,5 +101,26 @@ NODE* NODE_MAP::new_node(std::string s)
   return node;
 }
 /*--------------------------------------------------------------------------*/
+void NODE_MAP::permute(unsigned* p)
+{
+#ifndef NDEBUG
+  size_t size=how_many();
+
+  std::vector<bool> check(size+1);
+  for(unsigned i=0; i<=size; ++i){
+    check[p[i]] = true;
+  }
+
+  for(unsigned i=0; i<=size; ++i){
+    assert(check[i]);
+  }
+#endif
+
+  for(iterator a=_node_map.begin(); a!=_node_map.end(); ++a){
+    int n=a->second->user_number();
+    a->second->set_user_number(int(p[n]));
+  }
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

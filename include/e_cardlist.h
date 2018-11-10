@@ -92,8 +92,8 @@ public:
 					{return find_again(short_name, begin());}
 
   // add to it
-  CARD_LIST& push_front(CARD* c)	{_cl.push_front(c); return *this;}
-  CARD_LIST& push_back(CARD* c)		{_cl.push_back(c);  return *this;}
+  CARD_LIST& push_front(CARD* c);
+  CARD_LIST& push_back(CARD* c);
   CARD_LIST& insert(CARD_LIST::iterator i, CARD* c)
 					{_cl.insert(i, c);  return *this;}
 
