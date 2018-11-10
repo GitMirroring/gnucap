@@ -3,7 +3,7 @@ ap_ctof.2.ckt
 ap_ctof.ckt
 basic.bmd.ckt
 --- ==out//basic.bmd.ckt.out	2018-11-09 11:12:16.007952308 +0000
-+++ rcmk/basic.bmd.ckt.out	2018-11-09 11:20:26.567932191 +0000
++++ rcmk/basic.bmd.ckt.out	2018-11-10 05:16:37.655917506 +0000
 @@ -1,8 +1,4 @@
  # test "basic" formatting 
 -.options order=bmd 
@@ -16,7 +16,7 @@ basic.bmd.ckt
 basic.ckt
 basic.rcmk.ckt
 --- ==out//basic.rcmk.ckt.out	2018-11-09 11:12:16.007952308 +0000
-+++ rcmk/basic.rcmk.ckt.out	2018-11-09 11:20:26.583932190 +0000
++++ rcmk/basic.rcmk.ckt.out	2018-11-10 05:16:37.671917505 +0000
 @@ -1,8 +1,4 @@
  # test "basic" formatting 
 -.options order=rcmk 
@@ -45,7 +45,7 @@ bm_fit.0.1.ckt
 bm_fit.1.1.ckt
 bm_fit.2.1.ckt
 --- ==out//bm_fit.2.1.ckt.out	2018-11-09 11:12:16.007952308 +0000
-+++ rcmk/bm_fit.2.1.ckt.out	2018-11-09 11:20:26.739932184 +0000
++++ rcmk/bm_fit.2.1.ckt.out	2018-11-10 05:16:37.823917499 +0000
 @@ -24,7 +24,7 @@
  -7.         1.u       -7.        -76.378    -76.378    -49.       -7.        -7.        
  -6.75       1.u       -6.75      -71.02     -71.02     -45.563    -6.75      -6.75      
@@ -57,7 +57,7 @@ bm_fit.2.1.ckt
  -5.5        1.u       -5.5       -47.152    -47.152    -30.25     -5.5       -5.5       
 bm_fit.2.2.ckt
 --- ==out//bm_fit.2.2.ckt.out	2018-11-09 11:12:16.007952308 +0000
-+++ rcmk/bm_fit.2.2.ckt.out	2018-11-09 11:20:26.747932183 +0000
++++ rcmk/bm_fit.2.2.ckt.out	2018-11-10 05:16:37.831917499 +0000
 @@ -24,7 +24,7 @@
  -7.         1.u       -7.        -76.922    -76.922    -49.        0.         0.        
  -6.75       1.u       -6.75      -71.526    -71.526    -45.563     0.         0.        
@@ -69,7 +69,7 @@ bm_fit.2.2.ckt
  -5.5        1.u       -5.5       -47.488    -47.488    -30.25      0.         0.        
 bm_fit.2.3.ckt
 --- ==out//bm_fit.2.3.ckt.out	2018-11-09 11:12:16.007952308 +0000
-+++ rcmk/bm_fit.2.3.ckt.out	2018-11-09 11:20:26.759932183 +0000
++++ rcmk/bm_fit.2.3.ckt.out	2018-11-10 05:16:37.843917498 +0000
 @@ -24,7 +24,7 @@
  -7.         1.u       -7.        -76.922    -76.922    -49.        0.         0.        
  -6.75       1.u       -6.75      -71.526    -71.526    -45.563     0.         0.        
@@ -90,7 +90,7 @@ bm_fit.2.3.ckt
   7.         1.u        7.         7.4        7.4        49.        45.        45.       
 bm_fit.2.4.ckt
 --- ==out//bm_fit.2.4.ckt.out	2018-11-09 11:12:16.007952308 +0000
-+++ rcmk/bm_fit.2.4.ckt.out	2018-11-09 11:20:26.767932182 +0000
++++ rcmk/bm_fit.2.4.ckt.out	2018-11-10 05:16:37.851917498 +0000
 @@ -24,7 +24,7 @@
  -7.         1.u       -7.        -4.9K      -4.9K      -49.       -700.      -700.      
  -6.75       1.u       -6.75      -4.5563K   -4.5563K   -45.563    -675.      -675.      
@@ -138,7 +138,7 @@ bm_sin.9.ckt
 bm_table.1.1.ckt
 bm_table.2.1.ckt
 --- ==out//bm_table.2.1.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/bm_table.2.1.ckt.out	2018-11-09 11:20:27.195932165 +0000
++++ rcmk/bm_table.2.1.ckt.out	2018-11-10 05:16:38.283917480 +0000
 @@ -26,7 +26,7 @@
  -7.         1.u       -7.        -76.378    -76.378    -49.       -7.        -7.        
  -6.75       1.u       -6.75      -71.02     -71.02     -45.563    -6.75      -6.75      
@@ -150,7 +150,7 @@ bm_table.2.1.ckt
  -5.5        1.u       -5.5       -47.152    -47.152    -30.25     -5.5       -5.5       
 bm_table.2.2.ckt
 --- ==out//bm_table.2.2.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/bm_table.2.2.ckt.out	2018-11-09 11:20:27.203932165 +0000
++++ rcmk/bm_table.2.2.ckt.out	2018-11-10 05:16:38.291917480 +0000
 @@ -26,7 +26,7 @@
  -7.         1.u       -7.        -76.922    -76.922    -49.        0.         0.        
  -6.75       1.u       -6.75      -71.526    -71.526    -45.563     0.         0.        
@@ -162,7 +162,7 @@ bm_table.2.2.ckt
  -5.5        1.u       -5.5       -47.488    -47.488    -30.25      0.         0.        
 bm_table.2.3.ckt
 --- ==out//bm_table.2.3.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/bm_table.2.3.ckt.out	2018-11-09 11:20:27.211932164 +0000
++++ rcmk/bm_table.2.3.ckt.out	2018-11-10 05:16:38.303917479 +0000
 @@ -26,7 +26,7 @@
  -7.         1.u       -7.        -76.922    -76.922    -49.        0.         0.        
  -6.75       1.u       -6.75      -71.526    -71.526    -45.563     0.         0.        
@@ -183,7 +183,7 @@ bm_table.2.3.ckt
   7.         1.u        7.         7.4        7.4        49.        45.        45.       
 bm_table.2.4.ckt
 --- ==out//bm_table.2.4.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/bm_table.2.4.ckt.out	2018-11-09 11:20:27.219932164 +0000
++++ rcmk/bm_table.2.4.ckt.out	2018-11-10 05:16:38.311917479 +0000
 @@ -26,7 +26,7 @@
  -7.         1.u       -7.        -4.9K      -4.9K      -49.       -700.      -700.      
  -6.75       1.u       -6.75      -4.5563K   -4.5563K   -45.563    -675.      -675.      
@@ -216,7 +216,7 @@ bmm_res.5.ckt
 bmm_res.5p.ckt
 c.ckt
 --- ==out//c.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/c.ckt.out	2018-11-09 11:20:27.411932156 +0000
++++ rcmk/c.ckt.out	2018-11-10 05:16:38.503917471 +0000
 @@ -28,4 +28,4 @@
  iterations: op=23, dc=0, tran=0, fourier=0, total=23
  transient timesteps: accepted=0, rejected=0, total=0
@@ -237,8 +237,8 @@ c_help.1.ckt
 c_lib.1.ckt
 c_list.ckt
 c_measure.1.ckt
---- ==out//c_measure.1.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/c_measure.1.ckt.out	2018-11-09 11:20:27.555932150 +0000
+--- ==out//c_measure.1.ckt.out	2018-11-10 04:52:34.811976674 +0000
++++ rcmk/c_measure.1.ckt.out	2018-11-10 05:16:38.643917465 +0000
 @@ -8,28 +8,27 @@
   37.p       1.26       7.         35.p       55.p       62.615p    0.         82.915n    100.p      2.p       
   39.p       1.22       7.         0.         55.p       53.981p    0.         38.571n    100.p      2.p       
@@ -327,7 +327,7 @@ c_measure.1.ckt
  dctran density=100.0%, ac density=100.0%
 c_measure.1s.ckt
 --- ==out//c_measure.1s.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/c_measure.1s.ckt.out	2018-11-09 11:20:27.567932150 +0000
++++ rcmk/c_measure.1s.ckt.out	2018-11-10 05:16:38.651917465 +0000
 @@ -1,12 +1,12 @@
  ''''' 
  #Time       v(1)       control(0) eventtime(s1) eventtime(s2) nexttime(C1) eventtime(C1) nexttime(Vv1) eventtime(Vv1) dt(C1)    
@@ -376,7 +376,7 @@ c_measure.2s.ckt
 c_modify.ckt
 cc.ckt
 --- ==out//cc.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/cc.ckt.out	2018-11-09 11:20:27.599932148 +0000
++++ rcmk/cc.ckt.out	2018-11-10 05:16:38.687917463 +0000
 @@ -28,4 +28,4 @@
  iterations: op=23, dc=0, tran=0, fourier=0, total=23
  transient timesteps: accepted=0, rejected=0, total=0
@@ -386,7 +386,7 @@ cc.ckt
 charge-cons.ckt
 charge-cons2.ckt
 --- ==out//charge-cons2.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/charge-cons2.ckt.out	2018-11-09 11:20:27.647932146 +0000
++++ rcmk/charge-cons2.ckt.out	2018-11-10 05:16:38.735917462 +0000
 @@ -510,4 +510,4 @@
  iterations: op=4, dc=0, tran=2468, fourier=0, total=2976
  transient timesteps: accepted=504, rejected=0, total=504
@@ -395,7 +395,7 @@ charge-cons2.ckt
 +dctran density=77.8%, ac density=77.8%
 charge-cons3.ckt
 --- ==out//charge-cons3.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/charge-cons3.ckt.out	2018-11-09 11:20:27.671932145 +0000
++++ rcmk/charge-cons3.ckt.out	2018-11-10 05:16:38.759917461 +0000
 @@ -510,4 +510,4 @@
  iterations: op=4, dc=0, tran=2554, fourier=0, total=3062
  transient timesteps: accepted=504, rejected=0, total=504
@@ -409,7 +409,7 @@ d_bjt-diffpair-dc.ckt
 d_bjt-diffpair-nocap.ckt
 d_bjt-diffpair-tf.ckt
 --- ==out//d_bjt-diffpair-tf.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/d_bjt-diffpair-tf.ckt.out	2018-11-09 11:20:27.739932143 +0000
++++ rcmk/d_bjt-diffpair-tf.ckt.out	2018-11-10 05:16:38.827917458 +0000
 @@ -237,4 +237,4 @@
  iterations: op=9, dc=227, tran=164, fourier=0, total=1080
  transient timesteps: accepted=136, rejected=0, total=136
@@ -417,8 +417,8 @@ d_bjt-diffpair-tf.ckt
 -dctran density=58.2%, ac density=58.2%
 +dctran density=39.8%, ac density=39.8%
 d_bjt-diffpair-tr.ckt
---- ==out//d_bjt-diffpair-tr.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/d_bjt-diffpair-tr.ckt.out	2018-11-09 11:20:27.767932141 +0000
+--- ==out//d_bjt-diffpair-tr.ckt.out	2018-11-10 04:52:34.811976674 +0000
++++ rcmk/d_bjt-diffpair-tr.ckt.out	2018-11-10 05:16:38.855917457 +0000
 @@ -1,6 +1,7 @@
  difpair ckt - simple differential pair 
  .option method=gear order=1 
@@ -440,7 +440,7 @@ d_bjt-rca3040.ckt
 d_bjt-rtlinv.ckt
 d_bjt-schmitt-bypass.ckt
 --- ==out//d_bjt-schmitt-bypass.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/d_bjt-schmitt-bypass.ckt.out	2018-11-09 11:20:27.823932139 +0000
++++ rcmk/d_bjt-schmitt-bypass.ckt.out	2018-11-10 05:16:38.903917455 +0000
 @@ -167,4 +167,4 @@
  iterations: op=8, dc=0, tran=429, fourier=0, total=1526
  transient timesteps: accepted=231, rejected=9, total=240
@@ -449,7 +449,7 @@ d_bjt-schmitt-bypass.ckt
 +dctran density=33.6%, ac density=33.6%
 d_bjt-schmitt-nobypass.ckt
 --- ==out//d_bjt-schmitt-nobypass.ckt.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/d_bjt-schmitt-nobypass.ckt.out	2018-11-09 11:20:27.839932139 +0000
++++ rcmk/d_bjt-schmitt-nobypass.ckt.out	2018-11-10 05:16:38.919917454 +0000
 @@ -167,4 +167,4 @@
  iterations: op=8, dc=0, tran=424, fourier=0, total=1505
  transient timesteps: accepted=225, rejected=9, total=234
@@ -480,7 +480,7 @@ d_ccvs.2.ckt
 d_ccvs.3.ckt
 d_coil.1.ckt
 --- ==out//d_coil.1.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.1.ckt.out	2018-11-09 11:20:27.967932133 +0000
++++ rcmk/d_coil.1.ckt.out	2018-11-10 05:16:39.047917449 +0000
 @@ -63,4 +63,4 @@
  iterations: op=0, dc=0, tran=366, fourier=0, total=499
  transient timesteps: accepted=121, rejected=3, total=124
@@ -489,7 +489,7 @@ d_coil.1.ckt
 +dctran density=18.2%, ac density=18.2%
 d_coil.1a.ckt
 --- ==out//d_coil.1a.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.1a.ckt.out	2018-11-09 11:20:27.971932133 +0000
++++ rcmk/d_coil.1a.ckt.out	2018-11-10 05:16:39.051917449 +0000
 @@ -63,4 +63,4 @@
  iterations: op=0, dc=0, tran=366, fourier=0, total=499
  transient timesteps: accepted=121, rejected=3, total=124
@@ -498,7 +498,7 @@ d_coil.1a.ckt
 +dctran density=18.2%, ac density=18.2%
 d_coil.1b.ckt
 --- ==out//d_coil.1b.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.1b.ckt.out	2018-11-09 11:20:27.979932133 +0000
++++ rcmk/d_coil.1b.ckt.out	2018-11-10 05:16:39.059917448 +0000
 @@ -66,4 +66,4 @@
  iterations: op=0, dc=0, tran=366, fourier=0, total=499
  transient timesteps: accepted=121, rejected=3, total=124
@@ -507,7 +507,7 @@ d_coil.1b.ckt
 +dctran density=18.2%, ac density=18.2%
 d_coil.1c.ckt
 --- ==out//d_coil.1c.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.1c.ckt.out	2018-11-09 11:20:27.987932132 +0000
++++ rcmk/d_coil.1c.ckt.out	2018-11-10 05:16:39.063917448 +0000
 @@ -101,4 +101,4 @@
  iterations: op=0, dc=0, tran=378, fourier=0, total=515
  transient timesteps: accepted=125, rejected=3, total=128
@@ -516,7 +516,7 @@ d_coil.1c.ckt
 +dctran density=19.4%, ac density=19.4%
 d_coil.1d.ckt
 --- ==out//d_coil.1d.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.1d.ckt.out	2018-11-09 11:20:27.991932132 +0000
++++ rcmk/d_coil.1d.ckt.out	2018-11-10 05:16:39.071917448 +0000
 @@ -151,4 +151,4 @@
  iterations: op=0, dc=0, tran=378, fourier=0, total=515
  transient timesteps: accepted=125, rejected=3, total=128
@@ -525,7 +525,7 @@ d_coil.1d.ckt
 +dctran density=17.3%, ac density=17.3%
 d_coil.1e.ckt
 --- ==out//d_coil.1e.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.1e.ckt.out	2018-11-09 11:20:27.999932132 +0000
++++ rcmk/d_coil.1e.ckt.out	2018-11-10 05:16:39.075917448 +0000
 @@ -57,4 +57,4 @@
  iterations: op=0, dc=0, tran=71, fourier=0, total=122
  transient timesteps: accepted=23, rejected=2, total=25
@@ -534,7 +534,7 @@ d_coil.1e.ckt
 +dctran density=17.2%, ac density=17.2%
 d_coil.2.ckt
 --- ==out//d_coil.2.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.2.ckt.out	2018-11-09 11:20:28.003932132 +0000
++++ rcmk/d_coil.2.ckt.out	2018-11-10 05:16:39.083917447 +0000
 @@ -35,4 +35,4 @@
  iterations: op=0, dc=0, tran=393, fourier=0, total=544
  transient timesteps: accepted=130, rejected=3, total=133
@@ -543,7 +543,7 @@ d_coil.2.ckt
 +dctran density=14.8%, ac density=14.8%
 d_coil.3.ckt
 --- ==out//d_coil.3.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.3.ckt.out	2018-11-09 11:20:28.011932131 +0000
++++ rcmk/d_coil.3.ckt.out	2018-11-10 05:16:39.091917447 +0000
 @@ -35,4 +35,4 @@
  iterations: op=0, dc=0, tran=467, fourier=0, total=610
  transient timesteps: accepted=122, rejected=3, total=125
@@ -559,7 +559,7 @@ d_coil.error4.ckt
 d_coil.error5.ckt
 d_coil.m3.ckt
 --- ==out//d_coil.m3.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.m3.ckt.out	2018-11-09 11:20:28.043932130 +0000
++++ rcmk/d_coil.m3.ckt.out	2018-11-10 05:16:39.123917446 +0000
 @@ -35,4 +35,4 @@
  iterations: op=0, dc=0, tran=372, fourier=0, total=516
  transient timesteps: accepted=123, rejected=3, total=126
@@ -569,7 +569,7 @@ d_coil.m3.ckt
 d_coil.m3a.ckt
 d_coil.m3r.ckt
 --- ==out//d_coil.m3r.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_coil.m3r.ckt.out	2018-11-09 11:20:28.055932130 +0000
++++ rcmk/d_coil.m3r.ckt.out	2018-11-10 05:16:39.135917445 +0000
 @@ -35,4 +35,4 @@
  iterations: op=0, dc=0, tran=372, fourier=0, total=516
  transient timesteps: accepted=123, rejected=3, total=126
@@ -578,7 +578,7 @@ d_coil.m3r.ckt
 +dctran density=14.1%, ac density=14.1%
 d_diode.1.ckt
 --- ==out//d_diode.1.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_diode.1.ckt.out	2018-11-09 11:20:28.059932129 +0000
++++ rcmk/d_diode.1.ckt.out	2018-11-10 05:16:39.139917445 +0000
 @@ -4,7 +4,7 @@
  D1 ( 2 0 )  ddd 1
  .model ddd d ( tnom=NA( 27.) is=10.f rs=0. n=1. tt=0. cjo=1.p pb=1. mj=0.5 egap=1.11 xti=3. kf=0. af=1. fc=0.5 bv=50 ibv=0.001)
@@ -624,7 +624,7 @@ d_diode.9.ckt
 d_diode.error1.ckt
 d_logic.1.ckt
 --- ==out//d_logic.1.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_logic.1.ckt.out	2018-11-09 11:20:28.139932126 +0000
++++ rcmk/d_logic.1.ckt.out	2018-11-10 05:16:39.219917442 +0000
 @@ -5,4 +5,4 @@
  iterations: op=13, dc=0, tran=0, fourier=0, total=13
  transient timesteps: accepted=0, rejected=0, total=0
@@ -633,7 +633,7 @@ d_logic.1.ckt
 +dctran density=62.5%, ac density=62.5%
 d_logic.2.ckt
 --- ==out//d_logic.2.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_logic.2.ckt.out	2018-11-09 11:20:28.147932126 +0000
++++ rcmk/d_logic.2.ckt.out	2018-11-10 05:16:39.223917442 +0000
 @@ -5,4 +5,4 @@
  iterations: op=13, dc=0, tran=0, fourier=0, total=13
  transient timesteps: accepted=0, rejected=0, total=0
@@ -642,7 +642,7 @@ d_logic.2.ckt
 +dctran density=62.5%, ac density=62.5%
 d_logic.3.ckt
 --- ==out//d_logic.3.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_logic.3.ckt.out	2018-11-09 11:20:28.151932126 +0000
++++ rcmk/d_logic.3.ckt.out	2018-11-10 05:16:39.227917441 +0000
 @@ -5,4 +5,4 @@
  iterations: op=3, dc=0, tran=0, fourier=0, total=3
  transient timesteps: accepted=0, rejected=0, total=0
@@ -717,7 +717,7 @@ d_mos2.lin1.ckt
 d_mos2.lin1.late.ckt
 d_mos2.lin1r.ckt
 --- ==out//d_mos2.lin1r.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_mos2.lin1r.ckt.out	2018-11-09 11:20:28.803932099 +0000
++++ rcmk/d_mos2.lin1r.ckt.out	2018-11-10 05:16:39.671917423 +0000
 @@ -33,7 +33,7 @@
  -2.        -2.        -0.01      -0.01       0.        
  -1.        -1.        -0.01      -0.01       0.        
@@ -755,7 +755,7 @@ d_mos2.zero.ckt
 d_mos3.inv1.ckt
 d_mos3.lin1.ckt
 --- ==out//d_mos3.lin1.ckt.out	2018-11-09 11:12:16.015952307 +0000
-+++ rcmk/d_mos3.lin1.ckt.out	2018-11-09 11:20:29.075932088 +0000
++++ rcmk/d_mos3.lin1.ckt.out	2018-11-10 05:16:39.819917417 +0000
 @@ -33,7 +33,7 @@
  -2.        -2.         0.01       0.01       0.        
  -1.        -1.         0.01       0.01       0.        
@@ -770,7 +770,7 @@ d_mos3.lin1z.ckt
 d_mos3.lin2.ckt
 d_mos3.lin3.ckt
 --- ==out//d_mos3.lin3.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos3.lin3.ckt.out	2018-11-09 11:20:29.115932086 +0000
++++ rcmk/d_mos3.lin3.ckt.out	2018-11-10 05:16:39.843917416 +0000
 @@ -33,7 +33,7 @@
  -2.        -2.         0.01       0.01       0.        
  -1.        -1.         0.01       0.01       0.        
@@ -782,7 +782,7 @@ d_mos3.lin3.ckt
   4.         4.         0.0099988  0.01      -1.18u     
 d_mos3.lin4.ckt
 --- ==out//d_mos3.lin4.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos3.lin4.ckt.out	2018-11-09 11:20:29.127932086 +0000
++++ rcmk/d_mos3.lin4.ckt.out	2018-11-10 05:16:39.847917416 +0000
 @@ -33,7 +33,7 @@
  -2.        -2.         0.01       0.01       0.        
  -1.        -1.         0.01       0.01       0.        
@@ -804,7 +804,7 @@ d_mos3.plin.ckt
 d_mos3.psat1.ckt
 d_mos3.psat2.ckt
 --- ==out//d_mos3.psat2.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos3.psat2.ckt.out	2018-11-09 11:20:29.231932081 +0000
++++ rcmk/d_mos3.psat2.ckt.out	2018-11-10 05:16:39.899917414 +0000
 @@ -10,7 +10,7 @@
  -5.        -4.1842    -5.         0.         5.        
   27.       -4.1842    -5.         0.         6.        
@@ -820,7 +820,7 @@ d_mos3.sat007.ckt
 d_mos3.sat1.ckt
 d_mos3.sat2.ckt
 --- ==out//d_mos3.sat2.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos3.sat2.ckt.out	2018-11-09 11:20:29.279932079 +0000
++++ rcmk/d_mos3.sat2.ckt.out	2018-11-10 05:16:39.923917413 +0000
 @@ -3,7 +3,7 @@
  #           v(2)       v(3)       v(4)       iter(0)   
   27.        2.1164     5.         663.f      7.        
@@ -834,7 +834,7 @@ d_mos3.sat3.ckt
 d_mos3.sat4.ckt
 d_mos3.sat5.ckt
 --- ==out//d_mos3.sat5.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos3.sat5.ckt.out	2018-11-09 11:20:29.311932078 +0000
++++ rcmk/d_mos3.sat5.ckt.out	2018-11-10 05:16:39.943917412 +0000
 @@ -3,7 +3,7 @@
  #           v(2)       v(3)       iter(0)   
   27.        2.1164     5.         7.        
@@ -846,7 +846,7 @@ d_mos3.sat5.ckt
  #           gm(M1)     gds(M1)    gmb(M1)    cbd(M1)    cbs(M1)   
 d_mos3.sat6.ckt
 --- ==out//d_mos3.sat6.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos3.sat6.ckt.out	2018-11-09 11:20:29.323932078 +0000
++++ rcmk/d_mos3.sat6.ckt.out	2018-11-10 05:16:39.947917412 +0000
 @@ -3,7 +3,7 @@
  #           v(2)       v(3)       v(4)       iter(0)   
   27.        2.1164     5.         663.f      7.        
@@ -862,7 +862,7 @@ d_mos3.sts000.ckt
 d_mos3.zero.ckt
 d_mos4.1.ckt
 --- ==out//d_mos4.1.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos4.1.ckt.out	2018-11-09 11:20:29.371932076 +0000
++++ rcmk/d_mos4.1.ckt.out	2018-11-10 05:16:39.975917411 +0000
 @@ -3,19 +3,19 @@
   0.         0.         0.         0.         0.         0.        
   0.2        0.         0.         0.         0.         0.        
@@ -890,7 +890,7 @@ d_mos4.1.ckt
   3.6        38.64u     33.199u    29.479u    26.633u    24.351u   
 d_mos4.2.ckt
 --- ==out//d_mos4.2.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos4.2.ckt.out	2018-11-09 11:20:29.383932075 +0000
++++ rcmk/d_mos4.2.ckt.out	2018-11-10 05:16:39.983917410 +0000
 @@ -3,19 +3,19 @@
   0.         0.         0.         0.         0.         0.        
   0.2        0.         0.         0.         0.         0.        
@@ -918,7 +918,7 @@ d_mos4.2.ckt
   3.6        38.64u     33.199u    29.479u    26.633u    24.351u   
 d_mos4.3.ckt
 --- ==out//d_mos4.3.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos4.3.ckt.out	2018-11-09 11:20:29.395932075 +0000
++++ rcmk/d_mos4.3.ckt.out	2018-11-10 05:16:39.987917410 +0000
 @@ -3,13 +3,13 @@
   0.         0.         0.         0.         0.         0.        
   0.2        0.         0.         0.         0.         0.        
@@ -941,7 +941,7 @@ d_mos4.3.ckt
 d_mos49.nand1.ckt
 d_mos5.1.ckt
 --- ==out//d_mos5.1.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos5.1.ckt.out	2018-11-09 11:20:29.423932074 +0000
++++ rcmk/d_mos5.1.ckt.out	2018-11-10 05:16:40.007917409 +0000
 @@ -2,11 +2,11 @@
  #           I(V1)      I(V2)      I(V3)      I(V4)      I(V5)     
   0.         0.         0.         0.         0.         0.        
@@ -963,7 +963,7 @@ d_mos6.lin1r.ckt
 d_mos6.lin1z.ckt
 d_mos6.lin2.ckt
 --- ==out//d_mos6.lin2.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos6.lin2.ckt.out	2018-11-09 11:20:29.471932072 +0000
++++ rcmk/d_mos6.lin2.ckt.out	2018-11-10 05:16:40.031917408 +0000
 @@ -22,17 +22,17 @@
  #           vd(M1)     vg(M1)     vb(M1)     vs(M1)    
   27.        0.0099998  3.2367     0.         0.        
@@ -1022,7 +1022,7 @@ d_mos7.inv1.ckt
 d_mos7.lin1.ckt
 d_mos7.lin2.ckt
 --- ==out//d_mos7.lin2.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_mos7.lin2.ckt.out	2018-11-09 11:20:29.747932060 +0000
++++ rcmk/d_mos7.lin2.ckt.out	2018-11-10 05:16:40.167917403 +0000
 @@ -32,7 +32,7 @@
  -1.        -1.         0.01       0.01       0.        
   0.         0.         0.01       0.01       0.        
@@ -1061,7 +1061,7 @@ d_subckt.error3.ckt
 d_switch.c0.ckt
 d_switch.c1.ckt
 --- ==out//d_switch.c1.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_switch.c1.ckt.out	2018-11-09 11:20:30.015932049 +0000
++++ rcmk/d_switch.c1.ckt.out	2018-11-10 05:16:40.419917392 +0000
 @@ -79,7 +79,7 @@
  Vprobe ( 8 0 )  DC  0.
  .model sss csw ( it=0. ih=.002 ion=NA( 0.002) ioff=NA(-0.002) ron=1.K roff=1.E+12 tnom=NA( 27.))
@@ -1074,7 +1074,7 @@ d_switch.c1.ckt
  dctran density=25.0%, ac density=25.0%
 d_switch.c1.inc.ckt
 --- ==out//d_switch.c1.inc.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_switch.c1.inc.ckt.out	2018-11-09 11:20:30.027932049 +0000
++++ rcmk/d_switch.c1.inc.ckt.out	2018-11-10 05:16:40.431917392 +0000
 @@ -42,9 +42,10 @@
   0.02       1.         1.         1.         1.E+12     1.E+12     1.E+12    -20.u       20.u       20.u       2.         2.         2.         10.u       10.u      -10.u       6.        
   1.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.001      0.001      0.001      2.         2.         2.         20.u       20.u      -20.u       1.        
@@ -1129,7 +1129,7 @@ d_switch.c1.inc.ckt
  dctran density=25.0%, ac density=25.0%
 d_switch.c1.noinc.ckt
 --- ==out//d_switch.c1.noinc.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_switch.c1.noinc.ckt.out	2018-11-09 11:20:30.039932048 +0000
++++ rcmk/d_switch.c1.noinc.ckt.out	2018-11-10 05:16:40.443917391 +0000
 @@ -42,17 +42,18 @@
   0.02       1.         1.         1.         1.E+12     1.E+12     1.E+12    -20.u       20.u       20.u       2.         2.         2.         10.u       10.u      -10.u       6.        
   1.         1.         1.         1.         1.E+12     1.E+12     1.E+12    -0.001      0.001      0.001      2.         2.         2.         20.u       20.u      -20.u       1.        
@@ -1215,7 +1215,7 @@ d_switch.c1.noinc.ckt
  dctran density=25.0%, ac density=25.0%
 d_switch.c1a.ckt
 --- ==out//d_switch.c1a.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_switch.c1a.ckt.out	2018-11-09 11:20:30.047932048 +0000
++++ rcmk/d_switch.c1a.ckt.out	2018-11-10 05:16:40.451917391 +0000
 @@ -60,16 +60,22 @@
   0.         1.         1.         1.         2.         20.n       1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      0.        
  -1.         1.         1.         1.         2.         20.n       1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      1.        
@@ -1311,7 +1311,7 @@ d_switch.c1r.ckt
 d_switch.c2.ckt
 d_switch.c2a.ckt
 --- ==out//d_switch.c2a.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_switch.c2a.ckt.out	2018-11-09 11:20:30.079932047 +0000
++++ rcmk/d_switch.c2a.ckt.out	2018-11-10 05:16:40.483917390 +0000
 @@ -64,32 +64,25 @@
   0.         1.         1.         1.         2.         20.n       1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      0.        
  -1.         1.         1.         1.         2.         20.n       1.E+12     1.E+12     1.E+12    -0.002      0.002      0.002      1.        
@@ -1394,7 +1394,7 @@ d_tcap.4.ckt
 d_tcap.5.ckt
 d_trln.ac.ckt
 --- ==out//d_trln.ac.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_trln.ac.ckt.out	2018-11-09 11:20:30.299932038 +0000
++++ rcmk/d_trln.ac.ckt.out	2018-11-10 05:16:40.703917381 +0000
 @@ -112,4 +112,4 @@
  iterations: op=0, dc=0, tran=0, fourier=0, total=84
  transient timesteps: accepted=0, rejected=0, total=0
@@ -1403,7 +1403,7 @@ d_trln.ac.ckt
 +dctran density=45.5%, ac density=45.5%
 d_trln.tr.100.im.ckt
 --- ==out//d_trln.tr.100.im.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_trln.tr.100.im.ckt.out	2018-11-09 11:20:30.319932037 +0000
++++ rcmk/d_trln.tr.100.im.ckt.out	2018-11-10 05:16:40.727917380 +0000
 @@ -299,4 +299,4 @@
  iterations: op=0, dc=0, tran=304, fourier=0, total=1050
  transient timesteps: accepted=270, rejected=0, total=270
@@ -1412,7 +1412,7 @@ d_trln.tr.100.im.ckt
 +dctran density=45.5%, ac density=45.5%
 d_trln.tr.100.nim.ckt
 --- ==out//d_trln.tr.100.nim.ckt.out	2018-11-09 11:12:16.019952307 +0000
-+++ rcmk/d_trln.tr.100.nim.ckt.out	2018-11-09 11:20:30.343932036 +0000
++++ rcmk/d_trln.tr.100.nim.ckt.out	2018-11-10 05:16:40.747917379 +0000
 @@ -299,4 +299,4 @@
  iterations: op=0, dc=0, tran=304, fourier=0, total=1050
  transient timesteps: accepted=270, rejected=0, total=270
@@ -1421,7 +1421,7 @@ d_trln.tr.100.nim.ckt
 +dctran density=45.5%, ac density=45.5%
 d_trln.tr.300.im.ckt
 --- ==out//d_trln.tr.300.im.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/d_trln.tr.300.im.ckt.out	2018-11-09 11:20:30.363932035 +0000
++++ rcmk/d_trln.tr.300.im.ckt.out	2018-11-10 05:16:40.767917378 +0000
 @@ -299,4 +299,4 @@
  iterations: op=0, dc=0, tran=184, fourier=0, total=1050
  transient timesteps: accepted=270, rejected=0, total=270
@@ -1430,7 +1430,7 @@ d_trln.tr.300.im.ckt
 +dctran density=45.5%, ac density=45.5%
 d_trln.tr.300.nim.ckt
 --- ==out//d_trln.tr.300.nim.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/d_trln.tr.300.nim.ckt.out	2018-11-09 11:20:30.383932034 +0000
++++ rcmk/d_trln.tr.300.nim.ckt.out	2018-11-10 05:16:40.791917377 +0000
 @@ -299,4 +299,4 @@
  iterations: op=0, dc=0, tran=184, fourier=0, total=1050
  transient timesteps: accepted=270, rejected=0, total=270
@@ -1439,7 +1439,7 @@ d_trln.tr.300.nim.ckt
 +dctran density=45.5%, ac density=45.5%
 d_trln.tr.im.ckt
 --- ==out//d_trln.tr.im.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/d_trln.tr.im.ckt.out	2018-11-09 11:20:30.403932033 +0000
++++ rcmk/d_trln.tr.im.ckt.out	2018-11-10 05:16:40.811917376 +0000
 @@ -296,4 +296,4 @@
  iterations: op=0, dc=0, tran=359, fourier=0, total=1044
  transient timesteps: accepted=268, rejected=0, total=268
@@ -1448,7 +1448,7 @@ d_trln.tr.im.ckt
 +dctran density=45.5%, ac density=45.5%
 d_trln.tr.m.ckt
 --- ==out//d_trln.tr.m.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/d_trln.tr.m.ckt.out	2018-11-09 11:20:30.411932033 +0000
++++ rcmk/d_trln.tr.m.ckt.out	2018-11-10 05:16:40.823917376 +0000
 @@ -44,4 +44,4 @@
  iterations: op=0, dc=0, tran=59, fourier=0, total=81
  transient timesteps: accepted=22, rejected=0, total=22
@@ -1457,7 +1457,7 @@ d_trln.tr.m.ckt
 +dctran density=45.7%, ac density=45.7%
 d_trln.tr.nim.ckt
 --- ==out//d_trln.tr.nim.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/d_trln.tr.nim.ckt.out	2018-11-09 11:20:30.431932032 +0000
++++ rcmk/d_trln.tr.nim.ckt.out	2018-11-10 05:16:40.843917375 +0000
 @@ -296,4 +296,4 @@
  iterations: op=0, dc=0, tran=359, fourier=0, total=1044
  transient timesteps: accepted=268, rejected=0, total=268
@@ -1466,7 +1466,7 @@ d_trln.tr.nim.ckt
 +dctran density=45.5%, ac density=45.5%
 d_vccap.1.ckt
 --- ==out//d_vccap.1.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/d_vccap.1.ckt.out	2018-11-09 11:20:30.439932032 +0000
++++ rcmk/d_vccap.1.ckt.out	2018-11-10 05:16:40.851917375 +0000
 @@ -15,4 +15,4 @@
  iterations: op=0, dc=0, tran=58, fourier=0, total=77
  transient timesteps: accepted=16, rejected=3, total=19
@@ -1475,7 +1475,7 @@ d_vccap.1.ckt
 +dctran density=44.4%, ac density=44.4%
 d_vccap.2.ckt
 --- ==out//d_vccap.2.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/d_vccap.2.ckt.out	2018-11-09 11:20:30.451932031 +0000
++++ rcmk/d_vccap.2.ckt.out	2018-11-10 05:16:40.859917374 +0000
 @@ -27,4 +27,4 @@
  iterations: op=0, dc=0, tran=74, fourier=0, total=93
  transient timesteps: accepted=16, rejected=3, total=19
@@ -1500,8 +1500,8 @@ e_ccsrc.2.ckt
 e_node_probes.ckt
 e_storag.1.ckt
 eq3-1153.ckt
---- ==out//eq3-1153.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/eq3-1153.ckt.out	2018-11-09 11:20:30.635932024 +0000
+--- ==out//eq3-1153.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/eq3-1153.ckt.out	2018-11-10 05:16:41.047917367 +0000
 @@ -11,7 +11,7 @@
   9.         8.8907    
   10.        9.8785    
@@ -1518,8 +1518,8 @@ eq3-1153.ckt
 -dctran density=2.4%, ac density=2.4%
 +dctran density=0.9%, ac density=0.9%
 eq3-1153.fg.ckt
---- ==out//eq3-1153.fg.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/eq3-1153.fg.ckt.out	2018-11-09 11:20:30.655932023 +0000
+--- ==out//eq3-1153.fg.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/eq3-1153.fg.ckt.out	2018-11-10 05:16:41.067917366 +0000
 @@ -11,7 +11,7 @@
   9.         8.8907    
   10.        9.8785    
@@ -1536,8 +1536,8 @@ eq3-1153.fg.ckt
 -dctran density=2.4%, ac density=2.4%
 +dctran density=0.9%, ac density=0.9%
 eq3-1153.fg2.ckt
---- ==out//eq3-1153.fg2.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/eq3-1153.fg2.ckt.out	2018-11-09 11:20:33.603931902 +0000
+--- ==out//eq3-1153.fg2.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/eq3-1153.fg2.ckt.out	2018-11-10 05:16:44.011917245 +0000
 @@ -1,28 +1,28 @@
  A 1153 node circuit 
  #           v(2)      
@@ -1592,7 +1592,7 @@ eq3-1153.forward.ckt
 eq3-1153.reverse.ckt
 eq3-1153.tr-b.ckt
 --- ==out//eq3-1153.tr-b.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/eq3-1153.tr-b.ckt.out	2018-11-09 11:20:33.707931898 +0000
++++ rcmk/eq3-1153.tr-b.ckt.out	2018-11-10 05:16:44.103917241 +0000
 @@ -11,7 +11,7 @@
   9.         8.8907    
   10.        9.8785    
@@ -1604,7 +1604,7 @@ eq3-1153.tr-b.ckt
   250.       0.98785   -0.10617    715.34u   
 eq3-1153.tr-nb.ckt
 --- ==out//eq3-1153.tr-nb.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/eq3-1153.tr-nb.ckt.out	2018-11-09 11:20:33.743931896 +0000
++++ rcmk/eq3-1153.tr-nb.ckt.out	2018-11-10 05:16:44.143917240 +0000
 @@ -11,7 +11,7 @@
   9.         8.8907    
   10.        9.8785    
@@ -1616,7 +1616,7 @@ eq3-1153.tr-nb.ckt
   250.       0.98785   -0.10617    715.34u   
 eq3-1153.tr-ni.ckt
 --- ==out//eq3-1153.tr-ni.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/eq3-1153.tr-ni.ckt.out	2018-11-09 11:20:33.791931894 +0000
++++ rcmk/eq3-1153.tr-ni.ckt.out	2018-11-10 05:16:44.191917238 +0000
 @@ -11,7 +11,7 @@
   9.         8.8907    
   10.        9.8785    
@@ -1648,8 +1648,8 @@ nmos15a.ckt
 nmp100.ckt
 nothing.ckt
 opamp-ol-disto.2.ckt
---- ==out//opamp-ol-disto.2.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/opamp-ol-disto.2.ckt.out	2018-11-09 11:20:34.019931885 +0000
+--- ==out//opamp-ol-disto.2.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/opamp-ol-disto.2.ckt.out	2018-11-10 05:16:44.407917229 +0000
 @@ -167,17 +167,17 @@
   0.002      7.7668f   -2.4309    
  # v(vin)    --------- actual ---------  -------- relative --------
@@ -1685,8 +1685,8 @@ opamp-ol-disto.2.ckt
 -dctran density=47.5%, ac density=47.5%
 +dctran density=33.8%, ac density=33.8%
 opamp-ol-disto.ckt
---- ==out//opamp-ol-disto.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/opamp-ol-disto.ckt.out	2018-11-09 11:20:34.039931884 +0000
+--- ==out//opamp-ol-disto.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/opamp-ol-disto.ckt.out	2018-11-10 05:16:44.427917228 +0000
 @@ -167,17 +167,17 @@
   0.002      6.9343f   -2.4309    
  # v(vin)    --------- actual ---------  -------- relative --------
@@ -1724,7 +1724,7 @@ opamp-ol-disto.ckt
 opamp-ol.ckt
 opamp-vf.1.ckt
 --- ==out//opamp-vf.1.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/opamp-vf.1.ckt.out	2018-11-09 11:20:34.079931883 +0000
++++ rcmk/opamp-vf.1.ckt.out	2018-11-10 05:16:44.467917226 +0000
 @@ -14,7 +14,7 @@
  
  * accuracy, algorithms
@@ -1741,8 +1741,8 @@ opamp-vf.1.ckt
 -dctran density=47.9%, ac density=47.9%
 +dctran density=37.5%, ac density=37.5%
 opamp-vf.1d.ckt
---- ==out//opamp-vf.1d.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/opamp-vf.1d.ckt.out	2018-11-09 11:20:34.103931882 +0000
+--- ==out//opamp-vf.1d.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/opamp-vf.1d.ckt.out	2018-11-10 05:16:44.491917225 +0000
 @@ -14,7 +14,7 @@
  
  * accuracy, algorithms
@@ -1760,7 +1760,7 @@ opamp-vf.1d.ckt
 +dctran density=37.5%, ac density=37.5%
 opamp-vf.2.ckt
 --- ==out//opamp-vf.2.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/opamp-vf.2.ckt.out	2018-11-09 11:20:34.127931881 +0000
++++ rcmk/opamp-vf.2.ckt.out	2018-11-10 05:16:44.515917224 +0000
 @@ -14,7 +14,7 @@
  
  * accuracy, algorithms
@@ -1778,7 +1778,7 @@ opamp-vf.2.ckt
 +dctran density=37.5%, ac density=37.5%
 opamp-vf.3.ckt
 --- ==out//opamp-vf.3.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/opamp-vf.3.ckt.out	2018-11-09 11:20:34.147931880 +0000
++++ rcmk/opamp-vf.3.ckt.out	2018-11-10 05:16:44.535917224 +0000
 @@ -14,7 +14,7 @@
  
  * accuracy, algorithms
@@ -1796,7 +1796,7 @@ opamp-vf.3.ckt
 +dctran density=37.5%, ac density=37.5%
 opamp-vf.ckt
 --- ==out//opamp-vf.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/opamp-vf.ckt.out	2018-11-09 11:20:34.171931879 +0000
++++ rcmk/opamp-vf.ckt.out	2018-11-10 05:16:44.559917223 +0000
 @@ -14,7 +14,7 @@
  
  * accuracy, algorithms
@@ -1838,8 +1838,8 @@ parse.1.ckt
 s_tr.1.ckt
 sl.ckt
 trcurve.ckt
---- ==out//trcurve.ckt.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/trcurve.ckt.out	2018-11-09 11:20:34.519931865 +0000
+--- ==out//trcurve.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/trcurve.ckt.out	2018-11-10 05:16:44.907917208 +0000
 @@ -1,13 +1,13 @@
  TRANSFER curve tracer, ig-spice 
  #           V(1)       V(6)       I(VPU)     I(VPD)     id(MPU)    id(MPD)   
@@ -2254,8 +2254,8 @@ trcurve.ckt
 -dctran density=76.0%, ac density=76.0%
 +dctran density=56.0%, ac density=56.0%
 trcurve2.ckt
---- ==out//trcurve2.ckt.out	2018-11-09 11:17:44.179938850 +0000
-+++ rcmk/trcurve2.ckt.out	2018-11-09 11:20:34.531931864 +0000
+--- ==out//trcurve2.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/trcurve2.ckt.out	2018-11-10 05:16:44.919917208 +0000
 @@ -71,7 +71,7 @@
   5.         5.        -4.         12.493p    197.55u   -12.493p    197.55u    4.        
   0.         0.        -5.         219.35u    0.        -219.35u    81.092p    7.        
@@ -2272,8 +2272,8 @@ trcurve2.ckt
 -dctran density=88.9%, ac density=88.9%
 +dctran density=83.3%, ac density=83.3%
 trcurves.ckt
---- ==out//trcurves.ckt.out	2018-11-09 11:18:17.179937497 +0000
-+++ rcmk/trcurves.ckt.out	2018-11-09 11:20:34.539931864 +0000
+--- ==out//trcurves.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/trcurves.ckt.out	2018-11-10 05:16:44.931917207 +0000
 @@ -5,9 +5,9 @@
   0.         1.         0.         365.57u    746.34n   -365.57u    746.29n   
  #           V(1)       V(6)       I(VPU)     I(VPD)     id(MPU)    id(MPD)   
@@ -2329,319 +2329,13 @@ trcurves.ckt
 +dctran density=56.0%, ac density=56.0%
 bjt.bug0.gc
 c_attach.1.gc
---- ==out//c_attach.1.gc.out	2018-11-09 11:12:29.043951773 +0000
-+++ rcmk/c_attach.1.gc.out	2018-11-09 11:20:34.555931863 +0000
-@@ -1,7 +1,7 @@
- load command
- Loads plugins
- Syntax: load plugin
--Plugin search path is: /usr/local/lib/gnucap 
-+Plugin search path is: /usr/local/lib:/usr/local/lib/gnucap 
- Path is set by GNUCAP_PLUGPATH environment variable
- With no arg, it lists plugins already loaded
- 
 c_delete.1.gc
 c_list.0.gc
 c_list.1.gc
 c_list.map0.gc
 c_list.map1.gc
 d.gc
-d_bjt.inc1.gc
---- ==out//d_bjt.inc1.gc.out	2018-11-09 11:12:16.011952307 +0000
-+++ rcmk/d_bjt.inc1.gc.out	2018-11-09 11:20:34.603931861 +0000
-@@ -48,23 +48,21 @@
- #           v(_net0)   v(_net1)   v(_net2)   v(_net3)   v(_net4)   r(S4)     
-  0.         0.         0.         0.         0.         0.         1.n       
- -1.         3.0281     3.0281     0.53167    3.7        3.0288     1.n       
---2.         3.0597     3.0597     0.058932   3.7        3.057      1.n       
---3.         3.0819     3.0819     0.013017   3.7        3.083      1.n       
---4.         3.1096     3.1096    -495.95u    3.7        3.1095     1.n       
---5.         3.1324     3.1324     0.0047377  3.7        3.1333     1.n       
---6.         3.1466     3.1466     0.0090298  3.7        3.1483     1.n       
---7.         3.1922     3.1922    -0.0075062  3.7        3.1909     1.n       
---8.         3.3675     3.3675    -0.013255   3.7        3.365      1.n       
-+-2.         3.0547     3.0547     0.079761   3.7        3.0563     1.n       
-+-3.         3.082      3.082      0.010846   3.7        3.0826     1.n       
-+-4.         3.1054     3.1054     0.0098621  3.7        3.1072     1.n       
-+-5.         3.1276     3.1276     0.0090258  3.7        3.1293     1.n       
-+-6.         3.1569     3.1569    -0.0011913  3.7        3.1567     1.n       
-+-7.         3.1566     3.1566     0.0081846  3.7        3.1581     1.n       
-+-8.         3.1623     3.1623     0.0064981  3.7        3.1635     1.n       
-+-9.         3.2002     3.2002    -0.0025728  3.7        3.1998     1.n       
-+-10.        3.3552     3.3552    -0.0081525  3.7        3.3537     1.n       
- open circuit: internal node 8
---9.         104.25K    104.25K   -11.875     3.7        104.24K    1.n       
-+-11.        149.72K    149.72K   -26.277     3.7        149.71K    1.n       
- open circuit: internal node 8
---10.        0.46357    0.46357    282.86p    3.7        0.46357    1.n       
-+-12.        0.47824    0.47824    282.p      3.7        0.47824    1.n       
- open circuit: internal node 8
---11.        277.34     277.34    -8.6324u    3.7        277.34     1.n       
--open circuit: internal node 8
---12.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
--open circuit: internal node 8
---13.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
-+-13.        276.5      276.5     -8.5738u    3.7        276.5      1.n       
- open circuit: internal node 8
- -14.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
-@@ -292,7 +290,7 @@
- -6.         0.11932    0.11932    3.6371     3.7        2.916      1.n       
-  0.         0.11932    0.11932    3.6371     3.7        2.916      1.n       
- -1.         0.4288     0.4288     3.642      3.7        2.9414     1.n       
---2.         0.43003    0.43003    3.6379     3.7        2.9493     1.n       
-+-2.         0.42994    0.42994    3.6379     3.7        2.9493     1.n       
- -3.         0.43032    0.43032    3.6364     3.7        2.9514     1.n       
- -4.         0.43035    0.43035    3.6364     3.7        2.9516     1.n       
- -5.         0.43035    0.43035    3.6364     3.7        2.9516     1.n       
-@@ -316,187 +314,187 @@
-  0.         1.2043     1.2043     3.617      3.7        2.9681     1.n       
-  0.         1.2043     1.2043     3.617      3.7        2.9681     1.n       
- -1.         2.9772     2.9772     3.5921     3.7        2.9765     1.n       
---2.         2.9821     2.9821     3.5491     3.7        2.9783     1.n       
---3.         2.981      2.981      3.4428     3.7        2.9798     1.n       
---4.         2.9999     2.9999     2.0361     3.7        2.9992     1.n       
---5.         3.0319     3.0319     0.41005    3.7        3.031      1.n       
---6.         3.0601     3.0601     0.053067   3.7        3.0587     1.n       
---7.         3.085      3.085      0.0063543  3.7        3.0851     1.n       
---8.         3.1166     3.1166    -0.013511   3.7        3.1142     1.n       
---9.         3.1431     3.1431    -0.0037273  3.7        3.1425     1.n       
---10.        3.1752     3.1752    -0.0034149  3.7        3.1746     1.n       
---11.        3.1792     3.1792     0.00348    3.7        3.1799     1.n       
---12.        3.2465     3.2465    -0.0053951  3.7        3.2456     1.n       
---13.        2.5588     2.5588     0.0078556  3.7        2.5604     1.n       
---14.        3.2298     3.2298    -0.011698   3.7        3.2276     1.n       
---15.        3.2643     3.2643    -234.12u    3.7        3.2643     1.n       
---16.        2.6255     2.6255     0.0035814  3.7        2.6262     1.n       
---17.        3.1932     3.1932     0.0017677  3.7        3.1936     1.n       
---18.        3.3592     3.3592    -0.011099   3.7        3.3571     1.n       
-+-2.         2.9779     2.9779     3.5491     3.7        2.9783     1.n       
-+-3.         2.981      2.981      3.4431     3.7        2.9797     1.n       
-+-4.         3.0001     3.0001     2.0415     3.7        2.9991     1.n       
-+-5.         3.0322     3.0322     0.41032    3.7        3.031      1.n       
-+-6.         3.0607     3.0607     0.050763   3.7        3.0587     1.n       
-+-7.         3.0839     3.0839     0.010794   3.7        3.0848     1.n       
-+-8.         3.1161     3.1161    -0.013037   3.7        3.1138     1.n       
-+-9.         3.1421     3.1421    -0.0029854  3.7        3.1416     1.n       
-+-10.        3.1741     3.1741    -0.0034032  3.7        3.1735     1.n       
-+-11.        3.1576     3.1576     0.0070817  3.7        3.159      1.n       
-+-12.        3.1519     3.1519     0.0095225  3.7        3.1537     1.n       
-+-13.        3.1844     3.1844    -0.0015976  3.7        3.1842     1.n       
-+-14.        3.149      3.149      0.006939   3.7        3.1503     1.n       
-+-15.        3.1537     3.1537     0.0089059  3.7        3.1554     1.n       
-+-16.        3.149      3.149      0.010635   3.7        3.151      1.n       
-+-17.        3.2134     3.2134    -0.013929   3.7        3.211      1.n       
-+-18.        3.5775     3.5775    -0.014056   3.7        3.5748     1.n       
- open circuit: internal node 8
---19.        134.08K    134.08K   -20.644     3.7        134.07K    1.n       
-+-19.        279.96     279.96    -10.149u    3.7        279.96     1.n       
- open circuit: internal node 8
---20.        0.47236    0.47236    282.3p     3.7        0.47236    1.n       
-+-20.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
---21.        276.84     276.84    -8.5973u    3.7        276.84     1.n       
-+-21.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---22.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-22.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -23.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---24.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-24.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -25.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---26.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-26.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -27.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---28.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-28.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -29.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---30.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-30.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -31.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---32.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-32.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -33.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---34.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-34.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -35.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---36.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-36.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -37.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---38.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-38.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -39.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---40.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-40.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -41.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---42.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-42.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -43.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---44.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-44.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -45.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---46.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-46.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -47.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---48.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-48.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -49.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---50.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-50.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -51.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---52.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-52.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -53.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---54.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-54.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -55.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---56.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-56.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -57.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---58.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-58.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -59.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---60.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-60.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -61.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---62.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-62.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -63.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---64.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-64.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -65.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---66.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-66.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -67.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---68.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-68.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -69.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---70.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-70.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -71.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---72.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-72.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -73.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---74.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-74.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -75.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---76.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-76.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -77.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---78.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-78.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -79.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---80.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-80.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -81.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---82.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-82.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -83.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---84.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-84.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -85.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---86.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-86.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -87.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---88.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-88.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -89.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---90.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-90.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -91.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---92.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-92.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -93.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---94.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-94.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -95.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---96.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-96.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -97.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---98.        0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-98.        0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- -99.        277.99     277.99    -8.6773u    3.7        277.99     1.n       
- open circuit: internal node 8
---100.       0.4523     0.4523     756.63p    3.7        0.4523     1.n       
-+-100.       0.4523     0.4523     756.64p    3.7        0.4523     1.n       
- open circuit: internal node 8
- did not converge
-  0.         277.99     277.99    -8.6773u    3.7        277.99     1.n       
+d_bjt.inc0.gc
 d_bjt.pnp0.gc
 d_connectmodule.0.gc
 d_logic.01.critclock.gc
@@ -2682,8 +2376,8 @@ lang_verilog.paramset.1.gc
 map_error.1.gc
 map_error.2.gc
 node_order.0.gc
---- ==out//node_order.0.gc.out	2018-11-09 11:12:16.023952307 +0000
-+++ rcmk/node_order.0.gc.out	2018-11-09 11:20:34.903931849 +0000
+--- ==out//node_order.0.gc.out	2018-11-10 04:52:34.815976674 +0000
++++ rcmk/node_order.0.gc.out	2018-11-10 05:16:45.287917193 +0000
 @@ -1,5 +1,5 @@
  options order 
 -              ^ ? need an order (auto default forward reverse )
@@ -2703,5 +2397,11 @@ s_tr.7.gc
 temp.1.gc
 tran_temp.gc
 triac.0.gc
+--- ==out//triac.0.gc.out	2018-11-09 11:12:16.027952307 +0000
++++ rcmk/triac.0.gc.out	2018-11-10 05:16:45.383917189 +0000
+@@ -1,2 +1,2 @@
+ load models/ngspice17/bjt.so 
+-     ^ ? plugin not found in /usr/local/lib:/usr/local/lib/gnucap
++     ^ ? plugin not found in /usr/local/lib/gnucap
 uuh.gc
 done with gnucap
