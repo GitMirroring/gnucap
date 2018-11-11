@@ -278,7 +278,7 @@ double DEV_SUBCKT::tr_probe_num(const std::string& x)const
 }
 /*--------------------------------------------------------------------------*/
 }
-// #define DO_TRACE
+//#define DO_TRACE
 #include "io_trace.h"
 #include "u_nodemap.h"
 
@@ -307,19 +307,17 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
   }
 
   int internal_nodes=subckt->nodes()->how_many()-net_nodes;
+  int port_supernode=(bool)net_nodes;
 
   boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
     boost::property<boost::vertex_degree_t,int> > g(
-      size_t(internal_nodes+1)); // 1 dummy node for external ports.
+      size_t(internal_nodes+port_supernode)); // 1 dummy node for external ports.
 
+  n = boost::num_vertices(g);
 
-  if(subckt==&CARD_LIST::card_list){
-    // hack, select initial node.
-	    boost::add_edge(0, 1, g);
-  }
+  trace2("setup", port_supernode, n);
 
   for(auto i : *subckt){
-
     if(!i->is_device()){ untested();
       continue;
     }
@@ -337,10 +335,12 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
 	}else if(!n2){
 	  // gnd. ignore.
 	}else{
-	  n1 = std::max(0, n1-int(net_nodes));
-	  n2 = std::max(0, n2-int(net_nodes));
+	  n1 = std::max(0, n1-int(net_nodes)) + port_supernode - 1;
+	  n2 = std::max(0, n2-int(net_nodes)) + port_supernode - 1;
 
 	  if(n1!=n2){
+	    assert(n1<n);
+	    assert(n2<n);
 	    boost::add_edge(unsigned(n1), unsigned(n2), g);
 	  }else{
 	  }
@@ -349,7 +349,6 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
     }
   }
 
-  n = boost::num_vertices(g);
   auto id=boost::get(boost::vertex_index, g);
 
   std::vector<unsigned> inv_perm(n, -1u);
@@ -358,8 +357,15 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
   auto colormap=boost::make_iterator_property_map(&color[0], id, color[0]);
   auto degreemap=boost::get(boost::vertex_degree, g);
 
+  if(port_supernode){
     auto start=*(boost::vertices(g).first); // fix port supernode
     cuthill_mckee_ordering(g, start, inv_perm.begin(), colormap, degreemap);
+    assert(id[inv_perm[0]]==0); // external port supernode fixed.
+  }else{
+    // do it fully automatically: choose initial node, and do all connected
+    // components
+    cuthill_mckee_ordering(g, inv_perm.begin(), colormap, degreemap);
+  }
 
 #ifdef DO_TRACE
   boost::print_graph(g);
@@ -372,21 +378,21 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
   std::vector<unsigned> o(how_many + 1, -1u); // include gnd.
 
   for (int c = 0; c <=net_nodes; ++c){
-    o[c]=c; // gnd and external ports cannot be moved.
+    o[c] = c; // gnd and external ports cannot be moved.
     trace1("fix", c);
   }
 
-  assert(id[inv_perm[0]]==0); // external supernode fixed.
-
+  trace3("creating o", o.size(), port_supernode, id[inv_perm[0]]);
   unsigned uncolored=0;
-  for (int c = 1; c != inv_perm.size(); ++c){
-
+  for (int c = port_supernode; c != inv_perm.size(); ++c){
     if(id[inv_perm[c]]!=-1u){
-      assert(id[inv_perm[c]]+net_nodes < o.size());
-	  
-      trace2("map", id[inv_perm[c]]+net_nodes, c + net_nodes);
-      o[id[inv_perm[c]]+net_nodes] = c + net_nodes;
+      trace3("map", c, id[inv_perm[c]]+net_nodes, c + net_nodes + 1 - port_supernode);
+
+      assert(id[inv_perm[c]]+net_nodes + 1 - port_supernode < o.size());
+	
+      o[id[inv_perm[c]]+net_nodes + 1 - port_supernode] = c + net_nodes + 1 - port_supernode;
     }else{
+      assert(port_supernode);
       while(colormap[++uncolored]);
       trace2("not mapped", c, uncolored);
       o[uncolored+net_nodes] = c + net_nodes;
@@ -396,6 +402,7 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
   trace1("o", o.size());
   for( auto idx : o ){
     trace1("o", idx);
+    assert(idx!=-1u);
   }
 
 
@@ -403,9 +410,8 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
   subckt->nodes()->permute(o.data()); // change user numbers.
 
   if(subckt==&CARD_LIST::card_list){
-
+    // TODO: use _sim->_nm instead.
     for(auto i : *subckt){
-
       if(!i->is_device()){ untested();
 	continue;
       }
