@@ -278,7 +278,7 @@ double DEV_SUBCKT::tr_probe_num(const std::string& x)const
 }
 /*--------------------------------------------------------------------------*/
 }
-#define DO_TRACE
+//#define DO_TRACE
 #include "io_trace.h"
 #include "u_nodemap.h"
 
@@ -335,6 +335,7 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
 	}else if(!n2){
 	  // gnd. ignore.
 	}else{
+	  // squash ports into one supernode
 	  n1 = std::max(0, n1-int(net_nodes)) + port_supernode - 1;
 	  n2 = std::max(0, n2-int(net_nodes)) + port_supernode - 1;
 
@@ -368,6 +369,7 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
   }
 
 #ifdef DO_TRACE
+  aaa
   boost::print_graph(g);
 #endif
 
@@ -404,7 +406,6 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
     trace1("o", idx);
     assert(idx!=-1u);
   }
-
 
   // create a permutation p of [0 ... how_many], but fix <net_nodes
 

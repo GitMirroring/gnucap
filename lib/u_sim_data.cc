@@ -211,7 +211,7 @@ void SIM_DATA::order_reverse()
 void hack_finish(CARD_LIST* subckt, unsigned net_nodes);
 
 void SIM_DATA::init()
-{
+{ untested();
   if (is_first_expand()) { untested();
     uninit();
 
