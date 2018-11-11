@@ -1,0 +1,10 @@
+spice
+
+R3 e d 1
+R1 a b 1
+R1 a c 1
+R3 f f 1
+
+.list
+.op
+.end

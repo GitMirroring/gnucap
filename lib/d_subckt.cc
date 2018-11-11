@@ -285,41 +285,44 @@ double DEV_SUBCKT::tr_probe_num(const std::string& x)const
 #include <boost/graph/cuthill_mckee_ordering.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_utility.hpp>
-namespace{
 
-// reorder nodes
-// by degree: need degrees of each node.
-//  === MEANT TO BE OPTIONAL/PLUGIN SPACE ===
-void DEV_SUBCKT::finish()
-{ untested();
-  if(subckt()!=scope()){
-    // not building netlist.
-    return;
-  }
+void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
+{
+
 //  there should be nodes in _n. these are the ports.
 //  more nodes are in scope()->nodes()
 //  these need to be sorted somehow.
-  size_t how_many=size_t(subckt()->nodes()->how_many());
-  trace2("finish", net_nodes(), subckt()->nodes()->how_many());
+  size_t how_many=size_t(subckt->nodes()->how_many());
+  trace2("finish", net_nodes, subckt->nodes()->how_many());
 
-  for(auto n: *subckt()->nodes()){
+  for(auto n: *subckt->nodes()){
     trace3("finish", n.first, n.second->long_label(), n.second->user_number());
   }
   unsigned n=0;
-  for(; n<unsigned(net_nodes()); ++n){
-    trace2("user number", n, _n[n].t_());
+  for(; n<unsigned(net_nodes); ++n){
+//    trace2("user number", n, _n[n].t_());
   }
   for(; n<how_many; ++n){
     trace1("user number", n);
   }
 
-  int internal_nodes=subckt()->nodes()->how_many()-net_nodes();
+  int internal_nodes=subckt->nodes()->how_many()-net_nodes;
 
   boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS,
     boost::property<boost::vertex_degree_t,int> > g(
       size_t(internal_nodes+1)); // 1 dummy node for external ports.
 
-  for(auto i : *scope()){
+
+  if(subckt==&CARD_LIST::card_list){
+    // hack, select initial node.
+	    boost::add_edge(0, 1, g);
+  }
+
+  for(auto i : *subckt){
+
+    if(!i->is_device()){ untested();
+      continue;
+    }
     trace2("user number", i->long_label(), i->net_nodes());
     // create a clique for each set of ports
     // this is an overapproximation, exact looks pretty expensive and perhaps
@@ -334,8 +337,8 @@ void DEV_SUBCKT::finish()
 	}else if(!n2){
 	  // gnd. ignore.
 	}else{
-	  n1 = std::max(0, n1-net_nodes());
-	  n2 = std::max(0, n2-net_nodes());
+	  n1 = std::max(0, n1-int(net_nodes));
+	  n2 = std::max(0, n2-int(net_nodes));
 
 	  if(n1!=n2){
 	    boost::add_edge(unsigned(n1), unsigned(n2), g);
@@ -368,7 +371,7 @@ void DEV_SUBCKT::finish()
 
   std::vector<unsigned> o(how_many + 1, -1u); // include gnd.
 
-  for (int c = 0; c <=net_nodes(); ++c){
+  for (int c = 0; c <=net_nodes; ++c){
     o[c]=c; // gnd and external ports cannot be moved.
     trace1("fix", c);
   }
@@ -379,14 +382,14 @@ void DEV_SUBCKT::finish()
   for (int c = 1; c != inv_perm.size(); ++c){
 
     if(id[inv_perm[c]]!=-1u){
-      assert(id[inv_perm[c]]+net_nodes() < o.size());
+      assert(id[inv_perm[c]]+net_nodes < o.size());
 	  
-      trace2("map", id[inv_perm[c]]+net_nodes(), c + net_nodes());
-      o[id[inv_perm[c]]+net_nodes()] = c + net_nodes();
+      trace2("map", id[inv_perm[c]]+net_nodes, c + net_nodes);
+      o[id[inv_perm[c]]+net_nodes] = c + net_nodes;
     }else{
       while(colormap[++uncolored]);
       trace2("not mapped", c, uncolored);
-      o[uncolored+net_nodes()] = c + net_nodes();
+      o[uncolored+net_nodes] = c + net_nodes;
     }
   }
 
@@ -397,7 +400,34 @@ void DEV_SUBCKT::finish()
 
 
   // create a permutation p of [0 ... how_many], but fix <net_nodes
-  subckt()->nodes()->permute(o.data()); // change user numbers.
+  subckt->nodes()->permute(o.data()); // change user numbers.
+
+  if(subckt==&CARD_LIST::card_list){
+
+    for(auto i : *subckt){
+
+      if(!i->is_device()){ untested();
+	continue;
+      }
+      for(int j=0; j<i->net_nodes(); ++j){
+	i->n_(j).hack_ttt();
+      }
+    }
+  }
+}
+
+namespace{
+
+// reorder nodes
+// by degree: need degrees of each node.
+//  === MEANT TO BE OPTIONAL/PLUGIN SPACE ===
+void DEV_SUBCKT::finish()
+{ untested();
+  if(subckt()!=scope()){
+    // not building netlist.
+    return;
+  }
+  hack_finish(subckt(), net_nodes());
 }
 } // namespace
 /*--------------------------------------------------------------------------*/

@@ -208,10 +208,16 @@ void SIM_DATA::order_reverse()
 /* init: allocate, set up, etc ... for any type of simulation
  * also called by status and probe for access to internals and subckts
  */
+void hack_finish(CARD_LIST* subckt, unsigned net_nodes);
+
 void SIM_DATA::init()
 {
-  if (is_first_expand()) {
+  if (is_first_expand()) { untested();
     uninit();
+
+    hack_finish(&CARD_LIST::card_list, 0);
+
+
     init_node_count(CARD_LIST::card_list.nodes()->how_many(), 0, 0);
 
 

@@ -282,6 +282,8 @@ private:
   int _m;		// mapped, after reordering
 
 public:
+  void hack_ttt();
+public:
   unsigned m_()const{return unsigned(_m);}
 
   int	      t_()const {

@@ -1,0 +1,820 @@
+1lin.ckt
+ap_ctof.2.ckt
+ap_ctof.ckt
+basic.bmd.ckt
+basic.ckt
+basic.rcmk.ckt
+bm_complex.1.ckt
+bm_complex.1a.ckt
+bm_complex.2.ckt
+bm_complex.3.ckt
+bm_complex.4.ckt
+bm_cond.1.ckt
+bm_cond.2.ckt
+bm_cond.3.ckt
+bm_exp.1.ckt
+bm_exp.1p.ckt
+bm_exp.2.ckt
+bm_exp.3.ckt
+bm_exp.3p.ckt
+bm_exp.4p.ckt
+bm_exp.5p.ckt
+bm_fit.0.1.ckt
+bm_fit.1.1.ckt
+bm_fit.2.1.ckt
+bm_fit.2.2.ckt
+bm_fit.2.3.ckt
+bm_fit.2.4.ckt
+bm_fit.3.1.ckt
+bm_fit.3.2.ckt
+bm_fit.3.3.ckt
+bm_poly.1.ckt
+bm_poly.2.ckt
+bm_posy.1.ckt
+bm_pulse.1.ckt
+bm_pulse.1a.ckt
+bm_pulse.2.ckt
+bm_pulse.2a.ckt
+bm_pulse.3.ckt
+bm_pulse.3a.ckt
+bm_pulse.4.ckt
+bm_pulse.4a.ckt
+bm_pulse.4b.ckt
+bm_pwl.1.ckt
+bm_pwl.2.ckt
+bm_pwl.3.ckt
+bm_pwl.4.ckt
+bm_pwl.5.ckt
+bm_sffm.1.ckt
+bm_sffm.2.ckt
+bm_sffm.3.ckt
+bm_sffm.4.ckt
+bm_sffm.5.ckt
+bm_sffm.6.ckt
+bm_sin.1.ckt
+bm_sin.2.ckt
+bm_sin.3.ckt
+bm_sin.4.ckt
+bm_sin.5.ckt
+bm_sin.6.ckt
+bm_sin.7.ckt
+bm_sin.8.ckt
+bm_sin.9.ckt
+bm_table.1.1.ckt
+bm_table.2.1.ckt
+bm_table.2.2.ckt
+bm_table.2.3.ckt
+bm_table.2.4.ckt
+bm_table.3.1.ckt
+bm_table.3.2.ckt
+bm_table.3.3.ckt
+bm_table.error1.ckt
+bm_tanh.1.ckt
+bm_tanh.2.ckt
+bmm_cap.1.ckt
+bmm_cap.2.ckt
+bmm_cap.3.ckt
+bmm_cap.4.ckt
+bmm_cap.5.ckt
+bmm_res.1.ckt
+bmm_res.1p.ckt
+bmm_res.2.ckt
+bmm_res.2p.ckt
+bmm_res.3.ckt
+bmm_res.3p.ckt
+bmm_res.4.ckt
+bmm_res.4p.ckt
+bmm_res.5.ckt
+bmm_res.5p.ckt
+c.ckt
+--- ==out//c.ckt.out	2018-11-09 11:12:16.011952307 +0000
++++ hack_finish/c.ckt.out	2018-11-11 00:44:45.691517513 +0000
+@@ -28,4 +28,4 @@
+ iterations: op=23, dc=0, tran=0, fourier=0, total=23
+ transient timesteps: accepted=0, rejected=0, total=0
+ nodes: user=9, subckt=0, model=0, total=9
+-dctran density=75.3%, ac density=75.3%
++dctran density=72.8%, ac density=72.8%
+c_delete.2.ckt
+c_delete.3.ckt
+c_delete.4.ckt
+c_delete.5.ckt
+c_delete.6.ckt
+c_delete.7.ckt
+c_delete.ckt
+c_eval.1.ckt
+c_genrat.1.ckt
+c_getckt.ckt
+c_help.1.ckt
+c_lib.1.ckt
+c_list.ckt
+c_measure.1.ckt
+c_measure.1s.ckt
+c_measure.2.ckt
+c_measure.2s.ckt
+c_modify.ckt
+cc.ckt
+--- ==out//cc.ckt.out	2018-11-09 11:12:16.011952307 +0000
++++ hack_finish/cc.ckt.out	2018-11-11 00:44:45.835517507 +0000
+@@ -28,4 +28,4 @@
+ iterations: op=23, dc=0, tran=0, fourier=0, total=23
+ transient timesteps: accepted=0, rejected=0, total=0
+ nodes: user=9, subckt=0, model=0, total=9
+-dctran density=75.3%, ac density=75.3%
++dctran density=72.8%, ac density=72.8%
+charge-cons.ckt
+charge-cons2.ckt
+--- ==out//charge-cons2.ckt.out	2018-11-09 11:12:16.011952307 +0000
++++ hack_finish/charge-cons2.ckt.out	2018-11-11 00:44:45.879517505 +0000
+@@ -510,4 +510,4 @@
+ iterations: op=4, dc=0, tran=2468, fourier=0, total=2976
+ transient timesteps: accepted=504, rejected=0, total=504
+ nodes: user=3, subckt=0, model=0, total=3
+-dctran density=100.0%, ac density=100.0%
++dctran density=77.8%, ac density=77.8%
+charge-cons3.ckt
+--- ==out//charge-cons3.ckt.out	2018-11-09 11:12:16.011952307 +0000
++++ hack_finish/charge-cons3.ckt.out	2018-11-11 00:44:45.899517504 +0000
+@@ -510,4 +510,4 @@
+ iterations: op=4, dc=0, tran=2554, fourier=0, total=3062
+ transient timesteps: accepted=504, rejected=0, total=504
+ nodes: user=3, subckt=0, model=0, total=3
+-dctran density=100.0%, ac density=100.0%
++dctran density=77.8%, ac density=77.8%
+current.ckt
+d_bjt-diffpair-ccs.ckt
+d_bjt-diffpair-cjc.ckt
+d_bjt-diffpair-dc.ckt
+d_bjt-diffpair-nocap.ckt
+d_bjt-diffpair-tf.ckt
+--- ==out//d_bjt-diffpair-tf.ckt.out	2018-11-09 11:12:16.011952307 +0000
++++ hack_finish/d_bjt-diffpair-tf.ckt.out	2018-11-11 00:44:45.959517502 +0000
+@@ -237,4 +237,4 @@
+ iterations: op=9, dc=227, tran=164, fourier=0, total=1080
+ transient timesteps: accepted=136, rejected=0, total=136
+ nodes: user=10, subckt=0, model=4, total=14
+-dctran density=58.2%, ac density=58.2%
++dctran density=55.1%, ac density=55.1%
+d_bjt-diffpair-tr.ckt
+--- ==out//d_bjt-diffpair-tr.ckt.out	2018-11-10 04:52:34.811976674 +0000
++++ hack_finish/d_bjt-diffpair-tr.ckt.out	2018-11-11 00:44:45.983517501 +0000
+@@ -459,4 +459,4 @@
+ iterations: op=9, dc=0, tran=494, fourier=0, total=2437
+ transient timesteps: accepted=416, rejected=0, total=416
+ nodes: user=9, subckt=0, model=4, total=13
+-dctran density=65.7%, ac density=65.7%
++dctran density=62.1%, ac density=62.1%
+d_bjt-diffpair-tran.ckt
+d_bjt-pnp.ckt
+d_bjt-rca3040.ckt
+d_bjt-rtlinv.ckt
+d_bjt-schmitt-bypass.ckt
+--- ==out//d_bjt-schmitt-bypass.ckt.out	2018-11-09 11:12:16.011952307 +0000
++++ hack_finish/d_bjt-schmitt-bypass.ckt.out	2018-11-11 00:44:46.043517498 +0000
+@@ -167,4 +167,4 @@
+ iterations: op=8, dc=0, tran=429, fourier=0, total=1526
+ transient timesteps: accepted=231, rejected=9, total=240
+ nodes: user=8, subckt=0, model=8, total=16
+-dctran density=48.4%, ac density=48.4%
++dctran density=47.7%, ac density=47.7%
+d_bjt-schmitt-nobypass.ckt
+--- ==out//d_bjt-schmitt-nobypass.ckt.out	2018-11-09 11:12:16.011952307 +0000
++++ hack_finish/d_bjt-schmitt-nobypass.ckt.out	2018-11-11 00:44:46.059517498 +0000
+@@ -167,4 +167,4 @@
+ iterations: op=8, dc=0, tran=424, fourier=0, total=1505
+ transient timesteps: accepted=225, rejected=9, total=234
+ nodes: user=8, subckt=0, model=8, total=16
+-dctran density=48.4%, ac density=48.4%
++dctran density=47.7%, ac density=47.7%
+d_bjt.2.ckt
+d_bjt.ckt
+d_bjt.error1.ckt
+d_cap.1.ckt
+d_cap.2.ckt
+d_cap.3.ckt
+d_cap.3a.ckt
+d_cap.4.ckt
+d_cap.5.ckt
+d_cap.6.ckt
+d_cap.ic1.ckt
+d_cap.ic2.ckt
+d_cap.ic4.ckt
+d_cccs.1.ckt
+d_cccs.2.ckt
+d_cccs.3.ckt
+d_cccs.4.ckt
+d_cccs.5.ckt
+d_cccs.6.ckt
+d_ccvs.1.ckt
+d_ccvs.2.ckt
+d_ccvs.3.ckt
+d_coil.1.ckt
+d_coil.1a.ckt
+d_coil.1b.ckt
+d_coil.1c.ckt
+d_coil.1d.ckt
+d_coil.1e.ckt
+d_coil.2.ckt
+d_coil.3.ckt
+d_coil.4.ckt
+d_coil.5.ckt
+d_coil.error1.ckt
+d_coil.error2.ckt
+d_coil.error3.ckt
+d_coil.error4.ckt
+d_coil.error5.ckt
+d_coil.m3.ckt
+d_coil.m3a.ckt
+d_coil.m3r.ckt
+d_diode.1.ckt
+d_diode.10.ckt
+d_diode.10a.ckt
+d_diode.11.ckt
+d_diode.11a.ckt
+d_diode.11b.ckt
+d_diode.11c.ckt
+d_diode.11d.ckt
+d_diode.12.ckt
+d_diode.2.ckt
+d_diode.3.ckt
+d_diode.4.ckt
+d_diode.5.ckt
+d_diode.6.ckt
+d_diode.7.ckt
+d_diode.8.ckt
+d_diode.9.ckt
+d_diode.error1.ckt
+d_logic.1.ckt
+d_logic.2.ckt
+d_logic.3.ckt
+d_logic.4.ckt
+d_logic.5.ckt
+d_logic.6.ckt
+d_logic.7.ckt
+d_logic.error1.ckt
+d_logic.tnom.1.ckt
+d_logic_nand-dc.ckt
+d_logic_tr_ab1.ckt
+d_logic_tr_ab2.ckt
+d_logic_tr_an1.ckt
+d_logic_tr_an2.ckt
+d_logic_tr_db1.ckt
+d_logic_tr_db2.ckt
+d_logic_tr_dn1.ckt
+d_logic_tr_dn2.ckt
+d_logic_tr_mb1a.ckt
+d_logic_tr_mb1b.ckt
+d_logic_tr_mb2a.ckt
+d_logic_tr_mb2b.ckt
+d_logic_tr_mn1a.ckt
+d_logic_tr_mn1b.ckt
+d_logic_tr_mn2a.ckt
+d_logic_tr_mn2b.ckt
+d_macro.1.ckt
+d_mos.error1.ckt
+d_mos.error2.ckt
+d_mos.error3.ckt
+d_mos.error4.ckt
+d_mos1.bin1.ckt
+d_mos1.bin2.ckt
+d_mos1.bin3.ckt
+d_mos1.inv1.ckt
+d_mos1.inv2.ckt
+d_mos1.inv3.ckt
+d_mos1.lin1.ckt
+d_mos1.lin1.late.ckt
+d_mos1.lin1.none.ckt
+d_mos1.lin2.ckt
+d_mos1.lin3.ckt
+d_mos1.lin4.ckt
+d_mos1.lin5.ckt
+d_mos1.n+1.ckt
+d_mos1.n-1.ckt
+d_mos1.n0.ckt
+d_mos1.nand1.ckt
+d_mos1.nand2.ckt
+d_mos1.nand3.ckt
+d_mos1.p+1.ckt
+d_mos1.p-1.ckt
+d_mos1.p0.ckt
+d_mos1.plin.ckt
+d_mos1.psat1.ckt
+d_mos1.psat2.ckt
+d_mos1.psat3.ckt
+d_mos1.sat1.ckt
+d_mos1.sat2.ckt
+d_mos1.sat3.ckt
+d_mos1.sat4.ckt
+d_mos1.sat5.ckt
+d_mos1.sat6.ckt
+d_mos1.sat7.ckt
+d_mos1.sts.ckt
+d_mos1.zero.ckt
+d_mos2.inv1.ckt
+d_mos2.lin1.ckt
+d_mos2.lin1.late.ckt
+d_mos2.lin1r.ckt
+d_mos2.lin1z.ckt
+d_mos2.lin2.ckt
+d_mos2.lin3.ckt
+d_mos2.lin4.ckt
+d_mos2.lin5.ckt
+d_mos2.n+1.ckt
+d_mos2.n-1.ckt
+d_mos2.n0.ckt
+d_mos2.nand1.ckt
+d_mos2.p+1.ckt
+d_mos2.p-1.ckt
+d_mos2.p0.ckt
+d_mos2.plin.ckt
+d_mos2.psat1.ckt
+d_mos2.psat2.ckt
+d_mos2.psat3.ckt
+d_mos2.sat1.ckt
+d_mos2.sat2.ckt
+d_mos2.sat3.ckt
+d_mos2.sat4.ckt
+d_mos2.sat5.ckt
+d_mos2.sat6.ckt
+d_mos2.sat7.ckt
+d_mos2.sts.ckt
+d_mos2.zero.ckt
+d_mos3.inv1.ckt
+d_mos3.lin1.ckt
+d_mos3.lin1r.ckt
+d_mos3.lin1z.ckt
+d_mos3.lin2.ckt
+d_mos3.lin3.ckt
+d_mos3.lin4.ckt
+d_mos3.lin5.ckt
+d_mos3.n+1.ckt
+d_mos3.n-1.ckt
+d_mos3.n0.ckt
+d_mos3.nand1.ckt
+d_mos3.p+1.ckt
+d_mos3.p-1.ckt
+d_mos3.p0.ckt
+d_mos3.plin.ckt
+d_mos3.psat1.ckt
+d_mos3.psat2.ckt
+d_mos3.psat3.ckt
+d_mos3.sat000.ckt
+d_mos3.sat007.ckt
+d_mos3.sat1.ckt
+d_mos3.sat2.ckt
+d_mos3.sat3.ckt
+d_mos3.sat4.ckt
+d_mos3.sat5.ckt
+d_mos3.sat6.ckt
+d_mos3.sat7.ckt
+d_mos3.sts.ckt
+d_mos3.sts000.ckt
+d_mos3.zero.ckt
+d_mos4.1.ckt
+--- ==out//d_mos4.1.ckt.out	2018-11-09 11:12:16.019952307 +0000
++++ hack_finish/d_mos4.1.ckt.out	2018-11-11 00:44:47.415517442 +0000
+@@ -5,17 +5,17 @@
+  0.4        0.         0.         0.         0.         0.        
+  0.6        3.2634n    0.         0.         0.         0.        
+  0.8        324.07n    0.         0.         0.         0.        
+- 1.         3.0983u    857.65p    0.         0.         0.        
++ 1.         3.0983u    858.34p    0.         0.         0.        
+  1.2        6.3104u    146.13n    0.         0.         0.        
+  1.4        9.4193u    2.5054u    14.679n    0.         0.        
+- 1.6        12.442u    5.7153u    1.0697u    8.6361n    0.        
++ 1.6        12.442u    5.7153u    1.0698u    8.6368n    0.        
+  1.8        15.383u    8.8086u    4.4008u    968.95n    20.597n   
+  2.         18.245u    11.817u    7.4983u    4.2572u    1.6509u   
+  2.2        21.031u    14.743u    10.51u     7.3256u    4.8219u   
+  2.4        23.744u    17.591u    13.44u     10.31u     7.8414u   
+  2.6        26.387u    20.364u    16.292u    13.213u    10.779u   
+  2.8        28.962u    23.065u    19.069u    16.04u     13.638u   
+- 3.         31.473u    25.696u    21.773u    18.792u    16.422u   
++ 3.         31.473u    25.696u    21.773u    18.792u    16.423u   
+  3.2        33.922u    28.261u    24.408u    21.473u    19.134u   
+  3.4        36.31u     30.761u    26.975u    24.086u    21.776u   
+  3.6        38.64u     33.199u    29.479u    26.633u    24.351u   
+d_mos4.2.ckt
+--- ==out//d_mos4.2.ckt.out	2018-11-09 11:12:16.019952307 +0000
++++ hack_finish/d_mos4.2.ckt.out	2018-11-11 00:44:47.423517442 +0000
+@@ -5,17 +5,17 @@
+  0.4        0.         0.         0.         0.         0.        
+  0.6        3.2634n    0.         0.         0.         0.        
+  0.8        324.07n    0.         0.         0.         0.        
+- 1.         3.0983u    857.65p    0.         0.         0.        
++ 1.         3.0983u    858.34p    0.         0.         0.        
+  1.2        6.3104u    146.13n    0.         0.         0.        
+  1.4        9.4193u    2.5054u    14.679n    0.         0.        
+- 1.6        12.442u    5.7153u    1.0697u    8.6361n    0.        
++ 1.6        12.442u    5.7153u    1.0698u    8.6368n    0.        
+  1.8        15.383u    8.8086u    4.4008u    968.95n    20.597n   
+  2.         18.245u    11.817u    7.4983u    4.2572u    1.6509u   
+  2.2        21.031u    14.743u    10.51u     7.3256u    4.8219u   
+  2.4        23.744u    17.591u    13.44u     10.31u     7.8414u   
+  2.6        26.387u    20.364u    16.292u    13.213u    10.779u   
+  2.8        28.962u    23.065u    19.069u    16.04u     13.638u   
+- 3.         31.473u    25.696u    21.773u    18.792u    16.422u   
++ 3.         31.473u    25.696u    21.773u    18.792u    16.423u   
+  3.2        33.922u    28.261u    24.408u    21.473u    19.134u   
+  3.4        36.31u     30.761u    26.975u    24.086u    21.776u   
+  3.6        38.64u     33.199u    29.479u    26.633u    24.351u   
+d_mos4.3.ckt
+--- ==out//d_mos4.3.ckt.out	2018-11-09 11:12:16.019952307 +0000
++++ hack_finish/d_mos4.3.ckt.out	2018-11-11 00:44:47.431517441 +0000
+@@ -7,8 +7,8 @@
+  0.8        324.07n    0.         0.         0.         0.        
+  1.         3.0997u    858.34p    0.         0.         0.        
+  1.2        6.3139u    146.13n    0.         0.         0.        
+- 1.4        9.4248u    2.5068u    14.678n    0.         0.        
+- 1.6        12.45u     5.7195u    1.0701u    8.6368n    0.        
++ 1.4        9.4248u    2.5068u    14.679n    0.         0.        
++ 1.6        12.45u     5.7196u    1.0701u    8.6368n    0.        
+  1.8        15.392u    8.8155u    4.4047u    969.21n    20.597n   
+  2.         18.256u    11.826u    7.5057u    4.2617u    1.6521u   
+  2.2        21.043u    14.755u    10.521u    7.3344u    4.8282u   
+d_mos49.nand1.ckt
+d_mos5.1.ckt
+--- ==out//d_mos5.1.ckt.out	2018-11-09 11:12:16.019952307 +0000
++++ hack_finish/d_mos5.1.ckt.out	2018-11-11 00:44:47.451517441 +0000
+@@ -2,10 +2,10 @@
+ #           I(V1)      I(V2)      I(V3)      I(V4)      I(V5)     
+  0.         0.         0.         0.         0.         0.        
+  0.2        0.         0.         0.         0.         0.        
+- 0.4        623.81p    0.         0.         0.         0.        
++ 0.4        625.19p    0.         0.         0.         0.        
+  0.6        122.37n    0.         0.         0.         0.        
+  0.8        2.6904u    0.         0.         0.         0.        
+- 1.         7.4749u    94.028n    0.         0.         0.        
++ 1.         7.4749u    94.029n    0.         0.         0.        
+  1.2        12.537u    3.253u     2.056n     0.         0.        
+  1.4        17.421u    8.3849u    1.2574u    0.         0.        
+  1.6        22.134u    13.468u    6.2258u    397.06n    0.        
+d_mos6.inv1.ckt
+d_mos6.lin1.ckt
+d_mos6.lin1r.ckt
+d_mos6.lin1z.ckt
+d_mos6.lin2.ckt
+d_mos6.lin2r.ckt
+d_mos6.lin2z.ckt
+d_mos6.n+1.ckt
+d_mos6.n-1.ckt
+d_mos6.n0.ckt
+d_mos6.nand1.ckt
+d_mos6.p+1.ckt
+d_mos6.p-1.ckt
+d_mos6.p0.ckt
+d_mos6.plin.ckt
+d_mos6.psat1.ckt
+d_mos6.psat2.ckt
+d_mos6.psat3.ckt
+d_mos6.sat1.ckt
+d_mos6.sat1r.ckt
+d_mos6.sat1s.ckt
+d_mos6.sat1v.ckt
+d_mos6.sat2.ckt
+d_mos6.sat2r.ckt
+d_mos6.sat3.ckt
+d_mos6.sat3r.ckt
+d_mos6.sts.ckt
+d_mos6.sts000.ckt
+d_mos6.zero.ckt
+d_mos7.alpha.ckt
+d_mos7.inv1.ckt
+d_mos7.lin1.ckt
+d_mos7.lin2.ckt
+d_mos7.nand1.ckt
+d_mos7.nand1.nobypass.ckt
+d_mos7.plin.ckt
+d_mos7.psat.ckt
+d_mos7.sat1.ckt
+d_mos7.sat2.ckt
+d_mos7.sat3.ckt
+d_mos7.sts.ckt
+d_mos7.zero.ckt
+d_mos8.nand1.ckt
+d_mos8.sat2.ckt
+d_mos8.sat3.ckt
+d_mos8.sat4.ckt
+d_mos8c2.nand1.ckt
+d_mos8c2.nand1.nobypass.ckt
+d_subckt.1.ckt
+d_subckt.2.ckt
+d_subckt.3.ckt
+d_subckt.4.ckt
+d_subckt.5.ckt
+d_subckt.6.ckt
+d_subckt.7.ckt
+d_subckt.8.ckt
+d_subckt.error1.ckt
+d_subckt.error2.ckt
+d_subckt.error3.ckt
+d_switch.c0.ckt
+d_switch.c1.ckt
+d_switch.c1.inc.ckt
+d_switch.c1.noinc.ckt
+d_switch.c1a.ckt
+d_switch.c1r.ckt
+d_switch.c2.ckt
+d_switch.c2a.ckt
+d_switch.c2r.ckt
+d_switch.c3.ckt
+d_switch.error1.ckt
+d_switch.error2.ckt
+d_switch.error3.ckt
+d_switch.nro.1.ckt
+d_switch.nro.1e.ckt
+d_switch.nro.1g.ckt
+d_switch.nro.1gr.ckt
+d_switch.nro.2.auto.ckt
+d_switch.nro.2.ckt
+d_switch.nro.3.ckt
+d_switch.nro.3h.ckt
+d_switch.nro.4.ckt
+d_switch.v.ckt
+d_switch.vr.ckt
+d_tcap.1.ckt
+d_tcap.2.ckt
+d_tcap.3.ckt
+d_tcap.4.ckt
+d_tcap.5.ckt
+d_trln.ac.ckt
+--- ==out//d_trln.ac.ckt.out	2018-11-09 11:12:16.019952307 +0000
++++ hack_finish/d_trln.ac.ckt.out	2018-11-11 00:44:48.087517414 +0000
+@@ -112,4 +112,4 @@
+ iterations: op=0, dc=0, tran=0, fourier=0, total=84
+ transient timesteps: accepted=0, rejected=0, total=0
+ nodes: user=11, subckt=0, model=0, total=11
+-dctran density=24.0%, ac density=32.2%
++dctran density=17.4%, ac density=58.7%
+d_trln.tr.100.im.ckt
+--- ==out//d_trln.tr.100.im.ckt.out	2018-11-09 11:12:16.019952307 +0000
++++ hack_finish/d_trln.tr.100.im.ckt.out	2018-11-11 00:44:48.103517414 +0000
+@@ -299,4 +299,4 @@
+ iterations: op=0, dc=0, tran=304, fourier=0, total=1050
+ transient timesteps: accepted=270, rejected=0, total=270
+ nodes: user=11, subckt=0, model=0, total=11
+-dctran density=24.0%, ac density=32.2%
++dctran density=17.4%, ac density=58.7%
+d_trln.tr.100.nim.ckt
+--- ==out//d_trln.tr.100.nim.ckt.out	2018-11-09 11:12:16.019952307 +0000
++++ hack_finish/d_trln.tr.100.nim.ckt.out	2018-11-11 00:44:48.115517413 +0000
+@@ -299,4 +299,4 @@
+ iterations: op=0, dc=0, tran=304, fourier=0, total=1050
+ transient timesteps: accepted=270, rejected=0, total=270
+ nodes: user=11, subckt=0, model=0, total=11
+-dctran density=24.0%, ac density=32.2%
++dctran density=17.4%, ac density=58.7%
+d_trln.tr.300.im.ckt
+--- ==out//d_trln.tr.300.im.ckt.out	2018-11-09 11:12:16.023952307 +0000
++++ hack_finish/d_trln.tr.300.im.ckt.out	2018-11-11 00:44:48.127517413 +0000
+@@ -299,4 +299,4 @@
+ iterations: op=0, dc=0, tran=184, fourier=0, total=1050
+ transient timesteps: accepted=270, rejected=0, total=270
+ nodes: user=11, subckt=0, model=0, total=11
+-dctran density=24.0%, ac density=32.2%
++dctran density=17.4%, ac density=58.7%
+d_trln.tr.300.nim.ckt
+--- ==out//d_trln.tr.300.nim.ckt.out	2018-11-09 11:12:16.023952307 +0000
++++ hack_finish/d_trln.tr.300.nim.ckt.out	2018-11-11 00:44:48.139517412 +0000
+@@ -299,4 +299,4 @@
+ iterations: op=0, dc=0, tran=184, fourier=0, total=1050
+ transient timesteps: accepted=270, rejected=0, total=270
+ nodes: user=11, subckt=0, model=0, total=11
+-dctran density=24.0%, ac density=32.2%
++dctran density=17.4%, ac density=58.7%
+d_trln.tr.im.ckt
+--- ==out//d_trln.tr.im.ckt.out	2018-11-09 11:12:16.023952307 +0000
++++ hack_finish/d_trln.tr.im.ckt.out	2018-11-11 00:44:48.151517412 +0000
+@@ -296,4 +296,4 @@
+ iterations: op=0, dc=0, tran=359, fourier=0, total=1044
+ transient timesteps: accepted=268, rejected=0, total=268
+ nodes: user=11, subckt=0, model=0, total=11
+-dctran density=24.0%, ac density=32.2%
++dctran density=17.4%, ac density=58.7%
+d_trln.tr.m.ckt
+--- ==out//d_trln.tr.m.ckt.out	2018-11-09 11:12:16.023952307 +0000
++++ hack_finish/d_trln.tr.m.ckt.out	2018-11-11 00:44:48.159517412 +0000
+@@ -44,4 +44,4 @@
+ iterations: op=0, dc=0, tran=59, fourier=0, total=81
+ transient timesteps: accepted=22, rejected=0, total=22
+ nodes: user=9, subckt=0, model=0, total=9
+-dctran density=28.4%, ac density=38.3%
++dctran density=21.0%, ac density=60.5%
+d_trln.tr.nim.ckt
+--- ==out//d_trln.tr.nim.ckt.out	2018-11-09 11:12:16.023952307 +0000
++++ hack_finish/d_trln.tr.nim.ckt.out	2018-11-11 00:44:48.171517411 +0000
+@@ -296,4 +296,4 @@
+ iterations: op=0, dc=0, tran=359, fourier=0, total=1044
+ transient timesteps: accepted=268, rejected=0, total=268
+ nodes: user=11, subckt=0, model=0, total=11
+-dctran density=24.0%, ac density=32.2%
++dctran density=17.4%, ac density=58.7%
+d_vccap.1.ckt
+d_vccap.2.ckt
+d_vcg.1.ckt
+d_vcg.2.ckt
+d_vcg.3.ckt
+d_vcg.4.ckt
+d_vcg.5.ckt
+d_vcr.1.ckt
+d_vcr.2.ckt
+d_vcr.3.ckt
+d_vcr.4.ckt
+d_vcr.5.ckt
+d_vcvs.1.ckt
+d_vcvs.2.ckt
+dcsweep.ckt
+e_ccsrc.1.ckt
+e_ccsrc.2.ckt
+e_node_probes.ckt
+e_storag.1.ckt
+eq3-1153.ckt
+--- ==out//eq3-1153.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ hack_finish/eq3-1153.ckt.out	2018-11-11 00:44:48.339517404 +0000
+@@ -25,4 +25,4 @@
+ iterations: op=0, dc=30, tran=0, fourier=0, total=40
+ transient timesteps: accepted=0, rejected=0, total=0
+ nodes: user=2, subckt=1151, model=0, total=1153
+-dctran density=2.4%, ac density=2.4%
++dctran density=2.0%, ac density=2.0%
+eq3-1153.fg.ckt
+eq3-1153.fg2.ckt
+--- ==out//eq3-1153.fg2.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ hack_finish/eq3-1153.fg2.ckt.out	2018-11-11 00:44:48.391517402 +0000
+@@ -25,4 +25,4 @@
+ iterations: op=0, dc=30, tran=0, fourier=0, total=40
+ transient timesteps: accepted=0, rejected=0, total=0
+ nodes: user=3, subckt=1151, model=0, total=1154
+-dctran density=2.5%, ac density=2.5%
++dctran density=2.6%, ac density=2.6%
+eq3-1153.forward.ckt
+eq3-1153.reverse.ckt
+eq3-1153.tr-b.ckt
+eq3-1153.tr-nb.ckt
+eq3-1153.tr-ni.ckt
+eqb1.ckt
+eqboost.ckt
+eqflat.ckt
+eqmodify.ckt
+l.ckt
+l2.ckt
+ll.ckt
+ll1.ckt
+lll.ckt
+llll.ckt
+m_expression.1.ckt
+m_expression.2.ckt
+m_expression.3.ckt
+m_expression.error.1.ckt
+named_nodes.ckt
+nmos100.1.ckt
+nmos100.ckt
+nmos15.ckt
+nmos15a.ckt
+nmp100.ckt
+nothing.ckt
+opamp-ol-disto.2.ckt
+opamp-ol-disto.ckt
+opamp-ol.ckt
+opamp-vf.1.ckt
+opamp-vf.1d.ckt
+--- ==out//opamp-vf.1d.ckt.out	2018-11-10 04:52:34.815976674 +0000
++++ hack_finish/opamp-vf.1d.ckt.out	2018-11-11 00:44:48.863517383 +0000
+@@ -234,7 +234,7 @@
+  0.001  |                 .                .        *        .                |
+         +-----------------+----------------+-----------------+----------------+
+ Gnucap   System status
+-iterations: op=93, dc=322, tran=991, fourier=0, total=1614
++iterations: op=93, dc=322, tran=990, fourier=0, total=1613
+ transient timesteps: accepted=163, rejected=9, total=172
+ nodes: user=8, subckt=0, model=16, total=24
+ dctran density=47.9%, ac density=47.9%
+opamp-vf.2.ckt
+opamp-vf.3.ckt
+opamp-vf.ckt
+oscillator.1.ckt
+oscillator.2.ckt
+oscillator.3.ckt
+oscillator.4.ckt
+oscillator.5.ckt
+oscillator.6.ckt
+oscillator.7.ckt
+param.0.ckt
+param.0a.ckt
+param.1.ckt
+param.10.ckt
+param.11.ckt
+param.2.ckt
+param.2a.ckt
+param.2b.ckt
+param.3.ckt
+param.4.ckt
+param.5.ckt
+param.6.ckt
+param.7.ckt
+param.8.ckt
+param.9.ckt
+parse.1.ckt
+s_tr.1.ckt
+sl.ckt
+trcurve.ckt
+trcurve2.ckt
+trcurves.ckt
+bjt.bug0.gc
+c_attach.1.gc
+c_delete.1.gc
+c_list.0.gc
+c_list.1.gc
+c_list.map0.gc
+c_list.map1.gc
+d.gc
+d_bjt.inc0.gc
+--- ==out//d_bjt.inc0.gc.out	2018-11-10 05:14:39.443922353 +0000
++++ hack_finish/d_bjt.inc0.gc.out	2018-11-11 00:44:49.339517363 +0000
+@@ -30,21 +30,3 @@
+ Switch #(.MaxDuration(1e-6),.Roff(1e12),.Ron(0),.Temp(26.85),.init(off),.time(0.1ms)) S3 (.1(_net0),.2(0));
+ // fixit? 
+ // resistor #(.r(1000k)) R1 (.p(0),.n(_net1)); 
+-#           v(_net0)   v(_net1)   v(_net2)   v(_net3)   v(_net4)  
+- 0.         3.0656     3.0656     0.12034    3.7        3.0873    
+-#Time       v(_net0)   v(_net1)   v(_net2)   v(_net3)   v(_net4)  
+- 0.         3.0656     3.0656     0.12034    3.7        3.0873    
+- 2.E-6      3.0656     3.0656     0.12034    3.7        3.0873    
+- 4.E-6      3.0656     3.0656     0.12034    3.7        3.0873    
+- 7.2667E-6  3.0656     3.0656     0.12034    3.7        3.0873    
+- 100.E-6    3.0656     3.0656     0.12034    3.7        3.0873    
+- 100.E-6    3.0656     3.0656     0.12034    3.7        3.0873    
+- 100.E-6    26.E-15    51.E-15    0.12013    3.7        3.087     
+- 133.33E-6  25.E-15    50.E-15    3.6058     3.7        2.972     
+- 166.67E-6  25.E-15    50.E-15    3.5816     3.7        2.975     
+- 200.E-6    25.E-15    50.E-15    3.6057     3.7        2.972     
+-Gnucap   System status
+-iterations: op=0, dc=9, tran=51, fourier=0, total=70
+-transient timesteps: accepted=10, rejected=0, total=10
+-nodes: user=5, subckt=2, model=3, total=10
+-dctran density=30.0%, ac density=30.0%
+d_bjt.pnp0.gc
+d_connectmodule.0.gc
+d_logic.01.critclock.gc
+d_logic.01.overclock.gc
+d_logic.01.underclock.gc
+d_logic.1.gc
+d_paramset.0.gc
+d_paramset.2.gc
+d_paramset.verilog.1.gc
+d_subckt.3small.gc
+d_subckt.empty.1.gc
+d_subckt.error.1.gc
+d_vs.1.gc
+dc_temp.gc
+find.gc
+finish.0.gc
+finish.1.gc
+finish.2.gc
+finish.3.gc
+finish.4.gc
+l_map.0.gc
+lang_spectre.0.gc
+lang_spectre.1.gc
+lang_spectre.2.gc
+lang_spectre.error.4.gc
+lang_spectre.error.4a.gc
+lang_spice.0.gc
+lang_spice.1.gc
+lang_spice.error.1.gc
+lang_spice.error.4.gc
+lang_verilog.0.gc
+lang_verilog.1.gc
+lang_verilog.1a.gc
+lang_verilog.2.gc
+lang_verilog.3.gc
+lang_verilog.error.1.gc
+lang_verilog.error.2.gc
+lang_verilog.error.3.gc
+lang_verilog.error.4.gc
+lang_verilog.error.6.gc
+lang_verilog.paramset.0.gc
+lang_verilog.paramset.1.gc
+map_error.1.gc
+map_error.2.gc
+node_order.0.gc
+probe-hidden.gc
+resmat.gc
+s_tr.2.gc
+s_tr.3.gc
+s_tr.4.gc
+s_tr.5.gc
+s_tr.6.gc
+s_tr.6r.gc
+s_tr.7.gc
+temp.1.gc
+tran_temp.gc
+triac.0.gc
+--- ==out//triac.0.gc.out	2018-11-09 11:12:16.027952307 +0000
++++ hack_finish/triac.0.gc.out	2018-11-11 00:44:49.723517347 +0000
+@@ -1,2 +1,2 @@
+ load models/ngspice17/bjt.so 
+-     ^ ? plugin not found in /usr/local/lib:/usr/local/lib/gnucap
++     ^ ? plugin not found in /usr/local/lib/gnucap
+uuh.gc
+done with gnucap
