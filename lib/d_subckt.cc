@@ -278,7 +278,7 @@ double DEV_SUBCKT::tr_probe_num(const std::string& x)const
 }
 /*--------------------------------------------------------------------------*/
 }
-//#define DO_TRACE
+#define DO_TRACE
 #include "io_trace.h"
 #include "u_nodemap.h"
 
@@ -407,7 +407,6 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
 
 
   // create a permutation p of [0 ... how_many], but fix <net_nodes
-  subckt->nodes()->permute(o.data()); // change user numbers.
 
   if(subckt==&CARD_LIST::card_list){
     // TODO: use _sim->_nm instead.
@@ -416,7 +415,28 @@ void hack_finish(CARD_LIST* subckt, unsigned net_nodes)
 	continue;
       }
       for(int j=0; j<i->net_nodes(); ++j){
-	i->n_(j).hack_ttt();
+	trace4("b4",i->n_(j).t_(), i->n_(j).e_(),  CKT_BASE::_sim->_total_nodes, n );
+	int on= CKT_BASE::_sim->_total_nodes;
+	assert(on == 0 ||on==n);
+	CKT_BASE::_sim->_total_nodes = n;
+	i->n_(j).map_subckt_node((int*)o.data(), NULL);
+	CKT_BASE::_sim->_total_nodes = on;
+	trace2("",i->n_(j).t_(), i->n_(j).e_());
+      }
+    }
+  }
+
+  subckt->nodes()->permute(o.data()); // change user numbers.
+
+  if(subckt==&CARD_LIST::card_list){
+    for(auto i : *subckt){
+      if(!i->is_device()){ untested();
+	continue;
+      }
+      for(int j=0; j<i->net_nodes(); ++j){
+	trace2("check",i->n_(j).t_(), i->n_(j).e_());
+	assert(i->n_(j).t_() == i->n_(j).e_());
+
       }
     }
   }

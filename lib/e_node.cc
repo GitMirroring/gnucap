@@ -523,10 +523,6 @@ void node_t::new_node(const std::string& node_name, const CARD* d)
   assert(_nnn);
 }
 
-void node_t::hack_ttt(){
-  assert(_nnn);
-  _ttt = _nnn->user_number();
-}
 /*--------------------------------------------------------------------------*/
 /* new_model_node: a mapped new node, produced through model expansion.
  * Not really a model_node, but a node in the subckt that is made
