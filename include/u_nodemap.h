@@ -39,6 +39,8 @@ public:
   NODE*     operator[](std::string);
   NODE*     new_node(std::string);
 
+  void permute(int*);
+
   typedef std::map<const std::string, NODE*>::iterator iterator;
   typedef std::map<const std::string, NODE*>::const_iterator const_iterator;
 
