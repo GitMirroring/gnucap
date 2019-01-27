@@ -69,6 +69,12 @@ void STORAGE::precalc_last()
    */
 }
 /*--------------------------------------------------------------------------*/
+void STORAGE::keep_state()
+{
+  _i_kept = _i[0];
+  ELEMENT::keep_state();
+}
+/*--------------------------------------------------------------------------*/
 void STORAGE::tr_begin()
 {
   ELEMENT::tr_begin();
@@ -83,6 +89,7 @@ void STORAGE::tr_restore()
 {
   ELEMENT::tr_restore();
   _method_a = method_select[OPT::method][_method_u];
+  _i[0] = _i_kept;
 }
 /*--------------------------------------------------------------------------*/
 void STORAGE::dc_advance()

@@ -162,8 +162,10 @@ public: // commons
   double   _dt;
 
   double   _time[OPT::_keep_time_steps];
+  double   _time_kept;
   FPOLY1   _y1;		// iteration parameters, 1 iter ago
   FPOLY1   _y[OPT::_keep_time_steps]; /* charge or flux, and deriv.	*/
+  FPOLY1   _y_kept; /* charge or flux, and deriv.	*/
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -43,6 +43,7 @@ public: // override virtual
   //void   precalc_first();	//ELEMENT
   //void   expand();		//COMPONENT
   void	   precalc_last();
+  void     keep_state();
   void     tr_begin();
   void     tr_restore();
   void     dc_advance();
@@ -70,6 +71,7 @@ public: // used by commons
   METHOD   _method_a;	/* actual integration method (auto)	*/
 protected:
   FPOLY1   _i[OPT::_keep_time_steps]; /* deriv of _q */
+  FPOLY1   _i_kept; /* mark */
 protected:
   static METHOD method_select[meNUM_METHODS][meNUM_METHODS];
 };

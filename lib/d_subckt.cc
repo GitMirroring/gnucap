@@ -106,6 +106,7 @@ private: // no-ops for prototype
   void precalc_last(){}
   void map_nodes(){}
   void tr_begin(){}
+  void keep_state(){}
   void tr_load(){}
   TIME_PAIR tr_review(){ return TIME_PAIR(NEVER, NEVER);}
   void tr_accept(){}

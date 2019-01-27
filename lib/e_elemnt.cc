@@ -93,7 +93,8 @@ void ELEMENT::precalc_last()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::keep_state()
 {
-  incomplete();
+  _time_kept = _time[0];
+  _y_kept = _y[0];
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_begin()
@@ -116,12 +117,12 @@ void ELEMENT::tr_restore()
     // _freezetime
     incomplete();
     //BUG// wrong values in _time[]
-    for (int i=0  ; i<OPT::_keep_time_steps-1; ++i) {untested();
-      _time[i] = _time[i+1];
-      _y[i] = _y[i+1];
+    for (int i=1  ; i<OPT::_keep_time_steps; ++i) {untested();
+      _time[i] = 0.;
+      _y[i] = FPOLY1(0., 0., 0.);
     }
-    _time[OPT::_keep_time_steps-1] = 0.;
-    _y[OPT::_keep_time_steps-1]    = FPOLY1(0., 0., 0.);
+    _time[0] = _time_kept;
+    _y[0] = _y_kept;
   }else if (_time[0] == _sim->_time0) {
     // the usual continue where the last one left off
   }else{unreachable();
@@ -171,6 +172,7 @@ void ELEMENT::tr_advance()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_regress()
 {
+  trace3("tr_regress", _time[0], _time[1], _sim->_time0);
   assert(_time[0] >= _sim->_time0); // moving backwards
   assert(_time[1] <= _sim->_time0); // but not too far backwards
 

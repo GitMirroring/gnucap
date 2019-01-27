@@ -214,7 +214,7 @@ CARD_LIST& CARD_LIST::tr_iwant_matrix()
 /* keep_state: save operating point, for use in tr_restore
  */
 CARD_LIST& CARD_LIST::keep_state()
-{ untested();
+{
   for (iterator ci=begin(); ci!=end(); ++ci) {
     trace_func_comp();
     (**ci).keep_state();
