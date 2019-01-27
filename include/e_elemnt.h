@@ -44,6 +44,7 @@ public:
 public: // override virtual
   bool	   print_type_in_spice()const {return false;}
   void	   precalc_last();
+  void	   keep_state();
   void	   tr_begin();
   void	   tr_restore();
   void	   dc_advance();

@@ -211,6 +211,17 @@ CARD_LIST& CARD_LIST::tr_iwant_matrix()
   return *this;
 }
 /*--------------------------------------------------------------------------*/
+/* keep_state: save operating point, for use in tr_restore
+ */
+CARD_LIST& CARD_LIST::keep_state()
+{ untested();
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    trace_func_comp();
+    (**ci).keep_state();
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
 /* tr_begin: first pass on a new transient simulation (initial DC)
  */
 CARD_LIST& CARD_LIST::tr_begin()

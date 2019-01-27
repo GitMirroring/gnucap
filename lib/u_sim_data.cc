@@ -166,6 +166,7 @@ void SIM_DATA::keep_voltages()
       _vdc[ii] = _v0[ii];
     }
     _last_time = (_time0 > 0.) ? _time0 : 0.;
+    CARD_LIST::card_list.keep_state();
   }else{untested();
     //BUG// probably incorrect
   }

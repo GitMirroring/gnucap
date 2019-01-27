@@ -47,6 +47,7 @@ protected: // override virtual
   //void  expand()			//COMPONENT
   //void  precalc_last()	{assert(subckt()); subckt()->precalc();}
   //void  map_nodes();
+  void	  keep_state()	{assert(subckt()); subckt()->keep_state();}
   void	  tr_begin()	{assert(subckt()); subckt()->tr_begin();}
   void	  tr_restore()	{assert(subckt()); subckt()->tr_restore();}
   void	  dc_advance()	{assert(subckt()); subckt()->dc_advance();}

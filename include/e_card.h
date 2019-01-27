@@ -71,6 +71,7 @@ public:	// "elaborate"
   //--------------------------------------------------------------------
 public:	// dc-tran
   virtual void	 tr_iwant_matrix()	{}
+  virtual void	 keep_state()		{}
   virtual void	 tr_begin()		{}
   virtual void	 tr_restore()		{}
   virtual void	 dc_advance()		{}
