@@ -212,9 +212,9 @@ double LOGIC_NODE::tr_probe_num(const std::string& x)const
 {
   if (Umatch(x, "l{ogic} ")) {
     return annotated_logic_value();
-  }else if (Umatch(x, "la{stchange} ")) {untested();
+  }else if (Umatch(x, "la{stchange} ")) {
     return _lastchange;
-  }else if (Umatch(x, "fi{naltime} ")) {untested();
+  }else if (Umatch(x, "fi{naltime} ")) {
     return final_time();
   }else if (Umatch(x, "di{ter} ")) {untested();
     return static_cast<double>(_d_iter);
