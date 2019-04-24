@@ -29,8 +29,6 @@
 #include "e_subckt.h"
 #include "u_xprobe.h"
 #include "d_logic.h"
-#define DO_TRACE
-#include "io_trace.h"
 /*--------------------------------------------------------------------------*/
 int DEV_LOGIC::_count = -1;
 int COMMON_LOGIC::_count = -1;
@@ -204,7 +202,7 @@ void DEV_LOGIC::tr_advance()
   }
 }
 void DEV_LOGIC::tr_regress()
-{itested();
+{
   assert(_gatemode == moDIGITAL || _gatemode == moANALOG);
   const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
   assert(c);
@@ -244,11 +242,10 @@ void DEV_LOGIC::tr_regress()
       }else{
       }
       _n[0]->set_last_change_time(_n[0]->old_last_change_time());
-      _n[0]->set_d_iter(); //needed?
-      q_eval(); // really?
+      // _n[0]->set_d_iter(); //needed?
+      q_eval(); // really? yes
     }
-    trace1("regress", _lastchangenode);
-    _lastchangenode = 0; // needed?
+    // _lastchangenode = 0; // needed?
     break;
   }
 }
@@ -297,7 +294,6 @@ bool DEV_LOGIC::tr_eval_digital()
   }else{
   }
   if (_sim->analysis_is_static() || _sim->analysis_is_restore()) {
-    trace1("acc", long_label());
     tr_accept();
   }else{
     assert(_sim->analysis_is_tran_dynamic());
@@ -411,10 +407,10 @@ void DEV_LOGIC::tr_accept()
     }else{
     }
     assert(_gatemode == moANALOG);
-  }else if(_lastchangenode == 0){
-    incomplete();
+//  }else if(_lastchangenode == 0){
+//    incomplete();
   }else{
-    ELEMENT::tr_accept(); // needed?
+//    ELEMENT::tr_accept(); // needed? has no effect.
     assert(want_digital());
     if (_gatemode == moANALOG) {
       error(bTRACE, "%s:%u:%g switch to digital\n",
@@ -461,16 +457,9 @@ void DEV_LOGIC::tr_accept()
 	assert(future_state.lv_old() == future_state.lv_future());
 	if (_n[OUTNODE]->lv() == lvUNKNOWN
 	    || future_state.lv_future() != _n[OUTNODE]->lv_future()) {
-	  if(_n[OUTNODE]->final_time() == NEVER){
-	    _n[OUTNODE]->set_event(m->delay, future_state);
-	  }else{
-	  }
+	  _n[OUTNODE]->set_event(m->delay, future_state);
 
-	  if(_n[OUTNODE]->final_time() >= _sim->_time0 + _sim->_dtmin){
-	    _sim->new_event(_n[OUTNODE]->final_time());
-	  }else{
-	    // happens in overclocked test
-	  }
+	  _sim->new_event(_n[OUTNODE]->final_time());
 	  //assert(future_state == _n[OUTNODE].lv_future());
 	  if (_lastchangenode == OUTNODE) {
 	    unreachable();
@@ -490,9 +479,9 @@ void DEV_LOGIC::tr_accept()
       }
     }else{
     }
+    _n[0]->store_old_last_change_time();
+    _n[OUTNODE]->store_old_lv(); // needed? yes
   }
-  _n[0]->store_old_last_change_time();
-  _n[OUTNODE]->store_old_lv(); // needed?
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_unload()
