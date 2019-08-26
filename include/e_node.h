@@ -25,7 +25,7 @@
 #ifndef E_NODE_H
 #define E_NODE_H
 #include "u_sim_data.h"
-#include "e_base.h"
+#include "e_card.h"
 /*--------------------------------------------------------------------------*/
 class MODEL_LOGIC;
 /*--------------------------------------------------------------------------*/
@@ -79,10 +79,14 @@ public:
   LOGICVAL& set_in_transition(LOGICVAL newval);
 };
 /*--------------------------------------------------------------------------*/
-class NODE : public CKT_BASE {
+class NODE : public CARD {
+private: // CARD overrides
+  CARD* clone() const{ return new NODE(*this); }
+  std::string value_name()const {return "";} // pure in CARD
+  bool	is_device()const		{return true;}
 private:
   int	_user_number;
-  //int	_flat_number;
+  int	_flat_number;
   //int	_matrix_number;
 protected:
   explicit NODE();
@@ -95,13 +99,13 @@ public:
 
 public: // raw data access (rvalues)
   int	user_number()const	{return _user_number;}
-  //int	flat_number()const	{itested();return _flat_number;}
+  int	flat_number()const	{itested();return _flat_number;}
 public: // simple calculated data access (rvalues)
   int	matrix_number()const	{return _sim->_nm[_user_number];}
   int	m_()const		{return matrix_number();}
 public: // maniputation
   NODE&	set_user_number(int n)	{_user_number = n; return *this;}
-  //NODE& set_flat_number(int n) {itested();_flat_number = n; return *this;}
+  NODE& set_flat_number(int n) {itested();_flat_number = n; return *this;}
   //NODE& set_matrix_number(int n){untested();_matrix_number = n;return *this;}
 public: // virtuals
   double	tr_probe_num(const std::string&)const;
@@ -229,6 +233,7 @@ public: // matrix
 /*--------------------------------------------------------------------------*/
 class INTERFACE node_t {
 private:
+  static bool node_is_valid(NODE const*);
   static bool node_is_valid(int i) {
     if (i == INVALID_NODE) {
     }else if (i < 0) {
@@ -254,12 +259,16 @@ public:
   int	      m_()const	{return _m;}
 
   int	      t_()const {
-    //assert(_nnn);
-    //assert(_ttt == _nnn->flat_number());
-    return _ttt;
+    if(_nnn){
+      assert(_ttt == _nnn->flat_number());
+      return _nnn->flat_number();
+    }else{
+      return INVALID_NODE;
+    }
   }	// e_cardlist.cc:CARD_LIST::map_subckt_nodes:436 and
 	// e_node.h:node_t::map:263,265 only
 
+  // number in parent scope
   int	      e_()const {
     return ((_nnn) ? _nnn->user_number() : INVALID_NODE);
   }
@@ -271,7 +280,7 @@ public:
   void	set_to_ground(CARD*);
   void	new_node(const std::string&, const CARD*);
   void	new_model_node(const std::string& n, CARD* d);
-  void	map_subckt_node(int* map_array, const CARD* d);
+  void	map_subckt_node(NODE** map_array, const CARD* d);
   bool	is_grounded()const {return (e_() == 0);}
   bool	is_connected()const {return (e_() != INVALID_NODE);}
 
@@ -299,8 +308,9 @@ public:
   LOGIC_NODE*	    operator->()	{return &data();}
 
   node_t& operator=(const node_t& p);
+  node_t& operator=(NODE* p);
 
-  bool operator==(const node_t& p) {return _nnn==p._nnn && _ttt==p._ttt && _m==p._m;}
+  bool operator==(const node_t& p) const;
 
 public:
   double      v0()const {

@@ -89,9 +89,9 @@ LOGIC_NODE::LOGIC_NODE()
 /* default constructor : unconnected, don't use
  */
 NODE::NODE()
-  :CKT_BASE(),
-   _user_number(INVALID_NODE)
-   //_flat_number(INVALID_NODE)
+  :CARD(),
+   _user_number(INVALID_NODE),
+   _flat_number(INVALID_NODE)
    //_matrix_number(INVALID_NODE)
 {
 }
@@ -99,21 +99,20 @@ NODE::NODE()
 /* copy constructor : user data only
  */
 NODE::NODE(const NODE& p)
-  :CKT_BASE(p),
-   _user_number(p._user_number)
-   //_flat_number(p._flat_number)
-   //_matrix_number(INVALID_NODE)
+  :CARD(p),
+   _user_number(p._user_number),
+   _flat_number(p._flat_number)
+//   _matrix_number(INVALID_NODE)
 {
-  unreachable();
 }
 /*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
  * supposedly not used, but used by a required function that is also not used
  */
 NODE::NODE(const NODE* p)
-  :CKT_BASE(*p),
-   _user_number(p->_user_number)
-   //_flat_number(p->_flat_number)
+  :CARD(*p),
+   _user_number(p->_user_number),
+   _flat_number(p->_flat_number)
    //_matrix_number(INVALID_NODE)
 {
   unreachable();
@@ -122,11 +121,12 @@ NODE::NODE(const NODE* p)
 /* usual initializing constructor : name and index
  */
 NODE::NODE(const std::string& s, int n)
-  :CKT_BASE(s),
-   _user_number(n)
-   //_flat_number(n)
+  :CARD(),
+   _user_number(n),
+   _flat_number(n)
    //_matrix_number(INVALID_NODE)
 {
+  set_label(s);
 }
 /*--------------------------------------------------------------------------*/
 node_t::node_t()
@@ -140,19 +140,30 @@ node_t::node_t(const node_t& p)
    _ttt(p._ttt),
    _m(p._m)
 {
-  //assert(_ttt == _nnn->flat_number());
+  if(_nnn){
+    assert(_ttt == _nnn->flat_number());
+  }else{
+  }
 }
 node_t::node_t(NODE* n)
   :_nnn(n),
-   _ttt(n->user_number()),
+   _ttt(n->flat_number()),
    _m(to_internal(n->user_number()))
 {
-  //assert(_ttt == _nnn->flat_number());
+  assert(_ttt == _nnn->flat_number());
+}
+node_t& node_t::operator=(NODE* p)
+{
+  assert(!_nnn);
+  assert(p);
+  _ttt = p->flat_number();
+  _nnn = p;
+  return *this;
 }
 node_t& node_t::operator=(const node_t& p)
 {
   if (p._nnn) {
-    //assert(p._ttt == p._nnn->flat_number());
+    assert(p._ttt == p._nnn->flat_number());
   }else{
     assert(p._ttt == INVALID_NODE);
     assert(p._m   == INVALID_NODE);
@@ -161,6 +172,22 @@ node_t& node_t::operator=(const node_t& p)
   _ttt = p._ttt;
   _m   = p._m;
   return *this;
+}
+/*--------------------------------------------------------------------------*/
+bool node_t::operator==(node_t const& p) const
+{
+  if(!_nnn || !p._nnn){ untested();
+    return false;
+  }else if(_nnn->flat_number() !=  p._nnn->flat_number()){ untested();
+    return false;
+  }else if(_ttt!=p._ttt){ untested();
+    unreachable();
+    return false;
+  }else if(_m!=p._m){ untested();
+    return false;
+  }else{
+    return true;
+  }
 }
 /*--------------------------------------------------------------------------*/
 LOGIC_NODE& node_t::data()const
@@ -494,12 +521,15 @@ void LOGIC_NODE::set_event(double delay, LOGICVAL v)
 /*--------------------------------------------------------------------------*/
 void node_t::set_to_ground(CARD* d)
 {
-  //assert(!_nnn); //BUG// fails on MUTUAL_L::expand after clone
+  assert(!_nnn); //BUG// fails on MUTUAL_L::expand after clone
+                 // is there a test?
   assert(d);
 
   NODE_MAP* Map = d->scope()->nodes();
   assert(Map);
   _nnn = (*Map)["0"];
+  assert(_nnn->flat_number()==0);
+  assert(_nnn->user_number()==0);
   _ttt = 0;
   assert(_nnn);
 }
@@ -508,7 +538,9 @@ void node_t::set_to_ground(CARD* d)
  */
 void node_t::new_node(const std::string& node_name, const CARD* d)
 {
-  //assert(!_nnn); //BUG// fails on MUTUAL_L::expand after clone
+  //  assert(!_nnn); //BUG// fails on MUTUAL_L::expand after clone
+  //                         and in lang_spectre.error.4.gc
+  //
   assert(d);
 
   NODE_MAP* Map = d->scope()->nodes();
@@ -528,22 +560,49 @@ void node_t::new_model_node(const std::string& node_name, CARD* d)
 {
   new_node(node_name, d);
   _ttt = CKT_BASE::_sim->newnode_model();
-  //assert(_ttt == _nnn->flat_number());
+  if(_nnn){
+    if(_ttt == _nnn->flat_number()){
+    }else{
+      // something with coils?
+      incomplete();
+      _nnn->set_flat_number(_ttt);
+    }
+  }else{ untested();
+    _nnn = new NODE(node_name, _ttt); // BUG: ownership?
+    _nnn->set_flat_number(_ttt);
+  }
+  assert(_ttt == _nnn->flat_number());
 }
 /*--------------------------------------------------------------------------*/
-void node_t::map_subckt_node(int* m, const CARD* d)
+bool node_t::node_is_valid(NODE const* i)
+{
+  if(!i){ untested();
+    return false;
+  }else if (node_is_valid(i->flat_number())) { untested();
+    return true;
+  }else{ untested();
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+// after shallow copying a subckt in a subckt component
+// connect sub device port to node in subckt d
+void node_t::map_subckt_node(NODE** m, const CARD* d)
 {
   assert(m);
   if (e_() != INVALID_NODE) {
     if (node_is_valid(m[e_()])) {
-      _ttt = m[e_()];
-    }else{
+      _nnn = m[e_()];
+      _ttt = _nnn->flat_number();
+    }else{ untested();
       throw Exception(d->long_label() + ": need more nodes");
     }
   }else{untested();
     throw Exception(d->long_label() + ": invalid nodes");
   }
-  //_nnn->set_flat_number(_ttt);
+  assert(_nnn);
+//  assert(_nnn->flat_number()==_ttt); TODO: check in caller?
+//  _nnn->set_flat_number(_ttt);
   assert(node_is_valid(_ttt));
 }
 /*--------------------------------------------------------------------------*/

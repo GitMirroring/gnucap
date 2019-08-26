@@ -911,7 +911,7 @@ double COMPONENT::volts_limited(const node_t & n1, const node_t & n2)
       _sim->_fulldamp = true;
       error(bTRACE, "range limit damp\n");
     }
-    if (OPT::picky <= bTRACE) {untested();
+    if (OPT::picky <= bTRACE) {
       error(bNOERROR,"node limiting (n1,n2,dif) "
 	    "was (%g %g %g) now (%g %g %g)\n",
 	    n1.v0(), n2.v0(), n1.v0() - n2.v0(), v1, v2, v1-v2);

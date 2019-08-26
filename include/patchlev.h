@@ -1,1 +1,1 @@
-#define PATCHLEVEL "portnumber 2019.11.30"
+#define PATCHLEVEL "node_card 2019.12.01"

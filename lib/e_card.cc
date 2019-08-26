@@ -201,10 +201,11 @@ void CARD::new_subckt()
 }
 /*--------------------------------------------------------------------------*/
 void CARD::new_subckt(const CARD* Model, PARAM_LIST* Params)
-{
+{ untested();
   delete _subckt;
   _subckt = NULL;
   _subckt = new CARD_LIST(Model, this, scope(), Params);
+  _subckt->map_subckt_nodes(Model, this);
 }
 /*--------------------------------------------------------------------------*/
 void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)

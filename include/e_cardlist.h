@@ -33,6 +33,7 @@ class CARD_LIST;
 class CARD;
 class PARAM_LIST;
 class NODE_MAP;
+class NODE;
 class LANGUAGE;
 class TIME_PAIR;
 /*--------------------------------------------------------------------------*/

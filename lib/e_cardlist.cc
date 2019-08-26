@@ -43,7 +43,7 @@ CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
   :_parent(NULL),
    _nm(new NODE_MAP),
    _params(NULL)
-{
+{ untested();
   assert(model);
   assert(model->subckt());
   assert(owner);
@@ -52,7 +52,7 @@ CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
   attach_params(p, scope);
   shallow_copy(model->subckt());
   set_owner(owner);
-  map_subckt_nodes(model, owner);
+  // map_subckt_nodes(model, owner); // -> CARD::new_subckt?
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST::~CARD_LIST()
@@ -441,6 +441,7 @@ void CARD_LIST::attach_params(PARAM_LIST* p, const CARD_LIST* scope)
 /*--------------------------------------------------------------------------*/
 void CARD_LIST::shallow_copy(const CARD_LIST* p)
 {
+  trace0("sc");
   assert(p);
   _parent = p;
   for (const_iterator ci = p->begin(); ci != p->end(); ++ci) {
@@ -451,9 +452,12 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
     }else{
     }
   }
+  trace1("mapping", p->nodes()->how_many());
 }
 /*--------------------------------------------------------------------------*/
+// clone nodes from sckt proto
 // set up the map of external to expanded node numbers
+// move to BASE_SUBCKT::expand or so?
 void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_)
 {
   COMPONENT const* model = dynamic_cast<COMPONENT const*>(model_);
@@ -462,17 +466,17 @@ void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_)
   assert(model->subckt());
   assert(model->subckt()->nodes());
   assert(owner);
-  //assert(owner->subckt());
-  //assert(owner->subckt() == this);
+  assert(owner->subckt());
+  assert(owner->subckt() == this);
   trace0(model->long_label().c_str());
   trace0(owner->long_label().c_str());
 
   int num_nodes_in_subckt = model->subckt()->nodes()->how_many();
   trace2("",  model->net_nodes(),  num_nodes_in_subckt);
   assert(model->net_nodes() <= num_nodes_in_subckt);
-  std::vector<int> map(num_nodes_in_subckt+1);
+  std::vector<NODE*> map = std::vector<NODE*>(num_nodes_in_subckt+1);
   {
-    map[0] = 0;
+    map[0] = &ground_node;
     // self test: verify that port node numbering is correct
     trace1("ports", model->net_nodes());
     for (int port = 0; port < model->net_nodes(); ++port) {
@@ -484,25 +488,41 @@ void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_)
       // take care of the "port" nodes (external connections)
       // map them to what the calling circuit wants
       int i=0;
+      trace1("ports", owner->long_label());
       for (i=1; i <= model->net_nodes(); ++i) {
 	assert(i <= num_nodes_in_subckt);
-	map[i] = owner->n_(i-1).t_();
-	trace3("ports", i, map[i], owner->n_(i-1).t_());
+	map[i] = owner->n_(i-1).n_();
+	trace2("ports", i, owner->n_(i-1).t_());
+      }
+
+      // collecting ordered nodes from nodemap. clone internal nodes.
+      // this is alphabetic order, presumably. need to assign
+      // newnode_subckt() in order of appearance, below
+      for(auto ii : (*model->subckt()->nodes())){ itested();
+	int f = ii.second->user_number();
+	assert(f == ii.second->flat_number());
+	if(f>model->net_nodes()){
+	  CARD const* c = ii.second;
+	  CARD* nn = c->clone();
+	  push_back(nn);
+	  NODE* nnn = prechecked_cast<NODE*>(nn);
+	  map[f] = nnn; // owner->n_(i-1).n_(); // nnn;
+	}else{
+	}
       }
     
       // get new node numbers, and assign them to the remaining
+      trace3("internal", owner->long_label(), model->net_nodes(), num_nodes_in_subckt);
       for (assert(i==model->net_nodes() + 1); i <= num_nodes_in_subckt; ++i) {
-	// for each remaining node in card_list
-	map[i] = CKT_BASE::_sim->newnode_subckt();
-	trace2("internal", i, map[i]);
+	int f = CKT_BASE::_sim->newnode_subckt();
+	NODE* nnn = map[i];
+	assert(nnn);
+	nnn->set_flat_number(f); // TODO: let NODE decide. NODE::expand?
+	nnn->set_user_number(f); // TODO: let NODE decide. NODE::expand?
       }
     }
   }
-  // "map" now contains a translation list,
-  // from subckt local numbers to matrix index numbers
-
-  // The node list (_nm) in an instance of a subckt does not exist.
-  // Device nodes (type node_t) points to the NODE in the parent.
+  // "map" now contains pointers to nodes in newly created scope
   // Mapping is done in node_t.
 
   // scan the list, map the nodes
@@ -517,7 +537,7 @@ void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_)
 	c->n_(ii).map_subckt_node(map.data(), owner);
       }
     }else{
-      assert(dynamic_cast<MODEL_CARD*>(*ci));
+      // component proto
     }
   }
 }

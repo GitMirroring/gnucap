@@ -36,6 +36,7 @@
 #include "globals.h"
 #include "e_paramlist.h"
 #include "e_subckt.h"
+#include "u_nodemap.h"
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
@@ -107,6 +108,7 @@ protected:
 private:
   std::vector<node_t> _nodes;
   static int	_count;
+
 } p1;
 int DEV_SUBCKT::_count = -1;
 /*--------------------------------------------------------------------------*/
