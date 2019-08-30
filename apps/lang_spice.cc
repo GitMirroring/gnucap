@@ -615,7 +615,7 @@ COMPONENT* LANG_SPICE_BASE::parse_instance(CS& cmd, COMPONENT* x)
     if (x->use_obsolete_callback_parse()) {
       parse_element_using_obsolete_callback(cmd, x);
     }else if (DEV_LOGIC* xx = dynamic_cast<DEV_LOGIC*>(x)) {
-      parse_logic_using_obsolete_callback(cmd, xx);
+      parse_logic_using_obsolete_callback(cmd, dynamic_cast<BASE_SUBCKT*>(xx));
     }else{
       {
 	unsigned here = cmd.cursor();

@@ -1,1 +1,1 @@
-#define PATCHLEVEL "node_card 2019.12.01"
+#define PATCHLEVEL "subckt 2019.12.01"

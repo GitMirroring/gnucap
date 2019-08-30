@@ -29,10 +29,16 @@
 class BASE_SUBCKT : public COMPONENT {
 protected:
   explicit BASE_SUBCKT()
-    :COMPONENT() {}
+    :COMPONENT(),
+     _subckt(0) {}
   explicit BASE_SUBCKT(const BASE_SUBCKT& p)
-    :COMPONENT(p) {}
-  ~BASE_SUBCKT() {}
+    :COMPONENT(p),
+     _subckt(0) //BUG// isn't this supposed to copy????
+     {}
+
+  ~BASE_SUBCKT() {
+    delete _subckt;
+  }
 protected: // override virtual
   //char  id_letter()const		//CARD/null
   std::string dev_type()const {assert(common()); return common()->modelname();}
@@ -46,7 +52,41 @@ protected: // override virtual
   //void  precalc_first()	{assert(subckt()); subckt()->precalc();}
   //void  expand()			//COMPONENT
   //void  precalc_last()	{assert(subckt()); subckt()->precalc();}
-  //void  map_nodes();
+  void  map_nodes(){
+    COMPONENT::map_nodes();
+
+    if (subckt()) {
+      subckt()->map_nodes();
+    }else{
+    }
+  }
+  void      tr_iwant_matrix(){
+    if (is_device()) {
+      assert(matrix_nodes() == 0);
+      if (subckt()) {
+	subckt()->tr_iwant_matrix();
+      }else{untested();
+      }
+    }else{
+    }
+  }
+  void      ac_iwant_matrix(){
+    if (is_device()) {
+      assert(matrix_nodes() == 0);
+      if (subckt()) {
+	subckt()->ac_iwant_matrix();
+      }else{untested();
+      }
+    }else{
+    }
+  }
+  void set_slave(){
+    COMPONENT::set_slave();
+    if (subckt()) {
+      subckt()->set_slave();
+    }else{
+    }
+  }
   void	  tr_begin()	{assert(subckt()); subckt()->tr_begin();}
   void	  tr_restore()	{assert(subckt()); subckt()->tr_restore();}
   void	  dc_advance()	{assert(subckt()); subckt()->dc_advance();}
@@ -64,6 +104,16 @@ protected: // override virtual
   void	  ac_begin()	{assert(subckt()); subckt()->ac_begin();}
   void	  do_ac()	{assert(subckt()); subckt()->do_ac();}
   void	  ac_load()	{assert(subckt()); subckt()->ac_load();}
+public:
+  CARD_LIST*	     subckt(){ return _subckt; }
+  const CARD_LIST*   subckt()const{ return _subckt; }
+  void	  new_subckt();
+  void	  new_subckt(const CARD* model, PARAM_LIST* p);
+  void	  renew_subckt(const CARD* model, PARAM_LIST* p);
+  //void     new_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
+  //void     renew_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
+private:
+  CARD_LIST*	_subckt;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

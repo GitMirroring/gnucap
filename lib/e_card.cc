@@ -26,13 +26,13 @@
 #include "e_cardlist.h"
 #include "e_node.h"
 #include "e_card.h"
+#include "e_subckt.h"
 /*--------------------------------------------------------------------------*/
 const int POOLSIZE = 4;
 /*--------------------------------------------------------------------------*/
 CARD::CARD()
   :CKT_BASE(),
    _evaliter(-100),
-   _subckt(0),
    _owner(0),
    _constant(false),
    _net_nodes(0)
@@ -42,7 +42,6 @@ CARD::CARD()
 CARD::CARD(const CARD& p)
   :CKT_BASE(p),
    _evaliter(-100),
-   _subckt(0), //BUG// isn't this supposed to copy????
    _owner(0),
    _constant(p._constant),
    _net_nodes(p._net_nodes)
@@ -51,7 +50,6 @@ CARD::CARD(const CARD& p)
 /*--------------------------------------------------------------------------*/
 CARD::~CARD()
 {
-  delete _subckt;
 }
 /*--------------------------------------------------------------------------*/
 const std::string CARD::long_label()const
@@ -89,8 +87,8 @@ int CARD::connects_to(const node_t& node)const
 /*--------------------------------------------------------------------------*/
 CARD_LIST* CARD::scope()
 {
-  if (owner()) {
-    return owner()->subckt();	// normal element, owner determines scope
+  if (BASE_SUBCKT* o=dynamic_cast<BASE_SUBCKT*>(owner())) {
+    return o->subckt();	// normal element, owner determines scope
   }else{
     return &(CARD_LIST::card_list);	// root circuit
   }
@@ -192,7 +190,8 @@ TIME_PAIR CARD::tr_review()
   return TIME_PAIR(NEVER,NEVER);
 }
 /*--------------------------------------------------------------------------*/
-void CARD::new_subckt()
+// TODO: move
+void BASE_SUBCKT::new_subckt()
 {
   assert(!_subckt);
   delete _subckt;
@@ -200,7 +199,8 @@ void CARD::new_subckt()
   _subckt = new CARD_LIST;
 }
 /*--------------------------------------------------------------------------*/
-void CARD::new_subckt(const CARD* Model, PARAM_LIST* Params)
+// TODO: move
+void BASE_SUBCKT::new_subckt(const CARD* Model, PARAM_LIST* Params)
 { untested();
   delete _subckt;
   _subckt = NULL;
@@ -208,7 +208,8 @@ void CARD::new_subckt(const CARD* Model, PARAM_LIST* Params)
   _subckt->map_subckt_nodes(Model, this);
 }
 /*--------------------------------------------------------------------------*/
-void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)
+// TODO: move
+void BASE_SUBCKT::renew_subckt(const CARD* Model, PARAM_LIST* Params)
 {
   if (_sim->is_first_expand()) {
     new_subckt(Model, Params);
@@ -257,5 +258,24 @@ bool CARD::evaluated()const
   }
 }
 /*--------------------------------------------------------------------------*/
+CARD_LIST const* CARD::subckt() const
+{ untested();
+  BASE_SUBCKT const* s=dynamic_cast<BASE_SUBCKT const*>(this);
+  if(s){ untested();
+    return s->subckt();
+  }else{ untested();
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST* CARD::subckt()
+{ untested();
+  BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(this);
+  if(s){ untested();
+    return s->subckt();
+  }else{ untested();
+    return NULL;
+  }
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

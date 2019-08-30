@@ -569,21 +569,12 @@ void COMPONENT::map_nodes()
   for (int ii = 0; ii < ext_nodes()+int_nodes(); ++ii) {
     n_(ii).map();
   }
-
-  if (subckt()) {
-    subckt()->map_nodes();
-  }else{
-  }
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::tr_iwant_matrix()
 {
   if (is_device()) {
     assert(matrix_nodes() == 0);
-    if (subckt()) {
-      subckt()->tr_iwant_matrix();
-    }else{untested();
-    }
   }else{
   }
 }
@@ -592,10 +583,6 @@ void COMPONENT::ac_iwant_matrix()
 {
   if (is_device()) {
     assert(matrix_nodes() == 0);
-    if (subckt()) {
-      subckt()->ac_iwant_matrix();
-    }else{untested();
-    }
   }else{
   }
 }
@@ -623,10 +610,6 @@ void COMPONENT::set_parameters(const std::string& Label, CARD *Owner,
 void COMPONENT::set_slave()
 {
   mark_always_q_for_eval();
-  if (subckt()) {
-    subckt()->set_slave();
-  }else{
-  }
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_value(double v, COMMON_COMPONENT* c)

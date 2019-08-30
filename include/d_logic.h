@@ -26,10 +26,136 @@
 #define D_LOGIC_H
 #include "e_model.h"
 #include "e_elemnt.h"
+#include "e_subckt.h"
 /*--------------------------------------------------------------------------*/
 enum {PORTS_PER_GATE = 10};
 /*--------------------------------------------------------------------------*/
-class DEV_LOGIC : public ELEMENT {
+class DEV_LOGIC : public BASE_SUBCKT{
+private: // resolve conflicts
+  CARD_LIST* subckt(){ return BASE_SUBCKT::subckt(); }
+  CARD_LIST const* subckt() const{ return BASE_SUBCKT::subckt(); }
+
+/*--------------------------------------------------------------------------*/
+#if 1 // TRANSITION
+public: // ELEMENT. transition
+	// future logic will connect to circuit through connect modules or
+	// connect nodes. need to turn into BASE_SUBCKT first...
+  double   dampdiff(double*, const double&);
+  bool conv_check()const {
+    return conchk(_y1.f1, _y[0].f1)
+      && conchk(_y1.f0, _y[0].f0)
+      && conchk(_y1.x,  _y[0].x, OPT::vntol);
+  }
+  void	   store_values()		{assert(_y[0]==_y[0]); _y1=_y[0];}
+  void ac_load_passive() {
+    _sim->_acx.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), mfactor() * _acg);
+  }
+  inline void tr_load_source() {
+#if !defined(NDEBUG)
+    assert(_loaditer != _sim->iteration_tag()); // double load
+    _loaditer = _sim->iteration_tag();
+#endif
+
+    double d = dampdiff(&_m0.c0, _m1.c0);
+    if (d != 0.) {
+      if (_n[OUT2].m_() != 0) {
+	_n[OUT2].i() += d;
+      }else{
+      }
+      if (_n[OUT1].m_() != 0) {
+	_n[OUT1].i() -= d;
+      }else{
+      }
+    }else{
+    }
+    _m1 = _m0;
+  }
+  void	   tr_load_passive() {
+    double d = dampdiff(&_m0.c1, _m1.c1);
+    if (d != 0.) {
+      _sim->_aa.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), d);
+    }else{
+    }
+    tr_load_source(); // includes _m1 = _m0
+  }
+  void	   tr_unload_passive();
+  void ELEMENT_tr_begin() {
+    _time[0] = 0.;
+    _y[0].x  = 0.;
+    _y[0].f0 = LINEAR;
+    _y[0].f1 = value();
+    _y1 = _y[0];
+    for (int i=1; i<OPT::_keep_time_steps; ++i) {
+      _time[i] = 0.;
+      _y[i] = FPOLY1(0., 0., 0.);
+    }
+    _dt = NOT_VALID;
+  }
+  void ELEMENT_precalc_last()
+  {
+    COMPONENT::precalc_last();
+
+    //BUG// This is needed for AC analysis without doing op (or dc or tran ...) first.
+    // Something like it should be moved to ac_begin.
+    if (_sim->has_op() == s_NONE) {
+      _y[0].x  = 0.;
+      _y[0].f0 = LINEAR;
+      _y[0].f1 = value();
+    }else{
+    }
+  }
+  void ELEMENT_dc_advance() { untested();
+    assert(_sim->_time0 == 0.); // DC
+
+    for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
+      assert(_time[i] == 0.);
+    }
+
+    _dt = NOT_VALID;
+  }
+  void ELEMENT_tr_advance() { untested();
+    assert(_time[0] < _sim->_time0); // moving forward
+
+    for (int i=OPT::_keep_time_steps-1; i>0; --i) {
+      assert(_time[i] < _time[i-1] || _time[i] == 0.);
+      _time[i] = _time[i-1];
+      _y[i] = _y[i-1];
+    }
+    _time[0] = _sim->_time0;
+
+    _dt = _time[0] - _time[1];
+  }
+  void ELEMENT_tr_regress() {
+    assert(_time[0] >= _sim->_time0); // moving backwards
+    assert(_time[1] <= _sim->_time0); // but not too far backwards
+
+    for (int i=OPT::_keep_time_steps-1; i>0; --i) {
+      assert(_time[i] < _time[i-1] || _time[i] == 0.);
+    }
+    _time[0] = _sim->_time0;
+
+    _dt = _time[0] - _time[1];
+  }
+/*--------------------------------------------------------------------------*/
+protected:
+  int      _loaditer;	// load iteration number
+#endif // TRANSITION
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+//  const std::string long_label(){ return ELEMENT::long_label(); }
+  // void q_eval(){ ELEMENT::q_eval(); }
+  // void q_load(){ ELEMENT::q_load(); }
+  // void q_accept(){ ELEMENT::q_accept(); }
+  // bool converged() const{ return ELEMENT::converged(); }
+  // void set_converged(bool b){ return ELEMENT::set_converged(b); }
+  // bool is_q_for_eval() const{ return ELEMENT::is_q_for_eval(); }
+  // COMMON_COMPONENT const* common(){return ELEMENT::common(); }
+
+  // void map_nodes(){ untested();
+  //   ELEMENT::map_nodes();
+  //   BASE_SUBCKT::map_nodes();
+  // }
 public:
   enum {OUTNODE=0,GND_NODE=1,PWR_NODE=2,ENABLE=3,BEGIN_IN=4}; //node labels
 private:
@@ -39,7 +165,7 @@ private:
   smode_t	_oldgatemode;
   smode_t	_gatemode;
   static int	_count;
-  node_t	nodes[PORTS_PER_GATE];	/* PORTS_PER_GATE <= PORTSPERSUBCKT */
+  node_t       _n[PORTS_PER_GATE];     /* PORTS_PER_GATE <= PORTSPERSUBCKT */
 public:
   explicit	DEV_LOGIC();
   explicit	DEV_LOGIC(const DEV_LOGIC& p);
@@ -51,14 +177,15 @@ private: // override virtuals
   std::string dev_type()const {assert(has_common());
     return (common()->modelname() + " " + common()->name()).c_str();}
   int	   tail_size()const	{return 2;}
+  node_t& n_(int i) const{ return const_cast<node_t&>(_n[i]); }
   int	   max_nodes()const	{return PORTS_PER_GATE;}
   int	   min_nodes()const	{return BEGIN_IN+1;}
   int	   matrix_nodes()const	{return 2;}
   int	   net_nodes()const	{return _net_nodes;}
   CARD*	   clone()const		{return new DEV_LOGIC(*this);}
-  void	   precalc_first() {ELEMENT::precalc_first(); if (subckt()) {subckt()->precalc_first();}}
+//  void	   precalc_first() {precalc_first();*/ if (subckt()) {subckt()->precalc_first();}}
   void	   expand();
-  void	   precalc_last() {ELEMENT::precalc_last(); if (subckt()) {subckt()->precalc_last();}}
+  void	   precalc_last() {ELEMENT_precalc_last(); if (subckt()) {subckt()->precalc_last();}}
   //void   map_nodes();
 
   void	   tr_iwant_matrix();
@@ -83,8 +210,8 @@ private: // override virtuals
 
   void	   ac_iwant_matrix();
   void	   ac_begin();
-  void	   do_ac()	{untested();  assert(subckt());  subckt()->do_ac();}
-  void	   ac_load()	{untested();  assert(subckt());  subckt()->ac_load();}
+  void	   do_ac()	{untested();  assert(BASE_SUBCKT::subckt());  BASE_SUBCKT::subckt()->do_ac();}
+  void	   ac_load()	{untested();  assert(BASE_SUBCKT::subckt());  BASE_SUBCKT::subckt()->ac_load();}
   COMPLEX  ac_involts()const		{unreachable(); return 0.;}
   COMPLEX  ac_amps()const		{unreachable(); return 0.;}
   XPROBE   ac_probe_ext(const std::string&)const;
@@ -95,11 +222,68 @@ private: // override virtuals
   }
 public:
   static int count()			{return _count;}
+private: // from ELEMENT. will be obsolete with CONNECTMODULE
+  void tr_iwant_matrix_passive();
+  node_t   _nodes[NODES_PER_BRANCH]; // nodes (0,1:out, 2,3:in)
+public: // more ELEMENT
+  CPOLY1   _m0;		// matrix parameters, new
+  CPOLY1   _m1;		// matrix parameters, 1 fill ago
+  double   _loss0;	// shunt conductance
+  double   _loss1;
+  COMPLEX  _acg;	// ac admittance matrix values
+public: // commons, also from ELEMENT
+  COMPLEX  _ev;		// ac effective value (usually real)
+  double   _dt;
+
+  double   _time[OPT::_keep_time_steps];
+  FPOLY1   _y1;		// iteration parameters, 1 iter ago
+  FPOLY1   _y[OPT::_keep_time_steps]; /* charge or flux, and deriv.	*/
 private:
   bool	   tr_eval_digital();
   bool	   want_analog()const;
   bool	   want_digital()const;
 };
+/*--------------------------------------------------------------------------*/
+#if 1 // TRANSITION
+inline double DEV_LOGIC::dampdiff(double* v0, const double& v1)
+{
+  //double diff = v0 - v1;
+  assert(v0);
+  assert(*v0 == *v0);
+  assert(v1 == v1);
+  double diff = dn_diff(*v0, v1);
+  assert(diff == diff);
+  if (!_sim->is_advance_or_first_iteration()) {
+    diff *= _sim->_damp;
+    *v0 = v1 + diff;
+  }else{
+  }
+  return mfactor() * ((_sim->is_inc_mode()) ? diff : *v0);
+}
+/*--------------------------------------------------------------------------*/
+inline void DEV_LOGIC::tr_unload_passive()
+{
+  _m0.c0 = _m0.c1 = 0.;
+  _sim->mark_inc_mode_bad();
+  tr_load_passive(); // includes _m1 = _m0
+}
+/*--------------------------------------------------------------------------*/
+inline void DEV_LOGIC::tr_iwant_matrix_passive()
+{
+  assert(matrix_nodes() == 2);
+  assert(is_device());
+  //assert(!subckt()); ok for subckt to exist for logic
+  trace2(long_label().c_str(), _n[OUT1].m_(), _n[OUT2].m_());
+
+  assert(_n[OUT1].m_() != INVALID_NODE);
+  assert(_n[OUT2].m_() != INVALID_NODE);
+  //BUG// assert can fail as a result of some parse errors
+
+  _sim->_aa.iwant(_n[OUT1].m_(),_n[OUT2].m_());
+  _sim->_lu.iwant(_n[OUT1].m_(),_n[OUT2].m_());
+}
+#endif // TRANSITION
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class MODEL_LOGIC : public MODEL_CARD {
 private:

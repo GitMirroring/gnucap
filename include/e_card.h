@@ -39,7 +39,6 @@ class TIME_PAIR;
 class INTERFACE CARD : public CKT_BASE {
 private:
   mutable int	_evaliter;	// model eval iteration number
-  CARD_LIST*	_subckt;
   CARD* 	_owner;
   bool		_constant;	// eval stays the same every iteration
 public:
@@ -108,15 +107,9 @@ public: // owner, scope
   const CARD*	owner()const	   {return _owner;}
   void		set_owner(CARD* o) {assert(!_owner||_owner==o); _owner=o;}
   //--------------------------------------------------------------------
-public: // subckt
-  CARD_LIST*	     subckt()		{return _subckt;}
-  const CARD_LIST*   subckt()const	{return _subckt;}
-  void	  new_subckt();
-  void	  new_subckt(const CARD* model, PARAM_LIST* p);
-  void	  renew_subckt(const CARD* model, PARAM_LIST* p);
-  //void     new_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
-  //void     renew_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
-  //--------------------------------------------------------------------
+public: // subckt legacy access, don't use in new code
+  CARD_LIST*	     subckt();
+  const CARD_LIST*   subckt()const;
 public:	// type
   virtual std::string dev_type()const	{unreachable(); return "";}
   virtual void set_dev_type(const std::string&);

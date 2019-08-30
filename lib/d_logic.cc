@@ -37,14 +37,14 @@ static LOGIC_NONE Default_LOGIC(CC_STATIC);
 /*--------------------------------------------------------------------------*/
 static DEV_LOGIC p1;
 static DISPATCHER<CARD>::INSTALL
-d1(&device_dispatcher, "U|logic", &p1);
+d1(&device_dispatcher, "U|logic", (ELEMENT*)&p1);
 /*--------------------------------------------------------------------------*/
 static MODEL_LOGIC p2(&p1);
 static DISPATCHER<MODEL_CARD>::INSTALL
 d2(&model_dispatcher, "logic", &p2);
 /*--------------------------------------------------------------------------*/
 DEV_LOGIC::DEV_LOGIC()
-  :ELEMENT(),
+  : BASE_SUBCKT(),
    _lastchangenode(0),
    _quality(qGOOD),
    _failuremode("ok"),
@@ -52,12 +52,12 @@ DEV_LOGIC::DEV_LOGIC()
    _gatemode(moUNKNOWN)   
 {
   attach_common(&Default_LOGIC);
-  _n = nodes;
+  _n = nodes; // ELEMENT...
   ++_count;
 }
 /*--------------------------------------------------------------------------*/
 DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
-  :ELEMENT(p),
+  : BASE_SUBCKT(p),
    _lastchangenode(0),
    _quality(qGOOD),
    _failuremode("ok"),
@@ -74,7 +74,9 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::expand()
 {
-  ELEMENT::expand();
+//  ELEMENT::expand();
+//  DEV_SUBCKT::expand();
+  COMPONENT::expand();
   const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
   assert(c);
   
@@ -93,10 +95,12 @@ void DEV_LOGIC::expand()
     if(!dynamic_cast<const BASE_SUBCKT*>(model)) {untested();
       error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
-    }else{
+    }else if(BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(this)) {untested();
       _gatemode = OPT::mode;    
-      renew_subckt(model, NULL/*&(c->_params)*/);    
-      subckt()->expand();
+      s->renew_subckt(model, NULL/*&(c->_params)*/);    
+      s->subckt()->expand();
+    }else{
+      unreachable();
     }
   }catch (Exception_Cant_Find&) {
     error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)), 
@@ -108,8 +112,8 @@ void DEV_LOGIC::expand()
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_iwant_matrix()
 {
-  if (subckt()) {
-    subckt()->tr_iwant_matrix();
+  if (BASE_SUBCKT::subckt()) {
+    BASE_SUBCKT::subckt()->tr_iwant_matrix();
   }else{
   }
   tr_iwant_matrix_passive();
@@ -117,8 +121,8 @@ void DEV_LOGIC::tr_iwant_matrix()
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_begin()
 {
-  ELEMENT::tr_begin();
-  if (!subckt()) {
+  ELEMENT_tr_begin();
+  if (!BASE_SUBCKT::subckt()) {
     _gatemode = moDIGITAL;
     _n[OUTNODE]->set_mode(_gatemode);
     _oldgatemode = _gatemode;
@@ -126,24 +130,24 @@ void DEV_LOGIC::tr_begin()
     _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
     _n[OUTNODE]->set_mode(_gatemode);
     _oldgatemode = _gatemode;
-    subckt()->tr_begin();
+    BASE_SUBCKT::subckt()->tr_begin();
   }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_restore()
 {untested();
-  ELEMENT::tr_restore();
-  if (!subckt()) {untested();
+  tr_restore();
+  if (!BASE_SUBCKT::subckt()) {untested();
     _gatemode = moDIGITAL;
   }else{untested();
     _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
-    subckt()->tr_restore();
+    BASE_SUBCKT::subckt()->tr_restore();
   }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::dc_advance()
 {
-  ELEMENT::dc_advance();
+  ELEMENT_dc_advance();
 
   if (_gatemode != _oldgatemode) {untested();
     tr_unload();
@@ -155,8 +159,8 @@ void DEV_LOGIC::dc_advance()
   case moUNKNOWN: unreachable(); break;
   case moMIXED:   unreachable(); break;
   case moANALOG:
-    assert(subckt());
-    subckt()->dc_advance();
+    assert(BASE_SUBCKT::subckt());
+    BASE_SUBCKT::subckt()->dc_advance();
     break;
   case moDIGITAL:
     if (_n[OUTNODE]->in_transit()) {
@@ -173,7 +177,7 @@ void DEV_LOGIC::dc_advance()
  */
 void DEV_LOGIC::tr_advance()
 {
-  ELEMENT::tr_advance();
+  ELEMENT_tr_advance();
 
   if (_gatemode != _oldgatemode) {
     tr_unload();
@@ -203,7 +207,7 @@ void DEV_LOGIC::tr_advance()
 }
 void DEV_LOGIC::tr_regress()
 {itested();
-  ELEMENT::tr_regress();
+  ELEMENT_tr_regress();
 
   if (_gatemode != _oldgatemode) {itested();
     tr_unload();
@@ -258,12 +262,12 @@ bool DEV_LOGIC::tr_needs_eval()const
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_queue_eval()
-{
+{ untested();
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:	  unreachable(); break;
-  case moDIGITAL: ELEMENT::tr_queue_eval(); break;
-  case moANALOG:  assert(subckt()); subckt()->tr_queue_eval(); break;
+  case moDIGITAL: COMPONENT::tr_queue_eval(); break;
+  case moANALOG:  BASE_SUBCKT::tr_queue_eval(); break;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -298,7 +302,7 @@ bool DEV_LOGIC::tr_eval_digital()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::do_tr()
-{  
+{ untested();
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:   unreachable(); break;
@@ -309,7 +313,7 @@ bool DEV_LOGIC::do_tr()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_load()
-{
+{ untested();
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:   unreachable(); break;
@@ -320,7 +324,7 @@ void DEV_LOGIC::tr_load()
 /*--------------------------------------------------------------------------*/
 TIME_PAIR DEV_LOGIC::tr_review()
 {
-  // not calling ELEMENT::tr_review();
+  // not calling tr_review();
 
   q_accept();
   //digital mode queues events explicitly in tr_accept
