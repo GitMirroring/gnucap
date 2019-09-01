@@ -28,6 +28,7 @@
 #include "e_cardlist.h"
 #include "ap.h"
 #include "e_card.h"
+#include "e_subckt.h"
 /*--------------------------------------------------------------------------*/
 /* findbranch: find a matching label, by (ugh) linear search
  *	label to look for is in command line (cmd).
@@ -76,11 +77,13 @@ CARD_LIST::fat_iterator findbranch(CS& cmd, CARD_LIST::fat_iterator here)
       }else{untested();
 	// there are dots, so look inside subckt
 	untested();
-	if ((**here).subckt()) {untested();
+	BASE_SUBCKT* h=dynamic_cast<BASE_SUBCKT*>(*here);
+	if(!h){
+	}else if (h->subckt()) {untested();
 	  untested();
 	  // has a subckt, and its name matches, doing fine
 	  CS want(CS::_STRING, local_part); // recursion
-	  CARD_LIST::fat_iterator subbrh=findbranch(want,(**here).subckt());
+	  CARD_LIST::fat_iterator subbrh=findbranch(want, h->subckt());
 	  if (!subbrh.is_end()) {untested();
 	    // found it in a subckt
 	    return subbrh;

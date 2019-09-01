@@ -30,6 +30,7 @@
 #include "globals.h"
 #include "e_cardlist.h"
 #include "c_comand.h"
+#include "e_subckt.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -65,9 +66,11 @@ private:
       }else if ((**i).is_device()) {
 	// found a match, but it isn't a container (subckt)
 	return false;
-      }else{
+      }else if(BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(*i)){ untested();
 	// found the container, look inside
-	return delete_one_name(dev_name, (**i).subckt());
+	return delete_one_name(dev_name, s->subckt());
+      }else{ untested();
+	return false;
       }
       unreachable();
     }else{

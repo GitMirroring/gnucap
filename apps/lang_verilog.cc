@@ -247,7 +247,12 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
 {
   assert(x);
   x->set(cmd.fullstring());
-  CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
+  CARD_LIST* scope;
+  if(BASE_SUBCKT* o=dynamic_cast<BASE_SUBCKT*>(x->owner())){
+    scope = o->subckt();
+  }else{
+    scope = &CARD_LIST::card_list;
+  }
 
   cmd.reset();
   CMD::cmdproc(cmd, scope);
