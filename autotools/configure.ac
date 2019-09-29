@@ -135,8 +135,10 @@ fi
 AC_CHECK_LIB([dl], [dlopen])
 LIBGNUCAP_LIBS="$LIBS"
 LIBS="$LIBS_BAK"
+GNUCAP_LIBS="-lgnucap"
 
 AC_SUBST([LIBGNUCAP_LIBS])
+AC_SUBST([GNUCAP_LIBS]) # main/gnucap.conf.in
 
 # Checks for header files.
 #AC_CHECK_HEADERS([fcntl.h unistd.h])
