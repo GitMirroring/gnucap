@@ -87,18 +87,18 @@ int CARD::connects_to(const node_t& node)const
 /*--------------------------------------------------------------------------*/
 CARD_LIST* CARD::scope()
 {
-  if (BASE_SUBCKT* o=dynamic_cast<BASE_SUBCKT*>(owner())) {
+  if (BASE_SUBCKT* o=dynamic_cast<BASE_SUBCKT*>(owner())) { untested();
     return o->subckt();	// normal element, owner determines scope
-  }else{
+  }else{ untested();
     return &(CARD_LIST::card_list);	// root circuit
   }
 }
 /*--------------------------------------------------------------------------*/
 const CARD_LIST* CARD::scope()const
 {
-  if (owner()) {
-    return owner()->subckt();	// normal element, owner determines scope
-  }else{
+  if (BASE_SUBCKT const* o=dynamic_cast<BASE_SUBCKT const*>(owner())) { untested();
+    return o->subckt();	// normal element, owner determines scope
+  }else{ untested();
     return &(CARD_LIST::card_list);	// root circuit
   }
 }
@@ -190,35 +190,6 @@ TIME_PAIR CARD::tr_review()
   return TIME_PAIR(NEVER,NEVER);
 }
 /*--------------------------------------------------------------------------*/
-// TODO: move
-void BASE_SUBCKT::new_subckt()
-{
-  assert(!_subckt);
-  delete _subckt;
-  _subckt = NULL;
-  _subckt = new CARD_LIST;
-}
-/*--------------------------------------------------------------------------*/
-// TODO: move
-void BASE_SUBCKT::new_subckt(const CARD* Model, PARAM_LIST* Params)
-{ untested();
-  delete _subckt;
-  _subckt = NULL;
-  _subckt = new CARD_LIST(Model, this, scope(), Params);
-  _subckt->map_subckt_nodes(Model, this);
-}
-/*--------------------------------------------------------------------------*/
-// TODO: move
-void BASE_SUBCKT::renew_subckt(const CARD* Model, PARAM_LIST* Params)
-{
-  if (_sim->is_first_expand()) {
-    new_subckt(Model, Params);
-  }else{untested();
-    assert(subckt());
-    subckt()->attach_params(Params, scope());
-  }
-}
-/*--------------------------------------------------------------------------*/
 void CARD::set_param_by_name(std::string Name, std::string Value)
 {
   //BUG// ugly linear search
@@ -255,26 +226,6 @@ bool CARD::evaluated()const
   }else{
     _evaliter = _sim->iteration_tag();
     return false;
-  }
-}
-/*--------------------------------------------------------------------------*/
-CARD_LIST const* CARD::subckt() const
-{ untested();
-  BASE_SUBCKT const* s=dynamic_cast<BASE_SUBCKT const*>(this);
-  if(s){ untested();
-    return s->subckt();
-  }else{ untested();
-    return NULL;
-  }
-}
-/*--------------------------------------------------------------------------*/
-CARD_LIST* CARD::subckt()
-{ untested();
-  BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(this);
-  if(s){ untested();
-    return s->subckt();
-  }else{ untested();
-    return NULL;
   }
 }
 /*--------------------------------------------------------------------------*/
