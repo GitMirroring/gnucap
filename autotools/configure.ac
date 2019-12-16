@@ -149,6 +149,7 @@ AC_SUBST([GNUCAP_LIBS]) # main/gnucap.conf.in
 
 if test "$enable_debug" = "yes" ; then
 	CPPFLAGS="$CPPFLAGS -DTRACE_UNTESTED"
+	CXXFLAGS="$CXXFLAGS -O0 -g"
 else
 	CPPFLAGS="$CPPFLAGS -DNDEBUG"
 fi
