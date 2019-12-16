@@ -9,8 +9,7 @@
 #
 # This file is part of "Gnucap", the Gnu Circuit Analysis Package
 #
-#  Copyright (C) 2005 Dan McMahill
-#                2019 Felix Salfelder
+#  Copyright (C) 2019 Felix Salfelder
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -26,14 +25,4 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-include ../modelgen/Make1
-include ../autotools/common.mk
-
-bin_PROGRAMS = gnucap-modelgen
-#------------------------------------------------------------------------
-
-gnucap_modelgen_SOURCES = $(RAW_SRCS)
-gnucap_modelgen_LDADD = ../lib/libgnucap.la
-gnucap_modelgen_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/include -I$(top_builddir)/include
-
-noinst_HEADERS = ${RAW_HDRS}
+EXTRA_DIST = ${RAW_OTHER}

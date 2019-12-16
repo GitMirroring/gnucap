@@ -5,6 +5,7 @@
 #                            COPYRIGHT
 #
 #  Copyright (C) 2005, 2006 Dan McMahill
+#                2013, 2019 Felix Salfelder
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -25,11 +26,11 @@ AC_PREREQ(2.64)
 # this is any file in the source directory
 # used as a check to be sure we found it
 
-AC_INIT([gnucap], [20160724])
-AM_INIT_AUTOMAKE([-Wno-portability -Wall silent-rules])
+AC_INIT([gnucap], [dev-0831])
+AM_INIT_AUTOMAKE([-Wno-portability -Wall silent-rules foreign])
 AC_CONFIG_MACRO_DIR([autotools/m4])
 AM_CONFIG_HEADER([config.h])
-AM_CONFIG_HEADER([main/config.h])
+# AM_CONFIG_HEADER([main/config.h])
 AM_SILENT_RULES([yes])
 
 AM_PROG_AR
@@ -126,12 +127,18 @@ AC_ARG_WITH([readline],
 [],
 [with_readline=yes])
 
+LIBS_BAK="$LIBS"
 if test "x$with_readline" != xno ; then
-	AC_CHECK_LIB([termcap], [main])	
 	AC_CHECK_LIB([readline], [main])
 fi
 
 AC_CHECK_LIB([dl], [dlopen])
+LIBGNUCAP_LIBS="$LIBS"
+LIBS="$LIBS_BAK"
+GNUCAP_LIBS="-lgnucap"
+
+AC_SUBST([LIBGNUCAP_LIBS])
+AC_SUBST([GNUCAP_LIBS]) # main/gnucap.conf.in
 
 # Checks for header files.
 #AC_CHECK_HEADERS([fcntl.h unistd.h])
@@ -142,6 +149,7 @@ AC_CHECK_LIB([dl], [dlopen])
 
 if test "$enable_debug" = "yes" ; then
 	CPPFLAGS="$CPPFLAGS -DTRACE_UNTESTED"
+	CXXFLAGS="$CXXFLAGS -O0 -g"
 else
 	CPPFLAGS="$CPPFLAGS -DNDEBUG"
 fi
@@ -184,6 +192,8 @@ AC_CONFIG_FILES([main/gnucap-conf], [chmod +x main/gnucap-conf])
 AC_CONFIG_FILES([main/gnucap:autotools/gnucap.in], [chmod +x main/gnucap])
 
 AC_CONFIG_FILES([
+	main/gnucap.conf
+	main/config.h
 	autotools/Makefile
 	GNUmakefile:autotools/GNUmakefile.in
 	apps/Makefile:autotools/apps.in
@@ -195,15 +205,33 @@ AC_CONFIG_FILES([
 	])
 
 AC_CONFIG_COMMANDS([default])
-AC_OUTPUT
 
-plugindir=$libdir/$package
+# AS_IF?
+if test "x${prefix}" = "xNONE"; then
+   prefix="${ac_default_prefix}"
+fi
+
+# AS_IF?
+if test "x${exec_prefix}" = "xNONE"; then
+   exec_prefix='${prefix}'
+else
+   exec_prefix="${exec_prefix}"
+fi
+
+pkglibdir="${libdir}/$PACKAGE"
+# pkglibdir_expanded=`echo ${pkglibdir}`
+AC_SUBST([pkglibdir])
+AC_SUBST([pkglibdir_expanded], [`eval eval echo ${pkglibdir}`])
+
+AC_OUTPUT
 
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
    prefix:                   $prefix
-   plugindir:                $plugindir
+   libdir:                   $libdir
+   pkglibdir:                $pkglibdir
+   pkglibdir_expanded:       $pkglibdir_expanded
    CPPFLAGS:                 $CPPFLAGS
    CFLAGS:                   $CFLAGS
    CXXFLAGS:                 $CXXFLAGS
