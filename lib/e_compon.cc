@@ -54,7 +54,7 @@ COMMON_COMPONENT::COMMON_COMPONENT(int c)
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::~COMMON_COMPONENT()
 {
-  trace1("common,destruct", _attach_count);
+  trace2("common,destruct", _attach_count, this);
   assert(_attach_count == 0 || _attach_count == CC_STATIC);
 }
 /*--------------------------------------------------------------------------*/
@@ -469,7 +469,7 @@ void COMPONENT::set_port_to_ground(int num)
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_dev_type(const std::string& new_type)
 {
-  if (common()) {
+  if (common()) { untested();
     if (new_type != dev_type()) {
       COMMON_COMPONENT* c = common()->clone();
       assert(c);
@@ -477,7 +477,7 @@ void COMPONENT::set_dev_type(const std::string& new_type)
       attach_common(c);
     }else{
     }
-  }else{
+  }else{ untested();
     CARD::set_dev_type(new_type);
   }
 }

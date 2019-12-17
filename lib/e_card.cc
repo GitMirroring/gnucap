@@ -88,6 +88,7 @@ int CARD::connects_to(const node_t& node)const
 CARD_LIST* CARD::scope()
 {
   if (BASE_SUBCKT* o=dynamic_cast<BASE_SUBCKT*>(owner())) { untested();
+    trace1("CARD::scope", owner()->long_label());
     return o->subckt();	// normal element, owner determines scope
   }else{ untested();
     return &(CARD_LIST::card_list);	// root circuit
@@ -97,6 +98,7 @@ CARD_LIST* CARD::scope()
 const CARD_LIST* CARD::scope()const
 {
   if (BASE_SUBCKT const* o=dynamic_cast<BASE_SUBCKT const*>(owner())) { untested();
+    trace1("CARD::scope", owner()->long_label());
     return o->subckt();	// normal element, owner determines scope
   }else{ untested();
     return &(CARD_LIST::card_list);	// root circuit

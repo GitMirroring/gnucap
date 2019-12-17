@@ -1,6 +1,6 @@
 module m (a,b,c,d);
+vsource #(.dc(1)) v1 (.p(c),.n(d));
 endmodule // m
 
 m #() mm (.a(0),.b(0),.c(0));
-#          
- 27.       
+mm: need more nodes

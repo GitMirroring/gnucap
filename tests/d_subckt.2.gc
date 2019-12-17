@@ -1,11 +1,12 @@
 verilog
 
 module m( a b c d );
+vsource #(.dc(1)) v1( c d);
 endmodule
 
 m #() mm(.c(0), .a(0), .b(0));
 
 list
-
+print op v nodes
 op
 end

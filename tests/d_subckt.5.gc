@@ -1,0 +1,15 @@
+verilog
+
+module a(1 2);
+parameter v=0;
+parameter d=0;
+vsource #(.dc(v+d)) v(1 2);
+endmodule
+
+a #(.v(1)) a1(0,1);
+a1 #(.d(1)) a2(0,2);
+
+print op v(nodes)
+op
+del a1
+op

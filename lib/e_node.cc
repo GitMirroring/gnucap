@@ -525,6 +525,7 @@ void node_t::set_to_ground(CARD* d)
                  // is there a test?
   assert(d);
 
+  assert(d->scope());
   NODE_MAP* Map = d->scope()->nodes();
   assert(Map);
   _nnn = (*Map)["0"];
@@ -543,6 +544,8 @@ void node_t::new_node(const std::string& node_name, const CARD* d)
   //
   assert(d);
 
+  trace1("new_node", d->long_label());
+  assert(d->scope());
   NODE_MAP* Map = d->scope()->nodes();
   assert(Map);
   _nnn = Map->new_node(node_name);

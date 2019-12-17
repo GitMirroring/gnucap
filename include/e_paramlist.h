@@ -28,12 +28,12 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_PARAMLIST : public COMMON_COMPONENT {
-private:
+protected:
   explicit COMMON_PARAMLIST(const COMMON_PARAMLIST& p)
     :COMMON_COMPONENT(p), _params(p._params) {++_count;}
 public:
   explicit COMMON_PARAMLIST(int c=0)	:COMMON_COMPONENT(c) {++_count;}
-	   ~COMMON_PARAMLIST()		{--_count;}
+  virtual ~COMMON_PARAMLIST()		{--_count;}
   bool operator==(const COMMON_COMPONENT&)const;
   COMMON_COMPONENT* clone()const	{return new COMMON_PARAMLIST(*this);}
   std::string	name()const		{untested();return "";}

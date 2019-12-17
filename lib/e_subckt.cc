@@ -51,7 +51,7 @@ void BASE_SUBCKT::renew_subckt(const CARD* Model, PARAM_LIST* Params)
 /*--------------------------------------------------------------------------*/
 CARD_LIST const* CARD::subckt() const
 { untested();
-  unreachable(); // this is a compatibility hack
+  unreachable(); // this is a compatibility hack, used in some spice devices
   BASE_SUBCKT const* s=dynamic_cast<BASE_SUBCKT const*>(this);
   if(s){ untested();
     return s->subckt();
@@ -70,5 +70,43 @@ CARD_LIST* CARD::subckt()
     return NULL;
   }
 }
+/*--------------------------------------------------------------------------*/
+void COMMON_SUBCKT::set_port_by_index(int Index, std::string& Value){ untested();
+  incomplete(); // ports are in subckt->map
+  return;
+  assert(_ports.size()==size_t(Index)); // sequential assignment only
+  node_t n;
+  if(Value=="0"){
+    n = new /*PORT_*/NODE(Value, 0);
+  }else{
+    n = new /*PORT_*/NODE(Value, Index+1);
+  }
+  _ports.push_back(n);
+}
+/*--------------------------------------------------------------------------*/
+COMMON_SUBCKT::COMMON_SUBCKT(int c)
+  : COMMON_PARAMLIST(c),
+    _subckt(NULL)
+{untested();
+  trace1("COMMON_SUBCKT", this);
+//  _subckt = std::make_shared<const CARD_LIST>();
+}
+/*--------------------------------------------------------------------------*/
+std::string COMMON_SUBCKT::port_name(int i) const
+{
+  if (i<net_nodes()){
+    NODE const* nn = prechecked_cast<NODE const*>(_ports[i].n_());
+    assert(nn);
+    return nn->short_label();
+  }else{
+    return "";
+  }
+}
+/*--------------------------------------------------------------------------*/
+int COMMON_SUBCKT::net_nodes() const
+{
+  return int(_ports.size());
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

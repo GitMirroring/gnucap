@@ -1,0 +1,11 @@
+* too many nodes in instanciation. don't connect to anything. 
+X1 ( 0 1 2 3 4 )  foo 
+V1 ( 4 0 )  DC  1.
+V1 ( 3 0 )  DC  1.
+.subckt foo ( 1 2 3 4 )
+R1 ( 1 2 )  1.
+R1 ( 2 3 )  1.
+R1 ( 3 4 )  1.
+.ends foo
+#           v(1)       v(2)       v(3)       v(4)      
+ 27.        0.33333    0.66666    1.         1.        

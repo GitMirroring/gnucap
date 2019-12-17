@@ -458,6 +458,7 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
 // clone nodes from sckt proto
 // set up the map of external to expanded node numbers
 // move to BASE_SUBCKT::expand or so?
+// use COMMON_SUBCKT as model
 void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_)
 {
   COMPONENT const* model = dynamic_cast<COMPONENT const*>(model_);

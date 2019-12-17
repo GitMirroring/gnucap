@@ -25,6 +25,9 @@
 #ifndef E_SUBCKT_H
 #define E_SUBCKT_H
 #include "e_compon.h"
+#include "e_node.h"
+#include "e_paramlist.h"
+#include <memory> // shared_ptr, C++11
 /*--------------------------------------------------------------------------*/
 class BASE_SUBCKT : public COMPONENT {
 protected:
@@ -108,10 +111,65 @@ public:
   CARD_LIST*	     subckt(){ return _subckt; }
   const CARD_LIST*   subckt()const{ return _subckt; }
   void	  new_subckt();
-  void	  new_subckt(const CARD* model, PARAM_LIST* p); // virtual?
+  void	  new_subckt(const CARD* model, PARAM_LIST* p);
   void	  renew_subckt(const CARD* model, PARAM_LIST* p);
-private:
+  void	  new_subckt(const CARD_LIST* model, PARAM_LIST* p);
+protected:
   CARD_LIST*	_subckt;
+};
+/*--------------------------------------------------------------------------*/
+class COMMON_SUBCKT : public COMMON_PARAMLIST{
+public:
+  explicit COMMON_SUBCKT(int c);
+  explicit COMMON_SUBCKT(COMMON_PARAMLIST const& s,
+                         std::shared_ptr<const CARD_LIST> cl);
+  ~COMMON_SUBCKT(){ }
+private:
+  explicit COMMON_SUBCKT(){unreachable();}
+  explicit COMMON_SUBCKT(COMMON_SUBCKT const& s)
+    : COMMON_PARAMLIST(s),
+      _ports(s._ports),
+      _subckt(s._subckt)
+  {
+    if(_subckt.get()){
+      _params.set_try_again(_subckt->params());
+    }else{
+    }
+  }
+  COMMON_COMPONENT* clone() const{
+    trace1("COMMON_SUBCKT::clone", modelname());
+    return new COMMON_SUBCKT(*this);
+  }
+public:
+  bool operator==(const COMMON_COMPONENT& x)const {
+    const COMMON_SUBCKT* p = dynamic_cast<const COMMON_SUBCKT*>(&x);
+    bool rv = p
+      && COMMON_PARAMLIST::operator==(x)
+      && _subckt.get() == p->_subckt.get();
+    return rv;
+  }
+
+public: // overrides
+  void set_port_by_index(int Index, std::string& Value);
+public: // sckt model
+  CARD_LIST* new_subckt(){
+    assert(!_subckt.get());
+    _subckt = std::make_shared<CARD_LIST>();
+    trace3("COMMON_SUBCKT new sckt", this, _subckt.use_count(), _subckt.get());
+    _params.set_try_again(_subckt->params());
+    return const_cast<CARD_LIST*>(_subckt.get());
+  }
+  CARD_LIST const* subckt() const{
+    return _subckt.get();
+  }
+  int net_nodes() const;
+  std::string port_name(int i) const;
+  void map_subckt_nodes(BASE_SUBCKT* owner) const;
+
+public:
+  std::vector<node_t> _ports;
+private:
+  std::shared_ptr<const CARD_LIST> _subckt;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

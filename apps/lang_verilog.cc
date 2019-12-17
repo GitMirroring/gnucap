@@ -180,6 +180,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  cmd >> value;
 	  x->set_port_by_index(index, value);
 	  if (all_new) {
+	    // makes_own_scope?
 	    if (x->node_is_grounded(index)) {
 	      cmd.warn(bDANGER, here, "node 0 not allowed here");
 	    }else if (x->subckt() && x->subckt()->nodes()->how_many() != index+1) {
@@ -309,12 +310,13 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   cmd >> ';';
 
   // body
-  for (;;) {
+  for (;;) { untested();
     cmd.get_line("verilog-module>");
 
     if (cmd >> "endmodule ") {
       break;
     }else{
+      assert(x);
       new__instance(cmd, x, x->subckt());
     }
   }
@@ -349,7 +351,7 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
-{
+{ untested();
   cmd.get_line("gnucap-verilog>");
   new__instance(cmd, NULL, Scope);
 }
@@ -454,8 +456,10 @@ void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 {
+  // getting here if !x->is_device
   assert(x);
   assert(x->subckt());
+  assert(x->makes_own_scope());
 
   o << "module " <<  x->short_label();
   print_ports_short(o, x);
