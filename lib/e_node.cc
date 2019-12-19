@@ -131,45 +131,33 @@ NODE::NODE(const std::string& s, int n)
 /*--------------------------------------------------------------------------*/
 node_t::node_t()
   :_nnn(0),
-   _ttt(INVALID_NODE),
    _m(INVALID_NODE)
 {
 }
 node_t::node_t(const node_t& p)
   :_nnn(p._nnn),
-   _ttt(p._ttt),
    _m(p._m)
 {
-  if(_nnn){
-    assert(_ttt == _nnn->flat_number());
-  }else{
-  }
 }
 node_t::node_t(NODE* n)
   :_nnn(n),
-   _ttt(n->flat_number()),
    _m(to_internal(n->user_number()))
 {
-  assert(_ttt == _nnn->flat_number());
 }
 node_t& node_t::operator=(NODE* p)
 {
   assert(!_nnn);
   assert(p);
-  _ttt = p->flat_number();
   _nnn = p;
   return *this;
 }
 node_t& node_t::operator=(const node_t& p)
 {
   if (p._nnn) {
-    assert(p._ttt == p._nnn->flat_number());
   }else{
-    assert(p._ttt == INVALID_NODE);
     assert(p._m   == INVALID_NODE);
   }
   _nnn   = p._nnn;
-  _ttt = p._ttt;
   _m   = p._m;
   return *this;
 }
@@ -179,9 +167,6 @@ bool node_t::operator==(node_t const& p) const
   if(!_nnn || !p._nnn){ untested();
     return false;
   }else if(_nnn->flat_number() !=  p._nnn->flat_number()){ untested();
-    return false;
-  }else if(_ttt!=p._ttt){ untested();
-    unreachable();
     return false;
   }else if(_m!=p._m){ untested();
     return false;
@@ -531,7 +516,6 @@ void node_t::set_to_ground(CARD* d)
   _nnn = (*Map)["0"];
   assert(_nnn->flat_number()==0);
   assert(_nnn->user_number()==0);
-  _ttt = 0;
   assert(_nnn);
 }
 /*--------------------------------------------------------------------------*/
@@ -549,7 +533,6 @@ void node_t::new_node(const std::string& node_name, const CARD* d)
   NODE_MAP* Map = d->scope()->nodes();
   assert(Map);
   _nnn = Map->new_node(node_name);
-  _ttt = _nnn->user_number();
   assert(_nnn);
 }
 /*--------------------------------------------------------------------------*/
@@ -561,20 +544,11 @@ void node_t::new_node(const std::string& node_name, const CARD* d)
  */
 void node_t::new_model_node(const std::string& node_name, CARD* d)
 {
+  // do this in NODE::expand?
   new_node(node_name, d);
-  _ttt = CKT_BASE::_sim->newnode_model();
-  if(_nnn){
-    if(_ttt == _nnn->flat_number()){
-    }else{
-      // something with coils?
-      incomplete();
-      _nnn->set_flat_number(_ttt);
-    }
-  }else{ untested();
-    _nnn = new NODE(node_name, _ttt); // BUG: ownership?
-    _nnn->set_flat_number(_ttt);
-  }
-  assert(_ttt == _nnn->flat_number());
+  int ttt = CKT_BASE::_sim->newnode_model();
+  assert(_nnn);
+  _nnn->set_flat_number(ttt);
 }
 /*--------------------------------------------------------------------------*/
 bool node_t::node_is_valid(NODE const* i)
@@ -596,7 +570,6 @@ void node_t::map_subckt_node(NODE** m, const CARD* d)
   if (e_() != INVALID_NODE) {
     if (node_is_valid(m[e_()])) {
       _nnn = m[e_()];
-      _ttt = _nnn->flat_number();
     }else{
       throw Exception(d->long_label() + ": need more nodes");
     }
@@ -604,9 +577,8 @@ void node_t::map_subckt_node(NODE** m, const CARD* d)
     throw Exception(d->long_label() + ": invalid nodes");
   }
   assert(_nnn);
-//  assert(_nnn->flat_number()==_ttt); TODO: check in caller?
 //  _nnn->set_flat_number(_ttt);
-  assert(node_is_valid(_ttt));
+  assert(node_is_valid(_nnn->flat_number()));
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

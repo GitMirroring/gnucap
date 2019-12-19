@@ -252,7 +252,6 @@ private:
 
 private:
   NODE* _nnn;
-  int _ttt;		// m == nm[t] if properly set up
   int _m;		// mapped, after reordering
 
 public:
@@ -260,7 +259,6 @@ public:
 
   int	      t_()const {
     if(_nnn){
-      assert(_ttt == _nnn->flat_number());
       return _nnn->flat_number();
     }else{
       return INVALID_NODE;
