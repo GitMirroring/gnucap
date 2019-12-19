@@ -34,10 +34,13 @@ class WAVE;
 class CARD;
 class LOGIC_NODE;
 class NODE;
+class ROOT_SUBCKT;
+class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 enum TRI_STATE {tsNO=0, tsYES=1, tsBAD=-1};
 /*--------------------------------------------------------------------------*/
 struct INTERFACE SIM_DATA {
+  static CARD_LIST _card_list; /* own root circuit */
   double _time0;	/* time now */
   double _freq;		/* AC frequency to analyze at (Hertz) */
   double _temp_c;	/* ambient temperature, actual */
@@ -95,6 +98,7 @@ struct INTERFACE SIM_DATA {
   void clear_limit();
   void keep_voltages();
   void restore_voltages();
+  void restore_probes();
   void zero_voltages();
   void map__nodes();		/* s__map.cc */
   void order_reverse();

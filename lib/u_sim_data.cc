@@ -25,11 +25,14 @@
 #include "m_wave.h"
 #include "e_node.h"
 #include "u_nodemap.h"
-#include "e_cardlist.h"
+#include "e_subckt.h"
+#include "u_prblst.h"
 #include "u_status.h"
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 SIM_DATA::SIM_DATA()
-  :_time0(0.),
+  : // _card_list(CARD_LIST::card_list),
+   _time0(0.),
    _freq(0.),
    _temp_c(0.),
    _damp(0.),
@@ -78,7 +81,8 @@ SIM_DATA::SIM_DATA()
 }
 /*--------------------------------------------------------------------------*/
 SIM_DATA::~SIM_DATA()
-{
+{ untested();
+  _card_list.erase_all();
   if (_nm) {unreachable();
     delete [] _nm;
     _nm = NULL;
@@ -239,27 +243,78 @@ void SIM_DATA::order_auto()
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+class ROOT_SUBCKT : public BASE_SUBCKT{
+public:
+  ROOT_SUBCKT(CARD_LIST& c){
+    _subckt = &c;
+    _subckt->set_owner(this); // no effect
+    set_label("(root)");
+    set_owner(NULL);
+  }
+  ~ROOT_SUBCKT(){ untested();
+    assert(_subckt);
+    _subckt->erase_all();
+    _subckt = NULL; // don't delete in parent class descructor
+  }
+private:
+  CARD* clone()const{unreachable(); return NULL;}
+  std::string value_name()const{unreachable(); return "";}
+  std::string port_name(int)const{unreachable(); return "";}
+  bool print_type_in_spice()const{return false;}
+public:
+  void expand(){
+    assert(_subckt);
+    precalc_first();
+    _subckt->expand();
+  }
+private:
+  virtual node_t& n_(int) const{
+    unreachable();
+    static node_t n(0);
+    return n;
+  }
+};
+CARD_LIST SIM_DATA::_card_list;
+ROOT_SUBCKT root(SIM_DATA::_card_list);
+/*--------------------------------------------------------------------------*/
 /* init: allocate, set up, etc ... for any type of simulation
  * also called by status and probe for access to internals and subckts
  */
 void SIM_DATA::init()
-{
-  if (is_first_expand()) {
+{ untested();
+  CKT_BASE::_probe_lists->store_();
+  if (is_first_expand()) { untested();
     uninit();
-    init_node_count(CARD_LIST::card_list.nodes()->how_many(), 0, 0);
-    CARD_LIST::card_list.expand();
+
+    init_node_count(0, 0, 0);
+    _card_list.erase_all();
+    assert(CARD_LIST::card_list.nodes());
+    trace1("init", CARD_LIST::card_list.nodes()->how_many());
+    _card_list.params()->set_try_again(CARD_LIST::card_list.params());
+    _card_list.shallow_copy(&CARD_LIST::card_list);
+    _card_list.set_owner(&root);
+    _card_list.map_subckt_nodes(NULL, NULL, &CARD_LIST::card_list);
+
+    // TODO: use NODE::expand
+    _subckt_nodes -= CARD_LIST::card_list.nodes()->how_many();
+    _user_nodes += CARD_LIST::card_list.nodes()->how_many();
+
+    root.expand();
+
     map__nodes();
-    CARD_LIST::card_list.map_nodes();
+    _card_list.map_nodes();
     alloc_hold_vectors();
     _aa.reinit(_total_nodes);
     _lu.reinit(_total_nodes);
     _acx.reinit(_total_nodes);
-    CARD_LIST::card_list.tr_iwant_matrix();
-    CARD_LIST::card_list.ac_iwant_matrix();
+    _card_list.tr_iwant_matrix();
+    _card_list.ac_iwant_matrix();
     _last_time = 0;
   }else{
-    CARD_LIST::card_list.precalc_first();
+    _card_list.precalc_first();
   }
+
+  restore_probes();
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_hold_vectors:
@@ -285,6 +340,12 @@ void SIM_DATA::alloc_hold_vectors()
 
   assert(_nstat);
   assert(_vdc);
+}
+/*--------------------------------------------------------------------------*/
+void SIM_DATA::restore_probes()
+{
+  assert(CKT_BASE::_probe_lists);
+  CKT_BASE::_probe_lists->restore(&_card_list);
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_vectors:

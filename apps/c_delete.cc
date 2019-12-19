@@ -108,9 +108,9 @@ private:
   //-----------------------------------
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
-    if (cmd.umatch("all ")) {
+    if (cmd.umatch("all ")) { untested();
       CARD_LIST::card_list.erase_all();
-    }else{
+    }else{ untested();
       while (cmd.more()) {
 	unsigned mark = cmd.cursor();
 	bool didit = delete_one_name(cmd.ctos(), Scope);

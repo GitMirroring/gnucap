@@ -28,7 +28,7 @@
  1.G        1.         0.0099467 -89.43     -40.046    
 v1 ( 1 0 )  TRAN pwl( 0., 0.  1.999999n, 0.  2.000001n, 1. )  DC  2.  AC  1.
 r1 ( 1 2 )  1.K
-c2 ( 2 0 ) t1 l= 1.u w= 2.u
+c2 ( 2 0 ) t1(w=2u l=1u)
 .model t1 c ( cj=5 cjsw=1u narrow=NA( 0.) defw=NA( 1.u) tc1=NA( 0.) tc2=NA( 0.) tnom=NA( 27.))
 Gnucap   System status
 iterations: op=4, dc=0, tran=53, fourier=0, total=82

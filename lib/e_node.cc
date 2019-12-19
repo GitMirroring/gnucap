@@ -506,8 +506,10 @@ void LOGIC_NODE::set_event(double delay, LOGICVAL v)
 /*--------------------------------------------------------------------------*/
 void node_t::set_to_ground(CARD* d)
 {
-  assert(!_nnn); //BUG// fails on MUTUAL_L::expand after clone
-                 // is there a test?
+  if(_nnn){
+    incomplete(); //BUG// fails on MUTUAL_L::expand after clone
+  }else{
+  }
   assert(d);
 
   assert(d->scope());

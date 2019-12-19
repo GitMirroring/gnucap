@@ -1,4 +1,10 @@
+>>>>>module a(1 2); 
+>>>>>parameter v=0; 
+>>>>>parameter d=0; 
+>>>>>print op v(nodes) 
+>>>>>op 
 #           v(1)       v(2)      
  27.       -1.        -2.        
-#           v(1)       v(2)      
- 27.        0.        -2.        
+>>>>>del a1 
+>>>>>op 
+a2: can't find: a1

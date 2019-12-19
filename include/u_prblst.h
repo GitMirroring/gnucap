@@ -43,6 +43,8 @@ public:
   typedef _container::const_iterator const_iterator;
   void	   listing(const std::string&)const;
   void     clear();
+  void     store();
+  void     restore(CARD_LIST const*);
 
   void	   remove_list(CS&);
   void     remove_one(CKT_BASE*);
@@ -57,7 +59,7 @@ private:
   void	  push_new_probe(const std::string& param, const CKT_BASE* object);
   bool    add_branches(const std::string&,const std::string&,const CARD_LIST*);
   void    add_all_nodes(const std::string&);
-};
+}; // PROBELIST
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {
 public:
@@ -66,6 +68,8 @@ public:
   PROBELIST print[sCOUNT]; // list of print probes
   PROBELIST store[sCOUNT]; // list of probes to store for postproc
   void purge(CKT_BASE*);
+  void store_();
+  void restore(CARD_LIST const*);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -28,7 +28,7 @@ void CCSRC_BASE::expand_last()
 {
   ELEMENT::expand_last();
 
-  if (_input_label != "") {
+  if (_input_label != "") { untested();
     _input = dynamic_cast<const ELEMENT*>(find_in_my_scope(_input_label));
   }else{untested();
     // _input already set, an internal element.  example: mutual L.

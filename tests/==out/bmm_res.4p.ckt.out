@@ -13,5 +13,5 @@ r2: short circuit
  0.         5.         50.n      
 v1 ( 1 0 )  DC  2.  AC  5.
 r1 ( 1 2 )  1.K
-r2 ( 2 0 ) t1 l=pl w=pw
+r2 ( 2 0 ) t1(w=pw l=pl)
 .model t1 r ( rsh=1k narrow=1u defw=NA( 1.u) tc1=NA( 0.) tc2=NA( 0.) tnom=NA( 27.))

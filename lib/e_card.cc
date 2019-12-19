@@ -30,10 +30,24 @@
 /*--------------------------------------------------------------------------*/
 const int POOLSIZE = 4;
 /*--------------------------------------------------------------------------*/
+class ROOT_CARD : public CARD{
+public:
+  ROOT_CARD(){
+    set_label("(root)");
+    set_owner(NULL);
+  }
+private:
+  bool makes_own_scope() const{return true;}
+  CARD_LIST* scope(){untested(); return NULL;}
+  CARD_LIST const* scope()const{untested(); return NULL;}
+  CARD*	 clone()const{unreachable(); return NULL;}
+  std::string value_name()const { unreachable(); return ""; }
+} root_card;
+/*--------------------------------------------------------------------------*/
 CARD::CARD()
   :CKT_BASE(),
    _evaliter(-100),
-   _owner(0),
+   _owner(&root_card),
    _constant(false),
    _net_nodes(0)
 {
@@ -42,7 +56,7 @@ CARD::CARD()
 CARD::CARD(const CARD& p)
   :CKT_BASE(p),
    _evaliter(-100),
-   _owner(0),
+   _owner(&root_card),
    _constant(p._constant),
    _net_nodes(p._net_nodes)
 {
@@ -54,11 +68,12 @@ CARD::~CARD()
 /*--------------------------------------------------------------------------*/
 const std::string CARD::long_label()const
 {
-  std::string buffer(short_label());
-  for (const CARD* brh = owner();  brh;  brh = brh->owner()) {
-    buffer = brh->short_label() + '.' + buffer;
+  CARD const* brh = owner();
+  if(brh && brh->owner() && brh->owner()!=&root_card) {
+    return brh->long_label() + '.' + short_label();
+  }else{
+    return short_label();
   }
-  return buffer;
 }
 /*--------------------------------------------------------------------------*/
 /* connects_to: does this part connect to this node?
@@ -88,7 +103,6 @@ int CARD::connects_to(const node_t& node)const
 CARD_LIST* CARD::scope()
 {
   if (BASE_SUBCKT* o=dynamic_cast<BASE_SUBCKT*>(owner())) {
-    trace1("CARD::scope", owner()->long_label());
     return o->subckt();	// normal element, owner determines scope
   }else{
     return &(CARD_LIST::card_list);	// root circuit
@@ -100,9 +114,15 @@ const CARD_LIST* CARD::scope()const
   if (BASE_SUBCKT const* o=dynamic_cast<BASE_SUBCKT const*>(owner())) {
     trace1("CARD::scope", owner()->long_label());
     return o->subckt();	// normal element, owner determines scope
-  }else{
+  }else{ untested();
     return &(CARD_LIST::card_list);	// root circuit
   }
+}
+/*--------------------------------------------------------------------------*/
+void CARD::set_owner(CARD* o)
+{
+  assert(_owner==&root_card||_owner==o);
+  _owner=o;
 }
 /*--------------------------------------------------------------------------*/
 /* find_in_my_scope: find in same scope as myself
@@ -117,8 +137,11 @@ CARD* CARD::find_in_my_scope(const std::string& name)
 
   CARD_LIST::iterator i = scope()->find_(name);
   if (i == scope()->end()) {
-    throw Exception_Cant_Find(long_label(), name,
-			      ((owner()) ? owner()->long_label() : "(root)"));
+    if(owner()){
+      throw Exception_Cant_Find(long_label(), name, owner()->long_label());
+    }else{
+      throw Exception_Cant_Find(long_label(), name, "(root)"); // gah
+    }
   }else{
   }
   return *i;
@@ -132,12 +155,19 @@ CARD* CARD::find_in_my_scope(const std::string& name)
 const CARD* CARD::find_in_my_scope(const std::string& name)const
 {
   assert(name != "");
-  assert(scope());
+  if(!scope()){
+    throw Exception_Cant_Find(long_label(), name, "");
+  }else{
+  }
 
   CARD_LIST::const_iterator i = scope()->find_(name);
   if (i == scope()->end()) {
-    throw Exception_Cant_Find(long_label(), name,
-			      ((owner()) ? owner()->long_label() : "(root)"));
+    trace2("CARD::find_in_my_scope", long_label(), name);
+    if(owner()){
+      throw Exception_Cant_Find(long_label(), name, owner()->long_label());
+    }else{
+      throw Exception_Cant_Find(long_label(), name, "(root)"); // gah
+    }
   }else{
   }
   return *i;
@@ -152,6 +182,10 @@ const CARD* CARD::find_in_my_scope(const std::string& name)const
 const CARD* CARD::find_in_parent_scope(const std::string& name)const
 {
   assert(name != "");
+  if(!scope()){
+    throw Exception_Cant_Find(long_label(), name, "");
+  }else{
+  }
   const CARD_LIST* p_scope = (scope()->parent()) ? scope()->parent() : scope();
 
   CARD_LIST::const_iterator i = p_scope->find_(name);
@@ -168,12 +202,18 @@ const CARD* CARD::find_in_parent_scope(const std::string& name)const
  */
 const CARD* CARD::find_looking_out(const std::string& name)const
 {
-  try {
+  trace2("find_looking_out", short_label(), name);
+  try { untested();
     return find_in_parent_scope(name);
-  }catch (Exception_Cant_Find&) {
-    if (owner()) {
-      return owner()->find_looking_out(name);
-    }else if (makes_own_scope()) {
+  }catch (Exception_Cant_Find&) { untested();
+    if (owner()) { untested();
+      trace1("owner?", short_label());
+      try{
+	return owner()->find_looking_out(name);
+      }catch (Exception_Cant_Find&) { untested();
+	 throw Exception_Cant_Find(long_label(), name);
+      }
+    }else if (makes_own_scope()) { untested();
       // probably a subckt or "module"
       CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(name);
       if (i != CARD_LIST::card_list.end()) {
@@ -181,7 +221,7 @@ const CARD* CARD::find_looking_out(const std::string& name)const
       }else{
 	throw;
       }
-    }else{
+    }else{ untested();
       throw;
     }
   }

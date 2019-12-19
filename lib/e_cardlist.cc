@@ -427,7 +427,7 @@ CARD_LIST& CARD_LIST::ac_load()
 void CARD_LIST::attach_params(PARAM_LIST* p, const CARD_LIST* scope)
 {
   if (p) {
-    assert(scope);
+    // assert(scope);
     if (_params) {
       delete _params;
       _params = NULL;
@@ -459,38 +459,47 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
 // set up the map of external to expanded node numbers
 // move to BASE_SUBCKT::expand or so?
 // use COMMON_SUBCKT as model
-void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_)
+void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_,
+    CARD_LIST const* subckt)
 {
   COMPONENT const* model = dynamic_cast<COMPONENT const*>(model_);
   COMPONENT const* owner = dynamic_cast<COMPONENT const*>(owner_);
-  assert(model);
-  assert(model->subckt());
-  assert(model->subckt()->nodes());
-  assert(owner);
-  assert(owner->subckt());
-  assert(owner->subckt() == this);
-  trace0(model->long_label().c_str());
-  trace0(owner->long_label().c_str());
+  int num_nodes_in_subckt;
+  if(model){
+    subckt = model->subckt();
+    assert(owner);
+    assert(owner->subckt());
+    assert(owner->subckt() == this);
+    trace0(owner->long_label().c_str());
+    trace0(model->long_label().c_str());
+  }else{
+  }
+  assert(subckt);
+  assert(subckt->nodes());
 
-  int num_nodes_in_subckt = model->subckt()->nodes()->how_many();
-  trace2("",  model->net_nodes(),  num_nodes_in_subckt);
-  assert(model->net_nodes() <= num_nodes_in_subckt);
+  num_nodes_in_subckt = subckt->nodes()->how_many();
+  // trace2("",  model->net_nodes(),  num_nodes_in_subckt);
+  assert(!model || model->net_nodes() <= num_nodes_in_subckt);
   std::vector<NODE*> map = std::vector<NODE*>(num_nodes_in_subckt+1);
   {
     map[0] = &ground_node;
+    int np = 0;
+    if(model){
+      np = model->net_nodes();
+    }
     // self test: verify that port node numbering is correct
-    trace1("ports", model->net_nodes());
-    for (int port = 0; port < model->net_nodes(); ++port) {
-      assert(model->n_(port).e_() <= num_nodes_in_subckt);
+    trace1("ports", np);
+    for (int port = 0; port < np; ++port) {
+      assert(!model || model->n_(port).e_() <= num_nodes_in_subckt);
       //assert(model->n_(port).e_() == port+1);
-      trace3("ports", port, model->n_(port).e_(), owner->n_(port).t_());
+//      trace3("ports", port, model->n_(port).e_(), owner->n_(port).t_());
     }
     {
       // take care of the "port" nodes (external connections)
       // map them to what the calling circuit wants
       int i=0;
-      trace1("ports", owner->long_label());
-      for (i=1; i <= model->net_nodes(); ++i) {
+//      trace1("ports", owner->long_label());
+      for (i=1; i <= np; ++i) {
 	assert(i <= num_nodes_in_subckt);
 	map[i] = owner->n_(i-1).n_();
 	trace2("ports", i, owner->n_(i-1).t_());
@@ -499,10 +508,10 @@ void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_)
       // collecting ordered nodes from nodemap. clone internal nodes.
       // this is alphabetic order, presumably. need to assign
       // newnode_subckt() in order of appearance, below
-      for(auto ii : (*model->subckt()->nodes())){ itested();
+      for(auto ii : (*subckt->nodes())){ itested();
 	int f = ii.second->user_number();
 	assert(f == ii.second->flat_number());
-	if(f>model->net_nodes()){
+	if(f>np){
 	  CARD const* c = ii.second;
 	  CARD* nn = c->clone();
 	  push_back(nn);
@@ -513,8 +522,8 @@ void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_)
       }
     
       // get new node numbers, and assign them to the remaining
-      trace3("internal", owner->long_label(), model->net_nodes(), num_nodes_in_subckt);
-      for (assert(i==model->net_nodes() + 1); i <= num_nodes_in_subckt; ++i) {
+      // trace3("internal", owner->long_label(), np, num_nodes_in_subckt);
+      for (assert(i==np + 1); i <= num_nodes_in_subckt; ++i) {
 	int f = CKT_BASE::_sim->newnode_subckt();
 	NODE* nnn = map[i];
 	assert(nnn);

@@ -1,0 +1,7 @@
+
+.subckt a 1 2 3
+x1 (a b c) foo
+.ends
+x0 1 2 3 a
+.op
+.end

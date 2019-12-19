@@ -83,7 +83,7 @@ class NODE : public CARD {
 private: // CARD overrides
   CARD* clone() const{ return new NODE(*this); }
   std::string value_name()const {return "";} // pure in CARD
-  bool	is_device()const		{return true;}
+  bool	is_device()const		{return false;}
 private:
   int	_user_number;
   int	_flat_number;

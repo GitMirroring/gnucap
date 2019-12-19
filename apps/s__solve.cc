@@ -103,7 +103,7 @@ bool SIM::solve_with_homotopy(OPT::ITL itl, TRACE trace)
     double save_gmin = OPT::gmin;
     OPT::gmin = 1;
     while (_sim->_iter[iPRINTSTEP] < OPT::itl[OPT::SSTEP] && OPT::gmin > save_gmin) {
-      //CARD_LIST::card_list.precalc();
+      //_sim->_card_list.precalc();
       _sim->set_inc_mode_no();
       solve(itl, trace);
       if (!converged) {
@@ -116,7 +116,7 @@ bool SIM::solve_with_homotopy(OPT::ITL itl, TRACE trace)
     }
     OPT::itermin = save_itermin;
     OPT::gmin = save_gmin;
-    //CARD_LIST::card_list.precalc();
+    //_sim->_card_list.precalc();
     solve(itl, trace);
     if (!converged) {
       trace2("final fail", _sim->_iter[iSTEP], OPT::gmin);
@@ -140,7 +140,7 @@ bool SIM::solve_with_homotopy(OPT::ITL itl, TRACE trace)
 void SIM::finish_building_evalq(void)
 {
   ::status.queue.start();
-  CARD_LIST::card_list.tr_queue_eval();
+  _sim->_card_list.tr_queue_eval();
   ::status.queue.stop();
 }
 /*--------------------------------------------------------------------------*/
@@ -151,15 +151,15 @@ void SIM::advance_time(void)
   if (_sim->_time0 > 0) {
     if (_sim->_time0 > last_iter_time) {	/* moving forward */
       notstd::copy_n(_sim->_v0, _sim->_total_nodes+1, _sim->_vt1);
-      CARD_LIST::card_list.tr_advance();
+      _sim->_card_list.tr_advance();
     }else{				/* moving backward */
       /* don't save voltages.  They're wrong! */
       /* instead, restore a clean start for iteration */
       notstd::copy_n(_sim->_vt1, _sim->_total_nodes+1, _sim->_v0);
-      CARD_LIST::card_list.tr_regress();
+      _sim->_card_list.tr_regress();
     }
   }else{
-    CARD_LIST::card_list.dc_advance();
+    _sim->_card_list.dc_advance();
   }
   last_iter_time = _sim->_time0;
   ::status.advance.stop();
@@ -216,7 +216,7 @@ void SIM::evaluate_models()
     }
   }else{
     _sim->_evalq_uc->clear();
-    converged = CARD_LIST::card_list.do_tr();
+    converged = _sim->_card_list.do_tr();
   }
   while (!_sim->_late_evalq.empty()) { //BUG// encapsulation violation
     converged &= _sim->_late_evalq.front()->do_tr_last();
@@ -249,7 +249,7 @@ void SIM::load_matrix()
     }
   }else{
     _sim->_loadq.clear();
-    CARD_LIST::card_list.tr_load();
+    _sim->_card_list.tr_load();
   }
   assert(_sim->_loadq.empty());
   ::status.load.stop();

@@ -1,5 +1,5 @@
 verilog
-
+options trace
 module a(1 2);
 parameter v=0;
 parameter d=0;

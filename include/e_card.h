@@ -105,7 +105,7 @@ public: // owner, scope
 
   CARD*		owner()		   {return _owner;}
   const CARD*	owner()const	   {return _owner;}
-  void		set_owner(CARD* o) {assert(!_owner||_owner==o); _owner=o;}
+  void		set_owner(CARD* o);
   //--------------------------------------------------------------------
 public: // subckt legacy access, don't use in new code
   CARD_LIST*	     subckt();

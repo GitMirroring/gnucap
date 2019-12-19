@@ -24,8 +24,12 @@
 //testing=script 2009.06.21
 #include "u_sim_data.h"
 #include "u_status.h"
-#include "e_base.h"
+#include "e_card.h"
 #include "u_probe.h"
+#include "e_cardlist.h"
+#include "io_error.h"
+#include "e_subckt.h"
+#include "ap.h"
 /*--------------------------------------------------------------------------*/
 PROBE::PROBE(const std::string& what,const CKT_BASE *brh)
   :CKT_BASE(),
@@ -83,6 +87,76 @@ void PROBE::detach()
   }
   _what = "";
   _brh = NULL;
+}
+/*--------------------------------------------------------------------------*/
+// same. but keep label
+void PROBE::store()
+{
+  std::string lbl = label();
+  if(_brh){
+    trace2("store probe", lbl, _brh->short_label());
+    detach();
+    _what = lbl;
+  }else{
+    trace2("store probe nobrh", lbl, _what);
+    // hmm node probe?
+  }
+  assert(!_brh);
+}
+/*--------------------------------------------------------------------------*/
+// is this implemented somewhere else?
+static CARD const* find_card_nested(std::string device,
+                                    CARD_LIST const* scope)
+{
+  std::string::size_type dotplace = device.find_first_of(".");
+  if (dotplace != std::string::npos) {
+    std::string container = device.substr(0, dotplace);
+    device = device.substr(dotplace+1, std::string::npos);
+    trace2("have dot", container, device);
+    CARD_LIST::const_iterator i = scope->find_(container);
+    if (i == scope->end()) {
+    }else if (BASE_SUBCKT const* sc=dynamic_cast<BASE_SUBCKT* const>(*i)){ untested();
+      if(sc->subckt()){ untested();
+	return find_card_nested(device, sc->subckt());
+      }else{ untested();
+      }
+    }
+  }else{
+    CARD_LIST::const_iterator i = scope->find_(device);
+    if (i==scope->end()) {
+    }else{
+      return *i;
+    }
+  }
+  throw Exception_Cant_Find(device,"..");
+}
+/*--------------------------------------------------------------------------*/
+void PROBE::restore(CARD_LIST const* scope)
+{
+  if(_brh){untested();
+    //already set. fresh probe?
+  }else{
+    std::string s = _what; // label();
+    CS cmd(CS::_STRING, s);
+
+    std::string parameter(cmd.ctos(TOKENTERM));
+    int paren = cmd.skip1b('(');
+    std::string device(cmd.ctos(TOKENTERM));
+    paren -= cmd.skip1b(')');
+    assert(paren==0);
+
+    trace2("restore probe", parameter, device);
+
+    try{
+      CARD const* c = find_card_nested(device, scope);
+      _brh = c;
+      _brh->inc_probes();
+      _what = parameter;
+    }catch(Exception_Cant_Find const&){
+      trace2("nobr", parameter, _what);
+    }
+
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* label: returns a string corresponding to a possible probe point

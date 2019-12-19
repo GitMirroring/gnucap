@@ -39,6 +39,45 @@ void PROBE_LISTS::purge(CKT_BASE* brh)
   }
 }
 /*--------------------------------------------------------------------------*/
+// detach probes so they won't get deleted when components are deleted.
+void PROBE_LISTS::store_()
+{
+  for (int i = 0;  i < sCOUNT;  ++i) {
+    alarm[i].store();
+    plot[i] .store();
+    print[i].store();
+    store[i].store();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void PROBE_LISTS::restore(CARD_LIST const* c)
+{
+  for (int i = 0;  i < sCOUNT;  ++i) {
+    alarm[i].restore(c);
+    plot[i] .restore(c);
+    print[i].restore(c);
+    store[i].restore(c);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void PROBELIST::store()
+{
+  for (iterator p=begin();  p!=end(); ++p) {
+    p->store();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void PROBELIST::restore(CARD_LIST const* scope)
+{
+  for (iterator p=begin();  p!=end(); ++p) {
+    try{
+      p->restore(scope);
+    }catch(Exception_Cant_Find const& e){
+      incomplete();
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void PROBELIST::listing(const std::string& label)const
 {
   IO::mstdout.form("%-7s", label.c_str());
@@ -146,7 +185,7 @@ void PROBELIST::add_list(CS& cmd)
   }else if (cmd.is_alnum() || cmd.match1("*?")) {
     // branches or named nodes
     unsigned here1 = cmd.cursor();
-    bool found_something = add_branches(cmd.ctos(),what,&CARD_LIST::card_list);
+    bool found_something = add_branches(cmd.ctos(),what,&_sim->_card_list);
     if (!found_something) {
       cmd.warn(bWARNING, here1, "no match");
     }else{
@@ -158,7 +197,7 @@ void PROBELIST::add_list(CS& cmd)
       }else{
       }
       unsigned here2 = cmd.cursor();
-      found_something = add_branches(cmd.ctos(),what,&CARD_LIST::card_list);
+      found_something = add_branches(cmd.ctos(),what,&_sim->_card_list);
       if (!found_something) {itested();
 	cmd.reset(here2);
 	break;
@@ -195,14 +234,12 @@ void PROBELIST::push_new_probe(const std::string& param,const CKT_BASE* object)
 /*--------------------------------------------------------------------------*/
 void PROBELIST::add_all_nodes(const std::string& what)
 {
-  for (NODE_MAP::const_iterator
-       i = CARD_LIST::card_list.nodes()->begin();
-       i != CARD_LIST::card_list.nodes()->end();
+  for (CARD_LIST::const_iterator
+       i = _sim->_card_list.begin();
+       i != _sim->_card_list.end();
        ++i) {
-    if ((i->first != "0") && (i->first.find('.') == std::string::npos)) {
-      NODE* node = i->second;
-      assert (node);
-      push_new_probe(what, node);
+    if (dynamic_cast<NODE const*>(*i)){
+      push_new_probe(what, *i);
     }else{
     }
   }

@@ -1,0 +1,21 @@
+
+options trace
+simulator lang=spectre
+
+model zz npn bf=150
+
+subckt foo (c b e)
+q1   (c b e) zz
+ends
+
+Vin (c 0) vsource dc 5
+i1 (0 b) isource dc 1u
+
+- list
+
+X1 (c b 0) foo
+
+- list
+- print op i(Vin)
+- op
+- end

@@ -1,0 +1,28 @@
+>>>>>simulator lang=spectre 
+>>>>>model zz npn bf=150 
+>>>>>subckt foo (c b e) 
+>>>>>- list 
+model zz npn   level=1 kf=NA( 0.) af=NA( 1.) bf=150 br=NA( 1.) is=NA( 100.E-18) nf=NA( 1.) nr=NA( 1.) c4=NA( 0.) nc=NA( 2.) c2=NA( 0.) ne=NA( 1.5) rb=NA( 0.) re=NA( 0.) rc=NA( 0.) cjc=NA( 0.) cje=NA( 0.) cjs=NA( 0.) mjc=NA( 0.33) mje=NA( 0.33) mjs=NA( 0.) vjc=NA( 0.75) vje=NA( 0.75) vjs=NA( 0.75) xcjc=NA( 1.) itf=NA( 0.) ptf=NA( 0.) tf=NA( 0.) tr=NA( 0.) xtf=NA( 0.) xtb=NA( 0.) xti=NA( 3.) eg=NA( 1.11)
+
+subckt foo (c b e)
+q1 (c b e) zz  area=NA( 1.)
+ends foo
+
+Vin (c 0) vsource  dc=5
+i1 (0 b) isource  dc=1u
+>>>>>- list 
+model zz npn   level=1 kf=NA( 0.) af=NA( 1.) bf=150 br=NA( 1.) is=NA( 100.E-18) nf=NA( 1.) nr=NA( 1.) c4=NA( 0.) nc=NA( 2.) c2=NA( 0.) ne=NA( 1.5) rb=NA( 0.) re=NA( 0.) rc=NA( 0.) cjc=NA( 0.) cje=NA( 0.) cjs=NA( 0.) mjc=NA( 0.33) mje=NA( 0.33) mjs=NA( 0.) vjc=NA( 0.75) vje=NA( 0.75) vjs=NA( 0.75) xcjc=NA( 1.) itf=NA( 0.) ptf=NA( 0.) tf=NA( 0.) tr=NA( 0.) xtf=NA( 0.) xtb=NA( 0.) xti=NA( 3.) eg=NA( 1.11)
+
+subckt foo (c b e)
+q1 (c b e) zz  area=NA( 1.)
+ends foo
+
+Vin (c 0) vsource  dc=5
+i1 (0 b) isource  dc=1u
+X1 (c b 0) foo 
+>>>>>- print op i(Vin) 
+>>>>>- op 
+#           i(Vin)    
+new max = 5, new limit = 5.5
+ 27.       -150.u     
+>>>>>- end 
