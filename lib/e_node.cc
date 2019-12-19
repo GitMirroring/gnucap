@@ -579,9 +579,9 @@ void node_t::new_model_node(const std::string& node_name, CARD* d)
 /*--------------------------------------------------------------------------*/
 bool node_t::node_is_valid(NODE const* i)
 {
-  if(!i){ untested();
+  if(!i){
     return false;
-  }else if (node_is_valid(i->flat_number())) { untested();
+  }else if (node_is_valid(i->flat_number())) {
     return true;
   }else{ untested();
     return false;
@@ -597,7 +597,7 @@ void node_t::map_subckt_node(NODE** m, const CARD* d)
     if (node_is_valid(m[e_()])) {
       _nnn = m[e_()];
       _ttt = _nnn->flat_number();
-    }else{ untested();
+    }else{
       throw Exception(d->long_label() + ": need more nodes");
     }
   }else{untested();

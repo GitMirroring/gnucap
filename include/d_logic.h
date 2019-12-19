@@ -104,7 +104,7 @@ public: // ELEMENT. transition
     }else{
     }
   }
-  void ELEMENT_dc_advance() { untested();
+  void ELEMENT_dc_advance() {
     assert(_sim->_time0 == 0.); // DC
 
     for (int i=OPT::_keep_time_steps-1; i>=0; --i) {
@@ -113,7 +113,7 @@ public: // ELEMENT. transition
 
     _dt = NOT_VALID;
   }
-  void ELEMENT_tr_advance() { untested();
+  void ELEMENT_tr_advance() {
     assert(_time[0] < _sim->_time0); // moving forward
 
     for (int i=OPT::_keep_time_steps-1; i>0; --i) {
@@ -347,11 +347,11 @@ protected:
 /*--------------------------------------------------------------------------*/
 class LOGIC_AND : public COMMON_LOGIC {
 private:
-  explicit LOGIC_AND(const LOGIC_AND& p) :COMMON_LOGIC(p){untested();++_count;}
-  COMMON_COMPONENT* clone()const {untested(); return new LOGIC_AND(*this);}
+  explicit LOGIC_AND(const LOGIC_AND& p) :COMMON_LOGIC(p){++_count;}
+  COMMON_COMPONENT* clone()const { return new LOGIC_AND(*this);}
 public:
-  explicit LOGIC_AND(int c=0)		  :COMMON_LOGIC(c) {untested();}
-  LOGICVAL logic_eval(const node_t* n)const {untested();
+  explicit LOGIC_AND(int c=0)		  :COMMON_LOGIC(c) {}
+  LOGICVAL logic_eval(const node_t* n)const {
     LOGICVAL out(n[0]->lv());
     for (int ii=1; ii<incount; ++ii) {untested();
       out &= n[ii]->lv();

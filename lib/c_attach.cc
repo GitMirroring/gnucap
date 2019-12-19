@@ -91,11 +91,11 @@ public:
       }
       
       std::string full_file_name;
-      if (short_file_name[0]=='/' || short_file_name[0]=='.'){untested();
+      if (short_file_name[0]=='/' || short_file_name[0]=='.'){
 	if (OS::access_ok(short_file_name, R_OK)) {untested();
 	  // found it, local or root
 	  full_file_name = short_file_name;
-	}else{untested();
+	}else{
 	  cmd.reset(here);
 	  throw Exception_CS(std::string("plugin not found in ") + short_file_name[0], cmd);
 	}

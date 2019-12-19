@@ -93,7 +93,7 @@ void DEV_LOGIC::expand()
     if(!dynamic_cast<const BASE_SUBCKT*>(model)) {untested();
       error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
-    }else if(BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(this)) {untested();
+    }else if(BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(this)) {
       _gatemode = OPT::mode;    
       s->renew_subckt(model, NULL/*&(c->_params)*/);    
       s->subckt()->expand();
@@ -260,7 +260,7 @@ bool DEV_LOGIC::tr_needs_eval()const
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_queue_eval()
-{ untested();
+{
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:	  unreachable(); break;
@@ -300,7 +300,7 @@ bool DEV_LOGIC::tr_eval_digital()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::do_tr()
-{ untested();
+{
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:   unreachable(); break;
@@ -311,7 +311,7 @@ bool DEV_LOGIC::do_tr()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_load()
-{ untested();
+{
   switch (_gatemode) {
   case moUNKNOWN: unreachable(); break;
   case moMIXED:   unreachable(); break;

@@ -43,7 +43,7 @@ CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
   :_parent(NULL),
    _nm(new NODE_MAP),
    _params(NULL)
-{ untested();
+{
   assert(model);
   assert(model->subckt());
   assert(owner);

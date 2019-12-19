@@ -32,7 +32,7 @@ void BASE_SUBCKT::new_subckt()
 }
 /*--------------------------------------------------------------------------*/
 void BASE_SUBCKT::new_subckt(const CARD* Model, PARAM_LIST* Params)
-{ untested();
+{
   delete _subckt;
   _subckt = NULL;
   _subckt = new CARD_LIST(Model, this, scope(), Params);
@@ -50,23 +50,23 @@ void BASE_SUBCKT::renew_subckt(const CARD* Model, PARAM_LIST* Params)
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST const* CARD::subckt() const
-{ untested();
+{
   unreachable(); // this is a compatibility hack, used in some spice devices
   BASE_SUBCKT const* s=dynamic_cast<BASE_SUBCKT const*>(this);
-  if(s){ untested();
+  if(s){
     return s->subckt();
-  }else{ untested();
+  }else{
     return NULL;
   }
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST* CARD::subckt()
-{ untested();
+{
   unreachable(); // this is a compatibility hack
   BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(this);
-  if(s){ untested();
+  if(s){
     return s->subckt();
-  }else{ untested();
+  }else{
     return NULL;
   }
 }

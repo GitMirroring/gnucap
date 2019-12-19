@@ -210,7 +210,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  std::string name, value;
 	  cmd >> name >> '(' >> value >> ')' >> ',';
 	  x->set_port_by_name(name, value);
-	}catch (Exception_No_Match&) {untested();
+	}catch (Exception_No_Match&) {
 	  cmd.warn(bDANGER, here, "mismatch, ignored");
 	}
       }
@@ -310,7 +310,7 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   cmd >> ';';
 
   // body
-  for (;;) { untested();
+  for (;;) {
     cmd.get_line("verilog-module>");
 
     if (cmd >> "endmodule ") {
@@ -351,7 +351,7 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
-{ untested();
+{
   cmd.get_line("gnucap-verilog>");
   new__instance(cmd, NULL, Scope);
 }
@@ -485,7 +485,7 @@ void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
 void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 {
   assert(x);
-  if ((x->comment().compare(0, 2, "//")) != 0) {untested();
+  if ((x->comment().compare(0, 2, "//")) != 0) {
     o << "//";
   }else{
   }

@@ -440,7 +440,7 @@ void COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_port_by_index(int num, std::string& ext_name)
-{ untested();
+{
   if (num < max_nodes()) {
     n_(num).new_node(ext_name, this);
     if (num+1 > _net_nodes) {
@@ -469,7 +469,7 @@ void COMPONENT::set_port_to_ground(int num)
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_dev_type(const std::string& new_type)
 {
-  if (common()) { untested();
+  if (common()) {
     if (new_type != dev_type()) {
       COMMON_COMPONENT* c = common()->clone();
       assert(c);
@@ -477,7 +477,7 @@ void COMPONENT::set_dev_type(const std::string& new_type)
       attach_common(c);
     }else{
     }
-  }else{ untested();
+  }else{
     CARD::set_dev_type(new_type);
   }
 }

@@ -58,15 +58,15 @@ public:
   CARD*		clone()const		{return new DEV_SUBCKT(*this);}
 private: // override virtual
   char		id_letter()const	{return 'X';}
-  bool		print_type_in_spice()const {untested(); return true;}
+  bool		print_type_in_spice()const { return true;}
   std::string   value_name()const	{return "#";}
   node_t& n_(int i) const { return const_cast<node_t&>(_nodes[i]); }
   int		max_nodes()const	{
     COMMON_SUBCKT const* cs = dynamic_cast<COMMON_SUBCKT const*>(common());
-    if(cs){ untested();
+    if(cs){
       trace2("DS::max_nodes", long_label(), cs->net_nodes());
       return cs->net_nodes()+1;
-    }else{ untested();
+    }else{
       // INT_MAX results in arithmetic overflow in lang_spice
       // still, needed in spice, where ports are assigned before type is known
       return INT_MAX/2;
@@ -74,7 +74,7 @@ private: // override virtual
   }
 
 public:
-  void set_port_by_index(int Index, std::string& Value){ untested();
+  void set_port_by_index(int Index, std::string& Value){
     _nodes.resize(std::max(size_t(Index)+1, _nodes.size()));
     trace3("resized", long_label(), Index, _nodes.capacity());
 
@@ -175,7 +175,7 @@ private: // no-ops for prototype
 DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "subckt", &pp);
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT_PROTO::set_port_by_index(int Index, std::string& Value)
-{ untested();
+{
   COMMON_SUBCKT* cs = prechecked_cast<COMMON_SUBCKT*>(mutable_common());
   assert(cs);
 
@@ -187,7 +187,7 @@ void DEV_SUBCKT_PROTO::set_port_by_index(int Index, std::string& Value)
 }
 /*--------------------------------------------------------------------------*/
 int DEV_SUBCKT_PROTO::net_nodes() const
-{ untested();
+{
   return _net_nodes;
   COMMON_SUBCKT const* cs = prechecked_cast<COMMON_SUBCKT const*>(common());
   assert(cs);
@@ -196,7 +196,7 @@ int DEV_SUBCKT_PROTO::net_nodes() const
 /*--------------------------------------------------------------------------*/
 DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO(const DEV_SUBCKT_PROTO& p)
   : DEV_SUBCKT(p)
-{ untested();
+{
   assert(common());
   COMMON_SUBCKT* cs = dynamic_cast<COMMON_SUBCKT*>(p.common()->clone());
   assert(cs);
@@ -209,7 +209,7 @@ DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO(const DEV_SUBCKT_PROTO& p)
 /*--------------------------------------------------------------------------*/
 DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO()
   :DEV_SUBCKT()
-{ untested();
+{
   attach_common(&Default_SUBCKT_);
 }
 /*--------------------------------------------------------------------------*/
@@ -221,7 +221,7 @@ CARD* DEV_SUBCKT_PROTO::clone_instance()const
 
   if (this == &pp){ untested();
     unreachable();
-  }else{ untested();
+  }else{
   }
   new_instance->attach_common(common()->clone());
 
@@ -249,7 +249,7 @@ DEV_SUBCKT::DEV_SUBCKT(const DEV_SUBCKT& p)
 std::string DEV_SUBCKT::port_name(int i)const
 {
    COMMON_SUBCKT const* cs = prechecked_cast<COMMON_SUBCKT const*>(common());
-   if (cs) { untested();
+   if (cs) {
      return cs->port_name(i);
    }else{
     return "";
@@ -262,10 +262,10 @@ void DEV_SUBCKT::expand()
   if(subckt()){
     // all set
   }else{
-    if(dynamic_cast<COMMON_SUBCKT const*>(common())){ untested();
+    if(dynamic_cast<COMMON_SUBCKT const*>(common())){
       // getting here if something went wrong
       // or if subckt proto is a stub.
-    }else{ untested();
+    }else{
       // get here when instanciating X, then set modelname
       // X has a COMMON_PARAMLIST
     }
@@ -326,7 +326,7 @@ void DEV_SUBCKT::expand()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT::precalc_first()
-{ untested();
+{
   BASE_SUBCKT::precalc_first();
 
   if (subckt()) {
@@ -362,7 +362,7 @@ CARD_LIST* DEV_SUBCKT_PROTO::scope()
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST const* DEV_SUBCKT_PROTO::scope() const
-{ untested();
+{
   COMMON_SUBCKT const* cs = prechecked_cast<COMMON_SUBCKT const*>(common());
   assert(_subckt);
   assert(_subckt == cs->subckt()); // but const.
@@ -439,7 +439,7 @@ void COMMON_SUBCKT::map_subckt_nodes(BASE_SUBCKT* owner) const
       //}
       int i=0;
       trace3("ports", owner->long_label(), model->net_nodes(), net_nodes());
-      for (i=1; i <= model->net_nodes(); ++i) { untested();
+      for (i=1; i <= model->net_nodes(); ++i) {
 	assert(i <= num_nodes_in_subckt);
 	map[i] = owner->n_(i-1).n_();
 	trace2("ports", i, owner->n_(i-1).t_());
@@ -479,7 +479,7 @@ void COMMON_SUBCKT::map_subckt_nodes(BASE_SUBCKT* owner) const
   // Mapping is done in node_t.
 
   // scan the list, map the nodes
-  for (CARD_LIST::iterator ci = cl->begin(); ci != cl->end(); ++ci) { untested();
+  for (CARD_LIST::iterator ci = cl->begin(); ci != cl->end(); ++ci) {
     // for each card in card_list
     if (!(*ci)->is_device()) {
       assert(dynamic_cast<MODEL_CARD*>(*ci)

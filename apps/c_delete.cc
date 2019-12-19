@@ -66,7 +66,7 @@ private:
       }else if ((**i).is_device()) {
 	// found a match, but it isn't a container (subckt)
 	return false;
-      }else if(BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(*i)){ untested();
+      }else if(BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(*i)){
 	// found the container, look inside
 	return delete_one_name(dev_name, s->subckt());
       }else{ untested();
