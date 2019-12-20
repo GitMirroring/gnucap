@@ -3,7 +3,7 @@
  0.25       298.f     
  0.5        592.f     
  0.75       658.f     
- 1.         1.18p     
+ 1.         1.179p    
 Gnucap   System status
 iterations: op=0, dc=0, tran=0, fourier=15878, total=21171
 transient timesteps: accepted=5293, rejected=0, total=5293
