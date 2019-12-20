@@ -29,9 +29,9 @@
 /*--------------------------------------------------------------------------*/
 bool PROBE_BASE::operator==(const CKT_BASE& b)const
 {
-  if(PROBE_BASE const* p=prechecked_cast<PROBE_BASE const*>(brh())){
+  if(PROBE_BASE const* p=dynamic_cast<PROBE_BASE const*>(brh())){ untested();
     return *p==b;
-  }else{ unreachable();
+  }else{ untested();
     return (brh() == &b);
   }
 }
