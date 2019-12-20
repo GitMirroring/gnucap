@@ -1,5 +1,6 @@
 /*$Id: u_probe.cc 2016/09/22 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
+ *               2017, 2019 Felix Salfelder
  * Author: Albert Davis <aldavis@gnu.org>
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
