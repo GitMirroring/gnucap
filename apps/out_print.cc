@@ -66,8 +66,8 @@ private: // OUTPUT
       << "value        dB      phase  value        dB      phase\n";
   }
 #endif
-  void head(std::string const& s){
-    OUTPUT::head(s);
+  void h_ead(std::string const& s){
+    OUTPUT::h_ead(s);
     PROBELIST const& pr=probelist();
     assert(_sim->_axes.size());
     normal_head(_sim->_axes[0]._label, pr);
@@ -102,13 +102,13 @@ private: // OUTPUT
     out() << '\n';
   }
   // CMD_PRINT::
-  void commit(int flags)
+  void commit(int Flags)
   {
     double x = coord(0);
     PROBELIST const& pr=probelist();
-    trace2("print outdata", pr.size(), flags);
+    trace2("print outdata", pr.size(), Flags);
 
-    if(!(flags & ( ofPRINT | ofTRACE ))){
+    if(!(Flags & ( ofPRINT | ofTRACE ))){
     }else if (plotout.any() /*&& plt.has_probes()*/
       && !(CKT_BASE::_sim->_mode==s_OP)){
       // this is a hack from s_ac..
@@ -116,7 +116,7 @@ private: // OUTPUT
       OMSTREAM o=out();
       o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
       assert(x != NOT_VALID);
-      if(flags & ofTRACE){
+      if(Flags & ofTRACE){
 	o << -static_cast<double>(_sim->iteration_number());
       }else{
 	o << x;

@@ -264,18 +264,18 @@ int main(int argc, const char *argv[])
       exit(0);
     }
   }
-  { untested();
+  {
     SET_RUN_MODE xx(rINTERACTIVE);
     CS cmd(CS::_STDIN);
-    for (;;) { untested();
-      if (!sigsetjmp(env.p, true)) { untested();
-	try { untested();
-	  if (OPT::language) { untested();
+    for (;;) {
+      if (!sigsetjmp(env.p, true)) {
+	try {
+	  if (OPT::language) {
 	    OPT::language->parse_top_item(cmd, &CARD_LIST::card_list);
 	  }else{untested();
 	    CMD::cmdproc(cmd.get_line(I_PROMPT), &CARD_LIST::card_list);
 	  }
-	}catch (Exception_End_Of_Input& e) { untested();
+	}catch (Exception_End_Of_Input& e) {
 	  error(bDANGER, e.message() + '\n');
 	  finish();
 	  //CMD::command("quit", &CARD_LIST::card_list);

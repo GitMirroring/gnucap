@@ -69,14 +69,14 @@ void PROBE_BASE::set_param_by_index(unsigned, double){ untested();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-RANGE_PROBE::RANGE_PROBE(const std::string& what, PROBE_BASE const*brh)
-  :PROBE_BASE(what, brh),
+RANGE_PROBE::RANGE_PROBE(const std::string& What, PROBE_BASE const*Brh)
+  :PROBE_BASE(What, Brh),
    _lo(0.),
    _hi(0.)
 {
-  assert(brh);
-  trace1("RANGE_PROBE::RANGE_PROBE", what);
-  set_label(brh->label());
+  assert(Brh);
+  trace1("RANGE_PROBE::RANGE_PROBE", What);
+  set_label(Brh->label());
 }
 /*--------------------------------------------------------------------------*/
 RANGE_PROBE::RANGE_PROBE(const RANGE_PROBE& p)

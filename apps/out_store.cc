@@ -52,7 +52,7 @@ public: // OUTPUT_CMD
   }
 public: // OUTPUT
   // allocate space for output data
-  void head(std::string const& label_in)
+  void h_ead(std::string const& label_in)
   {
     static const std::string s[] = {"", "ac", "op", "dc", "tran", "fourier"};
     std::string label;
@@ -62,7 +62,7 @@ public: // OUTPUT
     }else{
       label = label_in;
     }
-    OUTPUT::head(label);
+    OUTPUT::h_ead(label);
     PROBELIST const& pr=probelist();
 //    SIM_DATA* _sim = CKT_BASE::_sim;
     CKT_BASE* data = data_dispatcher[label];
@@ -86,11 +86,11 @@ public: // OUTPUT
       _wavep.push_back(&w);
     }
   }
-  void commit(int flags) {
+  void commit(int Flags) {
     double x=coord(0); // can only store univariate...
     trace1("store out", probelist().size());
     std::vector<WAVE*>::iterator ii=_wavep.begin();
-    if(flags & ofSTORE) {
+    if(Flags & ofSTORE) {
       for (PROBELIST::const_iterator p=probelist().begin();
            p!=probelist().end(); ++p){
 	(*ii)->push(x, (*p)->value());

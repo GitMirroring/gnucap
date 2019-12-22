@@ -55,7 +55,7 @@ CARD_LIST CARD_LIST::card_list;	// root circuit
 
 // the rest of this should not be here, is residue of old stuff
 STATUS status;
-std::string head;
+std::string hea_d;
 /*--------------------------------------------------------------------------*/
 /* sweep command.  This will go away with a rewrite of looping */
 const int swp_nest_max = 1;	/* no loop, "future" expansion		*/

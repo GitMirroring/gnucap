@@ -42,11 +42,11 @@ public:
 
 protected:
   explicit PROBE_BASE() {unreachable(); incomplete();}
-  explicit PROBE_BASE(const std::string& what, CKT_BASE const* brh)
-    : _what(what),
-      _brh(brh)
+  explicit PROBE_BASE(const std::string& What, CKT_BASE const* Brh)
+    : _what(What),
+      _brh(Brh)
   {
-    trace2("construct baseprobe", what, _brh);
+    trace2("construct baseprobe", _what, _brh);
     if (_brh) {
       _brh->inc_probes();
       set_label( _what + '(' + _brh->long_label() + ')');
@@ -179,9 +179,9 @@ class PTR_PROBE : public PROBE_BASE{
 private:
   explicit PTR_PROBE(PTR_PROBE const& x) : PROBE_BASE(x) {}
 public:
-  explicit PTR_PROBE(std::string const& what, CKT_BASE const* brh, T const* t)
-  : PROBE_BASE(what, brh), _value(t){
-    assert(t);
+  explicit PTR_PROBE(std::string const& What, CKT_BASE const* Brh, T const* Value)
+  : PROBE_BASE(What, Brh), _value(Value){
+    assert(Value);
   }
 public:
   double value() const{

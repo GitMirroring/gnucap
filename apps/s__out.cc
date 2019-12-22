@@ -100,7 +100,7 @@ void SIM::outdata(double const& x, int outflags)
 /* SIM::head: print column headings and draw plot borders
  * obsolete version, all output functions start with "out"
  */
-void SIM::head(double start, double stop, const std::string& col1)
+void SIM::he_ad(double start, double stop, const std::string& col1)
 {
   _sim->_axes.set_axis(0, NULL, col1, start, stop);
   outhead();
@@ -117,7 +117,7 @@ void SIM::outinit()
 void SIM::outhead()
 {
   if(_output){
-    _output->head();
+    _output->h_ead();
   }else{ untested();
   }
 }

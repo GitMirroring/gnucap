@@ -57,10 +57,10 @@ public: // OUTPUT
  // void head(){ untested();
  //   OUTPUT::head();
  // }
-  void commit(int flags) {
+  void commit(int Flags) {
     OMSTREAM o=out();
     o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
-    if((flags & ofPRINT)){
+    if((Flags & ofPRINT)){
       for (PROBELIST::const_iterator p=probelist().begin();
            p!=probelist().end(); ++p){
 	probe_type const* q=dynamic_cast<probe_type const*>(*p);

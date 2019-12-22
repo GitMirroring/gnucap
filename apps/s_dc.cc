@@ -342,7 +342,7 @@ void DCOP::options(CS& Cmd, unsigned Nest)
 /*--------------------------------------------------------------------------*/
 void DCOP::sweep()
 {
-  head(_start[0], _stop[0], " ");
+  he_ad(_start[0], _stop[0], " ");
   _sim->_bypass_ok = false;
   _sim->set_inc_mode_bad();
   if (_cont) {untested();
