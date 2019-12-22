@@ -1,6 +1,5 @@
 ' a test of the fault and modify commands 
 >>>>>.print op v(nodes) 
-probe wildcard: skipping v on 0
 >>>>>.op 
 #           v(1)       v(2)      
  27.        1.         0.5       

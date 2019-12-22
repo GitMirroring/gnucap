@@ -16,6 +16,3 @@ r2 (2 0) 1
 .op
 .print op nan(nodes)
 .op
-.print op v(0)
-.options trace
-.print op v(nodes)

@@ -55,7 +55,7 @@ namespace TR {
 void TRANSIENT::sweep()
 {
   _sim->_phase = p_INIT_DC;
-  head(_tstart, _tstop, "Time");
+  he_ad(_tstart, _tstop, "Time");
   _sim->_bypass_ok = false;
   _sim->set_inc_mode_bad();
   

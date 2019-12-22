@@ -138,8 +138,8 @@ private: // types
   class BYPASS_PROBE : public PROBE_BASE{
   private:
     explicit BYPASS_PROBE(BYPASS_PROBE const& x) : PROBE_BASE(x) { untested(); }
-    explicit BYPASS_PROBE(std::string const& what, CKT_BASE const* brh)
-    : PROBE_BASE(what, brh) {
+    explicit BYPASS_PROBE(std::string const& What, CKT_BASE const* Brh)
+      : PROBE_BASE(What, Brh) {
     }
   public:
     double value() const{

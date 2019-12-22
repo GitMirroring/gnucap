@@ -69,7 +69,7 @@ private: // override OUTPUT
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
   void commit(int);
-  void head(std::string const& label);
+  void h_ead(std::string const& label);
   void flush();
 private:
   void do_it(CS&, CARD_LIST*) { unreachable(); }
@@ -117,9 +117,9 @@ private:
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::head(std::string const&)
+void OUTPUT_TEE::h_ead(std::string const&)
 {
-  OUTPUT::head();
+  OUTPUT::h_ead();
   if(empty()){
     // print something by default
     // this is to imitate pre-output behaviour
@@ -133,7 +133,7 @@ void OUTPUT_TEE::head(std::string const&)
   }else{
     for(outputs_type::const_iterator p=_outputs.begin();
         p!=_outputs.end(); ++p){
-      (*p)->head();
+      (*p)->h_ead();
     }
   }
 }
@@ -170,7 +170,7 @@ void OUTPUT_TEE::init()
   }
 }
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::commit(int flags)
+void OUTPUT_TEE::commit(int Flags)
 {
   if(empty()){
     // legacy
@@ -184,7 +184,7 @@ void OUTPUT_TEE::commit(int flags)
     for(outputs_type::iterator p=_outputs.begin();
 	p!=_outputs.end(); ++p){
       assert(*p);
-      (*p)->commit(flags);
+      (*p)->commit(Flags);
     }
   }
 }

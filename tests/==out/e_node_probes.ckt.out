@@ -13,13 +13,3 @@
  27.        Inf        Inf       
 #           nan(1)     nan(2)    
  27.        NaN        NaN       
-.print op v(0) 
-          ^ ? cannot resolve
-.print op v(0) 
-             ^ ? need a probe
-.print op v(0) 
-             ^ ? need device or node
-.print op v(0) 
-               ^ ? need )
->>>>>.print op v(nodes) 
-probe wildcard: skipping v on 0

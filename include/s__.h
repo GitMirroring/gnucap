@@ -84,7 +84,7 @@ protected: // OUTPUT interface, s__out.cc
   // ...
 protected: // obsolete wrappers.
   void outdata(double const&, int);
-  void head(double,double,const std::string&);
+  void he_ad(double,double,const std::string&);
 public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:				/* s__solve.cc */

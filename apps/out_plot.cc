@@ -330,8 +330,8 @@ private: // OUTPUT_CMD
     plotout = (plotset) ? IO::mstdout : OMSTREAM();
   }
 private: // OUTPUT
-  void head(std::string const& label){
-    OUTPUT::head(label);
+  void h_ead(std::string const& label){
+    OUTPUT::h_ead(label);
     PROBELIST const& pr=probelist();
     // if(0&& !plotout.any()){
     // }else
@@ -341,9 +341,9 @@ private: // OUTPUT
       plopen(start, stop, pr);
     }
   }
-  void commit(int flags){
+  void commit(int Flags){
     double x=coord(0); // can only plot univariate
-    if(!(flags & ofPRINT)){
+    if(!(Flags & ofPRINT)){
     }else if(probelist().size()){
       plottr(x, probelist());
     }else{ untested();

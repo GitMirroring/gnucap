@@ -67,7 +67,7 @@ public:
     _out = o;
   }
   // print column headings and draw plot borders
-  virtual void head(std::string const& label="");
+  virtual void h_ead(std::string const& label="");
   // trigger data collection
   virtual void commit(int flags)=0;
   // eject data

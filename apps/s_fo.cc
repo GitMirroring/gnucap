@@ -102,11 +102,11 @@ public:
 private: // pure, unused
   void do_it(CS&, CARD_LIST*){ unreachable(); }
 private:
-  void head(){
+  void h_ead_(){
   }
-  void commit(int flags){
-    // _zap->commit(sel, flags);
-    store(flags);
+  void commit(int Flags){
+    // _zap->commit(sel, Flags);
+    store(Flags);
   }
   void store(int);
 private:

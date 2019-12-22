@@ -43,7 +43,7 @@ public:
   struct axis_t{
     explicit axis_t() : _x(NULL), _label(""), _min(1e99), _max(-1e99) { }
     axis_t(axis_t const& p)
-      : _x(p._x), _label(p._label), _min(p._min), _max(p._max){ untested();
+      : _x(p._x), _label(p._label), _min(p._min), _max(p._max){
     }
     explicit axis_t(double const* x, std::string l, double min, double max)
       : _x(x), _label(l), _min(min), _max(max){
@@ -58,22 +58,22 @@ private:
   SIM_AXES(): _axes(0){ }
   SIM_AXES(SIM_AXES const&) : _axes(0){ unreachable(); }
 public:
-  void hack(double const*x){ untested();
+  void hack(double const*X){ untested();
     _axes.resize(1);
-    _axes[0]._x=x;
+    _axes[0]._x=X;
   }
-  void set_axis(unsigned pos, double const *x, std::string label="", double
-      lb=1e99, double ub=-1e99){
-    if(pos>=_axes.size()){
-      _axes.resize(pos+1);
+  void set_axis(unsigned Pos, double const *X, std::string Label="",
+		double Lb=1e99, double Ub=-1e99){
+    if(Pos>=_axes.size()){
+      _axes.resize(Pos+1);
     }else{
     }
-    axis_t& ap=_axes[pos];
-    ap._label = label;
-    ap._min = lb;
-    ap._max = ub;
-    if(x){
-      ap._x = x;
+    axis_t& ap=_axes[Pos];
+    ap._label = Label;
+    ap._min = Lb;
+    ap._max = Ub;
+    if(X){
+      ap._x = X;
     }else{
     }
   }
