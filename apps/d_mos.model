@@ -470,8 +470,8 @@ bool DEV_BUILT_IN_MOS::tr_needs_eval()const
     const MODEL_BUILT_IN_MOS_BASE* m=prechecked_cast<const MODEL_BUILT_IN_MOS_BASE*>(c->model());
     assert(m);
     polarity_t polarity = m->polarity;
-    node_t& eff_s((reversed) ? _n[n_id] : _n[n_is]);
-    node_t& eff_d((reversed) ? _n[n_is] : _n[n_id]);
+    node_t const& eff_s((reversed) ? _n[n_id] : _n[n_is]);
+    node_t const& eff_d((reversed) ? _n[n_is] : _n[n_id]);
     return !(conchk(vds,polarity*(eff_d.v0()-eff_s.v0()),OPT::vntol)
 	     && conchk(vgs, polarity*(_n[n_g].v0()-eff_s.v0()),
 		       OPT::vntol)

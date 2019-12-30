@@ -231,6 +231,7 @@ static void make_device(std::ofstream& out, const Device& d)
     "  bool      print_type_in_spice()const {return true;}\n"
     "  std::string value_name()const  {return \"area\";}\n"
     "  //std::string dev_type()const;   //BASE_SUBCKT\n"
+    "  node_t&   n_(int i)  const   {return const_cast<node_t&>(_n[i]);}\n"
     "  int       max_nodes()const     {return " << d.max_nodes() << ";}\n"
     "  int       min_nodes()const     {return " << d.min_nodes() << ";}\n";
   if (d.max_nodes() != d.min_nodes()) {
@@ -344,7 +345,7 @@ static void make_device(std::ofstream& out, const Device& d)
   size_t total_nodes = d.circuit().req_nodes().size() + d.circuit().opt_nodes().size()
     + d.circuit().local_nodes().size();
   out << "};\n"
-    "  node_t _nodes[" << total_nodes << "];\n"
+    "  node_t _n[" << total_nodes << "];\n"
     "  std::string port_name(int i)const {\n"
     "    assert(i >= 0);\n"
     "    assert(i < " << d.circuit().req_nodes().size() + d.circuit().opt_nodes().size() << ");\n"

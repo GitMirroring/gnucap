@@ -27,6 +27,7 @@
 #include "e_node.h"
 #include "u_nodemap.h"
 #include "e_model.h"
+#include "e_compon.h"
 /*--------------------------------------------------------------------------*/
 #define trace_func_comp() trace0((__func__ + (":" + (**ci).long_label())).c_str())
 /*--------------------------------------------------------------------------*/
@@ -453,8 +454,10 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
 }
 /*--------------------------------------------------------------------------*/
 // set up the map of external to expanded node numbers
-void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
+void CARD_LIST::map_subckt_nodes(const CARD* model_, const CARD* owner_)
 {
+  COMPONENT const* model = dynamic_cast<COMPONENT const*>(model_);
+  COMPONENT const* owner = dynamic_cast<COMPONENT const*>(owner_);
   assert(model);
   assert(model->subckt());
   assert(model->subckt()->nodes());
@@ -467,10 +470,11 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
   int num_nodes_in_subckt = model->subckt()->nodes()->how_many();
   trace2("",  model->net_nodes(),  num_nodes_in_subckt);
   assert(model->net_nodes() <= num_nodes_in_subckt);
-  int* map = new int[num_nodes_in_subckt+1];
+  std::vector<int> map(num_nodes_in_subckt+1);
   {
     map[0] = 0;
     // self test: verify that port node numbering is correct
+    trace1("ports", model->net_nodes());
     for (int port = 0; port < model->net_nodes(); ++port) {
       assert(model->n_(port).e_() <= num_nodes_in_subckt);
       //assert(model->n_(port).e_() == port+1);
@@ -504,21 +508,18 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
   // scan the list, map the nodes
   for (CARD_LIST::iterator ci = begin(); ci != end(); ++ci) {
     // for each card in card_list
-    if ((**ci).is_device()) {
+    if (!(*ci)->is_device()) {
+      assert(dynamic_cast<MODEL_CARD*>(*ci)
+           ||dynamic_cast<NODE*>(*ci));
+    }else if (COMPONENT* c=dynamic_cast<COMPONENT*>(*ci) ) {
       for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
 	// for each connection node in card
-	try{
-	  (**ci).n_(ii).map_subckt_node(map, owner);
-	}catch(...){
-	  delete[] map;
-	  throw;
-	}
+	c->n_(ii).map_subckt_node(map.data(), owner);
       }
     }else{
       assert(dynamic_cast<MODEL_CARD*>(*ci));
     }
   }
-  delete[] map;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

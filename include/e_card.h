@@ -42,8 +42,6 @@ private:
   CARD_LIST*	_subckt;
   CARD* 	_owner;
   bool		_constant;	// eval stays the same every iteration
-protected:
-  node_t*	_n;
 public:
   int		_net_nodes;	// actual number of "nodes" in the netlist
   //--------------------------------------------------------------------
@@ -129,7 +127,6 @@ public:	// label -- in CKT_BASE
   /*virtual*/ const std::string long_label()const; // no further override
   //--------------------------------------------------------------------
 public:	// ports -- mostly defer to COMPONENT
-  node_t& n_(int i)const;
   int     connects_to(const node_t& node)const;
   //--------------------------------------------------------------------
 public: // parameters

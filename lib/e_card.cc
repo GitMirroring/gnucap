@@ -35,7 +35,6 @@ CARD::CARD()
    _subckt(0),
    _owner(0),
    _constant(false),
-   _n(0),
    _net_nodes(0)
 {
 }
@@ -46,7 +45,6 @@ CARD::CARD(const CARD& p)
    _subckt(0), //BUG// isn't this supposed to copy????
    _owner(0),
    _constant(p._constant),
-   _n(0),
    _net_nodes(p._net_nodes)
 {
 }
@@ -72,6 +70,9 @@ const std::string CARD::long_label()const
  */
 int CARD::connects_to(const node_t& node)const
 {untested();
+  incomplete();
+  return 0;
+#if 0
   int count = 0;
   if (is_device()) {untested();
     for (int ii = 0;  ii < net_nodes();  ++ii) {untested();
@@ -83,6 +84,7 @@ int CARD::connects_to(const node_t& node)const
   }else{untested();
   }
   return count;
+#endif
 }
 /*--------------------------------------------------------------------------*/
 CARD_LIST* CARD::scope()
@@ -213,11 +215,6 @@ void CARD::renew_subckt(const CARD* Model, PARAM_LIST* Params)
     assert(subckt());
     subckt()->attach_params(Params, scope());
   }
-}
-/*--------------------------------------------------------------------------*/
-node_t& CARD::n_(int i)const
-{
-  return _n[i];
 }
 /*--------------------------------------------------------------------------*/
 void CARD::set_param_by_name(std::string Name, std::string Value)

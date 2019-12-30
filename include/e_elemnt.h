@@ -148,9 +148,10 @@ public:
   int param_count()const {return (0 + COMPONENT::param_count());}
 protected:
   int      _loaditer;	// load iteration number
-private:
+  node_t*  _n;
   node_t   _nodes[NODES_PER_BRANCH]; // nodes (0,1:out, 2,3:in)
 public:
+  virtual node_t& n_(int i) const{ return _n[i]; }
   CPOLY1   _m0;		// matrix parameters, new
   CPOLY1   _m1;		// matrix parameters, 1 fill ago
   double   _loss0;	// shunt conductance

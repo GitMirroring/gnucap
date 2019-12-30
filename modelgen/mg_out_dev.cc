@@ -99,7 +99,6 @@ void make_dev_default_constructor(std::ofstream& out,const Device& d)
   }
 
   out << "\n{\n"
-    "  _n = _nodes;\n"
     "  attach_common(&Default_" << d.name() << ");\n"
     "  ++_count;\n";
 
@@ -144,7 +143,6 @@ void make_dev_copy_constructor(std::ofstream& out, const Device& d)
   }
 
   out << "\n{\n"
-    "  _n = _nodes;\n"
     "  for (int ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
     "    _n[ii] = p._n[ii];\n"
     "  }\n"

@@ -237,6 +237,9 @@ public:	// ports
   virtual void set_current_port_by_index(int, const std::string&) {unreachable();}    
   bool current_port_exists(int i)const	{return i < num_current_ports();}
 
+public:
+  virtual node_t& n_(int i) const = 0;
+
   virtual int	max_nodes()const	{unreachable(); return 0;}
   virtual int	min_nodes()const	{unreachable(); return 0;}
   virtual int	num_current_ports()const {return 0;}
