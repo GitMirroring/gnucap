@@ -20,6 +20,7 @@
  * 02110-1301, USA.
  *------------------------------------------------------------------
  * alarm command
+ * print a message when a probe is out of range
  */
 #include "u_sim_data.h"
 #include "c_comand.h"
@@ -31,7 +32,6 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-// ALARM: print a message when a probe is out of range
 class OUTPUT_CMD_ALARM : public OUTPUT_CMD {
 private:
   typedef RANGE_PROBE probe_type;
@@ -54,9 +54,6 @@ public: // OUTPUT_CMD
     return &_probe_proto;
   }
 public: // OUTPUT
- // void head(){ untested();
- //   OUTPUT::head();
- // }
   void commit(int flags) {
     OMSTREAM o=out();
     o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);

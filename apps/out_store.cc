@@ -64,7 +64,6 @@ public: // OUTPUT
     }
     OUTPUT::head(label);
     PROBELIST const& pr=probelist();
-//    SIM_DATA* _sim = CKT_BASE::_sim;
     CKT_BASE* data = data_dispatcher[label];
     WAVESTASH* wl;
     if(WAVESTASH* w=dynamic_cast<WAVESTASH*>(data)){
