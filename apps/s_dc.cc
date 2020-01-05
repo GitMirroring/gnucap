@@ -92,6 +92,7 @@ void DC::do_it(CS& Cmd, CARD_LIST* Scope)
 {
   _scope = Scope;
   _sim->_time0 = 0.;
+  _sim->_label = "dc";
   _sim->set_command_dc();
   _sim->_phase = p_INIT_DC;
   ::status.dc.reset().start();
@@ -105,6 +106,7 @@ void OP::do_it(CS& Cmd, CARD_LIST* Scope)
 {
   _scope = Scope;
   _sim->_time0 = 0.;
+  _sim->_label = "op";
   _sim->set_command_op();
   _sim->_phase = p_INIT_DC;
   ::status.op.reset().start();
@@ -342,7 +344,7 @@ void DCOP::options(CS& Cmd, unsigned Nest)
 /*--------------------------------------------------------------------------*/
 void DCOP::sweep()
 {
-  he_ad(_start[0], _stop[0], " ");
+  head(_start[0], _stop[0], " ");
   _sim->_bypass_ok = false;
   _sim->set_inc_mode_bad();
   if (_cont) {untested();

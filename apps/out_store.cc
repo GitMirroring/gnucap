@@ -52,17 +52,16 @@ public: // OUTPUT_CMD
   }
 public: // OUTPUT
   // allocate space for output data
-  void h_ead(std::string const& label_in)
+  void head(std::string const& label_in)
   {
-    static const std::string s[] = {"", "ac", "op", "dc", "tran", "fourier"};
     std::string label;
     if(label_in==""){
       // fallback to legacy spice
-      label = s[_sim->_mode];
+      label = _sim->label();
     }else{
       label = label_in;
     }
-    OUTPUT::h_ead(label);
+    OUTPUT::head(label);
     PROBELIST const& pr=probelist();
 //    SIM_DATA* _sim = CKT_BASE::_sim;
     CKT_BASE* data = data_dispatcher[label];

@@ -1,1 +1,1 @@
-#define PATCHLEVEL "output-22 2019.12.22"
+#define PATCHLEVEL "output-22 2020.01.05"

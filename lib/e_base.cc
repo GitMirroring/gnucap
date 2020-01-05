@@ -155,11 +155,8 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
 /*--------------------------------------------------------------------------*/
 /*static*/ WAVE const* CKT_BASE::find_wave(const std::string& probe_name)
 {
-  const std::string s[] = {"", "ac", "op", "dc", "tran", "fourier"};
-  std::string label=s[_sim->_mode];
-
-  trace2("find_wave", probe_name, label);
-  CKT_BASE* wl = data_dispatcher[label];
+  trace2("find_wave", probe_name, _sim->label());
+  CKT_BASE* wl = data_dispatcher[_sim->label()];
 //  CKT_BASE* wl = _sim->_current?
   if(!wl){untested();
   }else if(WAVESTASH* WL=dynamic_cast<WAVESTASH*>(wl)){

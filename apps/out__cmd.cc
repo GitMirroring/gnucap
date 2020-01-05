@@ -240,7 +240,7 @@ PROBELIST& OUTPUT_CMD::prblist(std::string const& reason) {
 /*--------------------------------------------------------------------------*/
 /* OUTPUT::head: print column headings and draw plot borders
  */
-void OUTPUT::h_ead(std::string const&)
+void OUTPUT::head(std::string const&)
 {
 }
 /*--------------------------------------------------------------------------*/

@@ -105,9 +105,9 @@ class CMD_TITLE : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST*) {
     if (cmd.more()) {
-      hea_d = cmd.tail();
+      head = cmd.tail();
     }else{itested(); 
-      IO::mstdout << hea_d << '\n';
+      IO::mstdout << head << '\n';
     }
   }
 } p4;

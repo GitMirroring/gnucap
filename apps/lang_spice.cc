@@ -678,10 +678,10 @@ void LANG_SPICE::parse_top_item(CS& cmd, CARD_LIST* Scope)
       && cmd.is_first_read()
       && (Scope == &CARD_LIST::card_list)
       && (Scope->is_empty())
-      && (hea_d == "'")) {untested();	//BUG// ugly hack
+      && (head == "'")) {untested();	//BUG// ugly hack
     cmd.get_line("gnucap-spice-title>");
-    hea_d = cmd.fullstring();
-    IO::mstdout << hea_d << '\n';
+    head = cmd.fullstring();
+    IO::mstdout << head << '\n';
   }else{
     cmd.get_line("gnucap-spice>");
     new__instance(cmd, NULL, Scope);
@@ -917,10 +917,10 @@ static void getmerge(CS& cmd, Skip_Header skip_header, CARD_LIST* Scope)
 
   if (skip_header) { // get and store the header line
     file.get_line(">>>>");
-    hea_d = file.fullstring();
+    head = file.fullstring();
 
     if (!quiet) {
-      IO::mstdout << hea_d << '\n';
+      IO::mstdout << head << '\n';
     }else{untested();
     }
   }else{

@@ -24,8 +24,8 @@
  * outreset starts it all over
  */
 //testing=script,sparse 2006.07.17
-#include "io_.h"
 #include "u_out.h"
+#include "io_.h"
 #include "ap.h"
 #include "u_out.h"
 /*--------------------------------------------------------------------------*/
