@@ -66,8 +66,8 @@ private: // OUTPUT
       << "value        dB      phase  value        dB      phase\n";
   }
 #endif
-  void h_ead(std::string const& s){
-    OUTPUT::h_ead(s);
+  void head(std::string const& s){
+    OUTPUT::head(s);
     PROBELIST const& pr=probelist();
     assert(_sim->_axes.size());
     normal_head(_sim->_axes[0]._label, pr);
@@ -76,8 +76,7 @@ private: // OUTPUT
   {
     trace1("print head", col1);
 
-    if(CKT_BASE::_sim->_mode==s_DC){
-    }else if(CKT_BASE::_sim->_mode==s_OP){
+    if(CKT_BASE::_sim->analysis_is_dcop()){
       // print anyway
     }else if(!pr.size()){
       // nothing to do.
@@ -110,7 +109,7 @@ private: // OUTPUT
 
     if(!(Flags & ( ofPRINT | ofTRACE ))){
     }else if (plotout.any() /*&& plt.has_probes()*/
-      && !(CKT_BASE::_sim->_mode==s_OP)){
+	      && !(CKT_BASE::_sim->command_is_op())){
       // this is a hack from s_ac..
     }else{
       OMSTREAM o=out();

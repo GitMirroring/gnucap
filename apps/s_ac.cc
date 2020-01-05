@@ -71,6 +71,7 @@ private:
 void AC::do_it(CS& Cmd, CARD_LIST* Scope)
 {
   _scope = Scope;
+  _sim->_label = "ac";
   _sim->set_command_ac();
   reset_timers();
   ::status.ac.reset().start();
@@ -250,7 +251,7 @@ void AC::solve()
 /*--------------------------------------------------------------------------*/
 void AC::sweep()
 {
-  he_ad(_start, _stop, "Freq");
+  head(_start, _stop, "Freq");
   first();
   CARD_LIST::card_list.ac_begin();
   do {

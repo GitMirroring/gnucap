@@ -70,7 +70,8 @@ SIM_DATA::SIM_DATA()
    _evalq(NULL),
    _evalq_uc(NULL),
    _axes(),
-   _has_op(s_NONE)
+   _has_op(s_NONE),
+   _label()
 {
   _evalq = &_evalq1;
   _evalq_uc = &_evalq2;

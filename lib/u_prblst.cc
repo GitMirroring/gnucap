@@ -305,7 +305,7 @@ void PROBELIST::add_all_nodes(const std::string& what)
       try{
 	push_new_probe(what, node);
       }catch(Exception_Cant_Find& e){
-	error(bTRACE, "probe wildcard: skipping %s on %s\n",
+	error(bNOERROR, "probe wildcard: skipping %s on %s\n",
 	    what.c_str(), nn.c_str());
       }
     }else{

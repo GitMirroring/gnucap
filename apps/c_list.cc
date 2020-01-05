@@ -54,7 +54,7 @@ void list_save(CS& cmd, OMSTREAM out, CARD_LIST* scope)
   }else{
   }
 
-  (out - IO::mstdout) << hea_d << '\n';
+  (out - IO::mstdout) << head << '\n';
 
   if (cmd.is_end()) {			/* no args: list all		    */
     for (CARD_LIST::const_iterator ci=scope->begin();ci!=scope->end();++ci) {

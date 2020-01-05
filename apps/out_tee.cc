@@ -25,8 +25,6 @@
 #include "u_out.h"
 #include "u_sim_data.h"
 #include "globals.h"
-#include "constant.h"
-#include <stdio.h>
 /*--------------------------------------------------------------------------*/
 extern bool plotset;
 namespace{
@@ -69,7 +67,7 @@ private: // override OUTPUT
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
   void commit(int);
-  void h_ead(std::string const& label);
+  void head(std::string const& label);
   void flush();
 private:
   void do_it(CS&, CARD_LIST*) { unreachable(); }
@@ -117,9 +115,9 @@ private:
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::h_ead(std::string const&)
+void OUTPUT_TEE::head(std::string const&)
 {
-  OUTPUT::h_ead();
+  OUTPUT::head();
   if(empty()){
     // print something by default
     // this is to imitate pre-output behaviour
@@ -133,7 +131,7 @@ void OUTPUT_TEE::h_ead(std::string const&)
   }else{
     for(outputs_type::const_iterator p=_outputs.begin();
         p!=_outputs.end(); ++p){
-      (*p)->h_ead();
+      (*p)->head();
     }
   }
 }

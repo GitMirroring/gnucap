@@ -330,8 +330,8 @@ private: // OUTPUT_CMD
     plotout = (plotset) ? IO::mstdout : OMSTREAM();
   }
 private: // OUTPUT
-  void h_ead(std::string const& label){
-    OUTPUT::h_ead(label);
+  void head(std::string const& label){
+    OUTPUT::head(label);
     PROBELIST const& pr=probelist();
     // if(0&& !plotout.any()){
     // }else

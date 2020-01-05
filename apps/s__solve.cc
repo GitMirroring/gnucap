@@ -55,7 +55,7 @@ bool SIM::solve(OPT::ITL itl, TRACE trace)
     if (trace >= tITERATION) {
       // print plugin decides.
       // static_cast<double>(_sim->iteration_number());
-      outcommit(OUTPUT::ofPRINT | OUTPUT::ofTRACE);
+      outcommit(OUTPUT::ofTRACE);
     }
     set_flags();
     clear_arrays();

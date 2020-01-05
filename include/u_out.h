@@ -24,8 +24,11 @@
 #include "s__.h"
 // #include "u_prblst.h"
 #include <set>
+#include "io_.h"
+#include "c_comand.h"
 /*--------------------------------------------------------------------------*/
 class PROBELIST;
+class SIM;
 /*--------------------------------------------------------------------------*/
 // attached to SIM, can store probelist, do whatever output.
 class INTERFACE OUTPUT : public CMD {
@@ -67,7 +70,7 @@ public:
     _out = o;
   }
   // print column headings and draw plot borders
-  virtual void h_ead(std::string const& label="");
+  virtual void head(std::string const& label="");
   // trigger data collection
   virtual void commit(int flags)=0;
   // eject data
@@ -84,7 +87,7 @@ protected:
 private:
   OMSTREAM _out;
 public:
-  friend class SIM;
+  //friend class SIM;
 }; // OUTPUT
 /*--------------------------------------------------------------------------*/
 class INTERFACE OUTPUT_CMD : public OUTPUT {

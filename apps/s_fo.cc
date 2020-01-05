@@ -102,7 +102,7 @@ public:
 private: // pure, unused
   void do_it(CS&, CARD_LIST*){ unreachable(); }
 private:
-  void h_ead_(){
+  void head_(){
   }
   void commit(int Flags){
     // _zap->commit(sel, Flags);
@@ -120,6 +120,7 @@ private:
 void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
 {
   _scope = Scope;
+  _sim->_label = "fourier";
   _sim->set_command_fourier();
   reset_timers();
   ::status.four.reset().start();
