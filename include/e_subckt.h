@@ -111,8 +111,8 @@ public:
   CARD_LIST*	     subckt(){ return _subckt; }
   const CARD_LIST*   subckt()const{ return _subckt; }
   void	  new_subckt();
-#if 0 // forward to COMMON?
   void	  renew_subckt(const CARD* model, PARAM_LIST* p);
+#if 0 // forward to COMMON?
   void	  new_subckt(const CARD* model, PARAM_LIST* p);
   void	  new_subckt(const CARD_LIST* model, PARAM_LIST* p);
               //    (forward to COMMON?)

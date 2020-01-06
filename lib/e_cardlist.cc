@@ -452,6 +452,10 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
     }else{
     }
   }
+  assert(_nm);
+  delete _nm;
+  _nm = NULL;
+  _nm = p->nodes()->clone();
   trace1("mapping", p->nodes()->how_many());
 }
 /*--------------------------------------------------------------------------*/

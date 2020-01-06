@@ -166,16 +166,16 @@ void COMMON_SUBCKT::map_subckt_nodes(BASE_SUBCKT* owner, CARD_LIST const* sckt_p
       // collecting ordered nodes from nodemap. clone internal nodes.
       // this is alphabetic order, presumably. need to assign
       // newnode_subckt() in order of appearance, below
-      for(NODE_MAP::const_iterator ii = sckt_proto->nodes()->begin();
-	    ii!=sckt_proto->nodes()->end(); ++ii) {
+      for(NODE_MAP::const_iterator ii = cl->nodes()->begin();
+	    ii!=cl->nodes()->end(); ++ii) {
 	int f = ii->second->user_number();
 	assert(f == ii->second->flat_number());
 	if(f>np){
-	  CARD const* c = ii->second;
+	  CARD* c = ii->second;
 	  CARD* nn = c->clone();
 	  assert(nn);
 	  nn->set_owner(owner);
-	  cl->push_back(nn); // only push back "connect" nodes?
+	  cl->push_back(nn);
 	  NODE* nnn = prechecked_cast<NODE*>(nn);
 	  map[f] = nnn;
 	}else{

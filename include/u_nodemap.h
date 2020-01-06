@@ -38,6 +38,7 @@ public:
 	   ~NODE_MAP();
   NODE*     operator[](std::string);
   NODE*     new_node(std::string);
+  NODE_MAP* clone(){return new NODE_MAP(*this);}
 
   typedef std::map<const std::string, NODE*>::iterator iterator;
   typedef std::map<const std::string, NODE*>::const_iterator const_iterator;

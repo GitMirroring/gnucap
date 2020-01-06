@@ -291,7 +291,7 @@ bool PROBELIST::add_branches(const std::string&device,
     // no dots, look here
     if (device.find_first_of("*?") != std::string::npos) {
       // there's a wild card.  do linear search for all
-      { // nodes
+      if(0){ // nodes
 	for (NODE_MAP::const_iterator 
 	     i = scope->nodes()->begin();
 	     i != scope->nodes()->end();
@@ -321,7 +321,7 @@ bool PROBELIST::add_branches(const std::string&device,
       }
     }else{
       // no wild card.  do fast search for one
-      { // nodes
+      if(0){ // nodes
 	NODE* node = (*scope->nodes())[device];
 	if (node) {
 	  push_new_probe(param, node);
