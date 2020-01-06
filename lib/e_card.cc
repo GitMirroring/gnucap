@@ -203,10 +203,10 @@ const CARD* CARD::find_in_parent_scope(const std::string& name)const
 const CARD* CARD::find_looking_out(const std::string& name)const
 {
   trace2("find_looking_out", short_label(), name);
-  try { untested();
+  try {
     return find_in_parent_scope(name);
-  }catch (Exception_Cant_Find&) { untested();
-    if (owner()) { untested();
+  }catch (Exception_Cant_Find&) {
+    if (owner()) {
       trace1("owner?", short_label());
       try{
 	return owner()->find_looking_out(name);

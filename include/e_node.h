@@ -79,9 +79,9 @@ public:
   LOGICVAL& set_in_transition(LOGICVAL newval);
 };
 /*--------------------------------------------------------------------------*/
-class NODE : public CARD {
+class NODE : public CARD /* BUG */ {
 private: // CARD overrides
-  CARD* clone() const{ return new NODE(*this); }
+  CARD* clone() const;
   std::string value_name()const {return "";} // pure in CARD
   bool	is_device()const		{return false;}
 private:
@@ -96,6 +96,8 @@ public:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
   explicit NODE(const std::string& s, int n);
   ~NODE() {}
+
+  NODE* new_card();
 
 public: // raw data access (rvalues)
   int	user_number()const	{return _user_number;}
@@ -134,7 +136,12 @@ public: // virtuals
     assert(m_() <= _sim->_total_nodes);
     return _sim->_ac[m_()];
   }
-};
+
+public:
+  LOGIC_NODE* data();
+private:
+  LOGIC_NODE* _nnn;
+}; // NODE
 extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
 class INTERFACE LOGIC_NODE : public NODE {
@@ -286,6 +293,9 @@ public:
     if (t_() != INVALID_NODE) {
       assert(_nnn);
       _m=to_internal(t_());
+      _nnn=_nnn->data();
+      assert(_nnn);
+      assert(prechecked_cast<LOGIC_NODE*>(_nnn));
     }else{
       assert(_m == INVALID_NODE);
     }

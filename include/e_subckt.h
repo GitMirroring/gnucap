@@ -54,6 +54,7 @@ protected: // override virtual
   //CARD* clone()const			//CARD/null
   //void  precalc_first()	{assert(subckt()); subckt()->precalc();}
   //void  expand()			//COMPONENT
+  void  expand_last();
   //void  precalc_last()	{assert(subckt()); subckt()->precalc();}
   void  map_nodes(){
     COMPONENT::map_nodes();

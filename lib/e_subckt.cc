@@ -1,6 +1,6 @@
 /*$Id: e_subckt.cc                  -*- C++ -*-
  * Copyright (C) 2001 Albert Davis,
- *               2019 Felix Salfelder
+ *               2019, 2020 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -47,6 +47,40 @@ void BASE_SUBCKT::renew_subckt(const CARD* Model, PARAM_LIST* Params)
 {
   unreachable();
   incomplete(); // forward to COMMON?
+}
+/*--------------------------------------------------------------------------*/
+void BASE_SUBCKT::expand_last()
+{
+  // TODO: move/forward to COMMON?
+  auto model = prechecked_cast<COMMON_SUBCKT const*>(common());
+  int np = 0;
+  if(model){
+    np = model->net_nodes();
+  }else{
+  }
+  if(subckt()){
+    trace1("placing nodes", long_label());
+    for(NODE_MAP::iterator ii = subckt()->nodes()->begin();
+	ii!=subckt()->nodes()->end(); ++ii) {
+      int f = ii->second->user_number();
+      assert(f == ii->second->flat_number());
+      if(f>np){ untested();
+	NODE* c = ii->second;
+	NODE* nn = c->new_card();
+	assert(nn);
+	assert(c->data());
+	nn->set_owner(this);
+	nn->set_label(ii->first);
+	subckt()->push_back(nn);
+      }else{ untested();
+      }
+    }
+  }else{
+    trace1("no sckt", long_label());
+    incomplete();
+    // DEV_LOGIC?
+  }
+
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_SUBCKT::renew_subckt(BASE_SUBCKT* owner, PARAM_LIST* Params) const
@@ -171,11 +205,11 @@ void COMMON_SUBCKT::map_subckt_nodes(BASE_SUBCKT* owner, CARD_LIST const* sckt_p
 	int f = ii->second->user_number();
 	assert(f == ii->second->flat_number());
 	if(f>np){
-	  CARD* c = ii->second;
-	  CARD* nn = c->clone();
+	  NODE* c = ii->second;
+	  CARD* nn = c; // c->new_card();
 	  assert(nn);
-	  nn->set_owner(owner);
-	  cl->push_back(nn);
+//	  nn->set_owner(owner);
+//	  cl->push_back(nn);
 	  NODE* nnn = prechecked_cast<NODE*>(nn);
 	  map[f] = nnn;
 	}else{

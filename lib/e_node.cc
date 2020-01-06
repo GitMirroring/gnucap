@@ -106,6 +106,16 @@ NODE::NODE(const NODE& p)
 {
 }
 /*--------------------------------------------------------------------------*/
+CARD* NODE::clone() const{ unreachable(); return NULL;}
+NODE* NODE::new_card()
+{
+  LOGIC_NODE* n = new LOGIC_NODE();
+  n->set_flat_number(_flat_number);
+  n->set_user_number(_user_number);
+  _nnn = n;
+  return n;
+}
+/*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
  * supposedly not used, but used by a required function that is also not used
  */
@@ -177,8 +187,12 @@ bool node_t::operator==(node_t const& p) const
 /*--------------------------------------------------------------------------*/
 LOGIC_NODE& node_t::data()const
 {
-  assert(CKT_BASE::_sim->_nstat);
-  return CKT_BASE::_sim->_nstat[m_()];
+  assert(_nnn);
+  LOGIC_NODE* nn = prechecked_cast<LOGIC_NODE*>(_nnn);
+  assert(nn);
+  return *nn;
+  assert(_nnn->data());
+  return *_nnn->data();
 }
 /*--------------------------------------------------------------------------*/
 double NODE::tr_probe_num(const std::string& x)const
@@ -588,5 +602,14 @@ void node_t::map_subckt_node(NODE** m, const CARD* d)
   assert(node_is_valid(_nnn->flat_number()));
 }
 /*--------------------------------------------------------------------------*/
+// tmp hack
+LOGIC_NODE gln;
+LOGIC_NODE* NODE::data()
+{ 
+  if(this==&ground_node){
+    return &gln;
+  }
+  assert(_nnn); return _nnn;
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

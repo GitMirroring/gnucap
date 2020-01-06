@@ -272,7 +272,13 @@ public:
     precalc_first();
     _subckt->expand();
   }
+  void expand_last(){ untested();
+    BASE_SUBCKT::expand_last();
+  }
 private:
+  CARD_LIST* subckt(){ untested();
+    return &SIM_DATA::_card_list;
+  }
   virtual node_t& n_(int) const{
     unreachable();
     static node_t n(0);
@@ -305,6 +311,7 @@ void SIM_DATA::init()
     _user_nodes += CARD_LIST::card_list.nodes()->how_many();
 
     root.expand();
+    root.expand_last();
 
     map__nodes();
     _card_list.map_nodes();

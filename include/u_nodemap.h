@@ -30,6 +30,7 @@ class NODE;
 /*--------------------------------------------------------------------------*/
 class NODE_MAP {
 private:
+  // set?
   std::map<const std::string, NODE*> _node_map;
   explicit  NODE_MAP(const NODE_MAP&);
 
@@ -45,6 +46,8 @@ public:
 
   const_iterator begin()const		{return _node_map.begin();}
   const_iterator end()const		{return _node_map.end();}
+  iterator begin()		{return _node_map.begin();}
+  iterator end()		{return _node_map.end();}
   int		 how_many()const	{return static_cast<int>(_node_map.size()-1);}
 };
 /*--------------------------------------------------------------------------*/
