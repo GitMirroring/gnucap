@@ -101,7 +101,6 @@ void TRANSIENT::sweep()
     }else{
       outflags = OUTPUT::ofSTORE;
     }
-    //outdata(_sim->_time0, outflags);
     outcommit(outflags);
   }
   

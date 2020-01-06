@@ -22,13 +22,9 @@
 #ifndef U_OUT_H
 #define U_OUT_H
 #include "s__.h"
-// #include "u_prblst.h"
 #include <set>
-#include "io_.h"
-#include "c_comand.h"
 /*--------------------------------------------------------------------------*/
 class PROBELIST;
-class SIM;
 /*--------------------------------------------------------------------------*/
 // attached to SIM, can store probelist, do whatever output.
 class INTERFACE OUTPUT : public CMD {
@@ -86,8 +82,6 @@ protected:
   OMSTREAM out(){ return _out; }
 private:
   OMSTREAM _out;
-public:
-  //friend class SIM;
 }; // OUTPUT
 /*--------------------------------------------------------------------------*/
 class INTERFACE OUTPUT_CMD : public OUTPUT {

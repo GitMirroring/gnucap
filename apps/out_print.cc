@@ -35,7 +35,7 @@ extern OMSTREAM plotout;
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-// CMD_PRINT: print the list of results (text form) to out()
+// OUTPUT_CMD_PRINT: print the list of results (text form) to out()
 // The argument is the first column (independent variable, aka "x")
 class OUTPUT_CMD_PRINT : public OUTPUT_CMD {
 private:
@@ -56,16 +56,6 @@ private: // OUTPUT_CMD
     OUTPUT_CMD::setup(cmd);
   }
 private: // OUTPUT
-  // TODO: use this.
-#if 0
-  void fo_head(const PROBE_BASE& Prob)
-  { untested();
-    OUTPUT::_out.form("# %-10s", Prob.label().c_str())
-      << "--------- actual ---------  -------- relative --------\n"
-      << "#freq       "
-      << "value        dB      phase  value        dB      phase\n";
-  }
-#endif
   void head(std::string const& s){
     OUTPUT::head(s);
     PROBELIST const& pr=probelist();
@@ -100,7 +90,7 @@ private: // OUTPUT
     }
     out() << '\n';
   }
-  // CMD_PRINT::
+  // OUTPUT_CMD_PRINT::
   void commit(int Flags)
   {
     double x = coord(0);

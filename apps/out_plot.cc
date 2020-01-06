@@ -73,8 +73,7 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
       val[ii] = (*i)->value();
       RANGE_PROBE const* P=dynamic_cast<RANGE_PROBE const*>(*i);
       if(!P){
-       // user did not probide bounds.
-       // (how does this happen?!)
+	// user did not provide bounds, use defaults
 	lo[ii] = -5.;
 	hi[ii] = 5.;
       }else{

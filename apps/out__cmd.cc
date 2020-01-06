@@ -258,15 +258,6 @@ double OUTPUT::coord(unsigned i) const{
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-#if 0
-void OUTPUT_TEE::outset(CS& cs)
-{ untested();
-  ::outset(cs, &_out); // parser is hidden here.
-  for(auto const& p : _outputs){ untested();
-    p->outset(_out);
-  }
-}
-#endif
 class CMD_PROBES : public CMD{
 public:
   void do_it(CS& cmd, CARD_LIST*){

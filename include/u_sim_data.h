@@ -148,9 +148,9 @@ public:
   std::deque<CARD*>  _late_evalq; /* eval after everything else */
   std::deque<CARD*>* _evalq;   /* pointer to evalq to process */
   std::deque<CARD*>* _evalq_uc;/* pointer to evalq under construction */
+  std::string _label;
   SIM_AXES _axes;
   SIM_MODE _has_op;
-  std::string _label;
   SIM_DATA();
   ~SIM_DATA();
   bool is_first_expand() {return !_nstat;}
