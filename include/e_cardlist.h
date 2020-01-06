@@ -135,8 +135,6 @@ public:
   // more complex stuff
   void attach_params(PARAM_LIST* p, const CARD_LIST* scope);
   void shallow_copy(const CARD_LIST*);
-  void map_subckt_nodes(const CARD* model, const CARD* owner,
-      CARD_LIST const* subckt=NULL);
 
   explicit CARD_LIST();
   CARD_LIST(const CARD* model, CARD* owner, const CARD_LIST* scope,

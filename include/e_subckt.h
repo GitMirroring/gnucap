@@ -111,9 +111,12 @@ public:
   CARD_LIST*	     subckt(){ return _subckt; }
   const CARD_LIST*   subckt()const{ return _subckt; }
   void	  new_subckt();
-  void	  new_subckt(const CARD* model, PARAM_LIST* p);
+#if 0 // forward to COMMON?
   void	  renew_subckt(const CARD* model, PARAM_LIST* p);
+  void	  new_subckt(const CARD* model, PARAM_LIST* p);
   void	  new_subckt(const CARD_LIST* model, PARAM_LIST* p);
+              //    (forward to COMMON?)
+#endif
 protected:
   CARD_LIST*	_subckt;
 };
@@ -159,18 +162,20 @@ public: // sckt model
     _params.set_try_again(_subckt->params());
     return const_cast<CARD_LIST*>(_subckt.get());
   }
+   void new_subckt(BASE_SUBCKT* owner, PARAM_LIST* Params) const;
+   void renew_subckt(BASE_SUBCKT* owner, PARAM_LIST* Params) const;
   CARD_LIST const* subckt() const{
     return _subckt.get();
   }
   int net_nodes() const;
   std::string port_name(int i) const;
-  void map_subckt_nodes(BASE_SUBCKT* owner) const;
+  void map_subckt_nodes(BASE_SUBCKT* owner, CARD_LIST const* sckt=NULL) const;
 
 public:
   std::vector<node_t> _ports;
 private:
   std::shared_ptr<const CARD_LIST> _subckt;
-};
+}; // COMMON_SUBCKT
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

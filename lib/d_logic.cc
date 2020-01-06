@@ -89,14 +89,15 @@ void DEV_LOGIC::expand()
   std::string subckt_name(c->modelname()+c->name()+to_string(c->incount));
   try {
     const CARD* model = find_looking_out(subckt_name);
+    BASE_SUBCKT const* s=dynamic_cast<BASE_SUBCKT const*>(model);
     
-    if(!dynamic_cast<const BASE_SUBCKT*>(model)) {untested();
+    if(!s) {untested();
       error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
-    }else if(BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(this)) {
-      _gatemode = OPT::mode;    
-      s->renew_subckt(model, NULL/*&(c->_params)*/);    
-      s->subckt()->expand();
+    }else if(auto cs = prechecked_cast<COMMON_SUBCKT const*>(s->common())) {
+      _gatemode = OPT::mode;
+      cs->renew_subckt(this, NULL/*&(c->_params)*/);
+      subckt()->expand();
     }else{
       unreachable();
     }

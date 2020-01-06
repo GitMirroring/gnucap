@@ -262,6 +262,11 @@ private:
   std::string port_name(int)const{unreachable(); return "";}
   bool print_type_in_spice()const{return false;}
 public:
+  void map_subckt_nodes(){
+    COMMON_SUBCKT c(CC_STATIC);
+    c.map_subckt_nodes(this, &CARD_LIST::card_list);
+    // _card_list.map_subckt_nodes(NULL, NULL, &CARD_LIST::card_list);
+  }
   void expand(){
     assert(_subckt);
     precalc_first();
@@ -293,7 +298,7 @@ void SIM_DATA::init()
     _card_list.params()->set_try_again(CARD_LIST::card_list.params());
     _card_list.shallow_copy(&CARD_LIST::card_list);
     _card_list.set_owner(&root);
-    _card_list.map_subckt_nodes(NULL, NULL, &CARD_LIST::card_list);
+    root.map_subckt_nodes();
 
     // TODO: use NODE::expand
     _subckt_nodes -= CARD_LIST::card_list.nodes()->how_many();
