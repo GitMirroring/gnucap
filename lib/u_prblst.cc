@@ -239,7 +239,11 @@ void PROBELIST::add_all_nodes(const std::string& what)
        i != _sim->_card_list.end();
        ++i) {
     if (dynamic_cast<NODE const*>(*i)){
-      push_new_probe(what, *i);
+      if((*i)->short_label()[0] == '.'){
+	// model node? (incomplete);
+      }else{
+	push_new_probe(what, *i);
+      }
     }else{
     }
   }

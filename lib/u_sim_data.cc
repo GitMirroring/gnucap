@@ -59,7 +59,6 @@ SIM_DATA::SIM_DATA()
    _v0(NULL),
    _vt1(NULL),
    _ac(NULL),
-   _nstat(NULL),
    _vdc(NULL),
    _aa(),
    _lu(),
@@ -106,11 +105,6 @@ SIM_DATA::~SIM_DATA()
   if (_ac) {unreachable();
     delete [] _ac;
     _ac = NULL;
-  }else{
-  }
-  if (_nstat) {unreachable();
-    delete [] _nstat;
-    _nstat = NULL;
   }else{
   }
   if (_vdc) {unreachable();
@@ -340,17 +334,10 @@ void SIM_DATA::alloc_hold_vectors()
 {
   assert(is_first_expand());
 
-  assert(!_nstat);
-  _nstat = new LOGIC_NODE[_total_nodes+1];
-  for (int ii=0;  ii <= _total_nodes;  ++ii) {
-    _nstat[_nm[ii]].set_user_number(ii);
-  }
-
   assert(!_vdc);
   _vdc = new double[_total_nodes+1];
   std::fill_n(_vdc, _total_nodes+1, 0);
 
-  assert(_nstat);
   assert(_vdc);
 }
 /*--------------------------------------------------------------------------*/
@@ -410,15 +397,12 @@ void SIM_DATA::uninit()
     _aa.reinit(0);
     delete [] _vdc;
     _vdc = NULL;
-    delete [] _nstat;
-    _nstat = NULL;
     delete [] _nm;
     _nm = NULL;
   }else{
     assert(_acx.size() == 0);
     assert(_lu.size() == 0);
     assert(_aa.size() == 0);
-    assert(!_nstat);
     assert(!_nm);
   }
   _has_op = s_NONE;

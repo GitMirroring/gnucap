@@ -59,20 +59,27 @@ void BASE_SUBCKT::expand_last()
   }else{
   }
   if(subckt()){
-    trace1("placing nodes", long_label());
-    for(NODE_MAP::iterator ii = subckt()->nodes()->begin();
+    for(NODE_MAP::const_iterator ii = subckt()->nodes()->begin();
+	ii!=subckt()->nodes()->end(); ++ii) {
+	trace3("dry", ii->first, ii->second->user_number(),
+	                         ii->second->flat_number());
+    }
+    trace3("placing nodes", long_label(), np, subckt()->nodes()->how_many());
+    for(NODE_MAP::const_iterator ii = subckt()->nodes()->begin();
 	ii!=subckt()->nodes()->end(); ++ii) {
       int f = ii->second->user_number();
-      assert(f == ii->second->flat_number());
-      if(f>np){ untested();
+      // assert(f == ii->second->flat_number());
+      if(f>np){
 	NODE* c = ii->second;
 	NODE* nn = c->new_card();
 	assert(nn);
 	assert(c->data());
 	nn->set_owner(this);
 	nn->set_label(ii->first);
+	trace2("placing node", nn->long_label(), f);
 	subckt()->push_back(nn);
-      }else{ untested();
+      }else{
+	trace2("port", ii->first, f);
       }
     }
   }else{
@@ -197,19 +204,18 @@ void COMMON_SUBCKT::map_subckt_nodes(BASE_SUBCKT* owner, CARD_LIST const* sckt_p
 	trace2("ports", i, owner->n_(i-1).t_());
       }
 
-      // collecting ordered nodes from nodemap. clone internal nodes.
+      // collecting ordered nodes from nodemap.
       // this is alphabetic order, presumably. need to assign
       // newnode_subckt() in order of appearance, below
       for(NODE_MAP::const_iterator ii = cl->nodes()->begin();
 	    ii!=cl->nodes()->end(); ++ii) {
 	int f = ii->second->user_number();
+	trace2("collect", ii->first, f);
 	assert(f == ii->second->flat_number());
 	if(f>np){
 	  NODE* c = ii->second;
 	  CARD* nn = c; // c->new_card();
 	  assert(nn);
-//	  nn->set_owner(owner);
-//	  cl->push_back(nn);
 	  NODE* nnn = prechecked_cast<NODE*>(nn);
 	  map[f] = nnn;
 	}else{
@@ -223,7 +229,7 @@ void COMMON_SUBCKT::map_subckt_nodes(BASE_SUBCKT* owner, CARD_LIST const* sckt_p
 	NODE* nnn = map[i];
 	assert(nnn);
 	nnn->set_flat_number(f); // TODO: let NODE decide. NODE::expand?
-	nnn->set_user_number(f); // TODO: let NODE decide. NODE::expand?
+	trace2("new flat", nnn->long_label(), f);
       }
     }
   }

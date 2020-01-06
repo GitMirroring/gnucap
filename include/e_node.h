@@ -103,7 +103,7 @@ public: // raw data access (rvalues)
   int	user_number()const	{return _user_number;}
   int	flat_number()const	{itested();return _flat_number;}
 public: // simple calculated data access (rvalues)
-  int	matrix_number()const	{return _sim->_nm[_user_number];}
+  int	matrix_number()const	{untested(); return _sim->_nm[_flat_number];}
   int	m_()const		{return matrix_number();}
 public: // maniputation
   NODE&	set_user_number(int n)	{_user_number = n; return *this;}
@@ -161,8 +161,21 @@ private:
   // so it is not pure virtual
   //const	      std::string long_label()const;
 public: // virtuals
+  // node_t&       n_(int i) const{ untested();
+  //   assert(i==0); return const_cast<node_t&>(_n[i]);
+  // }
+
   double	tr_probe_num(const std::string&)const;
   //XPROBE	ac_probe_ext(const std::string&)const;
+  //
+public: // tmp, analog access
+  // node_t _n[1];
+  // double&     i() { return _n[0].i(); }
+  // int     m_() { return _n[0].m_(); }
+  // double     v0(){ return _n[0].v0(); }
+  // double     vt1(){ return _n[0].vt1(); }
+  // COMPLEX     vac()const{ return _n[0].vac(); }
+  // COMPLEX&     iac(){ return _n[0].iac(); }
 
 public: // raw data access (rvalues)
   LOGICVAL lv()const			{return _lv;}

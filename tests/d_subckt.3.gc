@@ -11,7 +11,7 @@ vsource #(.dc(1)) v(1,0);
 
 list
 
-print op v(nodes) v(mm.r1) v(mm.i*)
+print op v(nodes) v(mm.r1) v(mm.i1) v(mm.i*) v(mm.p)
 op
 status notime
 end

@@ -70,7 +70,6 @@ struct INTERFACE SIM_DATA {
   double *_vt1;		/* dc-tran voltage, 1 time ago		*/
 			/*  used to restore after rejected step	*/
   COMPLEX *_ac;		/* ac right side			*/
-  LOGIC_NODE* _nstat;	/* digital data				*/
   double *_vdc;		/* saved dc voltages			*/
   BSMATRIX<double> _aa;	/* raw matrix for DC & tran */
   BSMATRIX<double> _lu;	/* decomposed matrix for DC & tran */
@@ -87,7 +86,7 @@ struct INTERFACE SIM_DATA {
   SIM_MODE _has_op;
   SIM_DATA();
   ~SIM_DATA();
-  bool is_first_expand() {return !_nstat;}
+  bool is_first_expand() {return !_vdc;}
   void alloc_hold_vectors(); /* s__init.cc */
   void alloc_vectors();
   void unalloc_vectors();

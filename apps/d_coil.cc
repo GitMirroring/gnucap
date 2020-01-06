@@ -221,7 +221,7 @@ void DEV_INDUCTANCE::expand()
     if (!_c_model) {
       _n[IN1].set_to_ground(this);
     }else{
-      _n[IN1].new_model_node(long_label() + ".i", this);
+      _n[IN1].new_model_node("." + long_label() + ".i", this);
     }
   }else{untested();
   }

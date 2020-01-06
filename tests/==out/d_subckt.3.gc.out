@@ -6,8 +6,10 @@ endmodule // m
 
 m #() mm (.p(1),.n(0));
 vsource #(.dc(1)) v (.p(1),.n(0));
-#           v(1)       v(mm.r1)   v(mm.i1)   v(mm.i2)  
- 27.        1.         0.33333    0.66666    0.33333   
+print op v(node ... v(mm.i1) v(mm.i*) v(mm.p) 
+                                        ^ ? no match
+#           v(1)       v(mm.r1)   v(mm.i1)   v(mm.i1)   v(mm.i2)  
+ 27.        1.         0.33333    0.66666    0.66666    0.33333   
 Gnucap   System status
 iterations: op=2, dc=0, tran=0, fourier=0, total=2
 transient timesteps: accepted=0, rejected=0, total=0
