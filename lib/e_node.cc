@@ -1,5 +1,6 @@
 /*$Id: e_node.cc 2018/05/27  al $ -*- C++ -*-
- * Copyright (C) 2001 Albert Davis
+ * Copyright (C) 2001 Albert Davis,
+ *               2020 Felix Salfelder
  * Author: Albert Davis <aldavis@gnu.org>
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
@@ -27,114 +28,57 @@
 #include "e_aux.h"
 #include "u_xprobe.h"
 /*--------------------------------------------------------------------------*/
-const _LOGICVAL LOGICVAL::or_truth[lvNUM_STATES][lvNUM_STATES] = {
-  {lvSTABLE0, lvRISING,  lvFALLING, lvSTABLE1, lvUNKNOWN},
-  {lvRISING,  lvRISING,  lvRISING,  lvSTABLE1, lvRISING},
-  {lvFALLING, lvRISING,  lvFALLING, lvSTABLE1, lvUNKNOWN},
-  {lvSTABLE1, lvSTABLE1, lvSTABLE1, lvSTABLE1, lvSTABLE1},
-  {lvUNKNOWN, lvRISING,  lvUNKNOWN, lvSTABLE1, lvUNKNOWN}
-};
-/*--------------------------------------------------------------------------*/
-const _LOGICVAL LOGICVAL::xor_truth[lvNUM_STATES][lvNUM_STATES] = {
-  {lvSTABLE0, lvRISING,  lvFALLING, lvSTABLE1, lvUNKNOWN},
-  {lvRISING,  lvFALLING, lvRISING,  lvFALLING, lvUNKNOWN},
-  {lvFALLING, lvRISING,  lvFALLING, lvRISING,  lvUNKNOWN},
-  {lvSTABLE1, lvFALLING, lvRISING,  lvSTABLE0, lvUNKNOWN},
-  {lvUNKNOWN, lvUNKNOWN, lvUNKNOWN, lvUNKNOWN, lvUNKNOWN}
-};
-/*--------------------------------------------------------------------------*/
-const _LOGICVAL LOGICVAL::and_truth[lvNUM_STATES][lvNUM_STATES] = {
-  {lvSTABLE0, lvSTABLE0, lvSTABLE0, lvSTABLE0, lvSTABLE0},
-  {lvSTABLE0, lvRISING,  lvFALLING, lvRISING,  lvUNKNOWN},
-  {lvSTABLE0, lvFALLING, lvFALLING, lvFALLING, lvFALLING},
-  {lvSTABLE0, lvRISING,  lvFALLING, lvSTABLE1, lvUNKNOWN},
-  {lvSTABLE0, lvUNKNOWN, lvFALLING, lvUNKNOWN, lvUNKNOWN}
-};
-/*--------------------------------------------------------------------------*/
-const _LOGICVAL LOGICVAL::not_truth[lvNUM_STATES] = {
-  lvSTABLE1, lvFALLING, lvRISING,  lvSTABLE0, lvUNKNOWN  
-};
-/*--------------------------------------------------------------------------*/
-static _LOGICVAL prop_truth[lvNUM_STATES][lvNUM_STATES] = {
-  {lvSTABLE0, lvUNKNOWN, lvUNKNOWN, lvRISING,  lvUNKNOWN},
-  {lvFALLING, lvUNKNOWN, lvUNKNOWN, lvRISING,  lvUNKNOWN},
-  {lvFALLING, lvUNKNOWN, lvUNKNOWN, lvRISING,  lvUNKNOWN},
-  {lvFALLING, lvUNKNOWN, lvUNKNOWN, lvSTABLE1, lvUNKNOWN},
-  {lvFALLING, lvUNKNOWN, lvUNKNOWN, lvRISING,  lvUNKNOWN}
-};
-/*--------------------------------------------------------------------------*/
-inline LOGICVAL& LOGICVAL::set_in_transition(LOGICVAL newval)
-{
-  _lv = prop_truth[_lv][newval];
-  assert(_lv != lvUNKNOWN);
-  return *this;
-}
-/*--------------------------------------------------------------------------*/
-LOGIC_NODE::LOGIC_NODE()
-  :NODE(),
-   _family(0),
-   _d_iter(-1), // initially d_iter is older than a_iter
-   _a_iter(0),
-   _final_time(0),
-   _lastchange(0),
-   _old_lastchange(0),
-   _mode(moANALOG),
-   _lv(),
-   _old_lv(),
-   _quality(qBAD),
-   _failure_mode("initial")
-{
-}
-/*--------------------------------------------------------------------------*/
 /* default constructor : unconnected, don't use
  */
 NODE::NODE()
-  :CARD(),
-   _user_number(INVALID_NODE),
+  :CARD(), NODE_DATA(INVALID_NODE),
    _flat_number(INVALID_NODE)
-   //_matrix_number(INVALID_NODE)
 {
 }
 /*--------------------------------------------------------------------------*/
 /* copy constructor : user data only
  */
 NODE::NODE(const NODE& p)
-  :CARD(p),
-   _user_number(p._user_number),
+  :CARD(p), NODE_DATA(p),
    _flat_number(p._flat_number)
-//   _matrix_number(INVALID_NODE)
 {
 }
 /*--------------------------------------------------------------------------*/
 CARD* NODE::clone() const{ unreachable(); return NULL;}
-NODE* NODE::new_card()
+CARD* NODE::new_card()
 {
   LOGIC_NODE* n = new LOGIC_NODE();
-  n->set_flat_number(_flat_number);
-  n->set_user_number(_user_number);
+  trace2("new card", _flat_number, user_number());
+  n->set_flat_number(flat_number());
+  n->set_user_number(user_number());
+  n->_n[0] = this;
+  assert(n->_n[0].n_());
+  assert(n->_n[0].n_()==this);
   _nnn = n;
   return n;
 }
 /*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
- * supposedly not used, but used by a required function that is also not used
+ * used in NODE_MAP::clone
  */
 NODE::NODE(const NODE* p)
-  :CARD(*p),
-   _user_number(p->_user_number),
+  :CARD(*p), NODE_DATA(*p),
    _flat_number(p->_flat_number)
-   //_matrix_number(INVALID_NODE)
 {
+  trace3("node from ptr", p->long_label(), p->user_number(), _flat_number);
 }
 /*--------------------------------------------------------------------------*/
 /* usual initializing constructor : name and index
  */
 NODE::NODE(const std::string& s, int n)
-  :CARD(),
-   _user_number(n),
-   _flat_number(n)
-   //_matrix_number(INVALID_NODE)
+  :CARD(), NODE_DATA(n),
+   _flat_number(NOT_VALID)
 {
+  if(n){
+    unreachable();
+  }else{
+    set_flat_number(0);
+  }
   set_label(s);
 }
 /*--------------------------------------------------------------------------*/
@@ -150,7 +94,7 @@ node_t::node_t(const node_t& p)
 }
 node_t::node_t(NODE* n)
   :_nnn(n),
-   _m(to_internal(n->user_number()))
+   _m(to_internal(n->flat_number()))
 {
 }
 node_t& node_t::operator=(NODE* p)
@@ -173,10 +117,11 @@ node_t& node_t::operator=(const node_t& p)
 /*--------------------------------------------------------------------------*/
 bool node_t::operator==(node_t const& p) const
 {
+  incomplete();
   if(!_nnn || !p._nnn){ untested();
     return false;
-  }else if(_nnn->flat_number() !=  p._nnn->flat_number()){ untested();
-    return false;
+//  }else if(_nnn->flat_number() !=  p._nnn->flat_number()){ untested();
+//    return false;
   }else if(_m!=p._m){ untested();
     return false;
   }else{
@@ -184,19 +129,15 @@ bool node_t::operator==(node_t const& p) const
   }
 }
 /*--------------------------------------------------------------------------*/
-LOGIC_NODE& node_t::data()const
+NODE_DATA& node_t::data()const
 {
   assert(_nnn);
-  LOGIC_NODE* nn = prechecked_cast<LOGIC_NODE*>(_nnn);
-  assert(nn);
-  return *nn;
-  assert(_nnn->data());
-  return *_nnn->data();
+  return(*_nnn);
 }
 /*--------------------------------------------------------------------------*/
-double NODE::tr_probe_num(const std::string& x)const
-{
-  if (Umatch(x, "v ")) {
+double NODE_CARD::tr_probe_num(const std::string& x)const
+{ untested();
+  if (Umatch(x, "v ")) { untested();
     // return v0(); denoised
     return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {
@@ -233,23 +174,6 @@ double NODE::tr_probe_num(const std::string& x)const
   }
 }
 /*--------------------------------------------------------------------------*/
-double LOGIC_NODE::tr_probe_num(const std::string& x)const
-{ untested();
-  if (Umatch(x, "l{ogic} ")) {
-    return annotated_logic_value();
-  }else if (Umatch(x, "la{stchange} ")) {untested();
-    return _lastchange;
-  }else if (Umatch(x, "fi{naltime} ")) {untested();
-    return final_time();
-  }else if (Umatch(x, "di{ter} ")) {untested();
-    return static_cast<double>(_d_iter);
-  }else if (Umatch(x, "ai{ter} ")) {untested();
-    return static_cast<double>(_a_iter);
-  }else{ untested();
-    return NODE::tr_probe_num(x);
-  }
-}
-/*--------------------------------------------------------------------------*/
 XPROBE NODE::ac_probe_ext(const std::string& x)const
 {
   if (Umatch(x, "v ")) {
@@ -260,266 +184,6 @@ XPROBE NODE::ac_probe_ext(const std::string& x)const
   }else{untested();
     return CKT_BASE::ac_probe_ext(x);
   }
-}
-/*--------------------------------------------------------------------------*/
-/* annotated_logic_value:  a printable value for probe
- * that has secondary info encoded in its fraction part
- */
-double LOGIC_NODE::annotated_logic_value()const
-{
-  return (_lv + (.1 * (OPT::transits - quality())) + (.01 * (2 - _mode)));
-}
-/*--------------------------------------------------------------------------*/
-static bool newly_stable[lvUNKNOWN+1][lvUNKNOWN+1] = { // oldlv, _lv
-  /*	   s0	  rise   fall	s1     u */
-  /* s0 */{false, false, false, true,  false},
-  /*rise*/{false, false, false, true,  false},
-  /*fall*/{true,  false, false, false, false},
-  /* s1 */{true,  false, false, false, false},
-  /* u  */{true,  false, false, true,  false}
-};
-/*--------------------------------------------------------------------------*/
-inline bool LOGIC_NODE::just_reached_stable()const
-{
-  return newly_stable[old_lv()][lv()];
-}
-/*--------------------------------------------------------------------------*/
-/* to_logic: set up logic data for a node, if needed
- * If the logic data is already up to date, do nothing.
- * else set up: logic value (_lv) and quality.
- * Use and update _d_iter, _lastchange to keep track of what was done.
- */
-void LOGIC_NODE::to_logic(const MODEL_LOGIC*f)
-{
-  if (is_analog()){
-    set_a_iter();
-  }else{
-  }
-
-  assert(f);
-  if (process() && process() != f) {untested();
-    set_bad_quality("logic process mismatch");
-    error(bWARNING, "node " + long_label() 
-	  + " logic process mismatch\nis it " + process()->long_label() 
-	  + " or " + f->long_label() + "?\n");
-  }
-  set_process(f);
-
-  if (is_analog() &&  d_iter() < a_iter()) {
-    if (_sim->analysis_is_restore()) {untested();
-    }else if (_sim->analysis_is_static()) {
-    }else{
-    }
-    if (_sim->analysis_is_static() || _sim->analysis_is_restore()) {
-      set_last_change_time(0);
-      store_old_last_change_time();
-      set_lv(lvUNKNOWN);
-    }else{
-    }
-    double dt = _sim->_time0 - last_change_time();
-    if (dt < 0.) {untested();
-      error(bPICKY, "time moving backwards.  was %g, now %g\n",
-	    last_change_time(), _sim->_time0);
-      dt = _sim->_time0 - old_last_change_time();
-      if (dt <= 0.) {untested();
-	throw Exception("internal error: time moving backwards, can't recover");
-      }else{untested();
-      }
-      assert(dt > 0.);
-      restore_lv();			/* skip back one */
-    }else{
-      store_old_last_change_time();
-      store_old_lv();			/* save to see if it changes */
-    }
-    
-    double sv = v0() / process()->range;	/* new scaled voltage */
-    if (sv >= process()->th1) {		/* logic 1 */
-      switch (lv()) {
-      case lvSTABLE0: dont_set_quality("stable 0 to stable 1");	break;
-      case lvRISING:  dont_set_quality("begin stable 1");	break;
-      case lvFALLING:untested();set_bad_quality("falling to stable 1"); break;
-      case lvSTABLE1: dont_set_quality("continuing stable 1");	break;
-      case lvUNKNOWN: set_good_quality("initial 1");		break;
-      }
-      set_lv(lvSTABLE1);
-    }else if (sv <= process()->th0) {	/* logic 0 */
-      switch (lv()) {
-      case lvSTABLE0: dont_set_quality("continuing stable 0");	break;
-      case lvRISING: untested();set_bad_quality("rising to stable 0");	break;
-      case lvFALLING: dont_set_quality("begin stable 0");	break;
-      case lvSTABLE1: dont_set_quality("stable 1 to stable 0");	break;
-      case lvUNKNOWN: set_good_quality("initial 0");		break;
-      }
-      set_lv(lvSTABLE0);
-    }else{				/* transition region */
-      double oldsv = vt1() / process()->range;/* old scaled voltage */
-      double diff  = sv - oldsv;
-      if (diff > 0) {	/* rising */
-	switch (lv()) {
-	case lvSTABLE0:
-	  dont_set_quality("begin good rise");
-	  break;
-	case lvRISING:
-	  if (diff < dt/(process()->mr * process()->rise)) {
-	    set_bad_quality("slow rise");
-	  }else{
-	    dont_set_quality("continuing good rise");
-	  }
-	  break;
-	case lvFALLING:
-	  untested();
-	  set_bad_quality("positive glitch in fall");
-	  break;
-	case lvSTABLE1:
-	  untested();
-	  set_bad_quality("negative glitch in 1");
-	  break;
-	case lvUNKNOWN:
-	  set_bad_quality("initial rise");
-	  break;
-	}
-	set_lv(lvRISING);
-      }else if (diff < 0) {	/* falling */
-	switch (lv()) {
-	case lvSTABLE0:
-	  untested();
-	  set_bad_quality("positive glitch in 0");
-	  break;
-	case lvRISING:
-	  set_bad_quality("negative glitch in rise");
-	  break;
-	case lvFALLING:
-	  if (-diff < dt/(process()->mf * process()->fall)) {
-	    set_bad_quality("slow fall");
-	  }else{
-	    dont_set_quality("continuing good fall");
-	  }
-	  break;
-	case lvSTABLE1:
-	  dont_set_quality("begin good fall");
-	  break;
-	case lvUNKNOWN:
-	  untested();
-	  set_bad_quality("initial fall");
-	  break;
-	}
-	set_lv(lvFALLING);
-      }else{				/* hanging up in transition */
-	untested();
-	error(bDANGER, "inflection???\n");
-	set_bad_quality("in transition but no change");
-	/* state (rise/fall)  unchanged */
-      }
-    }
-    if (sv > 1.+process()->over || sv < -process()->over) {/* out of range */
-      set_bad_quality("out of range");
-    }
-    if (just_reached_stable()) { /* A bad node gets a little better */
-      improve_quality();	/* on every good transition.	   */
-    }				/* Eventually, it is good enough.  */
-				/* A good transition is defined as */
-				/* entering a stable state from    */
-				/* a transition state.		   */
-    set_d_iter();
-    set_last_change_time();
-    trace3(_failure_mode.c_str(), _lastchange, _quality, _lv);
-  }
-}
-/*--------------------------------------------------------------------------*/
-double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)
-{
-  assert(f);
-  if (process() && process() != f) {untested();
-    error(bWARNING, "node " + long_label() 
-	  + " logic process mismatch\nis it " + process()->long_label() 
-	  + " or " + f->long_label() + "?\n");
-  }
-  set_process(f);
-
-  double start = NOT_VALID;
-  double end = NOT_VALID;
-  double risefall = NOT_VALID;
-  switch (lv()) {
-  case lvSTABLE0:
-    return process()->vmin;
-  case lvRISING:
-    start = process()->vmin;
-    end = process()->vmax;
-    risefall = process()->rise;
-    break;
-  case lvFALLING:
-    start = process()->vmax;
-    end = process()->vmin;
-    risefall = process()->fall;
-    break;
-  case lvSTABLE1:
-    return process()->vmax;
-  case lvUNKNOWN:
-    return process()->unknown;
-  }
-  assert(start != NOT_VALID);
-  assert(end   != NOT_VALID);
-  assert(risefall != NOT_VALID);
-
-  if (_sim->_time0 <= (final_time()-risefall)) {
-    return start;
-  }else if (_sim->_time0 >= final_time()) {
-    untested();
-    return end;
-  }else{
-    return end - ((end-start) * (final_time()-_sim->_time0) / risefall);
-  }
-}
-/*--------------------------------------------------------------------------*/
-void LOGIC_NODE::propagate()
-{
-  assert(in_transit());
-  if (lv().is_rising()) {
-    set_lv(lvSTABLE1);
-  }else if (lv().is_falling()) {
-    set_lv(lvSTABLE0);
-  }else{
-    // lv no change
-  }
-  set_d_iter();
-  set_final_time(NEVER);
-  set_last_change_time();
-  assert(!(in_transit()));
-}
-/*--------------------------------------------------------------------------*/
-void LOGIC_NODE::force_initial_value(LOGICVAL v)
-{
-  if (_sim->analysis_is_restore()) {untested();
-  }else if (_sim->analysis_is_static()) {
-  }else{untested();
-  }
-  assert(_sim->analysis_is_static() || _sim->analysis_is_restore());
-  assert(_sim->_time0 == 0.);
-  assert(is_unknown());
-  assert(is_digital());
-  set_lv(v); // BUG ??
-  set_good_quality("initial dc");
-  set_d_iter();
-  set_final_time(NEVER);
-  set_last_change_time();
-}
-/*--------------------------------------------------------------------------*/
-void LOGIC_NODE::set_event(double delay, LOGICVAL v)
-{
-  _lv.set_in_transition(v);
-  if (_sim->analysis_is_tran_dynamic()  &&  in_transit()) {
-    set_bad_quality("race");
-  }else{
-    // normal good quality event
-    // leaving quality as it was
-  }
-  set_d_iter();
-  set_final_time(_sim->_time0 + delay);
-  if (OPT::picky <= bTRACE) {untested();
-    error(bTRACE, "%s:%u:%g new event\n",
-	  long_label().c_str(), d_iter(), final_time());
-  }
-  set_last_change_time();
 }
 /*--------------------------------------------------------------------------*/
 void node_t::set_to_ground(CARD* d)
@@ -533,10 +197,11 @@ void node_t::set_to_ground(CARD* d)
   assert(d->scope());
   NODE_MAP* Map = d->scope()->nodes();
   assert(Map);
-  _nnn = (*Map)["0"];
-  assert(_nnn->flat_number()==0);
-  assert(_nnn->user_number()==0);
+  NODE* nn = (*Map)["0"];
+  _nnn = nn;
   assert(_nnn);
+  assert(nn->flat_number()==0);
+  // assert(nn->user_number()==0);
 }
 /*--------------------------------------------------------------------------*/
 /* new_node: a raw new node, as when a netlist is parsed
@@ -568,12 +233,17 @@ void node_t::new_model_node(const std::string& node_name, CARD* d)
   new_node(node_name, d);
   int ttt = CKT_BASE::_sim->newnode_model();
   assert(_nnn);
-  _nnn->set_flat_number(ttt);
+  NODE* nn = prechecked_cast<NODE*>(_nnn);
+  assert(nn);
+  trace2("new_model_node", d->long_label(), ttt);
+  nn->set_flat_number(ttt);
 }
 /*--------------------------------------------------------------------------*/
 bool node_t::node_is_valid(NODE const* i)
 {
-  if(!i){
+  if(i == &ground_node){ untested();
+    return true;
+  }else if(!i){
     return false;
   }else if (node_is_valid(i->flat_number())) {
     return true;
@@ -591,6 +261,7 @@ void node_t::map_subckt_node(NODE** m, const CARD* d)
     if (node_is_valid(m[e_()])) {
       _nnn = m[e_()];
     }else{
+      trace3("not valid?", e_(), d->long_label(), m[e_()]->long_label());
       throw Exception(d->long_label() + ": need more nodes");
     }
   }else{untested();
@@ -598,14 +269,17 @@ void node_t::map_subckt_node(NODE** m, const CARD* d)
   }
   assert(_nnn);
 //  _nnn->set_flat_number(_ttt);
-  assert(node_is_valid(_nnn->flat_number()));
+  NODE* nn = prechecked_cast<NODE*>(_nnn);
+  assert(node_is_valid(nn));
 }
 /*--------------------------------------------------------------------------*/
 // tmp hack
-LOGIC_NODE gln;
-LOGIC_NODE* NODE::data()
+NODE_CARD gln("ground", 0);
+NODE_DATA* NODE::data()
 { 
+  gln.set_flat_number(0);
   if(_nnn==NULL){ untested();
+    incomplete();
     return &gln;
   }else if(this==&ground_node){ untested();
     return &gln;

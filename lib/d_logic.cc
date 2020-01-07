@@ -85,6 +85,7 @@ void DEV_LOGIC::expand()
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
   }else{
   }
+  _common_sckt = NULL;
 
   std::string subckt_name(c->modelname()+c->name()+to_string(c->incount));
   try {
@@ -94,7 +95,8 @@ void DEV_LOGIC::expand()
     if(!s) {untested();
       error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
-    }else if(auto cs = prechecked_cast<COMMON_SUBCKT const*>(s->common())) {
+    }else if(auto cs = prechecked_cast<COMMON_SUBCKT const*>(s->common())) { untested();
+      _common_sckt = s->common();
       _gatemode = OPT::mode;
       cs->renew_subckt(this, NULL/*&(c->_params)*/);
       subckt()->expand();
@@ -109,6 +111,17 @@ void DEV_LOGIC::expand()
   assert(!is_constant()); /* is a BUG */
 }
 /*--------------------------------------------------------------------------*/
+void DEV_LOGIC::expand_last()
+{
+  if(_common_sckt){ untested();
+    COMMON_COMPONENT* c = mutable_common();
+    attach_common(_common_sckt->clone()); // pretend we are a sckt.
+    BASE_SUBCKT::expand_last();
+    attach_common(c); // reset.
+  }else{ untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_iwant_matrix()
 {
   if (BASE_SUBCKT::subckt()) {
@@ -118,8 +131,22 @@ void DEV_LOGIC::tr_iwant_matrix()
   tr_iwant_matrix_passive();
 }
 /*--------------------------------------------------------------------------*/
+void DEV_LOGIC::map_nodes()
+{
+  BASE_SUBCKT::map_nodes();
+  _ln.resize(net_nodes());
+  for(int i=0; i<net_nodes(); ++i){ untested();
+    node_t& d = _n[i];
+    _ln[i] = dynamic_cast<LOGIC_NODE*>(&*d);
+    assert(_ln[i] || i==1 || i==2 || i==3);
+  }
+}
+/*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_begin()
 {
+  // tmp hack, some kind of map_nodes
+  LOGIC_NODE* const* _n = _ln.data();
+
   ELEMENT_tr_begin();
   if (!BASE_SUBCKT::subckt()) {
     _gatemode = moDIGITAL;
@@ -147,6 +174,7 @@ void DEV_LOGIC::tr_restore()
 void DEV_LOGIC::dc_advance()
 {
   ELEMENT_dc_advance();
+  LOGIC_NODE* const* _n = _ln.data();
 
   if (_gatemode != _oldgatemode) {untested();
     tr_unload();
@@ -177,6 +205,7 @@ void DEV_LOGIC::dc_advance()
 void DEV_LOGIC::tr_advance()
 {
   ELEMENT_tr_advance();
+  LOGIC_NODE* const* _n = _ln.data();
 
   if (_gatemode != _oldgatemode) {
     tr_unload();
@@ -207,6 +236,7 @@ void DEV_LOGIC::tr_advance()
 void DEV_LOGIC::tr_regress()
 {itested();
   ELEMENT_tr_regress();
+  LOGIC_NODE* const* _n = _ln.data();
 
   if (_gatemode != _oldgatemode) {itested();
     tr_unload();
@@ -272,6 +302,7 @@ void DEV_LOGIC::tr_queue_eval()
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::tr_eval_digital()
 {
+  LOGIC_NODE* const* _n = _ln.data();
   assert(_gatemode == moDIGITAL);
   if (_sim->analysis_is_restore()) {untested();
   }else if (_sim->analysis_is_static()) {
@@ -342,6 +373,7 @@ TIME_PAIR DEV_LOGIC::tr_review()
  */
 void DEV_LOGIC::tr_accept()
 {
+  LOGIC_NODE* const* _n = _ln.data();
   assert(_gatemode == moDIGITAL || _gatemode == moANALOG);
   const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
   assert(c);
@@ -482,12 +514,12 @@ void DEV_LOGIC::ac_begin()
 /*--------------------------------------------------------------------------*/
 double DEV_LOGIC::tr_probe_num(const std::string& what)const
 {
-  return _n[OUTNODE]->tr_probe_num(what);
+  return _ln[OUTNODE]->tr_probe_num(what);
 }
 /*--------------------------------------------------------------------------*/
 XPROBE DEV_LOGIC::ac_probe_ext(const std::string& what)const
 {untested();
-  return _n[OUTNODE]->ac_probe_ext(what);
+  return _ln[OUTNODE]->ac_probe_ext(what);
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_LOGIC::want_analog()const

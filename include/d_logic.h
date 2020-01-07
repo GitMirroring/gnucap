@@ -30,6 +30,127 @@
 /*--------------------------------------------------------------------------*/
 enum {PORTS_PER_GATE = 10};
 /*--------------------------------------------------------------------------*/
+class INTERFACE LOGIC_NODE : public NODE_CARD {
+private: // CARD overrides
+  CARD* clone() const {unreachable(); return NULL;}
+  std::string value_name()const {return "";} // pure in CARD
+  bool	is_device()const		{return false;}
+private:
+  const MODEL_LOGIC *_family;	/* logic family */
+  int 	      _d_iter;		/* iteration of last update - digital */
+  int 	      _a_iter;		/* iteration of last update - analog */
+  double      _final_time;	/* time logic transition attains final state */
+  double      _lastchange;	/* time of last change */
+  double      _old_lastchange;	/* in case it rejects a step */
+  smode_t     _mode;		/* simulation mode (analog or digital)*/
+  LOGICVAL    _lv;		/* "logic value" (real type is LOGICVAL) */
+  LOGICVAL    _old_lv;		/* in case it rejects a step */
+  int	      _quality;		/* quality of digital mode */
+  std::string _failure_mode;
+
+  // so it is not pure virtual
+  //const	      std::string long_label()const;
+public: // virtuals
+  node_t&       n_(int i) const{ untested();
+    assert(i==0); return const_cast<node_t&>(_n[i]);
+  }
+  int	        net_nodes()const	{return 1;}
+  int	        min_nodes()const	{return 1;}
+  int	        max_nodes()const	{return 1;}
+  int	        ext_nodes()const	{return 1;}
+  int	        int_nodes()const	{return 0;}
+  double	tr_probe_num(const std::string&)const;
+//  XPROBE	ac_probe_ext(const std::string&x)const{
+//    NODE const* nn = prechecked_cast<NODE const*>(_n[0].operator->());
+//    assert(nn);
+//    return nn->ac_probe_ext(x);
+//  }
+  void map_nodes();
+  //
+public: // tmp, analog access
+  node_t _n[1];
+  double&     i() { return _n[0].i(); }
+  int     m_() { return _n[0].m_(); }
+  double     v0(){ return _n[0].v0(); }
+  double     vt1(){ return _n[0].vt1(); }
+  COMPLEX     vac()const{ return _n[0].vac(); }
+  COMPLEX&     iac(){untested(); return _n[0].iac(); }
+
+public: // raw data access (rvalues)
+  LOGIC_NODE const* operator->() const{return this;}
+  LOGICVAL lv()const			{return _lv;}
+  int	   quality()const		{return _quality;}
+  const std::string& failure_mode()const {return _failure_mode;}
+  int	   d_iter()const		{return _d_iter;}
+  int	   a_iter()const		{return _a_iter;}
+  double   final_time()const		{return _final_time;}
+  double   last_change_time()const	{return _lastchange;}
+  const MODEL_LOGIC* process()const	{return _family;}
+  double   old_last_change_time()const	{untested(); return _old_lastchange;}
+  const LOGICVAL old_lv()const		{return _old_lv;}
+
+public: // simple calculated data access (rvalues)
+  bool	 lv_future()const	{return lv().lv_future();}
+  bool	 is_unknown()const	{return lv().is_unknown();}
+  bool	 in_transit()const	{return final_time() < NEVER;}
+  bool	 is_digital()const	{return _mode == moDIGITAL;}
+  bool	 is_analog()const	{return _mode == moANALOG;}
+  double annotated_logic_value()const;
+
+public: // calculated data access (rvalues)
+  bool	just_reached_stable()const;
+
+public: // raw data access (lvalues)
+  void	set_quality(int q)		{_quality = q;}
+  void	set_failure_mode(const std::string& f) {_failure_mode = f;}
+  void	set_final_time(double t)	{_final_time = t;}
+  
+  void	set_d_iter()			{_d_iter = _sim->iteration_tag();}
+  void	set_last_change_time()		{_lastchange = _sim->_time0;}
+  void	set_last_change_time(double t)	{_lastchange = t;}
+  void	set_lv(LOGICVAL v)		{_lv = v;}
+  void	set_process(const MODEL_LOGIC* f) {_family = f;}
+
+  void  store_old_last_change_time()	{_old_lastchange = last_change_time();}
+  void	store_old_lv()			{_old_lv = lv();}
+  void	restore_lv()			{untested(); set_lv(old_lv());}
+  void	set_mode(smode_t m)		{_mode = m;}
+
+public: // other internal
+  void  set_bad_quality(const std::string& f) {
+    set_quality(qBAD);
+    set_failure_mode(f);
+  }
+  void  set_good_quality(const std::string& f = "ok") {
+    set_quality(qGOOD);
+    set_failure_mode(f);
+  }
+  void	dont_set_quality(const std::string& f = "don't know") {
+    set_failure_mode(f);
+  }
+  void	improve_quality() {
+    if (quality() < qGOOD) {
+      ++_quality;
+    }
+  }
+
+public: // action, used by logic
+  void	      set_event(double delay, LOGICVAL v);
+  void	      force_initial_value(LOGICVAL v);
+  void	      propagate();
+  double      to_analog(const MODEL_LOGIC*f);
+  void	      to_logic(const MODEL_LOGIC*f);
+
+private: // inhibited
+  explicit LOGIC_NODE(const LOGIC_NODE&):NODE_CARD(){incomplete();unreachable();}
+public: // general use
+  explicit LOGIC_NODE();
+	   ~LOGIC_NODE() {}
+
+public: // matrix
+  LOGIC_NODE&	set_a_iter()	{_a_iter = _sim->iteration_tag(); return *this;}
+};
+/*--------------------------------------------------------------------------*/
 class DEV_LOGIC : public BASE_SUBCKT{
 private: // resolve conflicts
   CARD_LIST* subckt(){ return BASE_SUBCKT::subckt(); }
@@ -152,7 +273,7 @@ protected:
   // bool is_q_for_eval() const{ return ELEMENT::is_q_for_eval(); }
   // COMMON_COMPONENT const* common(){return ELEMENT::common(); }
 
-  // void map_nodes(){ untested();
+  void map_nodes();
   //   ELEMENT::map_nodes();
   //   BASE_SUBCKT::map_nodes();
   // }
@@ -166,6 +287,7 @@ private:
   smode_t	_gatemode;
   static int	_count;
   node_t       _n[PORTS_PER_GATE];     /* PORTS_PER_GATE <= PORTSPERSUBCKT */
+  std::vector<LOGIC_NODE*> _ln;
 public:
   explicit	DEV_LOGIC();
   explicit	DEV_LOGIC(const DEV_LOGIC& p);
@@ -185,6 +307,7 @@ private: // override virtuals
   CARD*	   clone()const		{return new DEV_LOGIC(*this);}
 //  void	   precalc_first() {precalc_first();*/ if (subckt()) {subckt()->precalc_first();}}
   void	   expand();
+  void	   expand_last();
   void	   precalc_last() {ELEMENT_precalc_last(); if (subckt()) {subckt()->precalc_last();}}
   //void   map_nodes();
 
@@ -242,6 +365,9 @@ private:
   bool	   tr_eval_digital();
   bool	   want_analog()const;
   bool	   want_digital()const;
+
+private: // temporary hack
+  COMMON_COMPONENT const* _common_sckt;
 };
 /*--------------------------------------------------------------------------*/
 #if 1 // TRANSITION
@@ -338,7 +464,7 @@ public:
 		~COMMON_LOGIC()			{--_count;}
   bool operator==(const COMMON_COMPONENT&)const;
   static  int	count()				{return _count;}
-  virtual LOGICVAL logic_eval(const node_t*)const	= 0;
+  virtual LOGICVAL logic_eval(LOGIC_NODE* const*)const	= 0;
 public:
   int		incount;
 protected:
@@ -351,7 +477,7 @@ private:
   COMMON_COMPONENT* clone()const { return new LOGIC_AND(*this);}
 public:
   explicit LOGIC_AND(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n)const {
+  LOGICVAL logic_eval(LOGIC_NODE* const* n)const {
     LOGICVAL out(n[0]->lv());
     for (int ii=1; ii<incount; ++ii) {untested();
       out &= n[ii]->lv();
@@ -367,7 +493,7 @@ private:
   COMMON_COMPONENT* clone()const {return new LOGIC_NAND(*this);}
 public:
   explicit LOGIC_NAND(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n)const {untested();
+  LOGICVAL logic_eval(LOGIC_NODE* const* n)const { untested();
     LOGICVAL out(n[0]->lv());
     for (int ii=1; ii<incount; ++ii) {untested();
       out &= n[ii]->lv();
@@ -383,7 +509,7 @@ private:
   COMMON_COMPONENT* clone()const {untested(); return new LOGIC_OR(*this);}
 public:
   explicit LOGIC_OR(int c=0)		  :COMMON_LOGIC(c) {untested();}
-  LOGICVAL logic_eval(const node_t* n)const {untested();
+  LOGICVAL logic_eval(LOGIC_NODE* const* n)const {
     LOGICVAL out(n[0]->lv());
     for (int ii=1; ii<incount; ++ii) {untested();
       out |= n[ii]->lv();
@@ -399,7 +525,7 @@ private:
   COMMON_COMPONENT* clone()const {return new LOGIC_NOR(*this);}
 public:
   explicit LOGIC_NOR(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n)const {
+  LOGICVAL logic_eval(LOGIC_NODE* const* n)const { untested();
     LOGICVAL out(n[0]->lv());
     for (int ii=1; ii<incount; ++ii) {
       out |= n[ii]->lv();
@@ -415,7 +541,7 @@ private:
   COMMON_COMPONENT* clone()const {untested(); return new LOGIC_XOR(*this);}
 public:
   explicit LOGIC_XOR(int c=0)		  :COMMON_LOGIC(c) {untested();}
-  LOGICVAL logic_eval(const node_t* n)const {untested();
+  LOGICVAL logic_eval(LOGIC_NODE* const* n)const { untested();
     LOGICVAL out(n[0]->lv());
     for (int ii=1; ii<incount; ++ii) {untested();
       out ^= n[ii]->lv();
@@ -431,7 +557,7 @@ private:
   COMMON_COMPONENT* clone()const {untested(); return new LOGIC_XNOR(*this);}
 public:
   explicit LOGIC_XNOR(int c=0)		  :COMMON_LOGIC(c) {untested();}
-  LOGICVAL logic_eval(const node_t* n)const {untested();
+  LOGICVAL logic_eval(LOGIC_NODE* const* n)const { untested();
     LOGICVAL out(n[0]->lv());
     for (int ii=1; ii<incount; ++ii) {untested();
       out ^= n[ii]->lv();
@@ -447,7 +573,7 @@ private:
   COMMON_COMPONENT* clone()const	{return new LOGIC_INV(*this);}
 public:
   explicit LOGIC_INV(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n)const {
+  LOGICVAL logic_eval(LOGIC_NODE* const* n)const { untested();
     return ~n[0]->lv();
   }
   virtual std::string name()const	  {return "inv";}
@@ -459,7 +585,7 @@ private:
   COMMON_COMPONENT* clone()const {itested(); return new LOGIC_NONE(*this);}
 public:
   explicit LOGIC_NONE(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t*)const {untested();
+  LOGICVAL logic_eval(LOGIC_NODE* const*)const { untested();
     return lvUNKNOWN;
   }
   virtual std::string name()const	  {untested();return "error";}

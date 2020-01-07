@@ -260,13 +260,13 @@ inline void ELEMENT::tr_unload_source()
 /*--------------------------------------------------------------------------*/
 inline void ELEMENT::ac_load_source()
 {
-  if (_n[OUT2].m_() != 0) {
-    _n[OUT2]->iac() += mfactor() * _acg;
-  }else{
+  if (_n[OUT2].m_() != 0) { untested();
+    _n[OUT2].iac() += mfactor() * _acg;
+  }else{ untested();
   }
-  if (_n[OUT1].m_() != 0) {
-    _n[OUT1]->iac() -= mfactor() * _acg;
-  }else{
+  if (_n[OUT1].m_() != 0) { untested();
+    _n[OUT1].iac() -= mfactor() * _acg;
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

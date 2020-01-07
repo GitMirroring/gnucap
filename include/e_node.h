@@ -26,6 +26,7 @@
 #define E_NODE_H
 #include "u_sim_data.h"
 #include "e_card.h"
+#include "u_xprobe.h" // BUG
 /*--------------------------------------------------------------------------*/
 class MODEL_LOGIC;
 /*--------------------------------------------------------------------------*/
@@ -79,15 +80,32 @@ public:
   LOGICVAL& set_in_transition(LOGICVAL newval);
 };
 /*--------------------------------------------------------------------------*/
-class NODE : public CARD /* BUG */ {
+class NODE_DATA{
+private:
+  NODE_DATA(): _user_number(INVALID_NODE) {unreachable();}
+public:
+  explicit NODE_DATA(int n): _user_number(n) {}
+  explicit NODE_DATA(NODE_DATA const& p): _user_number(p._user_number) {}
+public:
+  virtual ~NODE_DATA(){}
+  int user_number()const       {return _user_number;}
+  NODE_DATA& set_user_number(int n)    {_user_number = n; return *this;}
+
+public: // PORT?
+  virtual COMPLEX     vac()const = 0;
+  virtual COMPLEX&     iac() = 0;
+//  virtual std::string  short_label() const{incomplete(); return "NODE_DATA"; }
+private:
+  int _user_number;
+};
+/*--------------------------------------------------------------------------*/
+class NODE : public CARD, public NODE_DATA {
 private: // CARD overrides
   CARD* clone() const;
   std::string value_name()const {return "";} // pure in CARD
   bool	is_device()const		{return false;}
 private:
-  int	_user_number;
   int	_flat_number;
-  //int	_matrix_number;
 protected:
   explicit NODE();
 private: // inhibited
@@ -97,23 +115,21 @@ public:
   explicit NODE(const std::string& s, int n);
   ~NODE() {}
 
-  NODE* new_card();
+  CARD* new_card();
 
 public: // raw data access (rvalues)
-  int	user_number()const	{return _user_number;}
   int	flat_number()const	{itested();return _flat_number;}
 public: // simple calculated data access (rvalues)
   int	matrix_number()const	{untested(); return _sim->_nm[_flat_number];}
   int	m_()const		{return matrix_number();}
 public: // maniputation
-  NODE&	set_user_number(int n)	{_user_number = n; return *this;}
   NODE& set_flat_number(int n) {itested();_flat_number = n; return *this;}
   //NODE& set_matrix_number(int n){untested();_matrix_number = n;return *this;}
 public: // virtuals
   double	tr_probe_num(const std::string&)const;
   XPROBE	ac_probe_ext(const std::string&)const;
 
-  double      v0()const	{
+  double      v0()const	{ untested();
     assert(m_() >= 0);
     assert(m_() <= _sim->_total_nodes);
     return _sim->_v0[m_()];
@@ -138,118 +154,12 @@ public: // virtuals
   }
 
 public:
-  LOGIC_NODE* data();
+  NODE_DATA* data();
 private:
   LOGIC_NODE* _nnn;
 }; // NODE
 extern NODE ground_node;
-/*--------------------------------------------------------------------------*/
-class INTERFACE LOGIC_NODE : public NODE {
-private:
-  const MODEL_LOGIC *_family;	/* logic family */
-  int 	      _d_iter;		/* iteration of last update - digital */
-  int 	      _a_iter;		/* iteration of last update - analog */
-  double      _final_time;	/* time logic transition attains final state */
-  double      _lastchange;	/* time of last change */
-  double      _old_lastchange;	/* in case it rejects a step */
-  smode_t     _mode;		/* simulation mode (analog or digital)*/
-  LOGICVAL    _lv;		/* "logic value" (real type is LOGICVAL) */
-  LOGICVAL    _old_lv;		/* in case it rejects a step */
-  int	      _quality;		/* quality of digital mode */
-  std::string _failure_mode;
-
-  // so it is not pure virtual
-  //const	      std::string long_label()const;
-public: // virtuals
-  // node_t&       n_(int i) const{ untested();
-  //   assert(i==0); return const_cast<node_t&>(_n[i]);
-  // }
-
-  double	tr_probe_num(const std::string&)const;
-  //XPROBE	ac_probe_ext(const std::string&)const;
-  //
-public: // tmp, analog access
-  // node_t _n[1];
-  // double&     i() { return _n[0].i(); }
-  // int     m_() { return _n[0].m_(); }
-  // double     v0(){ return _n[0].v0(); }
-  // double     vt1(){ return _n[0].vt1(); }
-  // COMPLEX     vac()const{ return _n[0].vac(); }
-  // COMPLEX&     iac(){ return _n[0].iac(); }
-
-public: // raw data access (rvalues)
-  LOGICVAL lv()const			{return _lv;}
-  int	   quality()const		{return _quality;}
-  const std::string& failure_mode()const {return _failure_mode;}
-  int	   d_iter()const		{return _d_iter;}
-  int	   a_iter()const		{return _a_iter;}
-  double   final_time()const		{return _final_time;}
-  double   last_change_time()const	{return _lastchange;}
-  const MODEL_LOGIC* process()const	{return _family;}
-  double   old_last_change_time()const	{untested(); return _old_lastchange;}
-  const LOGICVAL old_lv()const		{return _old_lv;}
-
-public: // simple calculated data access (rvalues)
-  bool	 lv_future()const	{return lv().lv_future();}
-  bool	 is_unknown()const	{return lv().is_unknown();}
-  bool	 in_transit()const	{return final_time() < NEVER;}
-  bool	 is_digital()const	{return _mode == moDIGITAL;}
-  bool	 is_analog()const	{return _mode == moANALOG;}
-  double annotated_logic_value()const;
-
-public: // calculated data access (rvalues)
-  bool	just_reached_stable()const;
-
-public: // raw data access (lvalues)
-  void	set_quality(int q)		{_quality = q;}
-  void	set_failure_mode(const std::string& f) {_failure_mode = f;}
-  void	set_final_time(double t)	{_final_time = t;}
-  
-  void	set_d_iter()			{_d_iter = _sim->iteration_tag();}
-  void	set_last_change_time()		{_lastchange = _sim->_time0;}
-  void	set_last_change_time(double t)	{_lastchange = t;}
-  void	set_lv(LOGICVAL v)		{_lv = v;}
-  void	set_process(const MODEL_LOGIC* f) {_family = f;}
-
-  void  store_old_last_change_time()	{_old_lastchange = last_change_time();}
-  void	store_old_lv()			{_old_lv = lv();}
-  void	restore_lv()			{untested(); set_lv(old_lv());}
-  void	set_mode(smode_t m)		{_mode = m;}
-
-public: // other internal
-  void  set_bad_quality(const std::string& f) {
-    set_quality(qBAD);
-    set_failure_mode(f);
-  }
-  void  set_good_quality(const std::string& f = "ok") {
-    set_quality(qGOOD);
-    set_failure_mode(f);
-  }
-  void	dont_set_quality(const std::string& f = "don't know") {
-    set_failure_mode(f);
-  }
-  void	improve_quality() {
-    if (quality() < qGOOD) {
-      ++_quality;
-    }
-  }
-
-public: // action, used by logic
-  void	      set_event(double delay, LOGICVAL v);
-  void	      force_initial_value(LOGICVAL v);
-  void	      propagate();
-  double      to_analog(const MODEL_LOGIC*f);
-  void	      to_logic(const MODEL_LOGIC*f);
-
-private: // inhibited
-  explicit LOGIC_NODE(const LOGIC_NODE&):NODE(){incomplete();unreachable();}
-public: // general use
-  explicit LOGIC_NODE();
-	   ~LOGIC_NODE() {}
-
-public: // matrix
-  LOGIC_NODE&	set_a_iter()	{_a_iter = _sim->iteration_tag(); return *this;}
-};
+typedef NODE NODE_CARD; // TODO
 /*--------------------------------------------------------------------------*/
 class INTERFACE node_t {
 private:
@@ -271,7 +181,7 @@ private:
   }
 
 private:
-  NODE* _nnn;
+  NODE_DATA* _nnn;
   int _m;		// mapped, after reordering
 
 public:
@@ -279,7 +189,10 @@ public:
 
   int	      t_()const {
     if(_nnn){
-      return _nnn->flat_number();
+      assert(n_());
+      int i = n_()->flat_number();
+      assert (i <= NODE::_sim->_total_nodes);
+      return i;
     }else{
       return INVALID_NODE;
     }
@@ -290,8 +203,8 @@ public:
   int	      e_()const {
     return ((_nnn) ? _nnn->user_number() : INVALID_NODE);
   }
-  const NODE* n_()const {return _nnn;}
-  NODE*	      n_()	{return _nnn;}
+  const NODE* n_()const {return prechecked_cast<NODE const*>(_nnn);}
+  NODE*	      n_()	{return prechecked_cast<NODE*>(_nnn);}
 
   
   const std::string  short_label()const {return ((n_()) ? (n_()->short_label()) : "?????");}
@@ -302,18 +215,26 @@ public:
   bool	is_grounded()const {return (e_() == 0);}
   bool	is_connected()const {return (e_() != INVALID_NODE);}
 
-  node_t&     map() {
-    if (t_() != INVALID_NODE) {
+  node_t&     map(){
+    if (_nnn == &ground_node) {
+      _m = 0;
+    }else if (t_() != INVALID_NODE) {
       assert(_nnn);
-      _m=to_internal(t_());
-      _nnn=_nnn->data();
+      NODE_CARD* nn = prechecked_cast<NODE_CARD*>(_nnn);
+      if(nn){ untested();
+	_nnn = nn->data();
+	_m = to_internal(t_());
+      }else{ untested();
+	_m=0; // gnd node hack. BUG
+      }
       assert(_nnn);
-      assert(prechecked_cast<LOGIC_NODE*>(_nnn));
+//      assert(prechecked_cast<LOGIC_NODE*>(_nnn));
     }else{
       assert(_m == INVALID_NODE);
     }
     return *this;
   } // e_compon.cc:COMPONENT::map_nodes:522
+/*--------------------------------------------------------------------------*/
 
   explicit    node_t();
 	      node_t(const node_t&);
@@ -321,12 +242,12 @@ public:
 	      ~node_t() {}
 
 private: // raw data access (lvalues)
-  LOGIC_NODE&	data()const;
+  NODE_DATA&	data()const;
 
 public:
-  //LOGIC_NODE&	    operator*()const	{untested();return data();}
-  const LOGIC_NODE* operator->()const	{return &data();}
-  LOGIC_NODE*	    operator->()	{return &data();}
+  NODE_DATA&	    operator*()const	{return data();}
+  const NODE_DATA* operator->()const	{return &data();}
+  NODE_DATA*	    operator->()	{return &data();}
 
   node_t& operator=(const node_t& p);
   node_t& operator=(NODE* p);
@@ -337,10 +258,14 @@ public:
   double      v0()const {
     assert(m_() >= 0);
     assert(m_() <= NODE::_sim->_total_nodes);
-    assert(n_());
     //assert(n_()->m_() == m_());
     //assert(n_()->v0() == NODE::_sim->_v0[m_()]);
     return NODE::_sim->_v0[m_()];
+  }
+  double      vt1()const {
+    assert(m_() >= 0);
+    assert(m_() <= NODE::_sim->_total_nodes);
+    return NODE::_sim->_vt1[m_()];
   }
   
   COMPLEX     vac()const {
@@ -357,16 +282,18 @@ public:
     assert(m_() <= NODE::_sim->_total_nodes);
     return NODE::_sim->_i[m_()];
   }
-#if 0
+#if 1
   COMPLEX&    iac() {untested();
-    assert(n_());
-    assert(n_()->m_() == m_());
-    assert(n_()->iac() == NODE::_ac[m_()]);
+    if(n_()){
+      assert(n_()->m_() == m_());
+      // assert(n_()->iac() == NODE::_sim->_ac[m_()]);
+    }
+    assert(m_()!=INVALID_NODE);
     //return n_()->iac();
     return NODE::_sim->_ac[m_()];
   }
 #endif
-};
+}; // node_t
 /*--------------------------------------------------------------------------*/
 INTERFACE double volts_limited(const node_t& n1, const node_t& n2);
 /*--------------------------------------------------------------------------*/

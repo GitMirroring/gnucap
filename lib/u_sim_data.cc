@@ -304,6 +304,8 @@ void SIM_DATA::init()
     _subckt_nodes -= CARD_LIST::card_list.nodes()->how_many();
     _user_nodes += CARD_LIST::card_list.nodes()->how_many();
 
+    trace2("init", _subckt_nodes, _user_nodes);
+
     root.expand();
     root.expand_last();
 

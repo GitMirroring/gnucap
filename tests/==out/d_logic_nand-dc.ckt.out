@@ -1,10 +1,16 @@
 * nor-test 
 U2: can't find subckt: CMOSnor2, forcing digital
 U1: can't find subckt: CMOSnor2, forcing digital
-#           V(V2)      V(V3)      V(U1)      V(U2)      logic(U2)  logic(U1) 
- 0.         0.         10.        5.         0.         0.         3.        
- 2.         2.         10.        5.         0.         0.         3.        
- 4.         4.         10.        5.         0.         0.         2.        
- 6.         6.         10.        0.         0.         0.         0.        
- 8.         8.         10.        0.         0.         0.         0.        
- 10.        10.        10.        0.         0.         0.         0.        
+V2 ( 1 0 )  DC  10.
+V1 ( 4 0 )  DC  10.
+U2 ( 2 0 4 4 3 5 )  CMOS nor 
+V3 ( 5 0 )  DC  10.
+U1 ( 3 0 4 4 1 2 )  CMOS nor 
+.model CMOS logic ( delay=NA( 1.n) vmax=NA( 5.) vmin=NA( 0.) unknown=NA( 2.5) rise=NA( 500.p) fall=NA( 500.p) rs=NA( 100.) rw=NA( 1.G) thh=NA( 0.75) thl=NA( 0.25) mr=NA( 5.) mf=NA( 5.) over=NA( 0.1) tnom=NA( 27.))
+#           V(V2)      V(V3)      V(U1)      V(U2)      logic(U2)  logic(U1)  v(2)       v(3)      
+ 0.         0.         10.        5.         0.         0.         3.         0.         5.        
+ 2.         2.         10.        5.         0.         0.         3.         0.         5.        
+ 4.         4.         10.        5.         0.         0.         2.         0.         5.        
+ 6.         6.         10.        0.         0.         0.         0.         0.         0.        
+ 8.         8.         10.        0.         0.         0.         0.         0.         0.        
+ 10.        10.        10.        0.         0.         0.         0.         0.         0.        

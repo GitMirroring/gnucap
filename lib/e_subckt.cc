@@ -35,6 +35,7 @@ void BASE_SUBCKT::new_subckt()
 /*--------------------------------------------------------------------------*/
 void COMMON_SUBCKT::new_subckt(BASE_SUBCKT* owner, PARAM_LIST* Params) const
 {
+  trace1("COMMON_SUBCKT::new_subckt", owner->long_label());
   owner->new_subckt();
   CARD_LIST* s = owner->subckt();
   s->attach_params(Params, owner->scope());
@@ -52,11 +53,16 @@ void BASE_SUBCKT::renew_subckt(const CARD* Model, PARAM_LIST* Params)
 void BASE_SUBCKT::expand_last()
 {
   // TODO: move/forward to COMMON?
-  auto model = prechecked_cast<COMMON_SUBCKT const*>(common());
+  auto model = dynamic_cast<COMMON_SUBCKT const*>(common());
+  if(common() && !model){
+    // possibly modelgen?
+    return;
+  }
   int np = 0;
   if(model){
     np = model->net_nodes();
-  }else{
+  }else{ untested();
+    trace2("BASE_SUBCKT::expand_last", long_label(), np);
   }
   if(subckt()){
     for(NODE_MAP::const_iterator ii = subckt()->nodes()->begin();
@@ -71,9 +77,8 @@ void BASE_SUBCKT::expand_last()
       // assert(f == ii->second->flat_number());
       if(f>np){
 	NODE* c = ii->second;
-	NODE* nn = c->new_card();
+	CARD* nn = c->new_card();
 	assert(nn);
-	assert(c->data());
 	nn->set_owner(this);
 	nn->set_label(ii->first);
 	trace2("placing node", nn->long_label(), f);
@@ -114,7 +119,7 @@ CARD_LIST const* CARD::subckt() const
 /*--------------------------------------------------------------------------*/
 CARD_LIST* CARD::subckt()
 {
-  unreachable(); // this is a compatibility hack
+  trace0("TODO"); // this is a compatibility hack
   BASE_SUBCKT* s=dynamic_cast<BASE_SUBCKT*>(this);
   if(s){
     return s->subckt();
@@ -161,13 +166,16 @@ int COMMON_SUBCKT::net_nodes() const
 /*--------------------------------------------------------------------------*/
 void COMMON_SUBCKT::map_subckt_nodes(BASE_SUBCKT* owner, CARD_LIST const* sckt_proto) const
 {
+  trace1("map_subckt_nodes", owner->long_label());
   COMMON_SUBCKT const* model = this;
   int np = 0;
   if(sckt_proto){ untested();
+    trace1("map_subckt_nodes root hack",  owner->long_label());
     // root hack
   }else{ untested();
     assert(model->subckt());
     np = model->net_nodes();
+    trace1("map_subckt_nodes nonroot hack", np);
     sckt_proto = model->subckt();
   }
   assert(model);
@@ -210,15 +218,16 @@ void COMMON_SUBCKT::map_subckt_nodes(BASE_SUBCKT* owner, CARD_LIST const* sckt_p
       for(NODE_MAP::const_iterator ii = cl->nodes()->begin();
 	    ii!=cl->nodes()->end(); ++ii) {
 	int f = ii->second->user_number();
-	trace2("collect", ii->first, f);
-	assert(f == ii->second->flat_number());
+	trace3("collect", ii->first, f, ii->second->flat_number());
+	// assert(f == ii->second->flat_number());
 	if(f>np){
 	  NODE* c = ii->second;
 	  CARD* nn = c; // c->new_card();
 	  assert(nn);
 	  NODE* nnn = prechecked_cast<NODE*>(nn);
+	  assert(nnn);
 	  map[f] = nnn;
-	}else{
+	}else{ untested();
 	}
       }
     
@@ -239,7 +248,15 @@ void COMMON_SUBCKT::map_subckt_nodes(BASE_SUBCKT* owner, CARD_LIST const* sckt_p
   // scan the list, map the nodes
   for (CARD_LIST::iterator ci = cl->begin(); ci != cl->end(); ++ci) {
     // for each card in card_list
-    if (!(*ci)->is_device()) {
+    COMPONENT* c=dynamic_cast<COMPONENT*>(*ci);
+    if (dynamic_cast<NODE_DATA*>(*ci) ) {untested();
+      for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) { untested();
+	// for each connection node in card
+	assert(c); // must be a COMPONENT if it is in card list
+	c->n_(ii).map_subckt_node(map.data(), owner);
+	// c->expand_last()
+      }
+    }else if (!(*ci)->is_device()) {
       assert(dynamic_cast<MODEL_CARD*>(*ci)
            ||dynamic_cast<NODE*>(*ci));
     }else if (COMPONENT* c=dynamic_cast<COMPONENT*>(*ci) ) {

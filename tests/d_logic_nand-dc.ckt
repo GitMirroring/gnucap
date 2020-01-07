@@ -5,6 +5,7 @@ U2 2 0 4 4 3 5 CMOS NOR
 V3 5 0 10V
 U1 3 0 4 4 1 2 CMOS NOR
 .model CMOS LOGIC
-.print dc V(V2) V(V3) V(U1) V(U2) logic(u*)
+.print dc V(V2) V(V3) V(U1) V(U2) logic(u*) v(2 3)
+.list
 .dc V2 0 10 2
 .END

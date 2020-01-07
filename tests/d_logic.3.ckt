@@ -10,9 +10,9 @@ U6   6 0 8 8 5  mos inv
 U7   7 0 8 8 6  mos inv
 .model  mos logic ( delay= 1n  rise= 1n  fall= 1n  rs= 100.  rw= 1.G 
 + thh= 0.75  thl= 0.25  mr= 5.  mf= 5.  over=10k vmax= 5.  vmin= 0. )
-.subckt mosinv1  2  4  1  5  3 
+.subckt mosinv1  2  4  A  5  3 
 M1   2  3  4  4  nmos  l= 100.u  w= 100.u  nrd= 1.  nrs= 1. 
-M2   2  3  1  1  pmos  l= 100.u  w= 100.u  nrd= 1.  nrs= 1. 
+M2   2  3  A  A  pmos  l= 100.u  w= 100.u  nrd= 1.  nrs= 1. 
 .ends
 *+ends mosinv1
 .model nmos  nmos ( level=2  vto= 0.  gamma= 0.  phi= 0.6  is= 10.E-15 pb= 0.8 
