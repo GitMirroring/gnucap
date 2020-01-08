@@ -25,8 +25,7 @@
 #include "e_cardlist.h"
 #include "u_status.h"
 #include "e_node.h"
-#include "u_out.h"
-//#include "s__.h"
+#include "s__.h"
 /*--------------------------------------------------------------------------*/
 //	bool	SIM::solve(int,int);
 //	void	SIM::finish_building_evalq();
@@ -53,9 +52,7 @@ bool SIM::solve(OPT::ITL itl, TRACE trace)
  
   do{
     if (trace >= tITERATION) {
-      // print plugin decides.
-      // static_cast<double>(_sim->iteration_number());
-      outcommit(OUTPUT::ofTRACE);
+      out_trace(static_cast<double>(_sim->iteration_number()));
     }
     set_flags();
     clear_arrays();

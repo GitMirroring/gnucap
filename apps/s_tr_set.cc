@@ -26,7 +26,6 @@
 #include "u_prblst.h"
 #include "ap.h"
 #include "s_tr.h"
-#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 //	void	TRANSIENT::setup(CS&);
 //	void	TRANSIENT::options(CS&);
@@ -229,7 +228,6 @@ void TRANSIENT::options(CS& Cmd)
   }
 
   outinit();
-  _sim->_axes.set_axis(0, &_sim->_time0);
 
   _dtmax_in.e_val(BIGBIG, _scope);
   _dtmin_in.e_val(OPT::dtmin, _scope);

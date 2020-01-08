@@ -29,7 +29,6 @@
 #include "globals.h"
 #include "m_wave.h"
 #include "u_out.h"
-#include "s__.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -52,18 +51,20 @@ public: // OUTPUT_CMD
   }
 public: // OUTPUT
   // allocate space for output data
-  void head(std::string const& label_in)
+  //--------------------------------
+  void head(double start, double stop, const std::string& col1)
   {
     std::string label;
-    if(label_in==""){
+    if(col1==""){untested();
       // fallback to legacy spice
       label = _sim->label();
     }else{
-      label = label_in;
+      label = col1;
     }
-    OUTPUT::head(label);
+    trace0(label);
+    OUTPUT::head(start, stop, label);
     PROBELIST const& pr=probelist();
-    CKT_BASE* data = data_dispatcher[label];
+    CKT_BASE* data = data_dispatcher[_sim->label()];
     WAVESTASH* wl;
     if(WAVESTASH* w=dynamic_cast<WAVESTASH*>(data)){
       // already there.
@@ -71,7 +72,7 @@ public: // OUTPUT
     }else{
       // wrong type or not there, put new one
       wl = new WAVESTASH;
-      data_dispatcher.install(label, wl);
+      data_dispatcher.install(_sim->label(), wl);
     }
 
     _wavep.resize(0);
@@ -79,18 +80,20 @@ public: // OUTPUT
     for (PROBELIST::const_iterator
 	p=pr.begin(); p!=pr.end(); ++p) {
       assert(wl);
+      trace1("--", (*p)->label());
       WAVE& w = (*wl)[(*p)->label()];
       w.initialize();
       _wavep.push_back(&w);
     }
   }
-  void commit(int Flags) {
-    double x=coord(0); // can only store univariate...
+  //--------------------------------
+  void commit(double x, int Flags) {
     trace1("store out", probelist().size());
     std::vector<WAVE*>::iterator ii=_wavep.begin();
     if(Flags & ofSTORE) {
       for (PROBELIST::const_iterator p=probelist().begin();
            p!=probelist().end(); ++p){
+	trace2("commit", x,  (*p)->value());
 	(*ii)->push(x, (*p)->value());
 	++ii;
       }
@@ -98,6 +101,7 @@ public: // OUTPUT
     }else{
     }
   }
+  //-------------------------------------
 private:
   std::vector<WAVE*> _wavep;
 }p0; // OUTPUT_CMD_STORE

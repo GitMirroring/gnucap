@@ -104,7 +104,7 @@ private: // pure, unused
 private:
   void head_(){
   }
-  void commit(int Flags){
+  void commit(double /*X*/, int Flags){
     // _zap->commit(sel, Flags);
     store(Flags);
   }
@@ -124,7 +124,6 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->set_command_fourier();
   reset_timers();
   ::status.four.reset().start();
-  _sim->_axes.set_axis(0, &_sim->_freq);
 
   try {
     setup(Cmd);

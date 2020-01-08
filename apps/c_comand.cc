@@ -43,6 +43,7 @@ public:
 	command("status", Scope);
       }else{untested();
       }
+      untested();
       throw Exception("end");
       break;
     case rBATCH:

@@ -77,8 +77,12 @@ protected: // OUTPUT interface, s__out.cc
   void outinit();
   bool outset(CS&);
   void outreset();
-  void outcommit(int flags);
-  void outhead();
+  //void outcommit(double x, int flags);
+  void out_trace(double x);
+  void out_commit(double x);
+  void out_commit_hide(double x);
+  void out_keep(double x);
+  void outhead(double start, double stop, const std::string& col1);
   void outflush();
   PROBELIST const* outprobes() const; // hack
   // ...

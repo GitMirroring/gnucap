@@ -28,7 +28,6 @@
 #include "u_prblst.h"
 #include "globals.h"
 #include "u_out.h"
-#include "s__.h"
 /*--------------------------------------------------------------------------*/
 extern bool plotset;
 extern OMSTREAM plotout;
@@ -56,11 +55,10 @@ private: // OUTPUT_CMD
     OUTPUT_CMD::setup(cmd);
   }
 private: // OUTPUT
-  void head(std::string const& s){
-    OUTPUT::head(s);
+  void head(double start, double stop, const std::string& col1){
+    OUTPUT::head(start, stop, col1);
     PROBELIST const& pr=probelist();
-    assert(_sim->_axes.size());
-    normal_head(_sim->_axes[0]._label, pr);
+    normal_head(col1, pr);
   }
   void normal_head(const std::string& col1, PROBELIST const& pr)
   {
@@ -91,9 +89,8 @@ private: // OUTPUT
     out() << '\n';
   }
   // OUTPUT_CMD_PRINT::
-  void commit(int Flags)
+  void commit(double x, int Flags)
   {
-    double x = coord(0);
     PROBELIST const& pr=probelist();
     trace2("print outdata", pr.size(), Flags);
 

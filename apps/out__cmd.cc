@@ -22,23 +22,12 @@
  *------------------------------------------------------------------
  * output commands
  */
+#include "s__.h"
 #include "u_prblst.h"
 #include "u_out.h"
 #include "u_sim_data.h"
 #include "ap.h"
 #include "globals.h"
-/*--------------------------------------------------------------------------*/
-static void attach_to_all(OUTPUT* o)
-{ untested();
-  assert(o);
-  for(DISPATCHER<CARD*>::const_iterator i=command_dispatcher.begin();
-      i!=command_dispatcher.end(); ++i){ untested();
-    if(SIM* sim=dynamic_cast<SIM*>(i->second)){ untested();
-      sim->attach_output(*o);
-    }else{ untested();
-    }
-  }
-}
 /*--------------------------------------------------------------------------*/
 void OUTPUT_CMD::setup(CS& cmd)
 {
@@ -47,15 +36,7 @@ void OUTPUT_CMD::setup(CS& cmd)
   std::string s;
   cmd >> s;
   CMD* c=command_dispatcher[s];
-  if(0 && s=="all"){ untested();
-    // an idea. needs more work.
-    if(_prb){ untested();
-    }else{ untested();
-      attach_to_all(this);
-      setup_probelist("all");
-      _prb = &probelist();
-    }
-  }else if(!c){
+  if(!c){
     cmd.reset(here);
     _prb = NULL;
   }else if(SIM* sim=dynamic_cast<SIM*>(c)){
@@ -238,26 +219,6 @@ PROBELIST& OUTPUT_CMD::prblist(std::string const& reason) {
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/* OUTPUT::head: print column headings and draw plot borders
- */
-void OUTPUT::head(std::string const&)
-{
-}
-/*--------------------------------------------------------------------------*/
-void OUTPUT::init()
-{
- //  code from io_contr.cc initio goes here (?)
-}
-/*--------------------------------------------------------------------------*/
-void OUTPUT::commit(int)
-{ untested();
-}
-/*--------------------------------------------------------------------------*/
-double OUTPUT::coord(unsigned i) const{
-  return _sim->_axes.x(i);
-}
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 class CMD_PROBES : public CMD{
 public:
   void do_it(CS& cmd, CARD_LIST*){
@@ -272,7 +233,6 @@ public:
   }
 } cp;
 DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "probes", &cp);
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

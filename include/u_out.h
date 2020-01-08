@@ -21,10 +21,12 @@
  */
 #ifndef U_OUT_H
 #define U_OUT_H
-#include "s__.h"
+#include "io_.h"
+#include "c_comand.h"
 #include <set>
 /*--------------------------------------------------------------------------*/
 class PROBELIST;
+class SIM;
 /*--------------------------------------------------------------------------*/
 // attached to SIM, can store probelist, do whatever output.
 class INTERFACE OUTPUT : public CMD {
@@ -37,49 +39,27 @@ public:
     ofTRACE = 8
   };
 public: // construct
-  OUTPUT(){
-  }
-  virtual ~OUTPUT(){
-    assert(empty());
-  }
+  OUTPUT()				{}
+  virtual ~OUTPUT()			{assert(empty());}
 public: // CMD
-  OUTPUT* attach_output(OUTPUT& o){
-    return &o;
-  }
+  OUTPUT* attach_output(OUTPUT& o)	{return &o;}
 public:
-  virtual PROBELIST const* probes() const { untested();
-    return NULL;
-  }
-  virtual void reset(){
-    _out = IO::mstdout;
-    _out.reset(); // bug? check if needed
-  }
-  virtual void init();
-  virtual bool empty() const{
-    return true;
-  }
-  virtual OUTPUT* set(CS& cmd){
-    ::outset(cmd, &_out);
-    return this;
-  }
-  void set(OMSTREAM const& o){
-    _out = o;
-  }
-  // print column headings and draw plot borders
-  virtual void head(std::string const& label="");
-  // trigger data collection
-  virtual void commit(int flags)=0;
-  // eject data
-  virtual void flush() { }
-  static void purge(CKT_BASE*);
+  virtual PROBELIST const* probes() const {untested(); return NULL;}
+  virtual void reset()			{_out = IO::mstdout; _out.reset();} // bug? check if needed
+  virtual void init()			{}
+  virtual bool empty() const		{return true;}
+  virtual OUTPUT* set(CS& cmd)		{::outset(cmd, &_out); return this;}
+  void set(OMSTREAM const& o)		{_out = o;}
+
+  virtual void head(double, double, const std::string&) {}
+					// print column headings and draw plot borders
+  virtual void commit(double /*X*/, int /*Flags*/) {}	// trigger data collection
+  virtual void flush()			{}	// eject data
+  static  void purge(CKT_BASE*);
 public:
-  virtual int flags() const{ untested();
-    unreachable();
-    return -1;
-  }
+  virtual int flags() const		{untested(); unreachable(); return -1;}
 protected:
-  double coord(unsigned i) const;
-  OMSTREAM out(){ return _out; }
+  OMSTREAM out()			{return _out;}
 private:
   OMSTREAM _out;
 }; // OUTPUT

@@ -28,7 +28,6 @@
 #include "l_lib.h"
 /*--------------------------------------------------------------------------*/
 class CS;
-class OUTPUT;
 const int MAXHANDLE = CHAR_BIT*sizeof(int)-1;
 /*--------------------------------------------------------------------------*/
 class INTERFACE OMSTREAM {
@@ -66,11 +65,7 @@ public:
     }else{
     }
   }
-  OMSTREAM& operator=(const OMSTREAM& x){
-    _mask = x._mask;
-    _format = x._format;
-    return *this;
-  }
+  OMSTREAM& operator=(const OMSTREAM& x) {_mask = x._mask; _format = x._format; return *this;}
   OMSTREAM& attach(const OMSTREAM& x)	{itested();_mask |= x._mask; return *this;}
   OMSTREAM& attach(FILE* f)		{itested();return attach(OMSTREAM(f));}
   OMSTREAM& detach(const OMSTREAM& x)	{_mask &= ~(x._mask); return *this;}
@@ -109,11 +104,13 @@ class INTERFACE IO {
 public:
   static OMSTREAM mstdout;
   static OMSTREAM error;
+  static OMSTREAM plotout;		/* where to send ascii graphics */
+  static bool	  plotset;		/* plot on by default flag */
   static int	  formaat;		/* how to format io.  Basic option. */
   static bool	  incipher;		/* flag: decrypt input file */
 };
 /*--------------------------------------------------------------------------*/
-/* contrl */ INTERFACE void	   initio(OUTPUT*);
+/* contrl */ INTERFACE void	   initio(OMSTREAM&);
 	     INTERFACE void	   outreset();
 	     INTERFACE OMSTREAM*   outset(CS&,OMSTREAM*);
 /* findf */  INTERFACE std::string findfile(std::string const&,std::string const&,int);
