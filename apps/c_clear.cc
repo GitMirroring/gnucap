@@ -25,7 +25,6 @@
 
 #include "c_comand.h"
 #include "globals.h"
-#include "u_prblst.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -39,10 +38,7 @@ public:
   {
     command("unfault", Scope);
     command("unmark", Scope);
-
-    // detach all probes and uninstall probelists
     command("probes clear", Scope);
-
     command("data clear", Scope);
     command("delete all", Scope);
     command("title '", Scope);

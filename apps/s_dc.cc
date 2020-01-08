@@ -28,7 +28,6 @@
 #include "u_cardst.h"
 #include "e_elemnt.h"
 #include "s__.h"
-#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -188,7 +187,6 @@ void OP::setup(CS& Cmd)
   _sim->_freq = 0;
 
   outinit();
-  _sim->_axes.set_axis(0, _sweepval[0]);
 
   _start[0].e_val(OPT::temp_c, _scope);
   fix_args(0);
@@ -251,8 +249,6 @@ void DC::setup(CS& Cmd)
     }
   }
   _sim->_freq = 0;
-  // later: propagate all of them
-  _sim->_axes.set_axis(0, _sweepval[0]);
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::fix_args(int Nest)
@@ -382,7 +378,8 @@ void DCOP::sweep_recursive(int Nest)
       CARD_LIST::card_list.tr_accept();
       ::status.accept.stop();
       _sim->_has_op = _sim->_mode;
-      outcommit(OUTPUT::ofPRINT | OUTPUT::ofSTORE | OUTPUT::ofKEEP);
+      out_commit(*_sweepval[Nest]);
+      out_keep(*_sweepval[Nest]);
       itl = OPT::DCXFER;
     }else{
       sweep_recursive(Nest);

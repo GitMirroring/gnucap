@@ -58,43 +58,55 @@ PROBELIST const* SIM::outprobes() const
   }
 }
 /*--------------------------------------------------------------------------*/
-/* SIM::out: output the data, "keep" for ac reference
- * x = the x coordinate
- * print = selected points, "print" to screen, files, etc.
- * store = all points, for internal postprocessing, measure
- * keep = after the command is done, dcop for ac
- */
-void SIM::outcommit(int outflags)
+// trace .. show interim results
+void SIM::out_trace(double XX)
 {
   ::status.output.start();
-  if (outflags & OUTPUT::ofKEEP) {
-    _sim->keep_voltages();
-  }else{
-  }
-
-  if (!(outflags & OUTPUT::ofPRINT)) {
-    ++::status.hidden_steps;
-  }else{
-  }
-
+  ++::status.hidden_steps;
   if(_output){
-    _output->commit(outflags);
+    _output->commit(XX, OUTPUT::ofTRACE);
   }else{ untested();
-  }
-
-  if (outflags & OUTPUT::ofPRINT) {
-    _sim->reset_iteration_counter(iPRINTSTEP);
-    ::status.hidden_steps = 0;
-  }else{
   }
   ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
+// commit .. commit, print, plot, etc. data point
+void SIM::out_commit(double XX)
+{
+  ::status.output.start();
+  if(_output){
+    _output->commit(XX, OUTPUT::ofPRINT|OUTPUT::ofSTORE);
+  }else{ untested();
+  }
+  _sim->reset_iteration_counter(iPRINTSTEP);
+  ::status.hidden_steps = 0;
+  ::status.output.stop();
+}
+/*--------------------------------------------------------------------------*/
+// commit .. commit, print, plot, etc. data point
+void SIM::out_commit_hide(double XX)
+{
+  ::status.output.start();
+  ++::status.hidden_steps;
+  if(_output){
+    _output->commit(XX, OUTPUT::ofSTORE);
+  }else{ untested();
+  }
+  ::status.output.stop();
+}
+/*--------------------------------------------------------------------------*/
+// keep .. keep values to forward to AC, etc.
+void SIM::out_keep(double)
+{
+  ::status.output.start();
+  _sim->keep_voltages();
+  ::status.output.stop();
+}
+/*--------------------------------------------------------------------------*/
 // obsolete
-void SIM::outdata(double const& x, int outflags)
+void SIM::outdata(double const& x, int)
 { untested();
-  _sim->_axes.hack(&x);   // bit of a hack.
-  outcommit(outflags); // go for it.
+  out_commit(x); // go for it.
 }
 /*--------------------------------------------------------------------------*/
 /* SIM::head: print column headings and draw plot borders
@@ -102,8 +114,8 @@ void SIM::outdata(double const& x, int outflags)
  */
 void SIM::head(double start, double stop, const std::string& col1)
 {
-  _sim->_axes.set_axis(0, NULL, col1, start, stop);
-  outhead();
+  //_sim->_axes.set_axis(0, NULL, col1, start, stop);
+  outhead(start, stop, col1);
 }
 /*--------------------------------------------------------------------------*/
 void SIM::outinit()
@@ -114,10 +126,10 @@ void SIM::outinit()
   }
 }
 /*--------------------------------------------------------------------------*/
-void SIM::outhead()
+void SIM::outhead(double start, double stop, const std::string& col1)
 {
   if(_output){
-    _output->head();
+    _output->head(start, stop, col1);
   }else{ untested();
   }
 }

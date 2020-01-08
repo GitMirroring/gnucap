@@ -21,7 +21,7 @@
  *------------------------------------------------------------------
  * attach tees to simulation commands
  */
-
+#include "s__.h"
 #include "u_out.h"
 #include "u_sim_data.h"
 #include "globals.h"
@@ -66,8 +66,8 @@ private: // override OUTPUT
   }
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
-  void commit(int);
-  void head(std::string const& label);
+  void commit(double XX, int Flags);
+  void head(double, double, std::string const& label);
   void flush();
 private:
   void do_it(CS&, CARD_LIST*) { unreachable(); }
@@ -115,9 +115,9 @@ private:
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::head(std::string const&)
+void OUTPUT_TEE::head(double start, double stop, const std::string& col1)
 {
-  OUTPUT::head();
+  OUTPUT::head(start, stop, col1);
   if(empty()){
     // print something by default
     // this is to imitate pre-output behaviour
@@ -125,13 +125,12 @@ void OUTPUT_TEE::head(std::string const&)
     char format[20];
     //sprintf(format, "%%c%%-%u.%us", width, width);
     sprintf(format, "%%c%%-%us", width);
-    std::string col1=_sim->_axes[0]._label;
     out().form(format, '#', col1.c_str());
     out() << '\n';
   }else{
     for(outputs_type::const_iterator p=_outputs.begin();
         p!=_outputs.end(); ++p){
-      (*p)->head();
+      (*p)->head(start, stop, col1);
     }
   }
 }
@@ -168,13 +167,12 @@ void OUTPUT_TEE::init()
   }
 }
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::commit(int Flags)
+void OUTPUT_TEE::commit(double x, int Flags)
 {
   if(empty()){
     // legacy
     OMSTREAM o=out();
     o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
-    double x=coord(0);
     assert(x != NOT_VALID);
     o << x;
     o << '\n';
@@ -182,7 +180,7 @@ void OUTPUT_TEE::commit(int Flags)
     for(outputs_type::iterator p=_outputs.begin();
 	p!=_outputs.end(); ++p){
       assert(*p);
-      (*p)->commit(Flags);
+      (*p)->commit(x, Flags);
     }
   }
 }

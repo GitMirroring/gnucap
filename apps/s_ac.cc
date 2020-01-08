@@ -28,7 +28,6 @@
 #include "u_parameter.h"
 #include "u_prblst.h"
 #include "s__.h"
-#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -116,7 +115,6 @@ static int needslinfix;	// flag: lin option needs patch later (spice compat)
 void AC::setup(CS& Cmd)
 {
   outreset(); //BUG// don't know why this is needed
-  _sim->_axes.set_axis(0, &_sim->_freq);
 
   //temp_c = OPT::temp_c;
   // Don't set temperature.  Keep whatever was there before,
@@ -257,7 +255,7 @@ void AC::sweep()
   do {
     _sim->_jomega = COMPLEX(0., _sim->_freq * M_TWO_PI);
     solve();
-    outcommit(OUTPUT::ofPRINT | OUTPUT::ofSTORE);
+    out_commit(_sim->_freq);
   } while (next());
 }
 /*--------------------------------------------------------------------------*/

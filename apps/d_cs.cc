@@ -103,7 +103,7 @@ bool DEV_CS::do_tr()
     q_load();
     _m0.c0 = _y[0].f1;
     assert(_m0.c1 == 0.);
-  }else{
+  }else{untested();
     assert(_y[0].x  == 0.);
     assert(_y[0].f0 == 0.);
     assert(_y[0].f1 == value());

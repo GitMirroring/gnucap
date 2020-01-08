@@ -29,7 +29,6 @@
 #include "globals.h"
 #include "declare.h" // plopen
 #include "u_out.h"
-#include "s__.h"
 /*--------------------------------------------------------------------------*/
 OMSTREAM plotout; // plot.cc
 bool plotset; // plot.cc
@@ -329,19 +328,16 @@ private: // OUTPUT_CMD
     plotout = (plotset) ? IO::mstdout : OMSTREAM();
   }
 private: // OUTPUT
-  void head(std::string const& label){
-    OUTPUT::head(label);
+  void head(double start, double stop, const std::string& col1){
+    OUTPUT::head(start, stop, col1);
     PROBELIST const& pr=probelist();
     // if(0&& !plotout.any()){
     // }else
-    double start=_sim->_axes[0]._min;
-    double stop=_sim->_axes[0]._max;
     if(pr.size()){
       plopen(start, stop, pr);
     }
   }
-  void commit(int Flags){
-    double x=coord(0); // can only plot univariate
+  void commit(double x, int Flags){
     if(!(Flags & ofPRINT)){
     }else if(probelist().size()){
       plottr(x, probelist());

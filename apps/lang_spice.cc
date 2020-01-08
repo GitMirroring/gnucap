@@ -236,7 +236,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	break; // done.  have closing paren.
       }else if (index >= num_nodes) {
 	break; // done.  have maxnodes.
-      }else if (!cmd.more()) {
+      }else if (!cmd.more()) {untested();
 	break; // done.  premature end of line.
       }else if (OPT::keys_between_nodes &&
 		(cmd.umatch("poly ")
@@ -280,7 +280,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
   }catch (Exception& e) {untested();
     cmd.warn(bDANGER, here1, e.message());
   }
-  if (index < minnodes) {
+  if (index < minnodes) {untested();
     cmd.warn(bDANGER, "need " + to_string(minnodes-index) +" more nodes");
   }else{
   }
@@ -291,7 +291,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
   //assert(x->_net_nodes == index);
   
   // ground unused input nodes
-  for (int iii = index;  iii < minnodes;  ++iii) {
+  for (int iii = index;  iii < minnodes;  ++iii) {untested();
     x->set_port_to_ground(iii);
   }
   //assert(x->_net_nodes >= index);
@@ -347,7 +347,7 @@ void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* 
 
   size_t here = cmd.cursor();
   c->parse_common_obsolete_callback(cmd); //BUG//callback
-  if (cmd.stuck(&here)) {
+  if (cmd.stuck(&here)) {untested();
     cmd.warn(bDANGER, "needs a value");
   }else{
   }
@@ -500,7 +500,7 @@ void LANG_SPICE_BASE::parse_label(CS& cmd, CARD* x)
   std::string my_name;
   if (cmd >> my_name) {
     x->set_label(my_name);
-  }else{
+  }else{untested();
     x->set_label(x->id_letter() + std::string("_unnamed")); //BUG// not unique
     cmd.warn(bDANGER, "label required");
   }
@@ -771,7 +771,7 @@ void LANG_SPICE_BASE::print_type(OMSTREAM& o, const COMPONENT* x)
   assert(x);
   if (x->print_type_in_spice()) {
     o << "  " << x->dev_type();
-  }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {
+  }else if (fix_case(x->short_label()[0]) != fix_case(x->id_letter())) {untested();
     o << "  " << x->dev_type();
   }else{
     // don't print type
@@ -976,7 +976,7 @@ DISPATCHER<CMD>::INSTALL d33(&command_dispatcher, ".lib|lib", &p33);
 class CMD_INCLUDE : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)
-  {
+  {untested();
     getmerge(cmd, NO_HEADER, Scope);
   }
 } p3;

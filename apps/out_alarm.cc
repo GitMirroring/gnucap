@@ -27,7 +27,6 @@
 #include "u_prblst.h"
 #include "globals.h"
 #include "u_out.h"
-#include "s__.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -54,7 +53,7 @@ public: // OUTPUT_CMD
     return &_probe_proto;
   }
 public: // OUTPUT
-  void commit(int Flags) {
+  void commit(double, int Flags) {
     OMSTREAM o=out();
     o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
     if((Flags & ofPRINT)){
