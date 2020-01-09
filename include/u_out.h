@@ -42,7 +42,7 @@ public: // construct
   OUTPUT()				{}
   virtual ~OUTPUT()			{assert(empty());}
 public: // CMD
-  OUTPUT* attach_output(OUTPUT& o)	{return &o;}
+  OUTPUT* attach_output(OUTPUT* o)	{return o;}
 public:
   virtual PROBELIST const* probes() const {untested(); return NULL;}
   virtual void reset()			{_out = IO::mstdout; _out.reset();} // bug? check if needed
@@ -63,6 +63,48 @@ protected:
 private:
   OMSTREAM _out;
 }; // OUTPUT
+/*--------------------------------------------------------------------------*/
+class INTERFACE OUTPUT_TEE : public OUTPUT {
+public:
+  typedef std::set<OUTPUT*> outputs_type;
+private:
+  OUTPUT_TEE(OUTPUT_TEE const&){ unreachable(); }
+public: // construct
+  OUTPUT_TEE(){}
+  ~OUTPUT_TEE();
+private:
+  OUTPUT* attach_output(OUTPUT* o){
+    _outputs.insert(o);
+    return this; // <= will be attached to parent.
+  }
+  void detach_output(OUTPUT* o){
+    trace1("detach", _outputs.size());
+    _outputs.erase(o);
+    trace1("detached", _outputs.size());
+  }
+  void init();
+private: // override OUTPUT
+  PROBELIST const* probes() const{
+    if(_outputs.empty()){
+      return NULL;
+    }else{
+      // incomplete. but not better in old code.
+      return (*_outputs.begin())->probes();
+    }
+  }
+  bool empty() const{
+    return _outputs.empty();
+  }
+public: // OUTPUT. u_out.cc
+  OUTPUT* set(CS& cmd);
+  void commit(double XX, int Flags);
+  void head(double, double, std::string const& label);
+  void flush();
+private:
+  void do_it(CS&, CARD_LIST*) { unreachable(); }
+private:
+  outputs_type _outputs;
+}; // OUTPUT_TEE
 /*--------------------------------------------------------------------------*/
 class INTERFACE OUTPUT_CMD : public OUTPUT {
 protected: // types
