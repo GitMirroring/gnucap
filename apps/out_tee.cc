@@ -21,99 +21,11 @@
  *------------------------------------------------------------------
  * attach tees to simulation commands
  */
-#include "s__.h"
 #include "u_out.h"
 #include "u_sim_data.h"
 #include "globals.h"
 /*--------------------------------------------------------------------------*/
 extern bool plotset;
-namespace{
-/*--------------------------------------------------------------------------*/
-static const std::string sims_with_tee[] =
-  { "tr", "dc", "op", "ac", "fourier" };
-static const int number_sims = 5;
-/*--------------------------------------------------------------------------*/
-class INTERFACE OUTPUT_TEE : public OUTPUT {
-public:
-  typedef std::set<OUTPUT*> outputs_type;
-private:
-  OUTPUT_TEE(OUTPUT_TEE const&){ unreachable(); }
-public: // construct
-  OUTPUT_TEE(){}
-  ~OUTPUT_TEE();
-private:
-  OUTPUT* attach_output(OUTPUT& o){
-    _outputs.insert(&o);
-    return this; // <= will be attached to parent.
-  }
-  void detach_output(OUTPUT& o){
-    trace1("detach", _outputs.size());
-    _outputs.erase(&o);
-    trace1("detached", _outputs.size());
-  }
-  void init();
-private: // override OUTPUT
-  PROBELIST const* probes() const{
-    if(_outputs.empty()){
-      return NULL;
-    }else{
-      // incomplete. but not better in old code.
-      return (*_outputs.begin())->probes();
-    }
-  }
-  bool empty() const{
-    return _outputs.empty();
-  }
-public: // OUTPUT. u_out.cc
-  OUTPUT* set(CS& cmd);
-  void commit(double XX, int Flags);
-  void head(double, double, std::string const& label);
-  void flush();
-private:
-  void do_it(CS&, CARD_LIST*) { unreachable(); }
-private:
-  outputs_type _outputs;
-}; // OUTPUT_TEE
-/*--------------------------------------------------------------------------*/
-struct T{
-  T(){
-    for(unsigned i=0; i<number_sims; ++i){
-      _p[i] = do_it(sims_with_tee[i], _t[i]);
-    }
-  }
-  ~T(){
-    for(unsigned i=0; i<number_sims; ++i){
-      cleanup(_p[i], _t[i]);
-    }
-  }
-  CMD* do_it(const std::string& s, OUTPUT_TEE& t){
-    CMD* c=command_dispatcher[s];
-    if(!c){ untested();
-      // link order?
-    }else if(SIM* cs=dynamic_cast<SIM*>(c)){
-      cs->attach_output(t);
-      return c;
-    }else{
-      // unlikely.
-    }
-    return NULL;
-  }
-  void cleanup(CMD* c, OUTPUT_TEE& t){
-    if(!c){ untested();
-      // link order? gone?
-    }else if(SIM* cs=dynamic_cast<SIM*>(c)){
-      cs->detach_output(t);
-    }else{ untested();
-      // unlikely.
-    }
-  }
-private:
-  OUTPUT_TEE _t[number_sims];
-  CMD* _p[number_sims];
-} tees;
-/*--------------------------------------------------------------------------*/
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void OUTPUT_TEE::head(double start, double stop, const std::string& col1)
 {

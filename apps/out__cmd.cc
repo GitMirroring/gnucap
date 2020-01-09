@@ -22,7 +22,6 @@
  *------------------------------------------------------------------
  * output commands
  */
-#include "s__.h"
 #include "u_prblst.h"
 #include "u_out.h"
 #include "u_sim_data.h"
@@ -35,15 +34,11 @@ void OUTPUT_CMD::setup(CS& cmd)
   unsigned here = cmd.cursor();
   std::string s;
   cmd >> s;
-  CMD* c=command_dispatcher[s];
-  if(!c){
-    cmd.reset(here);
-    _prb = NULL;
-  }else if(SIM* sim=dynamic_cast<SIM*>(c)){
+  if (CMD* sim = command_dispatcher[s]) {
     trace2("attaching sink", s, short_label());
     std::string reason=short_label() + ":" + s;
 
-    container_type::iterator a=_sinks.find(c);
+    container_type::iterator a=_sinks.find(sim);
     OUTPUT_CMD* sink;
 
     if(a==_sinks.end() || !a->second){
@@ -52,7 +47,7 @@ void OUTPUT_CMD::setup(CS& cmd)
       sink = prechecked_cast<OUTPUT_CMD*>(o);
       assert(sink);
       assert(&sink->probelist() == _prb);
-      _sinks[c] = sink;
+      _sinks[sim] = sink;
       assert(sink);
     }else{
       sink = prechecked_cast<OUTPUT_CMD*>(a->second);
@@ -60,7 +55,7 @@ void OUTPUT_CMD::setup(CS& cmd)
     }
 
     sink->set_simname(s);
-    sim->attach_output(*sink);
+    sim->attach_output(sink);
     _prb = &sink->probelist();
   }else{
     cmd.reset(here);
@@ -204,8 +199,8 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
 void OUTPUT_CMD::detach_sinks(){
   for(container_type::iterator i=_sinks.begin();
       i!=_sinks.end(); ++i){
-    if(SIM* sim=dynamic_cast<SIM*>(i->first)){
-      sim->detach_output(*i->second);
+    if(CMD* sim = i->first){
+      sim->detach_output(i->second);
     }else{
       unreachable();
     }

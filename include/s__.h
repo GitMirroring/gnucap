@@ -24,6 +24,7 @@
 //testing=script,complete 2006.07.14
 #ifndef S___H
 #define S___H
+#include "u_out.h"
 #include "u_opt.h"
 #include "c_comand.h"
 /*--------------------------------------------------------------------------*/
@@ -64,7 +65,7 @@ private:
     : CMD(),_scope(NULL), _output(NULL) {unreachable(); incomplete();}
 protected:
   explicit SIM()
-    : CMD(), _scope(NULL), _output(NULL) {
+    : CMD(), _scope(NULL), _output(new OUTPUT_TEE) {
     }
 public:
   ~SIM();
@@ -104,8 +105,8 @@ private:
 	void	load_matrix();
 	void	solve_equations();
 public:
-  OUTPUT* attach_output(OUTPUT&);
-  void detach_output(OUTPUT&);
+  OUTPUT* attach_output(OUTPUT*);
+  void detach_output(OUTPUT*);
 }; // SIM
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

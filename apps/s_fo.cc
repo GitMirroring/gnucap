@@ -94,10 +94,10 @@ public:
   transient_data_tap(TRANSIENT* t, PROBELIST const* op, size_t ts,
       std::vector<COMPLEX>* fd)
     : _t(t), _outprobes(op), _timesteps(ts), _fdata(fd), _stepno(0) {
-    _t->attach_output(*this);
+    _t->attach_output(this);
   }
   ~transient_data_tap(){
-    _t->detach_output(*this);
+    _t->detach_output(this);
   }
 private: // pure, unused
   void do_it(CS&, CARD_LIST*){ unreachable(); }

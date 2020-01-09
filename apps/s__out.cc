@@ -147,20 +147,20 @@ void SIM::outflush()
   }
 }
 /*--------------------------------------------------------------------------*/
-OUTPUT* SIM::attach_output(OUTPUT& o)
+OUTPUT* SIM::attach_output(OUTPUT* o)
 {
   if(_output){
     // let output decide.
     _output = _output->attach_output(o);
   }else{
-    _output = &o;
+    _output = o;
   }
   return _output;
 }
 /*--------------------------------------------------------------------------*/
-void SIM::detach_output(OUTPUT& o)
+void SIM::detach_output(OUTPUT* o)
 {
-  if(_output == &o){
+  if(_output == o){
     _output = NULL;
   }else{
     _output->detach_output(o);
