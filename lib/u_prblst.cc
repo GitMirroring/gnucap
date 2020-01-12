@@ -90,7 +90,7 @@ void PROBELIST::listing(const std::string& label)const
     if ((*p)->param_count() != 0.) {
       // use u_lang?
       IO::mstdout.setfloatwidth(5) << '(' << (*p)->param_value(0);
-      for(unsigned i=1; i<(*p)->param_count(); ++i){
+      for(int i=1; i<(*p)->param_count(); ++i){
 	IO::mstdout << ',' << (*p)->param_value(1);
       }
       IO::mstdout << ')';

@@ -54,7 +54,7 @@ namespace TR {
 void TRANSIENT::sweep()
 {
   _sim->_phase = p_INIT_DC;
-  head(_tstart, _tstop, "Time");
+  outhead(_tstart, _tstop, "Time");
   _sim->_bypass_ok = false;
   _sim->set_inc_mode_bad();
   
@@ -98,7 +98,7 @@ void TRANSIENT::sweep()
     if (printnow) {
       //outflags = OUTPUT::ofPRINT | OUTPUT::ofSTORE | OUTPUT::ofKEEP;
       out_commit(_sim->_time0);
-      out_keep(_sim->_time0);
+      _sim->keep_voltages();
     }else{
       //outflags = OUTPUT::ofSTORE;
       out_commit_hide(_sim->_time0);
@@ -138,7 +138,7 @@ void TRANSIENT::sweep()
       if (printnow) {
 	//outflags = OUTPUT::ofPRINT | OUTPUT::ofSTORE | OUTPUT::ofKEEP;
 	out_commit(_sim->_time0);
-	out_keep(_sim->_time0);
+	_sim->keep_voltages();
       }else if (_accepted) {
 	//outflags = OUTPUT::ofSTORE;
 	out_commit_hide(_sim->_time0);

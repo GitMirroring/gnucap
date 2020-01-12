@@ -75,8 +75,7 @@ SIM::~SIM()
     _sim->uninit();
   }else{
   }
-  assert(_output);
-  delete _output;
+  delete_outputs();
 }
 /*--------------------------------------------------------------------------*/
 void SIM::reset_timers()

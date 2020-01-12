@@ -249,7 +249,7 @@ void AC::solve()
 /*--------------------------------------------------------------------------*/
 void AC::sweep()
 {
-  head(_start, _stop, "Freq");
+  outhead(_start, _stop, "Freq");
   first();
   CARD_LIST::card_list.ac_begin();
   do {

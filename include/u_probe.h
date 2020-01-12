@@ -72,14 +72,14 @@ public:
     return n;
   }
 public:
-  virtual unsigned param_count() const{
+  virtual int param_count() const{
     return 0;
   }
-  virtual std::string param_value(unsigned) const{ untested();
+  virtual std::string param_value(int) const{ untested();
     unreachable();
     return "NA";
   }
-  virtual void set_param_by_index(unsigned, double);
+  virtual void set_param_by_index(int, double);
 //  virtual std::string label() const;
   virtual double value()const = 0;
   std::string const& label() const{return short_label();}
@@ -130,10 +130,10 @@ private: // PROBE_BASE
     RANGE_PROBE* x=new RANGE_PROBE(what(), n);
     return x;
   }
-  unsigned param_count() const{
+  int param_count() const{
     return 2;
   }
-  void set_param_by_index(unsigned i, double d);
+  void set_param_by_index(int i, double d);
   double value() const{
     if(PROBE_BASE const* p=prechecked_cast<PROBE_BASE const*>(brh())){
       return p->value();
@@ -144,7 +144,7 @@ private: // PROBE_BASE
       return 99;
     }
   }
-  virtual std::string param_value(unsigned i) const{
+  virtual std::string param_value(int i) const{
     switch(i){
       case 0:
 	return to_string(_lo);

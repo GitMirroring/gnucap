@@ -65,10 +65,7 @@ io.o: io.cc ../include/io_.h ../include/l_lib.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h
 io_contr.o: io_contr.cc ../include/io_.h ../include/l_lib.h \
  ../include/md.h ../include/io_trace.h ../include/io_error.h \
- ../include/u_out.h ../include/s__.h ../include/u_opt.h ../include/mode.h \
- ../include/io_.h ../include/c_comand.h ../include/e_card.h \
- ../include/e_base.h ../include/u_prblst.h ../include/u_probe.h \
- ../include/l_compar.h ../include/ap.h
+ ../include/ap.h
 io_error.o: io_error.cc ../include/ap.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h ../include/u_opt.h \
  ../include/mode.h ../include/io_.h ../include/l_lib.h
@@ -96,8 +93,8 @@ u_nodemap.o: u_nodemap.cc ../include/e_node.h ../include/u_sim_data.h \
  ../include/io_error.h ../include/l_compar.h ../include/u_opt.h \
  ../include/mode.h ../include/io_.h ../include/l_lib.h \
  ../include/m_matrix.h ../include/l_stlextra.h ../include/e_base.h \
- ../include/u_nodemap.h ../include/u_probe.h ../include/u_status.h \
- ../include/l_timer.h
+ ../include/u_probe.h ../include/u_nodemap.h ../include/u_probe.h \
+ ../include/u_status.h ../include/l_timer.h ../include/io_error.h
 u_opt1.o: u_opt1.cc ../include/u_opt.h ../include/mode.h ../include/io_.h \
  ../include/l_lib.h ../include/md.h ../include/io_trace.h \
  ../include/io_error.h
@@ -118,9 +115,9 @@ u_prblst.o: u_prblst.cc ../include/e_cardlist.h ../include/md.h \
  ../include/u_sim_data.h ../include/constant.h ../include/l_compar.h \
  ../include/u_opt.h ../include/mode.h ../include/io_.h ../include/l_lib.h \
  ../include/m_matrix.h ../include/l_stlextra.h ../include/e_base.h \
- ../include/e_card.h ../include/u_nodemap.h ../include/ap.h \
- ../include/u_prblst.h ../include/u_probe.h ../include/globals.h \
- ../include/l_dispatcher.h ../include/ap.h
+ ../include/u_probe.h ../include/e_card.h ../include/u_nodemap.h \
+ ../include/ap.h ../include/u_prblst.h ../include/globals.h \
+ ../include/l_dispatcher.h ../include/ap.h ../include/io_error.h
 u_probe.o: u_probe.cc ../include/u_sim_data.h ../include/constant.h \
  ../include/md.h ../include/io_trace.h ../include/io_error.h \
  ../include/l_compar.h ../include/u_opt.h ../include/mode.h \
@@ -133,8 +130,9 @@ u_sim_data.o: u_sim_data.cc ../include/m_wave.h ../include/l_denoise.h \
  ../include/m_interp.h ../include/m_cpoly.h ../include/constant.h \
  ../include/l_dispatcher.h ../include/e_base.h ../include/l_stlextra.h \
  ../include/ap.h ../include/e_node.h ../include/u_sim_data.h \
- ../include/l_compar.h ../include/m_matrix.h ../include/u_nodemap.h \
- ../include/e_cardlist.h ../include/u_status.h ../include/l_timer.h
+ ../include/l_compar.h ../include/m_matrix.h ../include/u_probe.h \
+ ../include/u_nodemap.h ../include/e_cardlist.h ../include/u_status.h \
+ ../include/l_timer.h
 u_xprobe.o: u_xprobe.cc ../include/m_phase.h ../include/constant.h \
  ../include/md.h ../include/io_trace.h ../include/io_error.h \
  ../include/u_opt.h ../include/mode.h ../include/io_.h ../include/l_lib.h \
@@ -144,10 +142,11 @@ d_subckt.o: d_subckt.cc ../include/e_node.h ../include/u_sim_data.h \
  ../include/io_error.h ../include/l_compar.h ../include/u_opt.h \
  ../include/mode.h ../include/io_.h ../include/l_lib.h \
  ../include/m_matrix.h ../include/l_stlextra.h ../include/e_base.h \
- ../include/globals.h ../include/l_dispatcher.h ../include/ap.h \
- ../include/e_paramlist.h ../include/e_compon.h ../include/u_time_pair.h \
- ../include/u_parameter.h ../include/m_expression.h ../include/m_base.h \
- ../include/e_cardlist.h ../include/e_card.h ../include/e_subckt.h
+ ../include/u_probe.h ../include/globals.h ../include/l_dispatcher.h \
+ ../include/ap.h ../include/e_paramlist.h ../include/e_compon.h \
+ ../include/u_time_pair.h ../include/u_parameter.h \
+ ../include/m_expression.h ../include/m_base.h ../include/e_cardlist.h \
+ ../include/e_card.h ../include/e_subckt.h
 d_logic.o: d_logic.cc ../include/globals.h ../include/l_dispatcher.h \
  ../include/e_base.h ../include/md.h ../include/io_trace.h \
  ../include/io_error.h ../include/l_stlextra.h ../include/u_opt.h \
@@ -158,7 +157,7 @@ d_logic.o: d_logic.cc ../include/globals.h ../include/l_dispatcher.h \
  ../include/m_expression.h ../include/m_base.h ../include/e_cardlist.h \
  ../include/e_card.h ../include/u_xprobe.h ../include/d_logic.h \
  ../include/e_model.h ../include/e_elemnt.h ../include/e_node.h \
- ../include/m_cpoly.h ../include/l_denoise.h
+ ../include/u_probe.h ../include/m_cpoly.h ../include/l_denoise.h
 d_logicmod.o: d_logicmod.cc ../include/d_logic.h ../include/e_model.h \
  ../include/u_parameter.h ../include/u_opt.h ../include/mode.h \
  ../include/io_.h ../include/l_lib.h ../include/md.h \
@@ -167,8 +166,8 @@ d_logicmod.o: d_logicmod.cc ../include/d_logic.h ../include/e_model.h \
  ../include/e_cardlist.h ../include/e_card.h ../include/e_base.h \
  ../include/e_elemnt.h ../include/e_node.h ../include/u_sim_data.h \
  ../include/l_compar.h ../include/m_matrix.h ../include/l_stlextra.h \
- ../include/m_cpoly.h ../include/l_denoise.h ../include/e_compon.h \
- ../include/u_time_pair.h
+ ../include/u_probe.h ../include/m_cpoly.h ../include/l_denoise.h \
+ ../include/e_compon.h ../include/u_time_pair.h
 e_base.o: e_base.cc ../include/ap.h ../include/md.h ../include/io_trace.h \
  ../include/io_error.h ../include/globals.h ../include/l_dispatcher.h \
  ../include/e_base.h ../include/l_stlextra.h ../include/u_opt.h \
@@ -176,15 +175,14 @@ e_base.o: e_base.cc ../include/ap.h ../include/md.h ../include/io_trace.h \
  ../include/u_sim_data.h ../include/constant.h ../include/l_compar.h \
  ../include/m_matrix.h ../include/m_wave.h ../include/l_denoise.h \
  ../include/m_interp.h ../include/m_cpoly.h ../include/u_prblst.h \
- ../include/u_probe.h ../include/u_xprobe.h ../include/e_base.h \
- ../include/u_out.h ../include/s__.h ../include/c_comand.h \
- ../include/e_card.h ../include/u_prblst.h
+ ../include/u_probe.h ../include/u_xprobe.h ../include/e_base.h
 e_card.o: e_card.cc ../include/u_time_pair.h ../include/constant.h \
  ../include/md.h ../include/io_trace.h ../include/io_error.h \
  ../include/e_cardlist.h ../include/e_node.h ../include/u_sim_data.h \
  ../include/l_compar.h ../include/u_opt.h ../include/mode.h \
  ../include/io_.h ../include/l_lib.h ../include/m_matrix.h \
- ../include/l_stlextra.h ../include/e_base.h ../include/e_card.h
+ ../include/l_stlextra.h ../include/e_base.h ../include/u_probe.h \
+ ../include/e_card.h
 e_node.o: e_node.cc ../include/u_nodemap.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h ../include/d_logic.h \
  ../include/e_model.h ../include/u_parameter.h ../include/u_opt.h \
@@ -193,9 +191,9 @@ e_node.o: e_node.cc ../include/u_nodemap.h ../include/md.h \
  ../include/constant.h ../include/e_cardlist.h ../include/e_card.h \
  ../include/e_base.h ../include/e_elemnt.h ../include/e_node.h \
  ../include/u_sim_data.h ../include/l_compar.h ../include/m_matrix.h \
- ../include/l_stlextra.h ../include/m_cpoly.h ../include/l_denoise.h \
- ../include/e_compon.h ../include/u_time_pair.h ../include/e_aux.h \
- ../include/u_xprobe.h
+ ../include/l_stlextra.h ../include/u_probe.h ../include/m_cpoly.h \
+ ../include/l_denoise.h ../include/e_compon.h ../include/u_time_pair.h \
+ ../include/e_aux.h ../include/u_xprobe.h
 e_model.o: e_model.cc ../include/e_compon.h ../include/u_sim_data.h \
  ../include/constant.h ../include/md.h ../include/io_trace.h \
  ../include/io_error.h ../include/l_compar.h ../include/u_opt.h \
@@ -211,36 +209,39 @@ e_compon.o: e_compon.cc ../include/u_lang.h ../include/e_base.h \
  ../include/m_base.h ../include/ap.h ../include/constant.h \
  ../include/e_cardlist.h ../include/e_card.h ../include/e_elemnt.h \
  ../include/e_node.h ../include/u_sim_data.h ../include/l_compar.h \
- ../include/m_matrix.h ../include/l_stlextra.h ../include/m_cpoly.h \
- ../include/l_denoise.h ../include/e_compon.h ../include/u_time_pair.h
+ ../include/m_matrix.h ../include/l_stlextra.h ../include/u_probe.h \
+ ../include/m_cpoly.h ../include/l_denoise.h ../include/e_compon.h \
+ ../include/u_time_pair.h
 e_elemnt.o: e_elemnt.cc ../include/m_divdiff.h ../include/u_xprobe.h \
  ../include/constant.h ../include/md.h ../include/io_trace.h \
  ../include/io_error.h ../include/e_aux.h ../include/e_node.h \
  ../include/u_sim_data.h ../include/l_compar.h ../include/u_opt.h \
  ../include/mode.h ../include/io_.h ../include/l_lib.h \
  ../include/m_matrix.h ../include/l_stlextra.h ../include/e_base.h \
- ../include/e_elemnt.h ../include/m_cpoly.h ../include/l_denoise.h \
- ../include/e_compon.h ../include/u_time_pair.h ../include/u_parameter.h \
- ../include/m_expression.h ../include/m_base.h ../include/ap.h \
- ../include/e_cardlist.h ../include/e_card.h
+ ../include/u_probe.h ../include/e_elemnt.h ../include/m_cpoly.h \
+ ../include/l_denoise.h ../include/e_compon.h ../include/u_time_pair.h \
+ ../include/u_parameter.h ../include/m_expression.h ../include/m_base.h \
+ ../include/ap.h ../include/e_cardlist.h ../include/e_card.h
 e_ccsrc.o: e_ccsrc.cc ../include/e_ccsrc.h ../include/e_elemnt.h \
  ../include/e_node.h ../include/u_sim_data.h ../include/constant.h \
  ../include/md.h ../include/io_trace.h ../include/io_error.h \
  ../include/l_compar.h ../include/u_opt.h ../include/mode.h \
  ../include/io_.h ../include/l_lib.h ../include/m_matrix.h \
- ../include/l_stlextra.h ../include/e_base.h ../include/m_cpoly.h \
- ../include/l_denoise.h ../include/e_compon.h ../include/u_time_pair.h \
- ../include/u_parameter.h ../include/m_expression.h ../include/m_base.h \
- ../include/ap.h ../include/e_cardlist.h ../include/e_card.h
+ ../include/l_stlextra.h ../include/e_base.h ../include/u_probe.h \
+ ../include/m_cpoly.h ../include/l_denoise.h ../include/e_compon.h \
+ ../include/u_time_pair.h ../include/u_parameter.h \
+ ../include/m_expression.h ../include/m_base.h ../include/ap.h \
+ ../include/e_cardlist.h ../include/e_card.h
 e_storag.o: e_storag.cc ../include/e_storag.h ../include/e_elemnt.h \
  ../include/e_node.h ../include/u_sim_data.h ../include/constant.h \
  ../include/md.h ../include/io_trace.h ../include/io_error.h \
  ../include/l_compar.h ../include/u_opt.h ../include/mode.h \
  ../include/io_.h ../include/l_lib.h ../include/m_matrix.h \
- ../include/l_stlextra.h ../include/e_base.h ../include/m_cpoly.h \
- ../include/l_denoise.h ../include/e_compon.h ../include/u_time_pair.h \
- ../include/u_parameter.h ../include/m_expression.h ../include/m_base.h \
- ../include/ap.h ../include/e_cardlist.h ../include/e_card.h
+ ../include/l_stlextra.h ../include/e_base.h ../include/u_probe.h \
+ ../include/m_cpoly.h ../include/l_denoise.h ../include/e_compon.h \
+ ../include/u_time_pair.h ../include/u_parameter.h \
+ ../include/m_expression.h ../include/m_base.h ../include/ap.h \
+ ../include/e_cardlist.h ../include/e_card.h
 e_paramlist.o: e_paramlist.cc ../include/e_paramlist.h \
  ../include/e_compon.h ../include/u_sim_data.h ../include/constant.h \
  ../include/md.h ../include/io_trace.h ../include/io_error.h \
@@ -255,18 +256,18 @@ e_cardlist.o: e_cardlist.cc ../include/u_time_pair.h \
  ../include/io_error.h ../include/e_node.h ../include/u_sim_data.h \
  ../include/l_compar.h ../include/u_opt.h ../include/mode.h \
  ../include/io_.h ../include/l_lib.h ../include/m_matrix.h \
- ../include/l_stlextra.h ../include/e_base.h ../include/u_nodemap.h \
- ../include/e_model.h ../include/u_parameter.h ../include/m_expression.h \
- ../include/m_base.h ../include/ap.h ../include/e_cardlist.h \
- ../include/e_card.h
+ ../include/l_stlextra.h ../include/e_base.h ../include/u_probe.h \
+ ../include/u_nodemap.h ../include/e_model.h ../include/u_parameter.h \
+ ../include/m_expression.h ../include/m_base.h ../include/ap.h \
+ ../include/e_cardlist.h ../include/e_card.h
 bm_cond.o: bm_cond.cc ../include/globals.h ../include/l_dispatcher.h \
  ../include/e_base.h ../include/md.h ../include/io_trace.h \
  ../include/io_error.h ../include/l_stlextra.h ../include/u_opt.h \
  ../include/mode.h ../include/io_.h ../include/l_lib.h ../include/ap.h \
  ../include/e_elemnt.h ../include/e_node.h ../include/u_sim_data.h \
  ../include/constant.h ../include/l_compar.h ../include/m_matrix.h \
- ../include/m_cpoly.h ../include/l_denoise.h ../include/e_compon.h \
- ../include/u_time_pair.h ../include/u_parameter.h \
+ ../include/u_probe.h ../include/m_cpoly.h ../include/l_denoise.h \
+ ../include/e_compon.h ../include/u_time_pair.h ../include/u_parameter.h \
  ../include/m_expression.h ../include/m_base.h ../include/e_cardlist.h \
  ../include/e_card.h ../include/bm.h
 bm_value.o: bm_value.cc ../include/globals.h ../include/l_dispatcher.h \
@@ -284,10 +285,10 @@ bm.o: bm.cc ../include/globals.h ../include/l_dispatcher.h \
  ../include/mode.h ../include/io_.h ../include/l_lib.h ../include/ap.h \
  ../include/u_lang.h ../include/e_elemnt.h ../include/e_node.h \
  ../include/u_sim_data.h ../include/constant.h ../include/l_compar.h \
- ../include/m_matrix.h ../include/m_cpoly.h ../include/l_denoise.h \
- ../include/e_compon.h ../include/u_time_pair.h ../include/u_parameter.h \
- ../include/m_expression.h ../include/m_base.h ../include/e_cardlist.h \
- ../include/e_card.h ../include/bm.h
+ ../include/m_matrix.h ../include/u_probe.h ../include/m_cpoly.h \
+ ../include/l_denoise.h ../include/e_compon.h ../include/u_time_pair.h \
+ ../include/u_parameter.h ../include/m_expression.h ../include/m_base.h \
+ ../include/e_cardlist.h ../include/e_card.h ../include/bm.h
 c__cmd.o: c__cmd.cc ../include/u_status.h ../include/mode.h \
  ../include/io_.h ../include/l_lib.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h ../include/l_timer.h \

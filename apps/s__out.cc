@@ -95,29 +95,6 @@ void SIM::out_commit_hide(double XX)
   ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
-// keep .. keep values to forward to AC, etc.
-void SIM::out_keep(double)
-{
-  ::status.output.start();
-  _sim->keep_voltages();
-  ::status.output.stop();
-}
-/*--------------------------------------------------------------------------*/
-// obsolete
-void SIM::outdata(double const& x, int)
-{ untested();
-  out_commit(x); // go for it.
-}
-/*--------------------------------------------------------------------------*/
-/* SIM::head: print column headings and draw plot borders
- * obsolete version, all output functions start with "out"
- */
-void SIM::head(double start, double stop, const std::string& col1)
-{
-  //_sim->_axes.set_axis(0, NULL, col1, start, stop);
-  outhead(start, stop, col1);
-}
-/*--------------------------------------------------------------------------*/
 void SIM::outinit()
 {
   if(_output){
@@ -147,15 +124,13 @@ void SIM::outflush()
   }
 }
 /*--------------------------------------------------------------------------*/
-OUTPUT* SIM::attach_output(OUTPUT* o)
+void SIM::attach_output(OUTPUT* o)
 {
   if(_output){
-    // let output decide.
-    _output = _output->attach_output(o);
+    _output->attach_output(o);
   }else{
     _output = o;
   }
-  return _output;
 }
 /*--------------------------------------------------------------------------*/
 void SIM::detach_output(OUTPUT* o)
@@ -165,6 +140,18 @@ void SIM::detach_output(OUTPUT* o)
   }else{
     _output->detach_output(o);
   }
+}
+/*--------------------------------------------------------------------------*/
+void SIM::attach_new_tee()
+{
+  _output = new OUTPUT_TEE;
+}
+/*--------------------------------------------------------------------------*/
+void SIM::delete_outputs()
+{
+  assert(_output);
+  delete _output;
+  _output = NULL;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

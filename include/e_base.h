@@ -31,8 +31,6 @@ class XPROBE;
 class WAVE;
 class OMSTREAM;
 class SIM_DATA;
-class PROBE_LISTS;
-class PROBELIST;
 class PROBE_BASE;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {

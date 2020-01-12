@@ -113,7 +113,7 @@ void CMD::command(const std::string& cs, CARD_LIST* scope)
   CMD* c = command_dispatcher[s];
   if (c) {
     c->do_it(cmd, scope);
-  }else{ untested();
+  }else{
     error(bDEBUG, "bad internal command: " + s + '\n');
   }
 }

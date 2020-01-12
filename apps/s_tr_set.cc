@@ -147,8 +147,11 @@ void TRANSIENT::setup(CS& Cmd)
 
   // snap to last time, so the intent is clear, even if
   // _tstart has been converted to string and back.
-  if(fabs(_tstart - _sim->_last_time) < _sim->_dtmin*.01){
-    _tstart = _sim->_last_time;
+  if (fabs(_tstart - _sim->_last_time) < _sim->_dtmin*.01) {
+    if (_tstart != _sim->_last_time) { //BUG// not sure if this is good or not
+      _tstart = _sim->_last_time;
+    }else{
+    }
   }else{
   }
 
@@ -184,7 +187,6 @@ void TRANSIENT::setup(CS& Cmd)
 void TRANSIENT::options(CS& Cmd)
 {
   outreset();
-
   _sim->_temp_c = OPT::temp_c;
   _sim->_uic = _cold = false;
   _trace = tNONE;
