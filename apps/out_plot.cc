@@ -30,11 +30,7 @@
 #include "declare.h" // plopen
 #include "u_out.h"
 /*--------------------------------------------------------------------------*/
-OMSTREAM plotout; // plot.cc
-bool plotset; // plot.cc
-/*--------------------------------------------------------------------------*/
 namespace {
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 	void	plottr(double,const PROBELIST&);
 	int	plopen(double,double,const PROBELIST&);
@@ -103,7 +99,7 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
 int plopen(double start, double stop, const PROBELIST& plotlist)
 {
   if (start == stop) {
-    plotout = OMSTREAM();
+    IO::plotout = OMSTREAM();
   }
 #if 0
   if (!IO::plotout.any()) {untested();
@@ -129,7 +125,7 @@ void plclose(void)
   }
   plborder();
   active = false;
-  plotout = OMSTREAM();
+  IO::plotout = OMSTREAM();
 }
 /*--------------------------------------------------------------------------*/
 #if 0
@@ -148,7 +144,7 @@ void plclear(void)
  */
 static void plborder(void)
 {
-  plotout.tab(INDENT) << border << '\n';
+  IO::plotout.tab(INDENT) << border << '\n';
 }
 /*--------------------------------------------------------------------------*/
 /* calibrate: calibrate the y axis.  ascii plot.
@@ -184,7 +180,7 @@ static void calibrate(PROBE_BASE const& prb)
   /* *strchr(&highs[2],' ') = '\0'; */	    /* make the top label, and save */
   stop = OUTWIDTH - static_cast<int>(strlen(highs)) - 1; /* space for it. */
   
-  plotout << prb.label();
+  IO::plotout << prb.label();
   range = hi - lo;
   filled = 0;
   for (markno = 0.;  markno < OPT::ydivisions;  markno++) {
@@ -198,12 +194,12 @@ static void calibrate(PROBE_BASE const& prb)
     cal = round_to_int(INDENT + CONSSCALE * (markno/OPT::ydivisions));
     start = cal - (numsize+1)/2;
     if (start > filled  &&  start+numsize < stop) {
-      plotout.tab(start) << nums;		 /* if it fits, print it */
+      IO::plotout.tab(start) << nums;		 /* if it fits, print it */
       filled = start + numsize ;
     }else{untested();
     }
   }
-  plotout.tab(stop) << highs << '\n';    /* print the last calibration */
+  IO::plotout.tab(stop) << highs << '\n';    /* print the last calibration */
 }
 /*--------------------------------------------------------------------------*/
 static int round_to_int(double x)
@@ -291,8 +287,8 @@ static void plotarg(
     adata[point(zz,zlo,zhi,CONSSCALE,0,1)] = '+';/* zap data into string */
   }
   adata[point(yy,ylo,yhi,CONSSCALE,0,1)] = '*';
-  plotout.form( "%-8.8s%s", xxs, adata );
-  plotout << '\n';
+  IO::plotout.form( "%-8.8s%s", xxs, adata );
+  IO::plotout << '\n';
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -318,20 +314,20 @@ public:
   }
 private: // OUTPUT_CMD
   void setup(CS& cmd) {
-    plotset = true;
+    IO::plotset = true;
     OUTPUT_CMD::setup(cmd);
   }
   virtual PROBE_BASE const* probe_proto() const{
     return &_probe_proto;
   }
   void init(){
-    plotout = (plotset) ? IO::mstdout : OMSTREAM();
+    IO::plotout = (IO::plotset) ? IO::mstdout : OMSTREAM();
   }
 private: // OUTPUT
   void head(double start, double stop, const std::string& col1){
     OUTPUT::head(start, stop, col1);
     PROBELIST const& pr=probelist();
-    // if(0&& !plotout.any()){
+    // if(0&& !IO::plotout.any()){
     // }else
     if(pr.size()){
       plopen(start, stop, pr);

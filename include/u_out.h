@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+//testing=script 2020.01.11
 #ifndef U_OUT_H
 #define U_OUT_H
 #include "io_.h"
@@ -41,8 +42,6 @@ public:
 public: // construct
   OUTPUT()				{}
   virtual ~OUTPUT()			{assert(empty());}
-public: // CMD
-  OUTPUT* attach_output(OUTPUT* o)	{return o;}
 public:
   virtual PROBELIST const* probes() const {untested(); return NULL;}
   virtual void reset()			{_out = IO::mstdout; _out.reset();} // bug? check if needed
@@ -53,11 +52,9 @@ public:
 
   virtual void head(double, double, const std::string&) {}
 					// print column headings and draw plot borders
-  virtual void commit(double /*X*/, int /*Flags*/) {}	// trigger data collection
+  virtual void commit(double /*X*/, int /*Flags*/) {untested();}	// trigger data collection
   virtual void flush()			{}	// eject data
   static  void purge(CKT_BASE*);
-public:
-  virtual int flags() const		{untested(); unreachable(); return -1;}
 protected:
   OMSTREAM out()			{return _out;}
 private:
@@ -68,20 +65,13 @@ class INTERFACE OUTPUT_TEE : public OUTPUT {
 public:
   typedef std::set<OUTPUT*> outputs_type;
 private:
-  OUTPUT_TEE(OUTPUT_TEE const&){ unreachable(); }
+  OUTPUT_TEE(OUTPUT_TEE const&)		{unreachable();}
 public: // construct
-  OUTPUT_TEE(){}
+  OUTPUT_TEE()				{}
   ~OUTPUT_TEE();
 private:
-  OUTPUT* attach_output(OUTPUT* o){
-    _outputs.insert(o);
-    return this; // <= will be attached to parent.
-  }
-  void detach_output(OUTPUT* o){
-    trace1("detach", _outputs.size());
-    _outputs.erase(o);
-    trace1("detached", _outputs.size());
-  }
+  void attach_output(OUTPUT* o)		{_outputs.insert(o);}
+  void detach_output(OUTPUT* o)		{_outputs.erase(o);}
   void init();
 private: // override OUTPUT
   PROBELIST const* probes() const{
@@ -92,9 +82,7 @@ private: // override OUTPUT
       return (*_outputs.begin())->probes();
     }
   }
-  bool empty() const{
-    return _outputs.empty();
-  }
+  bool empty() const			{return _outputs.empty();}
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
   void commit(double XX, int Flags);
@@ -111,21 +99,13 @@ protected: // types
   typedef std::map<CMD*, OUTPUT*> container_type;
   typedef PROBE_BASE probe_type;
 public:
-  OUTPUT_CMD()
-    : OUTPUT(), _prb(NULL)
-  {
-  }
+  OUTPUT_CMD() : OUTPUT(), _prb(NULL) {}
 protected:
-  OUTPUT_CMD(OUTPUT_CMD const& p)
-    : OUTPUT(p), _prb(p._prb)
-  {
-  }
+  OUTPUT_CMD(OUTPUT_CMD const& p) : OUTPUT(p), _prb(p._prb)  {}
 private:
   static PROBELIST& prblist(std::string const& reason);
 protected:
-  void setup_probelist(std::string const& reason){
-    _prb = &prblist(reason);
-  }
+  void setup_probelist(std::string const& reason) {_prb = &prblist(reason);}
   virtual ~OUTPUT_CMD() {
     detach_sinks();
     for(container_type::const_iterator i=_sinks.begin();
@@ -136,34 +116,17 @@ protected:
 
   virtual OUTPUT* clone() const=0;
 protected:
-  PROBELIST const& probelist() const {
-    assert(_prb);
-    return *_prb;
-  }
-  PROBELIST& probelist() {
-    assert(_prb);
-    return *_prb;
-  }
+  PROBELIST const& probelist() const	{assert(_prb); return *_prb;}
+  PROBELIST&	   probelist()		{assert(_prb); return *_prb;}
   virtual void setup(CS&);
 public:
-  std::string const& simname() const {
-    return _simname;
-  }
-  void set_simname(const std::string& s){
-    _simname = s;
-  }
+  std::string const& simname() const	{return _simname;}
+  void set_simname(const std::string& s){_simname = s;}
 public:
   void do_it(CS&, CARD_LIST*);
-  virtual PROBE_BASE const* probe_proto() const{
-    return NULL;
-  }
+  virtual PROBE_BASE const* probe_proto() const{return NULL;}
 private: // OUTPUT
-  PROBELIST const* probes() const{
-    return _prb;
-  }
-  bool empty() const{
-    return false;
-  }
+  PROBELIST const* probes() const	{return _prb;}
   void detach_sinks();
 private:
   std::string _simname; // required for listing probes..
@@ -172,9 +135,6 @@ protected:
   container_type _sinks;
 }; // OUTPUT_CMD
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-void attach_output(OUTPUT& output, SIM& to); // apps/u_out.cc
-void detach_output(OUTPUT& output, SIM& to); // apps/u_out.cc
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:

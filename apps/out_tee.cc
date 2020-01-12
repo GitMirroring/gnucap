@@ -25,8 +25,6 @@
 #include "u_sim_data.h"
 #include "globals.h"
 /*--------------------------------------------------------------------------*/
-extern bool plotset;
-/*--------------------------------------------------------------------------*/
 void OUTPUT_TEE::head(double start, double stop, const std::string& col1)
 {
   OUTPUT::head(start, stop, col1);
@@ -57,7 +55,7 @@ OUTPUT* OUTPUT_TEE::set(CS& cs)
 {
   trace2("outset TEE", cs.tail(), _outputs.size());
 
-  Get(cs, "pl{ot}", &plotset)
+  Get(cs, "pl{ot}", &IO::plotset)
     || OUTPUT::set(cs); // parser hidden here.
 
   // propagate (necessary?)

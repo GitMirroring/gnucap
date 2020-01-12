@@ -30,7 +30,7 @@
 /*--------------------------------------------------------------------------*/
 bool PROBE_BASE::operator==(const CKT_BASE& b)const
 {
-  if(PROBE_BASE const* p=dynamic_cast<PROBE_BASE const*>(brh())){ untested();
+  if(PROBE_BASE const* p=dynamic_cast<PROBE_BASE const*>(brh())){
     return *p==b;
   }else{
     return (brh() == &b);
@@ -63,7 +63,7 @@ void PROBE_BASE::detach()
   _brh = NULL;
 }
 /*--------------------------------------------------------------------------*/
-void PROBE_BASE::set_param_by_index(unsigned, double){ untested();
+void PROBE_BASE::set_param_by_index(int, double){ untested();
    // pass string value, use PARAMETERs?
   incomplete(); // currently
 }
@@ -87,7 +87,7 @@ RANGE_PROBE::RANGE_PROBE(const RANGE_PROBE& p)
   incomplete();
 }
 /*--------------------------------------------------------------------------*/
-void RANGE_PROBE::set_param_by_index(unsigned i, double d){
+void RANGE_PROBE::set_param_by_index(int i, double d){
   switch(i){
     case 0:
       _lo = d;

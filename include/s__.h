@@ -24,7 +24,6 @@
 //testing=script,complete 2006.07.14
 #ifndef S___H
 #define S___H
-#include "u_out.h"
 #include "u_opt.h"
 #include "c_comand.h"
 /*--------------------------------------------------------------------------*/
@@ -65,8 +64,7 @@ private:
     : CMD(),_scope(NULL), _output(NULL) {unreachable(); incomplete();}
 protected:
   explicit SIM()
-    : CMD(), _scope(NULL), _output(new OUTPUT_TEE) {
-    }
+    : CMD(), _scope(NULL), _output(NULL) {attach_new_tee();}
 public:
   ~SIM();
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
@@ -86,11 +84,12 @@ protected: // OUTPUT interface, s__out.cc
   void outhead(double start, double stop, const std::string& col1);
   void outflush();
   PROBELIST const* outprobes() const; // hack
-  // ...
-protected: // obsolete wrappers.
-  void outdata(double const&, int);
-  void head(double,double,const std::string&);
 public:
+  void attach_output(OUTPUT*);
+  void detach_output(OUTPUT*);
+private:
+  void attach_new_tee();
+  void delete_outputs();
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:				/* s__solve.cc */
   bool	solve(OPT::ITL,TRACE);
@@ -104,9 +103,6 @@ private:
 	void	set_damp();
 	void	load_matrix();
 	void	solve_equations();
-public:
-  OUTPUT* attach_output(OUTPUT*);
-  void detach_output(OUTPUT*);
 }; // SIM
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

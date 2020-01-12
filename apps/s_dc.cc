@@ -36,7 +36,7 @@ public:
   void	finish();
 protected:
   void	fix_args(int);
-  void	options(CS&, unsigned nest);
+  void	options(CS&, int);
 private:
   void	sweep();
   void	sweep_recursive(int);
@@ -49,7 +49,7 @@ protected:
   
 protected:
   enum {DCNEST = 4};
-  unsigned _n_sweeps;
+  int _n_sweeps;
   PARAMETER<double> _start[DCNEST];
   PARAMETER<double> _stop[DCNEST];
   PARAMETER<double> _step_in[DCNEST];
@@ -135,7 +135,6 @@ DCOP::DCOP()
   
   //BUG// in SIM.  should be initialized there.
   //_sim->_genout=0.;
-  // _out=IO::mstdout;
   //_sim->_uic=false;
 }
 /*--------------------------------------------------------------------------*/
@@ -144,7 +143,7 @@ void DCOP::finish(void)
   // SIM::finish(); // why not?
   outflush();
 
-  for (unsigned ii=0; ii<_n_sweeps; ++ii) {
+  for (int ii = 0;  ii < _n_sweeps;  ++ii) {
     if (_zap[ii]) { // component
       _stash[ii].restore();
       _zap[ii]->dec_probes();
@@ -161,7 +160,6 @@ void OP::setup(CS& Cmd)
   _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
-
   outreset();
 
   _zap[0] = NULL;
@@ -180,7 +178,7 @@ void OP::setup(CS& Cmd)
   _step[0] = 0.;
   _sim->_genout = 0.;
 
-  options(Cmd, 0);
+  options(Cmd,0);
 
   _n_sweeps = 1;
   Cmd.check(bWARNING, "what's this?");
@@ -197,7 +195,6 @@ void DC::setup(CS& Cmd)
   _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
-
   outreset();
 
   if (Cmd.more()) {
@@ -225,18 +222,18 @@ void DC::setup(CS& Cmd)
       }
       
       _sim->_genout = 0.;
-      options(Cmd, _n_sweeps);
+      options(Cmd,_n_sweeps);
     }
-  }else{
+  }else{ 
   }
   Cmd.check(bWARNING, "what's this?");
 
   outinit();
 
   assert(_n_sweeps > 0);
-  for (unsigned ii=0; ii<_n_sweeps; ++ii) {
+  for (int ii = 0;  ii < _n_sweeps;  ++ii) {
     _start[ii].e_val(0., _scope);
-    fix_args(int(ii));
+    fix_args(ii);
 
     if (_zap[ii]) { // component
       _stash[ii] = _zap[ii];			// stash the std value
@@ -301,7 +298,7 @@ void DCOP::fix_args(int Nest)
   }
 }
 /*--------------------------------------------------------------------------*/
-void DCOP::options(CS& Cmd, unsigned Nest)
+void DCOP::options(CS& Cmd, int Nest)
 {
   _sim->_uic = _loop[Nest] = _reverse_in[Nest] = false;
   size_t here = Cmd.cursor();
@@ -340,7 +337,7 @@ void DCOP::options(CS& Cmd, unsigned Nest)
 /*--------------------------------------------------------------------------*/
 void DCOP::sweep()
 {
-  head(_start[0], _stop[0], " ");
+  outhead(_start[0], _stop[0], " ");
   _sim->_bypass_ok = false;
   _sim->set_inc_mode_bad();
   if (_cont) {untested();
@@ -350,7 +347,7 @@ void DCOP::sweep()
     _sim->clear_limit();
     CARD_LIST::card_list.tr_begin();
   }
-  sweep_recursive(int(_n_sweeps));
+  sweep_recursive(_n_sweeps);
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::sweep_recursive(int Nest)
@@ -379,7 +376,7 @@ void DCOP::sweep_recursive(int Nest)
       ::status.accept.stop();
       _sim->_has_op = _sim->_mode;
       out_commit(*_sweepval[Nest]);
-      out_keep(*_sweepval[Nest]);
+      _sim->keep_voltages();
       itl = OPT::DCXFER;
     }else{
       sweep_recursive(Nest);

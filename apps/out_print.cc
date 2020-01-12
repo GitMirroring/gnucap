@@ -29,9 +29,6 @@
 #include "globals.h"
 #include "u_out.h"
 /*--------------------------------------------------------------------------*/
-extern bool plotset;
-extern OMSTREAM plotout;
-/*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
 // OUTPUT_CMD_PRINT: print the list of results (text form) to out()
@@ -51,7 +48,7 @@ private: // OUTPUT_CMD
     return new OUTPUT_CMD_PRINT(*this);
   }
   void setup(CS& cmd) {
-    plotset = false;
+    IO::plotset = false;
     OUTPUT_CMD::setup(cmd);
   }
 private: // OUTPUT
@@ -69,7 +66,7 @@ private: // OUTPUT
     }else if(!pr.size()){
       // nothing to do.
       return;
-    }else if (plotout.any()) {
+    }else if (IO::plotout.any()) {
       // plotting is active, suppress any other output
       return;
     }else{
@@ -95,7 +92,7 @@ private: // OUTPUT
     trace2("print outdata", pr.size(), Flags);
 
     if(!(Flags & ( ofPRINT | ofTRACE ))){
-    }else if (plotout.any() /*&& plt.has_probes()*/
+    }else if (IO::plotout.any() /*&& plt.has_probes()*/
 	      && !(CKT_BASE::_sim->command_is_op())){
       // this is a hack from s_ac..
     }else{
