@@ -1,5 +1,3 @@
 pmos opp gate 
 ppp: rsh - rs - rd conflict: using rsh
 ppp: is - js conflict
-#          
- 27.       

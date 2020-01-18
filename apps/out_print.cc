@@ -23,8 +23,7 @@
  * set up print (select points, maintain probe lists)
  * command line operations
  */
-#include "u_sim_data.h"
-#include "c_comand.h"
+//testing=script,complete 2020.01.15
 #include "u_prblst.h"
 #include "globals.h"
 #include "u_out.h"
@@ -35,82 +34,54 @@ namespace {
 // The argument is the first column (independent variable, aka "x")
 class OUTPUT_CMD_PRINT : public OUTPUT_CMD {
 private:
-  OUTPUT_CMD_PRINT(const OUTPUT_CMD_PRINT&p)
-    : OUTPUT_CMD(p)
-  {
-  }
+  int _threshold;
+  OUTPUT_CMD_PRINT(const OUTPUT_CMD_PRINT&p) : OUTPUT_CMD(p), _threshold(dl_NONE) {}
 public:
-  OUTPUT_CMD_PRINT() : OUTPUT_CMD() {
-    set_label("print");
-  }
+  OUTPUT_CMD_PRINT() : OUTPUT_CMD() {set_label("print");}
 private: // OUTPUT_CMD
-  OUTPUT_CMD* clone() const{
-    return new OUTPUT_CMD_PRINT(*this);
-  }
-  void setup(CS& cmd) {
-    IO::plotset = false;
-    OUTPUT_CMD::setup(cmd);
-  }
+  OUTPUT_CMD* clone() const {return new OUTPUT_CMD_PRINT(*this);}
+  void setup(CS& cmd) {IO::plotset = false; OUTPUT_CMD::setup(cmd);}
 private: // OUTPUT
-  void head(double start, double stop, const std::string& col1){
-    OUTPUT::head(start, stop, col1);
-    PROBELIST const& pr=probelist();
-    normal_head(col1, pr);
-  }
-  void normal_head(const std::string& col1, PROBELIST const& pr)
-  {
-    trace1("print head", col1);
+  void init(int Level)  {_threshold=Level;}
 
-    if(CKT_BASE::_sim->analysis_is_dcop()){
-      // print anyway
-    }else if(!pr.size()){
-      // nothing to do.
-      return;
+  void head(double, double, const std::string& col1){
+    trace1("print head", col1);
+    if (IO::plotout.any()) {
+      // plotting is active, suppress any other output
+    }else{
+      int width = std::min(OPT::numdgt+5, BIGBUFLEN-10);
+      char format[20];
+      //sprintf(format, "%%c%%-%u.%us", width, width);
+      sprintf(format, "%%c%%-%us", width);
+      
+      out().form(format, '#', col1.c_str());
+      
+      PROBELIST const& pr=probelist();
+      for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
+	out().form(format, ' ', (*p)->label().c_str());
+      }
+      out() << '\n';
+    }
+  }
+
+  void commit(double XX, int Level)  {
+    if (Level < _threshold) {
     }else if (IO::plotout.any()) {
       // plotting is active, suppress any other output
-      return;
-    }else{
-    }
-
-    int width = std::min(OPT::numdgt+5, BIGBUFLEN-10);
-    char format[20];
-    //sprintf(format, "%%c%%-%u.%us", width, width);
-    sprintf(format, "%%c%%-%us", width);
-
-    out().form(format, '#', col1.c_str());
-
-    for (PROBELIST::const_iterator
-	p=pr.begin(); p!=pr.end(); ++p) {
-      out().form(format, ' ', (*p)->label().c_str());
-    }
-    out() << '\n';
-  }
-  // OUTPUT_CMD_PRINT::
-  void commit(double x, int Flags)
-  {
-    PROBELIST const& pr=probelist();
-    trace2("print outdata", pr.size(), Flags);
-
-    if(!(Flags & ( ofPRINT | ofTRACE ))){
-    }else if (IO::plotout.any() /*&& plt.has_probes()*/
-	      && !(CKT_BASE::_sim->command_is_op())){
-      // this is a hack from s_ac..
     }else{
       OMSTREAM o=out();
       o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
-      assert(x != NOT_VALID);
-      if(Flags & ofTRACE){
-	o << -static_cast<double>(_sim->iteration_number());
-      }else{
-	o << x;
-      }
-      for (PROBELIST::const_iterator
-	    p=pr.begin(); p!=pr.end(); ++p) {
+      o << XX;
+
+      PROBELIST const& pr=probelist();
+      for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
 	o << (*p)->value();
       }
       o << '\n';
     }
   }
+
+  void flush()  {}
 };
 OUTPUT_CMD_PRINT p3;
 DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "iprint|print|probe", &p3);

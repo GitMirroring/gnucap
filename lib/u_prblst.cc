@@ -21,7 +21,7 @@
  *------------------------------------------------------------------
  * probe list functions
  */
-//testing=script,sparse 2006.07.14
+//testing=obsolete
 #include "e_cardlist.h"
 #include "e_node.h"
 #include "e_card.h"
@@ -33,7 +33,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 PROBE_LISTS::~PROBE_LISTS()
-{
+{untested();
   // clear command does that.
   assert(probe_dispatcher.begin()==probe_dispatcher.end());
 }
@@ -48,7 +48,7 @@ void PROBE_LISTS::clear()
       P->clear();
       delete P;
       probe_dispatcher.uninstall(i);
-    }else if(i->second){ untested();
+    }else if(i->second){untested(); untested();
       unreachable();
     }else{
     }
@@ -57,7 +57,7 @@ void PROBE_LISTS::clear()
 /*--------------------------------------------------------------------------*/
 PROBELIST& PROBE_LISTS::get(std::string const& reason)
 {
-  if(PROBELIST* p=probe_dispatcher[reason]){
+  if(PROBELIST* p=probe_dispatcher[reason]){untested();
     trace1("probelist exists", reason);
     return *p;
   }else{
@@ -75,7 +75,7 @@ void PROBE_LISTS::purge(CKT_BASE* brh)
     PROBELIST* l=prechecked_cast<PROBELIST*>(i->second);
     if(l){
       l->remove_one(brh);
-    }else{ untested();
+    }else{untested(); untested();
       // uninstalled already
     }
   }

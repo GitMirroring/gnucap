@@ -23,85 +23,66 @@
  * set up print and plot (select points, maintain probe lists)
  * command line operations
  */
+//testing=script 2020.01.14
 #include "u_sim_data.h"
-#include "c_comand.h"
+#include "m_wave.h"
 #include "u_prblst.h"
 #include "globals.h"
-#include "m_wave.h"
 #include "u_out.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 class OUTPUT_CMD_STORE : public OUTPUT_CMD {
 private:
-  explicit OUTPUT_CMD_STORE(const OUTPUT_CMD_STORE&p)
-    : OUTPUT_CMD(p)
-  {
-  }
+  explicit OUTPUT_CMD_STORE(const OUTPUT_CMD_STORE&p) : OUTPUT_CMD(p) {}
 public:
-  virtual ~OUTPUT_CMD_STORE(){ }
-  OUTPUT_CMD_STORE() : OUTPUT_CMD() {
-    set_label("store");
-  }
+  OUTPUT_CMD_STORE() : OUTPUT_CMD() {set_label("store");}
+  virtual ~OUTPUT_CMD_STORE() {}
 public: // OUTPUT_CMD
-  OUTPUT_CMD* clone() const{
-    return new OUTPUT_CMD_STORE(*this);
-  }
+  OUTPUT_CMD* clone() const {return new OUTPUT_CMD_STORE(*this);}
 public: // OUTPUT
+  void init(int) {}
+
   // allocate space for output data
-  //--------------------------------
-  void head(double start, double stop, const std::string& col1)
+  void head(double, double, const std::string&)
   {
-    std::string label;
-    if(col1==""){untested();
-      // fallback to legacy spice
-      label = _sim->label();
-    }else{
-      label = col1;
-    }
-    trace0(label);
-    OUTPUT::head(start, stop, label);
-    PROBELIST const& pr=probelist();
-    CKT_BASE* data = data_dispatcher[_sim->label()];
-    WAVESTASH* wl;
-    if(WAVESTASH* w=dynamic_cast<WAVESTASH*>(data)){
-      // already there.
-      wl = w;
-    }else{
+    WAVESTASH* data = data_dispatcher[_sim->label()];
+    if(!data){
       // wrong type or not there, put new one
-      wl = new WAVESTASH;
-      data_dispatcher.install(_sim->label(), wl);
+      data = new WAVESTASH;
+      data_dispatcher.install(_sim->label(), data);
+    }else{
     }
+    assert(data);
 
     _wavep.resize(0);
 
-    for (PROBELIST::const_iterator
-	p=pr.begin(); p!=pr.end(); ++p) {
-      assert(wl);
+    PROBELIST const& pr=probelist();
+    for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
       trace1("--", (*p)->label());
-      WAVE& w = (*wl)[(*p)->label()];
-      w.initialize();
-      _wavep.push_back(&w);
+      WAVE& w = (*data)[(*p)->label()]; // allocate or find
+      w.initialize(); // needed if reusing
+      _wavep.push_back(&w); // build index
     }
+    assert(_wavep.size() == pr.size());
   }
-  //--------------------------------
-  void commit(double x, int Flags) {
-    trace1("store out", probelist().size());
-    std::vector<WAVE*>::iterator ii=_wavep.begin();
-    if(Flags & ofSTORE) {
-      for (PROBELIST::const_iterator p=probelist().begin();
-           p!=probelist().end(); ++p){
-	trace2("commit", x,  (*p)->value());
-	(*ii)->push(x, (*p)->value());
+
+  void commit(double XX, int Level) {
+    if (Level < dl_ACCEPTED) {
+    }else{
+      trace1("store out", probelist().size());
+      std::vector<WAVE*>::iterator ii=_wavep.begin();
+      PROBELIST const& pr=probelist();
+      for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p){
+	trace2("commit", XX,  (*p)->value());
+	(*ii)->push(XX, (*p)->value());
 	++ii;
       }
       assert(ii==_wavep.end());
-    }else{
     }
   }
-  //-------------------------------------
+
+  void flush() {}
 private:
   std::vector<WAVE*> _wavep;
 }p0; // OUTPUT_CMD_STORE

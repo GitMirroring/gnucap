@@ -73,13 +73,10 @@ protected:
 	 void	reset_timers();	
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected: // OUTPUT interface, s__out.cc
-  void outinit();
+  void outinit(TRACE);
   bool outset(CS&);
   void outreset();
-  //void outcommit(double x, int flags);
-  void out_trace(double x);
-  void out_commit(double x);
-  void out_commit_hide(double x);
+  void out_commit(double x, int level);
   void out_keep(double x);
   void outhead(double start, double stop, const std::string& col1);
   void outflush();
@@ -92,8 +89,8 @@ private:
   void delete_outputs();
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:				/* s__solve.cc */
-  bool	solve(OPT::ITL,TRACE);
-  bool	solve_with_homotopy(OPT::ITL,TRACE);
+  bool	solve(OPT::ITL);
+  bool	solve_with_homotopy(OPT::ITL);
   void	advance_time();
 private:
 	void	finish_building_evalq();

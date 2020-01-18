@@ -184,7 +184,7 @@ void OP::setup(CS& Cmd)
   Cmd.check(bWARNING, "what's this?");
   _sim->_freq = 0;
 
-  outinit();
+  outinit(_trace);
 
   _start[0].e_val(OPT::temp_c, _scope);
   fix_args(0);
@@ -228,7 +228,7 @@ void DC::setup(CS& Cmd)
   }
   Cmd.check(bWARNING, "what's this?");
 
-  outinit();
+  outinit(_trace);
 
   assert(_n_sweeps > 0);
   for (int ii = 0;  ii < _n_sweeps;  ++ii) {
@@ -365,7 +365,7 @@ void DCOP::sweep_recursive(int Nest)
 	CARD_LIST::card_list.precalc_last();
       }else{
       }
-      int converged = solve_with_homotopy(itl,_trace);
+      int converged = solve_with_homotopy(itl);
       if (!converged) {untested();
 	error(bWARNING, "did not converge\n");
       }else{
@@ -375,8 +375,10 @@ void DCOP::sweep_recursive(int Nest)
       CARD_LIST::card_list.tr_accept();
       ::status.accept.stop();
       _sim->_has_op = _sim->_mode;
-      out_commit(*_sweepval[Nest]);
+      out_commit(*_sweepval[Nest], dl_STROBE);
       _sim->keep_voltages();
+      _sim->reset_iteration_counter(iPRINTSTEP);
+      ::status.hidden_steps = 0;
       itl = OPT::DCXFER;
     }else{
       sweep_recursive(Nest);

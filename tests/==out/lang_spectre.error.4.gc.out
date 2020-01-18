@@ -10,5 +10,3 @@ subckt zero (n0 n1 n2 n3 n4)
 ends zero
 
 X1 (1 2) crash 
-#          
- 27.       

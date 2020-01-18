@@ -82,7 +82,7 @@ void TRANSIENT::sweep()
     _sim->_loadq.clear(); // fake solve, clear the queue
     //BUG// UIC needs further analysis.
   }else{
-    _converged = solve_with_homotopy(OPT::DCBIAS,_trace);
+    _converged = solve_with_homotopy(OPT::DCBIAS);
     if (!_converged) {
       error(bWARNING, "did not converge\n");
     }else{
@@ -94,14 +94,14 @@ void TRANSIENT::sweep()
   
   {
     bool printnow = (_sim->_time0 == _tstart || _trace >= tALLTIME);
-    //int outflags = OUTPUT::ofNONE;
     if (printnow) {
-      //outflags = OUTPUT::ofPRINT | OUTPUT::ofSTORE | OUTPUT::ofKEEP;
-      out_commit(_sim->_time0);
+      out_commit(_sim->_time0, dl_STROBE);
       _sim->keep_voltages();
+      _sim->reset_iteration_counter(iPRINTSTEP);
+      ::status.hidden_steps = 0;
     }else{
-      //outflags = OUTPUT::ofSTORE;
-      out_commit_hide(_sim->_time0);
+      ++::status.hidden_steps;
+      out_commit(_sim->_time0, dl_ACCEPTED);
     }
   }
   
@@ -109,7 +109,7 @@ void TRANSIENT::sweep()
     _sim->_bypass_ok = false;
     _sim->_phase = p_TRAN;
     _sim->_genout = gen();
-    _converged = solve(OPT::TRHIGH,_trace);
+    _converged = solve(OPT::TRHIGH);
 
     _accepted = _converged && review();
 
@@ -134,22 +134,21 @@ void TRANSIENT::sweep()
 	|| (_accepted && (_trace >= tALLTIME
 			  || step_cause() == scUSER
 			  || (!_tstrobe.has_hard_value() && _sim->_time0+_sim->_dtmin > _tstart)));
-      //int outflags = OUTPUT::ofNONE;
       if (printnow) {
-	//outflags = OUTPUT::ofPRINT | OUTPUT::ofSTORE | OUTPUT::ofKEEP;
-	out_commit(_sim->_time0);
+	out_commit(_sim->_time0, dl_STROBE);
 	_sim->keep_voltages();
+	_sim->reset_iteration_counter(iPRINTSTEP);
+	::status.hidden_steps = 0;
       }else if (_accepted) {
-	//outflags = OUTPUT::ofSTORE;
-	out_commit_hide(_sim->_time0);
+	++::status.hidden_steps;
+	out_commit(_sim->_time0, dl_ACCEPTED);
       }else{
+	out_commit(_sim->_time0, dl_REJECTED);
       }
-      //outcommit(_sim->_time0, outflags);
     }
     
     if (!_converged && OPT::quitconvfail) {untested();
-      //outcommit(_sim->_time0, OUTPUT::ofPRINT);
-      out_trace(_sim->_time0);
+      out_commit(_sim->_time0, dl_REJECTED);
       throw Exception("convergence failure, giving up");
     }else{
     }

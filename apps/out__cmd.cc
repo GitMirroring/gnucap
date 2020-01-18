@@ -22,11 +22,11 @@
  *------------------------------------------------------------------
  * output commands
  */
-#include "u_prblst.h"
-#include "u_out.h"
+//testing=script 2020.01.16
 #include "u_sim_data.h"
-#include "ap.h"
+#include "u_prblst.h"
 #include "globals.h"
+#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 void OUTPUT_CMD::setup(CS& cmd)
 {
@@ -40,7 +40,6 @@ void OUTPUT_CMD::setup(CS& cmd)
 
     container_type::iterator a=_sinks.find(sim);
     OUTPUT_CMD* sink;
-
     if(a==_sinks.end() || !a->second){
       setup_probelist(reason);
       OUTPUT* o=clone();
@@ -71,36 +70,32 @@ static void probeargs(CS& cmd,
 {
   double a0, a1;
   bool have_args=false;
-
   if (cmd.skip1b('(')) {
     // extra probe parameters (such as range)
     a0 = cmd.ctof();
     a1 = cmd.ctof();
     have_args = true;
+    if (!cmd.skip1b(')')) {untested();
+      cmd.check(bWARNING, "need )");
+    }else{
+    }
   }else{
+    have_args=false;
   }
 
   for (; p!=e; ++p) {
     PROBE_BASE const* cP=dynamic_cast<PROBE_BASE const*>(*p);
     PROBE_BASE* P=const_cast<PROBE_BASE*>(cP);
-
     if(wrap){
       P = wrap->new_wrap(P);
       *p = P;
     }else{
     }
-
     if(have_args){
       P->set_param_by_index(0, a0);
       P->set_param_by_index(1, a1);
     }else{
     }
-
-  }
-  if (!have_args) {
-  }else if (!cmd.skip1b(')')) {
-    cmd.check(bWARNING, "need )");
-  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -112,7 +107,7 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
   enum {aADD, aDELETE, aNEW} action;
 
   if (cmd.match1('-')) {untested();	/* handle .probe - ac ...... */
-    action = aDELETE;		/* etc. 		     */
+    action = aDELETE;			/* etc. 		     */
     cmd.skip();
   }else if (cmd.match1('+')) {untested();
     action = aADD;
@@ -136,26 +131,26 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
 	PROBELIST const& pl=S->probelist();
 	pl.listing(S->simname());
       }
-    }else if (cmd.umatch("clear ")) {
+    }else if (cmd.umatch("clear ")) {untested();
       // clear all
-      for(container_type::const_iterator i=_sinks.begin(); i!=_sinks.end(); ++i){
+      for(container_type::const_iterator i=_sinks.begin(); i!=_sinks.end(); ++i){untested();
 	OUTPUT_CMD* S=prechecked_cast<OUTPUT_CMD*>(i->second);
 	assert(S);
 	PROBELIST& pl=S->probelist();
 	pl.clear();
       }
       detach_sinks();
-    }else{untested();				/* error */
+    }else{untested();
       throw Exception_CS("what's this?", cmd);
     }
   }else{
-    if (cmd.is_end()) {		/* list */
+    if (cmd.is_end()) {				/* list */
       _prb->listing("");
     }else if (cmd.umatch("clear ")) {
       _prb->clear();
     }else{					/* add/remove */
       CKT_BASE::_sim->init();
-      if (cmd.match1('-')) {		/* setup cases like: */
+      if (cmd.match1('-')) {			/* setup cases like: */
 	action = aDELETE;			/* .probe ac + ....  */
 	cmd.skip();
       }else if (cmd.match1('+')) {
@@ -164,7 +159,7 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
       }else{
       }
       if (action == aNEW) {			/* no +/- here or at beg. */
-	_prb->clear();		/* means clear first	  */
+	_prb->clear();				/* means clear first	  */
 	action = aADD;
       }else{
       }
@@ -196,12 +191,12 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
   }
 }
 /*--------------------------------------------------------------------------*/
-void OUTPUT_CMD::detach_sinks(){
-  for(container_type::iterator i=_sinks.begin();
-      i!=_sinks.end(); ++i){
-    if(CMD* sim = i->first){
+void OUTPUT_CMD::detach_sinks()
+{
+  for (container_type::iterator i=_sinks.begin(); i!=_sinks.end(); ++i) {
+    if (CMD* sim = i->first) {
       sim->detach_output(i->second);
-    }else{
+    }else{untested();
       unreachable();
     }
     delete i->second;
@@ -209,7 +204,8 @@ void OUTPUT_CMD::detach_sinks(){
   }
 }
 /*--------------------------------------------------------------------------*/
-PROBELIST& OUTPUT_CMD::prblist(std::string const& reason) {
+PROBELIST& OUTPUT_CMD::prblist(std::string const& reason)
+{
   return PROBE_LISTS::get(reason);
 }
 /*--------------------------------------------------------------------------*/
@@ -219,9 +215,9 @@ public:
   void do_it(CS& cmd, CARD_LIST*){
     if (cmd.umatch("clear ")) {
       PROBE_LISTS::clear();
-    }else if (cmd.umatch("list ")) { untested();
+    }else if (cmd.umatch("list ")) {untested();
       incomplete();
-    }else{ untested();
+    }else{untested();
       incomplete();
       // later
     }

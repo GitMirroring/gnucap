@@ -34,6 +34,15 @@ inline OMSTREAM& operator<<(OMSTREAM& o, smode_t t) {
   return (o << s[t]);
 }
 
+enum DATALEVEL {
+  dl_NONE,	// nothing
+  dl_ITERATING,	// not yet converged, iterating
+  dl_REJECTED,	// rejected data points
+  dl_ACCEPTED,	// all good points, possibly out of x range
+  dl_INRANGE,	// all good points, in x range
+  dl_STROBE,	// strobe or fixed step
+};
+
 enum SIM_MODE { // simulation types
   s_NONE,	/* not doing anything, reset by cmd interpreter	*/
   s_AC,  	/* AC analysis					*/

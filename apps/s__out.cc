@@ -45,7 +45,7 @@ void SIM::outreset()
 {
   if(_output){
     _output->reset();
-  }else{
+  }else{untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -53,52 +53,36 @@ PROBELIST const* SIM::outprobes() const
 {
   if(_output){
     return _output->probes();
-  }else{
+  }else{untested();
     return NULL;
   }
 }
 /*--------------------------------------------------------------------------*/
-// trace .. show interim results
-void SIM::out_trace(double XX)
-{
-  ::status.output.start();
-  ++::status.hidden_steps;
-  if(_output){
-    _output->commit(XX, OUTPUT::ofTRACE);
-  }else{ untested();
-  }
-  ::status.output.stop();
-}
-/*--------------------------------------------------------------------------*/
 // commit .. commit, print, plot, etc. data point
-void SIM::out_commit(double XX)
+void SIM::out_commit(double XX, int Level)
 {
   ::status.output.start();
   if(_output){
-    _output->commit(XX, OUTPUT::ofPRINT|OUTPUT::ofSTORE);
-  }else{ untested();
-  }
-  _sim->reset_iteration_counter(iPRINTSTEP);
-  ::status.hidden_steps = 0;
-  ::status.output.stop();
-}
-/*--------------------------------------------------------------------------*/
-// commit .. commit, print, plot, etc. data point
-void SIM::out_commit_hide(double XX)
-{
-  ::status.output.start();
-  ++::status.hidden_steps;
-  if(_output){
-    _output->commit(XX, OUTPUT::ofSTORE);
+    _output->commit(XX, Level);
   }else{ untested();
   }
   ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
-void SIM::outinit()
+void SIM::outinit(TRACE Trace)
 {
+  DATALEVEL dl;
+  switch (Trace) {
+  case tNONE:	    dl=dl_STROBE; break;
+  case tUNDER:	    dl=dl_STROBE; break;
+  case tALLTIME:    dl=dl_ACCEPTED; break;
+  case tREJECTED:   dl=dl_REJECTED; break;
+  case tITERATION:  dl=dl_ITERATING; break;
+  case tVERBOSE:    dl=dl_NONE; break;
+  }
+
   if(_output){
-    _output->init();
+    _output->init(dl);
   }else{ untested();
   }
 }
@@ -128,14 +112,14 @@ void SIM::attach_output(OUTPUT* o)
 {
   if(_output){
     _output->attach_output(o);
-  }else{
+  }else{untested();
     _output = o;
   }
 }
 /*--------------------------------------------------------------------------*/
 void SIM::detach_output(OUTPUT* o)
 {
-  if(_output == o){
+  if(_output == o){untested();
     _output = NULL;
   }else{
     _output->detach_output(o);

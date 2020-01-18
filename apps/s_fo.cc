@@ -102,13 +102,18 @@ public:
 private: // pure, unused
   void do_it(CS&, CARD_LIST*){ unreachable(); }
 private:
-  void head_(){
+  void init(int){}
+  void head(double, double, const std::string&){}
+
+  void commit(double /*X*/, int Level){
+    if (Level >= dl_STROBE) {
+      store();
+    }else{
+    }
   }
-  void commit(double /*X*/, int Flags){
-    // _zap->commit(sel, Flags);
-    store(Flags);
-  }
-  void store(int);
+
+  void flush(){}
+  void store();
 private:
   TRANSIENT* _t;
   PROBELIST const* _outprobes;
@@ -171,10 +176,9 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
 /*--------------------------------------------------------------------------*/
 /* store: stash time domain data in preparation for Fourier Transform
  */
-void transient_data_tap::store(int flag)
+void transient_data_tap::store()
 {
-  if (! (flag & ofPRINT)){
-  }else if (_outprobes){ itested();
+  if (_outprobes){
     int ii = 0;
     for (PROBELIST::const_iterator p=_outprobes->begin();
          p!=_outprobes->end(); ++p) {

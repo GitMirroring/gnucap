@@ -154,19 +154,17 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
 /*static*/ WAVE const* CKT_BASE::find_wave(const std::string& probe_name)
 {
   trace2("find_wave", probe_name, _sim->label());
-  CKT_BASE* wl = data_dispatcher[_sim->label()];
-//  CKT_BASE* wl = _sim->_current?
-  if(!wl){untested();
-  }else if(WAVESTASH* WL=dynamic_cast<WAVESTASH*>(wl)){
-    WAVESTASH::const_iterator w = WL->find(probe_name);
-    if(w!=WL->end()) {
-      return &(w->second);
-    }else{
-    }
-  }else{ untested();
-  }
 
-  return NULL;
+  if (WAVESTASH* data = data_dispatcher[_sim->label()]) {
+    WAVESTASH::const_iterator wi = data->find(probe_name);
+    if (wi != data->end()) {
+      return &(wi->second);
+    }else{
+      return NULL;
+    }
+  }else{untested();
+    return NULL;
+  }
 }
 /*--------------------------------------------------------------------------*/
 namespace legacy{

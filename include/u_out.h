@@ -31,29 +31,19 @@ class SIM;
 /*--------------------------------------------------------------------------*/
 // attached to SIM, can store probelist, do whatever output.
 class INTERFACE OUTPUT : public CMD {
-public:
-  enum OUTFLAGS { // bit fields
-    ofNONE  = 0,
-    ofPRINT = 1,
-    ofSTORE = 2,
-    ofKEEP  = 4,
-    ofTRACE = 8
-  };
 public: // construct
   OUTPUT()				{}
-  virtual ~OUTPUT()			{assert(empty());}
+  virtual ~OUTPUT()			{}
 public:
   virtual PROBELIST const* probes() const {untested(); return NULL;}
   virtual void reset()			{_out = IO::mstdout; _out.reset();} // bug? check if needed
-  virtual void init()			{}
-  virtual bool empty() const		{return true;}
   virtual OUTPUT* set(CS& cmd)		{::outset(cmd, &_out); return this;}
   void set(OMSTREAM const& o)		{_out = o;}
 
-  virtual void head(double, double, const std::string&) {}
-					// print column headings and draw plot borders
-  virtual void commit(double /*X*/, int /*Flags*/) {untested();}	// trigger data collection
-  virtual void flush()			{}	// eject data
+  virtual void init(int)=0;
+  virtual void head(double, double, const std::string&)=0;
+  virtual void commit(double X, int Level)=0;
+  virtual void flush()=0;
   static  void purge(CKT_BASE*);
 protected:
   OMSTREAM out()			{return _out;}
@@ -72,7 +62,6 @@ public: // construct
 private:
   void attach_output(OUTPUT* o)		{_outputs.insert(o);}
   void detach_output(OUTPUT* o)		{_outputs.erase(o);}
-  void init();
 private: // override OUTPUT
   PROBELIST const* probes() const{
     if(_outputs.empty()){
@@ -82,11 +71,11 @@ private: // override OUTPUT
       return (*_outputs.begin())->probes();
     }
   }
-  bool empty() const			{return _outputs.empty();}
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
-  void commit(double XX, int Flags);
+  void init(int);
   void head(double, double, std::string const& label);
+  void commit(double X, int Level);
   void flush();
 private:
   void do_it(CS&, CARD_LIST*) { unreachable(); }

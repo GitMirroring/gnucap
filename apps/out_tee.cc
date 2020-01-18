@@ -21,34 +21,21 @@
  *------------------------------------------------------------------
  * attach tees to simulation commands
  */
+//testing=script,complete 2020.01.14
+#include "ap.h"
 #include "u_out.h"
-#include "u_sim_data.h"
-#include "globals.h"
 /*--------------------------------------------------------------------------*/
 void OUTPUT_TEE::head(double start, double stop, const std::string& col1)
 {
-  OUTPUT::head(start, stop, col1);
-  if(empty()){
-    // print something by default
-    // this is to imitate pre-output behaviour
-    int width=std::min(OPT::numdgt+5, BIGBUFLEN-10);
-    char format[20];
-    //sprintf(format, "%%c%%-%u.%us", width, width);
-    sprintf(format, "%%c%%-%us", width);
-    out().form(format, '#', col1.c_str());
-    out() << '\n';
-  }else{
-    for(outputs_type::const_iterator p=_outputs.begin();
-        p!=_outputs.end(); ++p){
-      (*p)->head(start, stop, col1);
-    }
+  for(outputs_type::const_iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
+    assert(*p);
+    (*p)->head(start, stop, col1);
   }
 }
 /*--------------------------------------------------------------------------*/
 OUTPUT_TEE::~OUTPUT_TEE()
 {
   trace1("~tee", _outputs.size());
-  assert(empty());
 }
 /*--------------------------------------------------------------------------*/
 OUTPUT* OUTPUT_TEE::set(CS& cs)
@@ -59,46 +46,34 @@ OUTPUT* OUTPUT_TEE::set(CS& cs)
     || OUTPUT::set(cs); // parser hidden here.
 
   // propagate (necessary?)
-  for(outputs_type::iterator p=_outputs.begin();
-      p!=_outputs.end(); ++p){
+  for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
     assert(*p);
     (*p)->set(out());
   }
   return this;
 }
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::init()
+void OUTPUT_TEE::init(int Dl)
 {
-  for(outputs_type::iterator p=_outputs.begin();
-      p!=_outputs.end(); ++p){
+  for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
     assert(*p);
     (*p)->set(out()); // BUG? here?
-    (*p)->init();
+    (*p)->init(Dl);
   }
 }
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::commit(double x, int Flags)
+void OUTPUT_TEE::commit(double x, int Level)
 {
-  if(empty()){
-    // legacy
-    OMSTREAM o=out();
-    o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
-    assert(x != NOT_VALID);
-    o << x;
-    o << '\n';
-  }else{
-    for(outputs_type::iterator p=_outputs.begin();
-	p!=_outputs.end(); ++p){
-      assert(*p);
-      (*p)->commit(x, Flags);
-    }
+  for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
+    assert(*p);
+    (*p)->commit(x, Level);
   }
 }
 /*--------------------------------------------------------------------------*/
 void OUTPUT_TEE::flush()
 {
-  for(outputs_type::iterator p=_outputs.begin();
-      p!=_outputs.end(); ++p){
+  for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
+    assert(*p);
     (*p)->flush();
   }
 }

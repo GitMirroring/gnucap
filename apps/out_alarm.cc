@@ -22,8 +22,7 @@
  * alarm command
  * print a message when a probe is out of range
  */
-#include "u_sim_data.h"
-#include "c_comand.h"
+//testing=script 2020.01.14
 #include "u_prblst.h"
 #include "globals.h"
 #include "u_out.h"
@@ -35,32 +34,25 @@ class OUTPUT_CMD_ALARM : public OUTPUT_CMD {
 private:
   typedef RANGE_PROBE probe_type;
 private:
-  OUTPUT_CMD_ALARM(OUTPUT_CMD const&p)
-    : OUTPUT_CMD(p)
-  { untested();
-  }
+  OUTPUT_CMD_ALARM(OUTPUT_CMD_ALARM const&p) : OUTPUT_CMD(p) {}
 public:
-  OUTPUT_CMD_ALARM() : OUTPUT_CMD() {
-    set_label("alarm");
-  }
-  virtual ~OUTPUT_CMD_ALARM(){
-  }
+  OUTPUT_CMD_ALARM() : OUTPUT_CMD() {set_label("alarm");}
+  virtual ~OUTPUT_CMD_ALARM() {}
 public: // OUTPUT_CMD
-  OUTPUT_CMD* clone() const{
-    return new OUTPUT_CMD_ALARM(*this);
-  }
-  virtual PROBE_BASE const* probe_proto() const{
-    return &_probe_proto;
-  }
+  OUTPUT_CMD* clone() const {return new OUTPUT_CMD_ALARM(*this);}
+  PROBE_BASE const* probe_proto() const {return &_probe_proto;}
 public: // OUTPUT
-  void commit(double, int Flags) {
-    OMSTREAM o=out();
-    o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
-    if((Flags & ofPRINT)){
-      for (PROBELIST::const_iterator p=probelist().begin();
-           p!=probelist().end(); ++p){
+  void init(int){}
+  void head(double, double, const std::string&) {}
+
+  void commit(double, int Level) {
+    if (Level < dl_ACCEPTED) {
+    }else{
+      OMSTREAM o=out();
+      o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
+      for (PROBELIST::const_iterator p=probelist().begin(); p!=probelist().end(); ++p){
 	probe_type const* q=dynamic_cast<probe_type const*>(*p);
-	if(!q){ untested();
+	if(!q){untested();
 	}else if (!q->in_range()) {
 	  o << (*p)->label() << "=" << (*p)->value() << '\n';
 	}else{
@@ -68,6 +60,8 @@ public: // OUTPUT
       }
     }
   }
+
+  void flush() {}
 private:
   static probe_type _probe_proto;
 }p1;
