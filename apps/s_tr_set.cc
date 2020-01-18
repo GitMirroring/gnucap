@@ -229,7 +229,7 @@ void TRANSIENT::options(CS& Cmd)
   }else{
   }
 
-  outinit();
+  outinit(_trace);
 
   _dtmax_in.e_val(BIGBIG, _scope);
   _dtmin_in.e_val(OPT::dtmin, _scope);

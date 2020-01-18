@@ -1,6 +1,4 @@
 schmitt ckt - ecl compatible schmitt trigger 
-#          
- 27.       
 #Time       v(1)       v(3)       v(5)       v(6)      
  0.        -1.6       -0.2597    -1.2206    -1.1106    
  20.n      -1.59      -0.25966   -1.2206    -1.1105    

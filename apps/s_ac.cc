@@ -224,7 +224,7 @@ void AC::setup(CS& Cmd)
   }else{
   }
 
-  outinit();
+  outinit(tALLTIME);
 }
 /*--------------------------------------------------------------------------*/
 void AC::solve()
@@ -255,7 +255,7 @@ void AC::sweep()
   do {
     _sim->_jomega = COMPLEX(0., _sim->_freq * M_TWO_PI);
     solve();
-    out_commit(_sim->_freq);
+    out_commit(_sim->_freq, dl_STROBE);
   } while (next());
 }
 /*--------------------------------------------------------------------------*/

@@ -4,5 +4,3 @@ X1 1 2 crash
 subckt crash ()
 ends crash
 
-#          
- 27.       

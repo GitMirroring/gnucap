@@ -21,7 +21,6 @@
  *------------------------------------------------------------------
  */
 #include "c_comand.h"
-#include "u_parameter.h"
 #include "globals.h"
 #include "m_wave.h"
 /*--------------------------------------------------------------------------*/
@@ -35,13 +34,13 @@ public:
     cmd >> what;
 
     if(what=="clear"){
-      for(DISPATCHER<CARD*>::const_iterator
+      for(DISPATCHER<WAVESTASH*>::const_iterator
 	    i=data_dispatcher.begin(); i!=data_dispatcher.end(); ++i){
 	if (WAVESTASH* L=dynamic_cast<WAVESTASH*>(i->second)) {
 	  L->clear();
 	  delete L;
 	  data_dispatcher.uninstall(i);
-	}else if (i->second){untested();
+	}else if(i->second){ untested();
 	  unreachable();
 	}else{untested();
 	}

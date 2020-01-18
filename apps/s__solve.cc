@@ -39,7 +39,7 @@
 /*--------------------------------------------------------------------------*/
 static bool converged = false;
 /*--------------------------------------------------------------------------*/
-bool SIM::solve(OPT::ITL itl, TRACE trace)
+bool SIM::solve(OPT::ITL itl)
 {
   assert(_sim->_loadq.empty());
   converged = false;
@@ -51,9 +51,7 @@ bool SIM::solve(OPT::ITL itl, TRACE trace)
   _sim->_damp = OPT::dampmax;
  
   do{
-    if (trace >= tITERATION) {
-      out_trace(static_cast<double>(_sim->iteration_number()));
-    }
+      out_commit(-static_cast<double>(_sim->iteration_number()), dl_ITERATING);
     set_flags();
     clear_arrays();
     finish_building_evalq();
@@ -93,9 +91,9 @@ bool SIM::solve(OPT::ITL itl, TRACE trace)
   return converged;
 }
 /*--------------------------------------------------------------------------*/
-bool SIM::solve_with_homotopy(OPT::ITL itl, TRACE trace)
+bool SIM::solve_with_homotopy(OPT::ITL itl)
 {
-  solve(itl, trace);
+  solve(itl);
   trace2("plain", _sim->_iter[iSTEP], OPT::gmin);
   if (!converged && OPT::itl[OPT::SSTEP] > 0) {
     int save_itermin = OPT::itermin;
@@ -105,7 +103,7 @@ bool SIM::solve_with_homotopy(OPT::ITL itl, TRACE trace)
     while (_sim->_iter[iPRINTSTEP] < OPT::itl[OPT::SSTEP] && OPT::gmin > save_gmin) {
       //CARD_LIST::card_list.precalc();
       _sim->set_inc_mode_no();
-      solve(itl, trace);
+      solve(itl);
       if (!converged) {
 	trace2("fail", _sim->_iter[iSTEP], OPT::gmin);
 	OPT::gmin *= 3.5;
@@ -117,7 +115,7 @@ bool SIM::solve_with_homotopy(OPT::ITL itl, TRACE trace)
     OPT::itermin = save_itermin;
     OPT::gmin = save_gmin;
     //CARD_LIST::card_list.precalc();
-    solve(itl, trace);
+    solve(itl);
     if (!converged) {
       trace2("final fail", _sim->_iter[iSTEP], OPT::gmin);
     }else{

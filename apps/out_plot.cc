@@ -23,11 +23,10 @@
  * set up ascii plot (select points, maintain probe lists)
  * command line operations
  */
-#include "u_sim_data.h"
-#include "c_comand.h"
+//testing=script 2020.01.14
+#include "constant.h"
 #include "u_prblst.h"
 #include "globals.h"
-#include "declare.h" // plopen
 #include "u_out.h"
 /*--------------------------------------------------------------------------*/
 namespace {
@@ -67,7 +66,7 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
 	 ++i) {
       val[ii] = (*i)->value();
       RANGE_PROBE const* P=dynamic_cast<RANGE_PROBE const*>(*i);
-      if(!P){
+      if(!P){untested();
 	// user did not provide bounds, use defaults
 	lo[ii] = -5.;
 	hi[ii] = 5.;
@@ -87,10 +86,12 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
     }
     if (ii <= 1) {
       val[1] = NOT_VALID;
+    }else{
     }
     plotarg(xx, val[0], val[1],
 	    xstart, lo[0], lo[1],
 	    xstop,  hi[0], hi[1]);
+  }else{untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -98,16 +99,10 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
  */
 int plopen(double start, double stop, const PROBELIST& plotlist)
 {
-  if (start == stop) {
+  if (start == stop) {untested();
     IO::plotout = OMSTREAM();
-  }
-#if 0
-  if (!IO::plotout.any()) {untested();
-    plclear();
-    return false;
   }else{
   }
-#endif
   xstart  = start;
   xstop   = stop;
   plhead(plotlist);
@@ -120,25 +115,14 @@ int plopen(double start, double stop, const PROBELIST& plotlist)
  */
 void plclose(void)
 {
-  if (!active) {
+  if (!active) {untested();
     return;
+  }else{
+    plborder();
+    active = false;
+    IO::plotout = OMSTREAM();
   }
-  plborder();
-  active = false;
-  IO::plotout = OMSTREAM();
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-/* plclear: clear graphics mode
- */
-void plclear(void)
-{
-  if (active) {
-    untested();
-  }
-  active = false;
-}
-#endif
 /*--------------------------------------------------------------------------*/
 /* plborder: draw the border -- Ascii graphics
  */
@@ -169,7 +153,7 @@ static void calibrate(PROBE_BASE const& prb)
       hi = A->hi();
       lo = A->lo();
     }
-  }else{
+  }else{untested();
     hi = 5;
     lo = -5;
   }
@@ -187,6 +171,7 @@ static void calibrate(PROBE_BASE const& prb)
     double number = lo + range * markno/OPT::ydivisions ;
     if (std::abs(number) < std::abs(range)/(10.*CONSSCALE)) {
       number = 0.;
+    }else{
     }						/* label to put on this div. */
     strcpy(nums, ftos(number, 0, 5, IO::formaat));
     nums[8] = '\0';				/* trim to 8 chrs */
@@ -258,9 +243,11 @@ static int point(
   
   if (place < 0) {
     place = 0;
+  }else{
   }
   if (place > scale) {itested();
     place = scale;
+  }else{
   }
   return  place + offset;
 }
@@ -285,6 +272,7 @@ static void plotarg(
   xxs = ftos( xx, 11, 5, IO::formaat );
   if (zz != NOT_VALID) {
     adata[point(zz,zlo,zhi,CONSSCALE,0,1)] = '+';/* zap data into string */
+  }else{
   }
   adata[point(yy,ylo,yhi,CONSSCALE,0,1)] = '*';
   IO::plotout.form( "%-8.8s%s", xxs, adata );
@@ -299,50 +287,36 @@ class OUTPUT_CMD_PLOT : public OUTPUT_CMD {
 private: // types
   typedef RANGE_PROBE probe_type;
 private:
-  OUTPUT_CMD_PLOT(const OUTPUT_CMD_PLOT&p)
-    : OUTPUT_CMD(p)
-  {
-  }
+  OUTPUT_CMD_PLOT(const OUTPUT_CMD_PLOT&p) : OUTPUT_CMD(p) {}
 public:
-  OUTPUT_CMD_PLOT() : OUTPUT_CMD() {
-    set_label("plot");
-  }
-  virtual ~OUTPUT_CMD_PLOT(){
-  }
-  OUTPUT_CMD* clone() const{
-    return new OUTPUT_CMD_PLOT(*this);
-  }
+  OUTPUT_CMD_PLOT() : OUTPUT_CMD() {set_label("plot");}
+  virtual ~OUTPUT_CMD_PLOT() {}
 private: // OUTPUT_CMD
-  void setup(CS& cmd) {
-    IO::plotset = true;
-    OUTPUT_CMD::setup(cmd);
-  }
-  virtual PROBE_BASE const* probe_proto() const{
-    return &_probe_proto;
-  }
-  void init(){
-    IO::plotout = (IO::plotset) ? IO::mstdout : OMSTREAM();
-  }
+  OUTPUT_CMD* clone() const {return new OUTPUT_CMD_PLOT(*this);}
+  void setup(CS& cmd) {IO::plotset = true; OUTPUT_CMD::setup(cmd);}
+  PROBE_BASE const* probe_proto() const {return &_probe_proto;}
 private: // OUTPUT
-  void head(double start, double stop, const std::string& col1){
-    OUTPUT::head(start, stop, col1);
+  void init(int) {IO::plotout = (IO::plotset) ? IO::mstdout : OMSTREAM();}
+
+  void head(double start, double stop, const std::string&){
     PROBELIST const& pr=probelist();
-    // if(0&& !IO::plotout.any()){
-    // }else
     if(pr.size()){
       plopen(start, stop, pr);
+    }else{untested();
     }
   }
-  void commit(double x, int Flags){
-    if(!(Flags & ofPRINT)){
-    }else if(probelist().size()){
-      plottr(x, probelist());
-    }else{ untested();
+
+  void commit(double XX, int Level){
+    if (Level < dl_STROBE) {
+    }else{
+      if(probelist().size()){
+	plottr(XX, probelist());
+      }else{untested();
+      }
     }
   }
-  void flush(){
-    plclose();
-  }
+
+  void flush() {plclose();}
 private:
   static probe_type _probe_proto;
 }p2;
