@@ -168,6 +168,7 @@ static void parse_label(CS& cmd, CARD* x)
 static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 {
   assert(x);
+  assert(all_new==x->makes_own_scope());
 
   if (cmd >> '(') {
     if (cmd.is_alnum()) {
