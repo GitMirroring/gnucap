@@ -72,7 +72,7 @@ NODE::NODE(const NODE* p)
  */
 NODE::NODE(const std::string& s, int n)
   :CARD(), NODE_DATA(n),
-   _flat_number(NOT_VALID)
+   _flat_number(INVALID_NODE)
 {
   if(n){
     unreachable();
