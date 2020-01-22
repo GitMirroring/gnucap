@@ -52,7 +52,6 @@ DEV_LOGIC::DEV_LOGIC()
    _gatemode(moUNKNOWN)   
 {
   attach_common(&Default_LOGIC);
-  _n = nodes; // ELEMENT...
   ++_count;
 }
 /*--------------------------------------------------------------------------*/
@@ -66,9 +65,8 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
 {
   assert(max_nodes() == PORTS_PER_GATE);
   for (int ii = 0;  ii < max_nodes();  ++ii) {
-    nodes[ii] = p.nodes[ii];
+    _n[ii] = p._n[ii];
   }
-  _n = nodes;
   ++_count;
 }
 /*--------------------------------------------------------------------------*/
