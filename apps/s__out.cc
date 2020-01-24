@@ -32,7 +32,24 @@
 #include "s__.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-bool SIM::outset(CS& cmd)
+PROBELIST const* SIM::outproBes() const ////BUG////transitional code
+{
+  if(_output){
+    return _output->proBes();
+  }else{untested();
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void SIM::out_reset()
+{
+  if(_output){
+    _output->reset();
+  }else{untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool SIM::out_set(CS& cmd)
 {
   if(_output){
     return _output->set(cmd);
@@ -41,37 +58,10 @@ bool SIM::outset(CS& cmd)
   }
 }
 /*--------------------------------------------------------------------------*/
-void SIM::outreset()
-{
-  if(_output){
-    _output->reset();
-  }else{untested();
-  }
-}
-/*--------------------------------------------------------------------------*/
-PROBELIST const* SIM::outprobes() const
-{
-  if(_output){
-    return _output->probes();
-  }else{untested();
-    return NULL;
-  }
-}
-/*--------------------------------------------------------------------------*/
-// commit .. commit, print, plot, etc. data point
-void SIM::out_commit(double XX, int Level)
+void SIM::out_init(TRACE Trace)
 {
   ::status.output.start();
-  if(_output){
-    _output->commit(XX, Level);
-  }else{ untested();
-  }
-  ::status.output.stop();
-}
-/*--------------------------------------------------------------------------*/
-void SIM::outinit(TRACE Trace)
-{
-  DATALEVEL dl;
+  DATALEVEL dl = dl_ACCEPTED;
   switch (Trace) {
   case tNONE:	    dl=dl_STROBE; break;
   case tUNDER:	    dl=dl_STROBE; break;
@@ -82,30 +72,40 @@ void SIM::outinit(TRACE Trace)
   }
 
   if(_output){
-    _output->init(dl);
+    _output->init(dl, _sim->label());
   }else{ untested();
   }
+  ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
-void SIM::outhead(double start, double stop, const std::string& col1)
+void SIM::out_head(double start, double stop, const std::string& col1)
 {
+  ::status.output.start();
   if(_output){
     _output->head(start, stop, col1);
   }else{ untested();
   }
+  ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
-void SIM::finish()
+void SIM::out_commit(double XX, int Level)
 {
-  outflush();
+  ::status.output.start();
+  if(_output){
+    _output->commit(XX, Level);
+  }else{ untested();
+  }
+  ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
-void SIM::outflush()
+void SIM::out_flush()
 {
+  ::status.output.start();
   if(_output){
     _output->flush();
   }else{ untested();
   }
+  ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
 void SIM::attach_output(OUTPUT* o)

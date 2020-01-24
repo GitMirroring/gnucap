@@ -23,7 +23,6 @@
  * general probe object
  */
 //testing=script 2009.06.21
-#include "u_sim_data.h"
 #include "u_status.h"
 #include "e_base.h"
 #include "u_probe.h"

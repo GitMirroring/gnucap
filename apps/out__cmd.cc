@@ -22,11 +22,19 @@
  *------------------------------------------------------------------
  * output commands
  */
+////BUG//// this file needs to move to lib.
+// apps is a collection of plugins, all optional, all independent.
+// This is an essential part of the system, not optional.
+// This file is a library, used to build output plugins.
+// apps sources are not usually installed, so this file
+// would not be available for additional modules if left in apps.
+
 //testing=script 2020.01.16
 #include "u_sim_data.h"
 #include "u_prblst.h"
 #include "globals.h"
 #include "u_out.h"
+//#include "trace_on.h"
 /*--------------------------------------------------------------------------*/
 void OUTPUT_CMD::setup(CS& cmd)
 {
@@ -41,22 +49,39 @@ void OUTPUT_CMD::setup(CS& cmd)
     container_type::iterator a=_sinks.find(sim);
     OUTPUT_CMD* sink;
     if(a==_sinks.end() || !a->second){
+      if(a==_sinks.end()){
+	// really a new sink
+      }else if(!a->second){untested();
+	// had one before but lost it, so make a new one
+      }else{untested();
+	unreachable();
+      }
+
+      trace2("new sink", s, short_label());
       setup_probelist(reason);
-      OUTPUT* o=clone();
-      sink = prechecked_cast<OUTPUT_CMD*>(o);
+      assert(&probelist() == _prb);
+
+      //OUTPUT_CMD* o=clone();
+      //sink = prechecked_cast<OUTPUT_CMD*>(o);
+      sink = clone();
+
       assert(sink);
       assert(&sink->probelist() == _prb);
       _sinks[sim] = sink;
       assert(sink);
     }else{
+      trace2("reusing sink", s, short_label());
       sink = prechecked_cast<OUTPUT_CMD*>(a->second);
       assert(sink);
+      //assert(&sink->probelist() != _prb);
+      //assert(&sink->probelist() == _prb);
+      _prb = &sink->probelist();
     }
-
     sink->set_simname(s);
     sim->attach_output(sink);
-    _prb = &sink->probelist();
+    assert(&sink->probelist() == _prb);
   }else{
+    trace2("no sim, no sink", s, short_label());
     cmd.reset(here);
     _prb = NULL;
   }
@@ -68,7 +93,20 @@ static void probeargs(CS& cmd,
     PROBE_BASE const* wrap,
     PROBELIST::iterator p, PROBELIST::iterator e)
 {
+  ////BUG//// only works for 2 args.
+
+  ////BUG//// This really belongs to PROBE and PROBELIST, not here.
+  // It really operates on a PROBE, so that's where it really belongs.
+  // through a PROBELIST, where PROBEs are stored.
+  // so here in OUTPUT_CMD is really two levels removed from where it belongs.
+  // Polymorphic probes need work.  Will back out for now, reverting to the old
+  // implementation of PROBE and PROBELIST.  This will make it possible to 
+  // move ahead with output plugins, which is what this is all about.
+
   double a0, a1;
+#if 1
+  bool have_args = (cmd >> '(') && (cmd >> a0 >> a1 >> ')');
+#else
   bool have_args=false;
   if (cmd.skip1b('(')) {
     // extra probe parameters (such as range)
@@ -82,6 +120,7 @@ static void probeargs(CS& cmd,
   }else{
     have_args=false;
   }
+#endif
 
   for (; p!=e; ++p) {
     PROBE_BASE const* cP=dynamic_cast<PROBE_BASE const*>(*p);
@@ -210,6 +249,9 @@ PROBELIST& OUTPUT_CMD::prblist(std::string const& reason)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+////BUG//// doesn't work, crashes, due to problem in PROBE_LISTS
+// Even if it did, it is out of place in this file, because it has no connection
+// to OUTPUT_CMD.  It could exist as a stand-alone plugin.
 class CMD_PROBES : public CMD{
 public:
   void do_it(CS& cmd, CARD_LIST*){

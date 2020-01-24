@@ -23,6 +23,21 @@
  * performs transient analysis, silently, then fft.
  * outputs results of fft
  */
+
+////BUG//// need to revert to old s_fo.cc
+// This version (aside from being not finished) changes
+// old FOURIER is-a TRANSIENT, with changes to parameters and output.
+// specifically .. specifying frequency instead of time in the command.
+// and using different output. 
+// This is a natural test of the output plugin concept.
+// If it isn't super smoooth, it isn't ready.
+// This version changes to a "has-a" relationship.
+// The FOURIER has-a TRANSIENT.
+// It's a case of try it .. and in doing so see that it is the wrong way.
+
+
+
+
 //testing=script 2014.07.04
 #include "globals.h"
 #include "u_sim_data.h"
@@ -102,7 +117,7 @@ public:
 private: // pure, unused
   void do_it(CS&, CARD_LIST*){ unreachable(); }
 private:
-  void init(int){}
+  void init(int, const std::string&){}
   void head(double, double, const std::string&){}
 
   void commit(double /*X*/, int Level){
@@ -146,7 +161,7 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
         + " strobe=" + to_string(_tstrobe));
 
     {
-      transient_data_tap tdg(_tr, outprobes(), _timesteps, _fdata);
+      transient_data_tap tdg(_tr, outproBes(), _timesteps, _fdata);
       _tr->do_it(tropt, _scope);
     }
 
@@ -205,7 +220,7 @@ void FOURIER::foout()
   //plclose();
   //plclear();
   int ii = 0;
-  if (PROBELIST const* pl=outprobes()){
+  if (PROBELIST const* pl=outproBes()){
     for (PROBELIST::const_iterator p=pl->begin(); p!=pl->end(); ++p) {
       PROBE_BASE const* P=dynamic_cast<PROBE_BASE const*>(*p);
       if(!P){ untested();
@@ -397,8 +412,8 @@ void FOURIER::setup(CS& Cmd)
 void FOURIER::fftallocate()
 {
   assert(!_fdata);
-  if(!outprobes()){
-  }else if (PROBELIST const* pl=outprobes()){
+  if(!outproBes()){
+  }else if (PROBELIST const* pl=outproBes()){
     int probes = pl->size();
     _fdata = new std::vector<COMPLEX>[probes];
     for (int ii = 0;  ii < probes;  ++ii) {
@@ -412,8 +427,8 @@ void FOURIER::fftallocate()
  */
 void FOURIER::fftunallocate()
 {
-  if(!outprobes()){
-  }else if (PROBELIST const* pl=outprobes()){
+  if(!outproBes()){
+  }else if (PROBELIST const* pl=outproBes()){
     assert (_fdata || !pl->size());
     delete [] _fdata;
     _fdata = NULL;

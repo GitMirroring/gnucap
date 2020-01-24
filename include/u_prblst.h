@@ -21,7 +21,7 @@
  *------------------------------------------------------------------
  * list of probes
  */
-//testing=script,complete 2006.09.28
+//testing=obsolete
 #ifndef U_PRBLST_H
 #define U_PRBLST_H
 #include "mode.h"
@@ -32,19 +32,19 @@ class CARD_LIST;
 class INTERFACE PROBELIST : public CKT_BASE {
 private:
   typedef std::vector<PROBE_BASE const*> container_type;
+public:
+  typedef container_type::iterator iterator;
+  typedef container_type::const_iterator const_iterator;
+private:
   container_type bag;
 
 private:
   explicit PROBELIST(const PROBELIST&p)
-   : CKT_BASE(p), bag(p.bag) { untested();
-     incomplete();
-  }
+    : CKT_BASE(p), bag(p.bag) {untested(); untested(); incomplete();}
 public:
   explicit PROBELIST() {}
   ~PROBELIST() {}
 
-  typedef container_type::iterator	     iterator;
-  typedef container_type::const_iterator const_iterator;
   void	   listing(const std::string&)const;
   void     clear();
 
@@ -65,18 +65,13 @@ private:
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {
 private:
-  PROBE_LISTS( const PROBE_LISTS&){ unreachable(); }
-  PROBE_LISTS() {
-  }
+  PROBE_LISTS(const PROBE_LISTS&) {unreachable();}
+  PROBE_LISTS() {untested();}
   ~PROBE_LISTS();
 public:
-  PROBELIST& operator[](std::string const& reason) const{ untested();
-    return get(reason);
-  }
-public:
+  PROBELIST& operator[](std::string const& reason) const {untested(); return get(reason);}
   static PROBELIST& get(std::string const& reason);
   static void clear();
-public:
   static void purge(CKT_BASE*);
 };
 /*--------------------------------------------------------------------------*/

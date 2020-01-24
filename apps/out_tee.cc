@@ -21,17 +21,19 @@
  *------------------------------------------------------------------
  * attach tees to simulation commands
  */
+////BUG//// this file needs to move to lib.
+// apps is a collection of plugins, all optional, all independent.
+// This is an essential part of the system, not optional.
+// OUTPUT_TEE is acccessed directly in s__out.cc, not through the plugin mechanism.
+// Therefore it cannot be a plugin.
+// It could be a plugin by giving it a name, registering with a dispatcher,
+// and always using it that way, but it would still be required
+// because the functionality is needed even in the most basic sense.
+// Examples: bm_cond.cc, bm_value.cc, d_subckt.cc
+
 //testing=script,complete 2020.01.14
 #include "ap.h"
 #include "u_out.h"
-/*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::head(double start, double stop, const std::string& col1)
-{
-  for(outputs_type::const_iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
-    assert(*p);
-    (*p)->head(start, stop, col1);
-  }
-}
 /*--------------------------------------------------------------------------*/
 OUTPUT_TEE::~OUTPUT_TEE()
 {
@@ -53,12 +55,20 @@ OUTPUT* OUTPUT_TEE::set(CS& cs)
   return this;
 }
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::init(int Dl)
+void OUTPUT_TEE::init(int Dl, const std::string& Label)
 {
   for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
     assert(*p);
     (*p)->set(out()); // BUG? here?
-    (*p)->init(Dl);
+    (*p)->init(Dl, Label);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void OUTPUT_TEE::head(double start, double stop, const std::string& col1)
+{
+  for(outputs_type::const_iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
+    assert(*p);
+    (*p)->head(start, stop, col1);
   }
 }
 /*--------------------------------------------------------------------------*/

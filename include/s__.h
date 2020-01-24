@@ -57,7 +57,7 @@ private:
 private:
   virtual void	setup(CS&)	= 0;
   virtual void	sweep()		= 0;
-  virtual void	finish();
+  virtual void	finish()	{out_flush();}
   virtual bool	is_step_rejected()const {return false;}
 
   explicit SIM(const SIM&)
@@ -72,15 +72,14 @@ protected:
   	 void	command_base(CS&);	/* s__init.cc */
 	 void	reset_timers();	
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
-protected: // OUTPUT interface, s__out.cc
-  void outinit(TRACE);
-  bool outset(CS&);
-  void outreset();
+protected:				/* s__out.cc */
+  PROBELIST const* outproBes() const;	////BUG//// // transitional code hack
+  void out_reset();
+  bool out_set(CS&);
+  void out_init(TRACE);
+  void out_head(double start, double stop, const std::string& col1);
   void out_commit(double x, int level);
-  void out_keep(double x);
-  void outhead(double start, double stop, const std::string& col1);
-  void outflush();
-  PROBELIST const* outprobes() const; // hack
+  void out_flush();
 public:
   void attach_output(OUTPUT*);
   void detach_output(OUTPUT*);

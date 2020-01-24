@@ -186,7 +186,7 @@ void TRANSIENT::setup(CS& Cmd)
  */
 void TRANSIENT::options(CS& Cmd)
 {
-  outreset();
+  out_reset();
   _sim->_temp_c = OPT::temp_c;
   _sim->_uic = _cold = false;
   _trace = tNONE;
@@ -219,7 +219,7 @@ void TRANSIENT::options(CS& Cmd)
 		       "rejected, iterations, verbose")
 	   )
 	  )
-      || outset(Cmd)
+      || out_set(Cmd)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
   Cmd.check(bWARNING, "what's this?");
@@ -229,7 +229,7 @@ void TRANSIENT::options(CS& Cmd)
   }else{
   }
 
-  outinit(_trace);
+  out_init(_trace);
 
   _dtmax_in.e_val(BIGBIG, _scope);
   _dtmin_in.e_val(OPT::dtmin, _scope);

@@ -35,19 +35,25 @@ namespace {
 class OUTPUT_CMD_PRINT : public OUTPUT_CMD {
 private:
   int _threshold;
+private:
   OUTPUT_CMD_PRINT(const OUTPUT_CMD_PRINT&p) : OUTPUT_CMD(p), _threshold(dl_NONE) {}
 public:
-  OUTPUT_CMD_PRINT() : OUTPUT_CMD() {set_label("print");}
+  OUTPUT_CMD_PRINT() : OUTPUT_CMD()	{set_label("print");}
 private: // OUTPUT_CMD
-  OUTPUT_CMD* clone() const {return new OUTPUT_CMD_PRINT(*this);}
-  void setup(CS& cmd) {IO::plotset = false; OUTPUT_CMD::setup(cmd);}
-private: // OUTPUT
-  void init(int Level)  {_threshold=Level;}
+  OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_PRINT(*this);}
+  void setup(CS& cmd)			{IO::plotset = false; OUTPUT_CMD::setup(cmd);}
 
-  void head(double, double, const std::string& col1){
+  ////BUG//// IO::plotset still sucks.
+
+private: // OUTPUT
+  void init(int Level, const std::string&)		{_threshold=Level;}
+
+  void head(double, double, const std::string& col1)
+  {
     trace1("print head", col1);
     if (IO::plotout.any()) {
       // plotting is active, suppress any other output
+      ////BUG//// need a better way to do this.
     }else{
       int width = std::min(OPT::numdgt+5, BIGBUFLEN-10);
       char format[20];
@@ -56,32 +62,35 @@ private: // OUTPUT
       
       out().form(format, '#', col1.c_str());
       
-      PROBELIST const& pr=probelist();
+      PROBELIST const& pr = probelist();
       for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
+	assert(*p);
 	out().form(format, ' ', (*p)->label().c_str());
       }
       out() << '\n';
     }
   }
 
-  void commit(double XX, int Level)  {
+  void commit(double XX, int Level)
+  {
     if (Level < _threshold) {
+      // user specified, trace option
     }else if (IO::plotout.any()) {
       // plotting is active, suppress any other output
+      ////BUG//// need a better way to do this.
     }else{
       OMSTREAM o=out();
       o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
       o << XX;
 
-      PROBELIST const& pr=probelist();
+      PROBELIST const& pr = probelist();
       for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
+	assert(*p);
 	o << (*p)->value();
       }
       o << '\n';
     }
   }
-
-  void flush()  {}
 };
 OUTPUT_CMD_PRINT p3;
 DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "iprint|print|probe", &p3);
