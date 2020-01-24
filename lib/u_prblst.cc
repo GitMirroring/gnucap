@@ -21,7 +21,13 @@
  *------------------------------------------------------------------
  * probe list functions
  */
-//testing=obsolete
+////BUG//// inappropriate use of dispatcher.
+// as used here, no real advantage over std::map
+// used only here, therefore should not be global.
+// so change to a private std::map inside PROBE_LISTS
+
+
+//testing=failed 2020.01.19
 #include "e_cardlist.h"
 #include "e_node.h"
 #include "e_card.h"
@@ -48,6 +54,8 @@ void PROBE_LISTS::clear()
       P->clear();
       delete P;
       probe_dispatcher.uninstall(i);
+      assert(!i->second);
+      ////BUG//// crash later.  does not clear pointer from OUTPUT.
     }else if(i->second){untested(); untested();
       unreachable();
     }else{
@@ -104,6 +112,7 @@ void PROBELIST::clear()
 {
   trace2("PROBELIST::clear", bag.size(), this);
   erase(begin(), end());
+  assert(begin() == end());
 }
 /*--------------------------------------------------------------------------*/
 void PROBELIST::erase(PROBELIST::iterator b, PROBELIST::iterator e)
@@ -269,17 +278,17 @@ void PROBELIST::add_list(CS& cmd)
       }
       unsigned here2 = cmd.cursor();
       found_something = add_branches(cmd.ctos(),what,&CARD_LIST::card_list);
-      if (!found_something) {itested();
+      if (!found_something) {untested();
 	cmd.reset(here2);
 	break;
       }else{
       }
     }
-  }else{itested();
+  }else{
     cmd.warn(bDANGER, "need device or node");
   }
   paren -= cmd.skip1b(')');
-  if (paren != 0) {itested();
+  if (paren != 0) {
     cmd.warn(bWARNING, "need )");
   }else{
   }

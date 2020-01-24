@@ -141,7 +141,7 @@ DCOP::DCOP()
 void DCOP::finish(void)
 {
   // SIM::finish(); // why not?
-  outflush();
+  out_flush();
 
   for (int ii = 0;  ii < _n_sweeps;  ++ii) {
     if (_zap[ii]) { // component
@@ -160,7 +160,7 @@ void OP::setup(CS& Cmd)
   _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
-  outreset();
+  out_reset();
 
   _zap[0] = NULL;
   _sweepval[0] = &(_sim->_temp_c);
@@ -184,7 +184,7 @@ void OP::setup(CS& Cmd)
   Cmd.check(bWARNING, "what's this?");
   _sim->_freq = 0;
 
-  outinit(_trace);
+  out_init(_trace);
 
   _start[0].e_val(OPT::temp_c, _scope);
   fix_args(0);
@@ -195,7 +195,7 @@ void DC::setup(CS& Cmd)
   _sim->_temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
-  outreset();
+  out_reset();
 
   if (Cmd.more()) {
     for (_n_sweeps = 0; Cmd.more() && _n_sweeps < DCNEST; ++_n_sweeps) {
@@ -228,7 +228,7 @@ void DC::setup(CS& Cmd)
   }
   Cmd.check(bWARNING, "what's this?");
 
-  outinit(_trace);
+  out_init(_trace);
 
   assert(_n_sweeps > 0);
   for (int ii = 0;  ii < _n_sweeps;  ++ii) {
@@ -330,14 +330,14 @@ void DCOP::options(CS& Cmd, int Nest)
 		       "need none, off, warnings, iterations, verbose")
 	   )
 	  )
-      || outset(Cmd)
+      || out_set(Cmd)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::sweep()
 {
-  outhead(_start[0], _stop[0], " ");
+  out_head(_start[0], _stop[0], " ");
   _sim->_bypass_ok = false;
   _sim->set_inc_mode_bad();
   if (_cont) {untested();

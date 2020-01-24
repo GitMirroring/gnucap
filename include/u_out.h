@@ -28,6 +28,12 @@
 /*--------------------------------------------------------------------------*/
 class PROBELIST;
 class SIM;
+////BUG//// Hierarchy is wrong.
+// OUTPUT should not be a CMD (not a "is-a" relationship)
+// OUTPUT_CMD "is-a" CMD
+// but should be "has-a" OUTPUT
+// Other than this, CMD are not cloned.
+// This clone should be really to clone the OUTPUT, not the CMD.
 /*--------------------------------------------------------------------------*/
 // attached to SIM, can store probelist, do whatever output.
 class INTERFACE OUTPUT : public CMD {
@@ -35,15 +41,15 @@ public: // construct
   OUTPUT()				{}
   virtual ~OUTPUT()			{}
 public:
-  virtual PROBELIST const* probes() const {untested(); return NULL;}
+  virtual PROBELIST const* proBes() const {untested(); return NULL;}
   virtual void reset()			{_out = IO::mstdout; _out.reset();} // bug? check if needed
   virtual OUTPUT* set(CS& cmd)		{::outset(cmd, &_out); return this;}
   void set(OMSTREAM const& o)		{_out = o;}
 
-  virtual void init(int)=0;
-  virtual void head(double, double, const std::string&)=0;
-  virtual void commit(double X, int Level)=0;
-  virtual void flush()=0;
+  virtual void init(int, const std::string&)		{}
+  virtual void head(double, double, const std::string&)	{}
+  virtual void commit(double X, int Level)		=0;
+  virtual void flush()					{}
   static  void purge(CKT_BASE*);
 protected:
   OMSTREAM out()			{return _out;}
@@ -63,17 +69,17 @@ private:
   void attach_output(OUTPUT* o)		{_outputs.insert(o);}
   void detach_output(OUTPUT* o)		{_outputs.erase(o);}
 private: // override OUTPUT
-  PROBELIST const* probes() const{
+  PROBELIST const* proBes() const{
     if(_outputs.empty()){
       return NULL;
     }else{
       // incomplete. but not better in old code.
-      return (*_outputs.begin())->probes();
+      return (*_outputs.begin())->proBes();
     }
   }
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
-  void init(int);
+  void init(int, const std::string&);
   void head(double, double, std::string const& label);
   void commit(double X, int Level);
   void flush();
@@ -94,7 +100,6 @@ protected:
 private:
   static PROBELIST& prblist(std::string const& reason);
 protected:
-  void setup_probelist(std::string const& reason) {_prb = &prblist(reason);}
   virtual ~OUTPUT_CMD() {
     detach_sinks();
     for(container_type::const_iterator i=_sinks.begin();
@@ -103,10 +108,13 @@ protected:
     }
   }
 
-  virtual OUTPUT* clone() const=0;
+  virtual OUTPUT_CMD* clone() const=0;
 protected:
+  void setup_probelist(std::string const& reason) {_prb = &prblist(reason);}
   PROBELIST const& probelist() const	{assert(_prb); return *_prb;}
   PROBELIST&	   probelist()		{assert(_prb); return *_prb;}
+  ////BUG//// proBes, probelist ... why both?????
+  // proBes only used by fourier (s_fo.cc)
   virtual void setup(CS&);
 public:
   std::string const& simname() const	{return _simname;}
@@ -115,10 +123,10 @@ public:
   void do_it(CS&, CARD_LIST*);
   virtual PROBE_BASE const* probe_proto() const{return NULL;}
 private: // OUTPUT
-  PROBELIST const* probes() const	{return _prb;}
+  PROBELIST const* proBes() const	{return _prb;}
   void detach_sinks();
 private:
-  std::string _simname; // required for listing probes..
+  std::string _simname;
   PROBELIST* _prb;
 protected:
   container_type _sinks;

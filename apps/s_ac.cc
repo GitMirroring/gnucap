@@ -106,7 +106,7 @@ void AC::do_it(CS& Cmd, CARD_LIST* Scope)
   // can't call finish from here.
   // (can't use command_base either)
   // why is this needed?
-  outflush();
+  out_flush();
 } // AC::do_it
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -114,7 +114,7 @@ static int needslinfix;	// flag: lin option needs patch later (spice compat)
 /*--------------------------------------------------------------------------*/
 void AC::setup(CS& Cmd)
 {
-  outreset(); //BUG// don't know why this is needed
+  out_reset(); //BUG// don't know why this is needed
 
   //temp_c = OPT::temp_c;
   // Don't set temperature.  Keep whatever was there before,
@@ -160,7 +160,7 @@ void AC::setup(CS& Cmd)
       || Get(Cmd, "sta{rt}",	  &_start)
       || Get(Cmd, "sto{p}",	  &_stop)
       || Get(Cmd, "te{mperature}",&_sim->_temp_c)
-      || outset(Cmd)
+      || out_set(Cmd)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
   Cmd.check(bWARNING, "what's this??");
@@ -224,7 +224,7 @@ void AC::setup(CS& Cmd)
   }else{
   }
 
-  outinit(tALLTIME);
+  out_init(tALLTIME);
 }
 /*--------------------------------------------------------------------------*/
 void AC::solve()
@@ -249,7 +249,7 @@ void AC::solve()
 /*--------------------------------------------------------------------------*/
 void AC::sweep()
 {
-  outhead(_start, _stop, "Freq");
+  out_head(_start, _stop, "Freq");
   first();
   CARD_LIST::card_list.ac_begin();
   do {

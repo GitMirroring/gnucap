@@ -64,6 +64,7 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
 	 i =  plotlist.begin();
 	 i != plotlist.end();
 	 ++i) {
+      assert(*i);
       val[ii] = (*i)->value();
       RANGE_PROBE const* P=dynamic_cast<RANGE_PROBE const*>(*i);
       if(!P){untested();
@@ -201,7 +202,8 @@ static void plhead(const PROBELIST& plotlist)
        i =  plotlist.begin();
        i != plotlist.end();
        ++i) {
-      calibrate(**i);
+    assert(*i);
+    calibrate(**i);
   }
   for (int ii = 0;  ii < CONSSCALE; ii++) {		/* build strings */
     border[ii] = '-';
@@ -286,30 +288,34 @@ static void plotarg(
 class OUTPUT_CMD_PLOT : public OUTPUT_CMD {
 private: // types
   typedef RANGE_PROBE probe_type;
+  static probe_type _probe_proto;
 private:
   OUTPUT_CMD_PLOT(const OUTPUT_CMD_PLOT&p) : OUTPUT_CMD(p) {}
 public:
-  OUTPUT_CMD_PLOT() : OUTPUT_CMD() {set_label("plot");}
-  virtual ~OUTPUT_CMD_PLOT() {}
+  OUTPUT_CMD_PLOT() : OUTPUT_CMD()	{set_label("plot");}
+  virtual ~OUTPUT_CMD_PLOT()		{}
 private: // OUTPUT_CMD
-  OUTPUT_CMD* clone() const {return new OUTPUT_CMD_PLOT(*this);}
-  void setup(CS& cmd) {IO::plotset = true; OUTPUT_CMD::setup(cmd);}
-  PROBE_BASE const* probe_proto() const {return &_probe_proto;}
+  OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_PLOT(*this);}
+  void setup(CS& cmd)			{IO::plotset = true; OUTPUT_CMD::setup(cmd);}
+  PROBE_BASE const* probe_proto() const	{return &_probe_proto;}
 private: // OUTPUT
-  void init(int) {IO::plotout = (IO::plotset) ? IO::mstdout : OMSTREAM();}
+  void init(int, const std::string&) {IO::plotout = (IO::plotset) ? IO::mstdout : OMSTREAM();}
 
-  void head(double start, double stop, const std::string&){
-    PROBELIST const& pr=probelist();
-    if(pr.size()){
+  void head(double start, double stop, const std::string&)
+  {
+    PROBELIST const& pr = probelist();
+    if (pr.size() > 0) {
       plopen(start, stop, pr);
     }else{untested();
     }
   }
 
-  void commit(double XX, int Level){
+  void commit(double XX, int Level)
+  {
     if (Level < dl_STROBE) {
+      // use strobed data for uniform step size, if available
     }else{
-      if(probelist().size()){
+      if(probelist().size() > 0){
 	plottr(XX, probelist());
       }else{untested();
       }
@@ -317,8 +323,6 @@ private: // OUTPUT
   }
 
   void flush() {plclose();}
-private:
-  static probe_type _probe_proto;
 }p2;
 OUTPUT_CMD_PLOT::probe_type OUTPUT_CMD_PLOT::_probe_proto(PROBE_BASE::_STATIC);
 DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "iplot|plot", &p2);

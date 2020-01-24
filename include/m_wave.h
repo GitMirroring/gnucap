@@ -83,6 +83,12 @@ public:
 private:
   container_type _container;
 };
+////BUG//// too much external hacking needed.
+// OUTPUT_CMD_STORE does too much internal manipulating
+// WAVESTASH as presented has one advantage over old code .
+// .....  faster search in postprocessing.
+// but really, it's just a wrapper for map, like a typedef
+// linear indexing, if used at all, needs to be part of WAVESTASH.
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // push: insert a signal on the "input" end.

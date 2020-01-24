@@ -21,6 +21,11 @@
  *------------------------------------------------------------------
  * dispatcher -- for dynamically loaded modules
  */
+////BUG//// need to rework to interface-oriented form.
+// also ....  usage examples so far do not support the need/desire for dynamic dispatchers.
+// best to limit the dispatcher to static use, as a tool for managing plugins.
+// In the dynamic sense, it's just a map.
+
 //testing=script 2015.01.21
 #ifndef L_DISPATCHER_H
 #define L_DISPATCHER_H
