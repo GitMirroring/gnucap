@@ -15,7 +15,7 @@ GNUCAP_CXXFLAGS+= -fPIC -shared
 
 INSTALL_FILES = out_hdf.so
 CLEANFILES = *.so *.o *~
-OBJS = out_hdf.o s__out.o out__cmd.o
+OBJS = out_hdf.o s__out.o out__cmd.o out_tee.o
 
 all: $(INSTALL_FILES)
 
