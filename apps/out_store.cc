@@ -35,15 +35,18 @@ class OUTPUT_STORE : public OUTPUT {
 private:
   std::vector<WAVE*> _wavep;
 private:
-  explicit OUTPUT_STORE(const OUTPUT_STORE&p) : OUTPUT(p) {}
+  explicit OUTPUT_STORE(const OUTPUT_STORE&p) : OUTPUT(p), _fill(NULL) {}
 public:
-  OUTPUT_STORE() : OUTPUT()	{set_label("store");}
-  virtual ~OUTPUT_STORE()		{}
+  OUTPUT_STORE() : OUTPUT(), _fill(NULL) {set_label("store");}
+  virtual ~OUTPUT_STORE()		{ assert(!_fill); }
 public: // OUTPUT
   OUTPUT* clone() const		{return new OUTPUT_STORE(*this);}
 public: // OUTPUT
-  void init(int, const std::string& Label)
-  {
+  void flush(){
+    delete _fill;
+    _fill = NULL;
+  }
+  void init(int, const std::string& Label) {
     WAVESTASH* data = data_dispatcher[Label];
 
     if(!data){
@@ -60,17 +63,8 @@ public: // OUTPUT
     }
     assert(data);
 
-    _wavep.resize(0);
-
     PROBELIST const& pr = probelist();
-    for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
-      assert(*p);
-      trace1("--", (*p)->label());
-      WAVE& w = (*data)[(*p)->label()]; // allocate or find
-      w.initialize(); // needed if reusing
-      _wavep.push_back(&w); // build index
-    }
-    assert(int(_wavep.size()) == pr.size());
+    _fill = data->init(pr);
   }
 
   ////BUG//// It is possible when reusing "data" with a changed probelist
@@ -81,8 +75,6 @@ public: // OUTPUT
   /// this was intentional, there is a clear command. could as well
   /// always clear when rebuilding the stash.
 
-  ////BUG//// This indexing should be part of WAVESTASH, not done here.
-  // Code here is more complex than old code that uses a C style array.
   // use of dispatcher (data_dispatcher) also seems inappropriate.
 
   /// where to put the data instead? what should own the data?
@@ -92,19 +84,17 @@ public: // OUTPUT
     if (Level < dl_ACCEPTED) {
       // only look at dl_ACCEPTED or better.
     }else{
-      trace1("store out", probelist().size());
-      std::vector<WAVE*>::iterator ii=_wavep.begin();
-      PROBELIST const& pr=probelist();
+      PROBELIST const& pr = probelist();
+      int ii=0;
       for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p){
 	assert(*p);
-	trace2("commit", XX,  (*p)->value());
-	(*ii)->push(XX, (*p)->value());
+	(*_fill)[ii].push(XX, (*p)->value());
 	++ii;
       }
-      assert(ii==_wavep.end());
     }
   }
-
+private:
+  WAVESTASH::INDEX* _fill;
 }o0; // OUTPUT_STORE
 OUTPUT_CMD p0(&o0);
 DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "store", &p0);

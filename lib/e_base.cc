@@ -156,10 +156,10 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
   trace2("find_wave", probe_name, _sim->label());
 
   if (WAVESTASH* data = data_dispatcher[_sim->label()]) {
-    WAVESTASH::const_iterator wi = data->find(probe_name);
-    if (wi != data->end()) {
-      return &(wi->second);
-    }else{
+    try{
+      WAVE const& wi = (*data)[probe_name];
+      return &wi;
+    }catch (Exception_Cant_Find const&){
       return NULL;
     }
   }else{untested();

@@ -27,6 +27,8 @@
 #include "l_denoise.h"
 #include "m_interp.h"
 #include "l_dispatcher.h"
+#include <set>
+#include "u_prblst.h" // possibly move to m_wave.cc?
 /*--------------------------------------------------------------------------*/
 class WAVE : public CKT_BASE {
 private:
@@ -55,40 +57,68 @@ public:
 /*--------------------------------------------------------------------------*/
 class WAVESTASH : public CKT_BASE{
 public:
+  // linear index to waves. only accessible to data source.
+  class INDEX {
+    friend class WAVESTASH;
+  private:
+    INDEX(WAVE* o): _out(o) {}
+  public:
+    WAVE& operator[](int i){
+      return _out[i];
+    }
+  private:
+    WAVE* _out;
+  };
+public:
   typedef std::string key_type;
-  typedef std::map<key_type, WAVE> container_type;
+  typedef std::vector<WAVE> container_type;
+private:
+  typedef container_type::iterator iterator;
   typedef container_type::const_iterator const_iterator;
 private:
   WAVESTASH(const WAVESTASH&x):CKT_BASE(x){ unreachable(); }
 public:
-  WAVESTASH() : CKT_BASE(), _container() {}
-  ~WAVESTASH() {
-  }
-public:
-  const_iterator find(const key_type& k) const{
-    return _container.find(k);
-  }
-  const_iterator end() const{
-    return _container.end();
-  }
-  void clear(){
-    _container.clear();
-  }
-  WAVE& operator[](const std::string& s){
-    return _container[s];
-  }
-//  WAVE const& operator[](const std::string& s) const{
-//    return _container[s];
-//  }
+  WAVESTASH() : CKT_BASE() {}
+  ~WAVESTASH() {}
 private:
-  container_type _container;
+  const_iterator begin() const{return _data.begin();}
+public:
+  // invalidates WAVE references.
+  void clear(){ untested();
+    _data.clear();
+  }
+  // this is slow, but so what?
+  // (could change to map or set, won't affect the interface.)
+  WAVE const& operator[](const key_type& key) const{
+    for(const_iterator i=begin(); i!=_data.end(); ++i){ untested();
+      if (i->short_label()==key){
+	return *i;
+      }else{
+      }
+    }
+    throw Exception_Cant_Find("wave", key);
+  }
+
+  // BUG? no provision against calling init twice. (will crash).
+  // will also crash if probelist changes on the way (why would it?).
+  INDEX* init(PROBELIST const& pr){
+    clear();
+    _data.resize(pr.size());
+    iterator w = _data.begin();
+
+    for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
+      assert(*p);
+      assert(w!=_data.end());
+      w->set_label((*p)->label());
+      w->initialize();
+      ++w;
+    }
+
+    return new INDEX(_data.data());
+  }
+private:
+  container_type _data;
 };
-////BUG//// too much external hacking needed.
-// OUTPUT_CMD_STORE does too much internal manipulating
-// WAVESTASH as presented has one advantage over old code .
-// .....  faster search in postprocessing.
-// but really, it's just a wrapper for map, like a typedef
-// linear indexing, if used at all, needs to be part of WAVESTASH.
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // push: insert a signal on the "input" end.
