@@ -35,8 +35,13 @@
 // The FOURIER has-a TRANSIENT.
 // It's a case of try it .. and in doing so see that it is the wrong way.
 
-
-
+/// if OUTPUT_TEE is part of the lib, it will be much easier to get hold of
+/// the probes, perhaps removing proBes, making it more smooth.
+///
+/// the actual bug... the (old) fourier command did not work with store (and
+/// breaks gnucap-python) as it only prints the output. I have postponed it,
+/// as it is only tangential to output plugins -- i could use a modified plugin
+/// where required.
 
 //testing=script 2014.07.04
 #include "globals.h"

@@ -26,6 +26,11 @@
 // used only here, therefore should not be global.
 // so change to a private std::map inside PROBE_LISTS
 
+/// as it is, PROBE_LISTS manages DISPATCHER<PROBELIST>.  PROBE_LISTS has no
+/// instance. but there is a "clear" command, accessing probe_lists through
+/// PROBE_LISTS::clear (this seems to be needed).  a map in PROBE_LISTS would
+/// require an instance (new global) and make probe_lists obsolete. replace the
+/// dispatcher?
 
 //testing=failed 2020.01.19
 #include "e_cardlist.h"

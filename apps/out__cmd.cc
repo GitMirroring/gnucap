@@ -29,6 +29,10 @@
 // apps sources are not usually installed, so this file
 // would not be available for additional modules if left in apps.
 
+/// same with s__out, perhaps merge out_cmd into s__out?
+/// additional modules need to carry s__out anyway, but it can be adapted to
+/// what is needed.
+
 //testing=script 2020.01.16
 #include "u_sim_data.h"
 #include "u_prblst.h"
@@ -99,9 +103,20 @@ static void probeargs(CS& cmd,
   // It really operates on a PROBE, so that's where it really belongs.
   // through a PROBELIST, where PROBEs are stored.
   // so here in OUTPUT_CMD is really two levels removed from where it belongs.
+
+  /// this is parsing probe expressions, and it has to do with language, but it
+  /// was hardwired in PROBELIST. It is here, so it can be replaced more easily
+  /// another output command.
+
+  /// the limitation to two args is not new, but more arguments are not currently
+  /// needed. how important is this?
+
   // Polymorphic probes need work.  Will back out for now, reverting to the old
   // implementation of PROBE and PROBELIST.  This will make it possible to 
   // move ahead with output plugins, which is what this is all about.
+
+  /// hmmm. either way, i will have to revisit this. could we keep the switch
+  /// to PROBE pointers, as it will simplify tinkering?
 
   double a0, a1;
 #if 1
@@ -252,6 +267,14 @@ PROBELIST& OUTPUT_CMD::prblist(std::string const& reason)
 ////BUG//// doesn't work, crashes, due to problem in PROBE_LISTS
 // Even if it did, it is out of place in this file, because it has no connection
 // to OUTPUT_CMD.  It could exist as a stand-alone plugin.
+
+/// previously, hardwired probelists were cleared by
+///   command("alarm clear", Scope);
+///   command("plot clear", Scope);
+///   command("print clear", Scope);
+/// need global access to all PROBELISTs from here (or some stand-alone plugin).
+
+//
 class CMD_PROBES : public CMD{
 public:
   void do_it(CS& cmd, CARD_LIST*){

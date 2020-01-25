@@ -34,6 +34,10 @@ class SIM;
 // but should be "has-a" OUTPUT
 // Other than this, CMD are not cloned.
 // This clone should be really to clone the OUTPUT, not the CMD.
+//
+/// the initial draft had a class OUTPUT_CMD that inherited from both CMD and
+/// OUTPUT, but i dont remember why the latter. should try and move CMD over to
+/// OUTPUT_CMD.
 /*--------------------------------------------------------------------------*/
 // attached to SIM, can store probelist, do whatever output.
 class INTERFACE OUTPUT : public CMD {

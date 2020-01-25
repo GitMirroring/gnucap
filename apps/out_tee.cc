@@ -26,10 +26,23 @@
 // This is an essential part of the system, not optional.
 // OUTPUT_TEE is acccessed directly in s__out.cc, not through the plugin mechanism.
 // Therefore it cannot be a plugin.
+
+/// it was designed to be optional. the OUTPUT_TEE was only attached to a
+/// simulation command as-needed (e.g. in the spice tests). As part of lib and
+/// attached in s__out (like now), it will no longer be possible to not
+/// use it.
+
 // It could be a plugin by giving it a name, registering with a dispatcher,
 // and always using it that way, but it would still be required
 // because the functionality is needed even in the most basic sense.
 // Examples: bm_cond.cc, bm_value.cc, d_subckt.cc
+
+/// out_tee.cc was (intended as) a plugin. there was no need for registering
+/// with a dispatcher, because it was enabled by loading it with the default
+/// plugins.
+///
+/// (either way, I don't object to hardwire it in lib, and this might simplify
+/// things.)
 
 //testing=script,complete 2020.01.14
 #include "ap.h"

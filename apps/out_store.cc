@@ -50,6 +50,11 @@ public: // OUTPUT
       // wrong type or not there, put new one
       data = new WAVESTASH;
       ////BUG//// memory leak
+
+      /// really? data is intentionally global, so it can be seen by others,
+      /// it's only one object per key, and then cleared during shutdown from
+      /// "clear" command...
+
       data_dispatcher.install(Label, data);
     }else{
     }
@@ -73,9 +78,14 @@ public: // OUTPUT
   // Not rebuilt, not seen, here but are still available to users of the stored data,
   // such as "measure".
 
+  /// this was intentional, there is a clear command. could as well
+  /// always clear when rebuilding the stash.
+
   ////BUG//// This indexing should be part of WAVESTASH, not done here.
   // Code here is more complex than old code that uses a C style array.
   // use of dispatcher (data_dispatcher) also seems inappropriate.
+
+  /// where to put the data instead? what should own the data?
 
   void commit(double XX, int Level)
   {
