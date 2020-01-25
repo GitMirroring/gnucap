@@ -30,20 +30,17 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-// OUTPUT_CMD_PRINT: print the list of results (text form) to out()
+// OUTPUT_PRINT: print the list of results (text form) to out()
 // The argument is the first column (independent variable, aka "x")
-class OUTPUT_CMD_PRINT : public OUTPUT_CMD {
+class OUTPUT_PRINT : public OUTPUT {
 private:
   int _threshold;
 private:
-  OUTPUT_CMD_PRINT(const OUTPUT_CMD_PRINT&p) : OUTPUT_CMD(p), _threshold(dl_NONE) {}
+  OUTPUT_PRINT(const OUTPUT_PRINT&p) : OUTPUT(p), _threshold(dl_NONE) {}
 public:
-  OUTPUT_CMD_PRINT() : OUTPUT_CMD()	{set_label("print");}
+  OUTPUT_PRINT() : OUTPUT()	{set_label("print");}
 private: // OUTPUT_CMD
-  OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_PRINT(*this);}
-  void setup(CS& cmd)			{IO::plotset = false; OUTPUT_CMD::setup(cmd);}
-
-  ////BUG//// IO::plotset still sucks.
+  OUTPUT* clone() const		{return new OUTPUT_PRINT(*this);}
 
 private: // OUTPUT
   void init(int Level, const std::string&)		{_threshold=Level;}
@@ -91,9 +88,17 @@ private: // OUTPUT
       o << '\n';
     }
   }
+}o0;
+/*--------------------------------------------------------------------------*/
+class OUTPUT_CMD_PRINT : public OUTPUT_CMD{
+public:
+  OUTPUT_CMD_PRINT(OUTPUT const* o) : OUTPUT_CMD(o) {}
+private: ////BUG//// IO::plotset still sucks.
+  void setup(CS& cmd) {IO::plotset = false; OUTPUT_CMD::setup(cmd);}
 };
-OUTPUT_CMD_PRINT p3;
-DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "iprint|print|probe", &p3);
+/*--------------------------------------------------------------------------*/
+OUTPUT_CMD_PRINT p0(&o0);
+DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "iprint|print|probe", &p0);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

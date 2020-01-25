@@ -81,6 +81,8 @@ protected:				/* s__out.cc */
   void out_commit(double x, int level);
   void out_flush();
 public:
+  // is this similar to COMPONENT::attach_common? who is the owner?
+  // (otherwise, perhaps use a different verb, register? set?)
   void attach_output(OUTPUT*);
   void detach_output(OUTPUT*);
 private:

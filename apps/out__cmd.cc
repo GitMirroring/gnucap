@@ -38,7 +38,13 @@
 #include "u_prblst.h"
 #include "globals.h"
 #include "u_out.h"
-//#include "trace_on.h"
+#include "trace_on.h"
+/*--------------------------------------------------------------------------*/
+OUTPUT& OUTPUT::setup(std::string const& reason)
+{ untested();
+  _prb = &prblist(reason);
+  return *this;
+}
 /*--------------------------------------------------------------------------*/
 void OUTPUT_CMD::setup(CS& cmd)
 {
@@ -51,9 +57,9 @@ void OUTPUT_CMD::setup(CS& cmd)
     std::string reason=short_label() + ":" + s;
 
     container_type::iterator a=_sinks.find(sim);
-    OUTPUT_CMD* sink;
+    OUTPUT* sink;
     if(a==_sinks.end() || !a->second){
-      if(a==_sinks.end()){
+      if(a==_sinks.end()){ untested();
 	// really a new sink
       }else if(!a->second){untested();
 	// had one before but lost it, so make a new one
@@ -62,20 +68,20 @@ void OUTPUT_CMD::setup(CS& cmd)
       }
 
       trace2("new sink", s, short_label());
-      setup_probelist(reason);
-      assert(&probelist() == _prb);
 
+      setup_probelist(reason);
+//      assert(&probelist() == _prb);
       //OUTPUT_CMD* o=clone();
       //sink = prechecked_cast<OUTPUT_CMD*>(o);
-      sink = clone();
+      sink = &new_output(reason);
 
       assert(sink);
-      assert(&sink->probelist() == _prb);
+      // assert(&sink->probelist() == _prb);
       _sinks[sim] = sink;
       assert(sink);
     }else{
       trace2("reusing sink", s, short_label());
-      sink = prechecked_cast<OUTPUT_CMD*>(a->second);
+      sink = prechecked_cast<OUTPUT*>(a->second);
       assert(sink);
       //assert(&sink->probelist() != _prb);
       //assert(&sink->probelist() == _prb);
@@ -83,7 +89,7 @@ void OUTPUT_CMD::setup(CS& cmd)
     }
     sink->set_simname(s);
     sim->attach_output(sink);
-    assert(&sink->probelist() == _prb);
+    // assert(&sink->probelist() == _prb);
   }else{
     trace2("no sim, no sink", s, short_label());
     cmd.reset(here);
@@ -174,13 +180,13 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
   // this results in NULL, if there is no SIM registered.
   setup(cmd);
 
-  if (!_prb) {
+  if (!_prb) { untested();
     // go through all sims that have been mentioned
-    if (cmd.is_end()) {
+    if (cmd.is_end()) { untested();
       // list probes for this output command.
       // forall simulations
       for(container_type::const_iterator i=_sinks.begin(); i!=_sinks.end(); ++i){
-	OUTPUT_CMD const* S=prechecked_cast<OUTPUT_CMD const*>(i->second);
+	OUTPUT const* S=i->second;
 	assert(S);
 	PROBELIST const& pl=S->probelist();
 	pl.listing(S->simname());
@@ -188,7 +194,7 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
     }else if (cmd.umatch("clear ")) {untested();
       // clear all
       for(container_type::const_iterator i=_sinks.begin(); i!=_sinks.end(); ++i){untested();
-	OUTPUT_CMD* S=prechecked_cast<OUTPUT_CMD*>(i->second);
+	OUTPUT* S=i->second;
 	assert(S);
 	PROBELIST& pl=S->probelist();
 	pl.clear();
@@ -197,7 +203,7 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
     }else{untested();
       throw Exception_CS("what's this?", cmd);
     }
-  }else{
+  }else{ untested();
     if (cmd.is_end()) {				/* list */
       _prb->listing("");
     }else if (cmd.umatch("clear ")) {
@@ -258,7 +264,7 @@ void OUTPUT_CMD::detach_sinks()
   }
 }
 /*--------------------------------------------------------------------------*/
-PROBELIST& OUTPUT_CMD::prblist(std::string const& reason)
+PROBELIST& OUTPUT::prblist(std::string const& reason)
 {
   return PROBE_LISTS::get(reason);
 }

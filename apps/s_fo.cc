@@ -121,6 +121,7 @@ public:
   }
 private: // pure, unused
   void do_it(CS&, CARD_LIST*){ unreachable(); }
+  OUTPUT* clone()const { unreachable(); return NULL; }
 private:
   void init(int, const std::string&){}
   void head(double, double, const std::string&){}

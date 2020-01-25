@@ -28,44 +28,69 @@
 /*--------------------------------------------------------------------------*/
 class PROBELIST;
 class SIM;
-////BUG//// Hierarchy is wrong.
-// OUTPUT should not be a CMD (not a "is-a" relationship)
-// OUTPUT_CMD "is-a" CMD
-// but should be "has-a" OUTPUT
-// Other than this, CMD are not cloned.
-// This clone should be really to clone the OUTPUT, not the CMD.
-//
-/// the initial draft had a class OUTPUT_CMD that inherited from both CMD and
-/// OUTPUT, but i dont remember why the latter. should try and move CMD over to
-/// OUTPUT_CMD.
 /*--------------------------------------------------------------------------*/
 // attached to SIM, can store probelist, do whatever output.
-class INTERFACE OUTPUT : public CMD {
+class INTERFACE OUTPUT : public CKT_BASE {
 public: // construct
-  OUTPUT()				{}
+  OUTPUT(): _prb(NULL)			{}
   virtual ~OUTPUT()			{}
+protected:
+  OUTPUT(OUTPUT const& p) : CKT_BASE(p), _prb(p._prb)  {}
 public:
-  virtual PROBELIST const* proBes() const {untested(); return NULL;}
+  virtual OUTPUT* clone()const = 0;
+  OUTPUT& setup(std::string const& reason);
+private:
+public: // friend OUTPUT_CMD?
+  static PROBELIST& prblist(std::string const& reason);
+  PROBELIST const& probelist() const	{assert(_prb); return *_prb;}
+  PROBELIST&	   probelist()		{assert(_prb); return *_prb;}
+public:
+  virtual PROBELIST const* proBes() const {untested(); return _prb;}
   virtual void reset()			{_out = IO::mstdout; _out.reset();} // bug? check if needed
   virtual OUTPUT* set(CS& cmd)		{::outset(cmd, &_out); return this;}
   void set(OMSTREAM const& o)		{_out = o;}
+
+  static void attach(OUTPUT* o, OUTPUT*& to){
+    if(to){
+      to->attach_output(o);
+    }else{untested();
+      to = o;
+    }
+  }
+
+  static void detach(OUTPUT* o, OUTPUT*& from){
+    if(from){
+      from->detach_output(o);
+    }else{untested();
+      from = NULL;
+    }
+  }
+  virtual void attach_output(OUTPUT*)		{unreachable();}
+  virtual void detach_output(OUTPUT*)		{unreachable();}
 
   virtual void init(int, const std::string&)		{}
   virtual void head(double, double, const std::string&)	{}
   virtual void commit(double X, int Level)		=0;
   virtual void flush()					{}
   static  void purge(CKT_BASE*);
+public:
+  std::string const& simname() const	{return _simname;}
+  void set_simname(const std::string& s){_simname = s;}
 protected:
   OMSTREAM out()			{return _out;}
 private:
   OMSTREAM _out;
+  std::string _simname;
+protected:
+  PROBELIST* _prb;
 }; // OUTPUT
 /*--------------------------------------------------------------------------*/
 class INTERFACE OUTPUT_TEE : public OUTPUT {
 public:
   typedef std::set<OUTPUT*> outputs_type;
 private:
-  OUTPUT_TEE(OUTPUT_TEE const&)		{unreachable();}
+  OUTPUT_TEE(OUTPUT_TEE const&) : OUTPUT() {unreachable();}
+  OUTPUT* clone()const {unreachable(); return NULL;}
 public: // construct
   OUTPUT_TEE()				{}
   ~OUTPUT_TEE();
@@ -89,21 +114,18 @@ public: // OUTPUT. u_out.cc
   void flush();
 private:
   void do_it(CS&, CARD_LIST*) { unreachable(); }
-private:
   outputs_type _outputs;
 }; // OUTPUT_TEE
 /*--------------------------------------------------------------------------*/
-class INTERFACE OUTPUT_CMD : public OUTPUT {
+class INTERFACE OUTPUT_CMD : public CMD {
 protected: // types
   typedef std::map<CMD*, OUTPUT*> container_type;
   typedef PROBE_BASE probe_type;
 public:
-  OUTPUT_CMD() : OUTPUT(), _prb(NULL) {}
-protected:
-  OUTPUT_CMD(OUTPUT_CMD const& p) : OUTPUT(p), _prb(p._prb)  {}
-private:
-  static PROBELIST& prblist(std::string const& reason);
-protected:
+  OUTPUT_CMD(OUTPUT const* p) : CMD(), _outproto(p) {}
+private: // inhibuited
+  OUTPUT_CMD(OUTPUT_CMD const& p) : CMD(p) {}
+public:
   virtual ~OUTPUT_CMD() {
     detach_sinks();
     for(container_type::const_iterator i=_sinks.begin();
@@ -111,31 +133,34 @@ protected:
       assert(!i->second);
     }
   }
-
-  virtual OUTPUT_CMD* clone() const=0;
 protected:
-  void setup_probelist(std::string const& reason) {_prb = &prblist(reason);}
-  PROBELIST const& probelist() const	{assert(_prb); return *_prb;}
-  PROBELIST&	   probelist()		{assert(_prb); return *_prb;}
+  void setup_probelist(std::string const& reason);
+  virtual OUTPUT& new_output(std::string const& reason){
+    assert(_outproto);
+    OUTPUT* o = _outproto->clone();
+    assert(o);
+    return o->setup(reason);
+  }
   ////BUG//// proBes, probelist ... why both?????
   // proBes only used by fourier (s_fo.cc)
   virtual void setup(CS&);
 public:
-  std::string const& simname() const	{return _simname;}
-  void set_simname(const std::string& s){_simname = s;}
-public:
   void do_it(CS&, CARD_LIST*);
   virtual PROBE_BASE const* probe_proto() const{return NULL;}
 private: // OUTPUT
-  PROBELIST const* proBes() const	{return _prb;}
   void detach_sinks();
 private:
-  std::string _simname;
-  PROBELIST* _prb;
+  OUTPUT const* _outproto;
 protected:
   container_type _sinks;
+protected:
+  PROBELIST* _prb; // OUTPUT?
 }; // OUTPUT_CMD
 /*--------------------------------------------------------------------------*/
+inline void OUTPUT_CMD::setup_probelist(std::string const& reason)
+{
+  _prb = &OUTPUT::prblist(reason);
+}
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:

@@ -285,18 +285,17 @@ static void plotarg(
 // vim:ts=8:sw=2:noet:
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class OUTPUT_CMD_PLOT : public OUTPUT_CMD {
+class OUTPUT_PLOT : public OUTPUT {
 private: // types
   typedef RANGE_PROBE probe_type;
   static probe_type _probe_proto;
 private:
-  OUTPUT_CMD_PLOT(const OUTPUT_CMD_PLOT&p) : OUTPUT_CMD(p) {}
+  OUTPUT_PLOT(const OUTPUT_PLOT&p) : OUTPUT(p) {}
 public:
-  OUTPUT_CMD_PLOT() : OUTPUT_CMD()	{set_label("plot");}
-  virtual ~OUTPUT_CMD_PLOT()		{}
-private: // OUTPUT_CMD
-  OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_PLOT(*this);}
-  void setup(CS& cmd)			{IO::plotset = true; OUTPUT_CMD::setup(cmd);}
+  OUTPUT_PLOT() : OUTPUT()	{set_label("plot");}
+  virtual ~OUTPUT_PLOT()		{}
+private: // OUTPUT
+  OUTPUT* clone() const		{return new OUTPUT_PLOT(*this);}
   PROBE_BASE const* probe_proto() const	{return &_probe_proto;}
 private: // OUTPUT
   void init(int, const std::string&) {IO::plotout = (IO::plotset) ? IO::mstdout : OMSTREAM();}
@@ -323,9 +322,16 @@ private: // OUTPUT
   }
 
   void flush() {plclose();}
-}p2;
-OUTPUT_CMD_PLOT::probe_type OUTPUT_CMD_PLOT::_probe_proto(PROBE_BASE::_STATIC);
-DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "iplot|plot", &p2);
+}o0;
+class OUTPUT_CMD_PLOT : public OUTPUT_CMD{
+public:
+  OUTPUT_CMD_PLOT(OUTPUT const* o) : OUTPUT_CMD(o) {}
+private: ////BUG//// IO::plotset still sucks.
+  void setup(CS& cmd) {IO::plotset = true; OUTPUT_CMD::setup(cmd);}
+};
+OUTPUT_CMD_PLOT p0(&o0);
+OUTPUT_PLOT::probe_type OUTPUT_PLOT::_probe_proto(PROBE_BASE::_STATIC);
+DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "iplot|plot", &p0);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
