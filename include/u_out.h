@@ -41,11 +41,10 @@ public:
   OUTPUT& setup(std::string const& reason);
 private:
 public: // friend OUTPUT_CMD?
-  static PROBELIST& prblist(std::string const& reason);
+  static PROBELIST& prblist(std::string const& reason, CMD const* sim);
   PROBELIST const& probelist() const	{assert(_prb); return *_prb;}
   PROBELIST&	   probelist()		{assert(_prb); return *_prb;}
 public:
-  virtual PROBELIST const* proBes() const {untested(); return _prb;}
   virtual void reset()			{_out = IO::mstdout; _out.reset();} // bug? check if needed
   virtual OUTPUT* set(CS& cmd)		{::outset(cmd, &_out); return this;}
   void set(OMSTREAM const& o)		{_out = o;}
@@ -95,17 +94,8 @@ public: // construct
   OUTPUT_TEE()				{}
   ~OUTPUT_TEE();
 private:
-  void attach_output(OUTPUT* o)		{_outputs.insert(o);}
-  void detach_output(OUTPUT* o)		{_outputs.erase(o);}
-private: // override OUTPUT
-  PROBELIST const* proBes() const{
-    if(_outputs.empty()){
-      return NULL;
-    }else{
-      // incomplete. but not better in old code.
-      return (*_outputs.begin())->proBes();
-    }
-  }
+  void attach_output(OUTPUT* o);
+  void detach_output(OUTPUT* o);
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
   void init(int, const std::string&);
@@ -134,15 +124,13 @@ public:
     }
   }
 protected:
-  void setup_probelist(std::string const& reason);
+  void setup_probelist(std::string const& reason, CMD const* sim);
   virtual OUTPUT& new_output(std::string const& reason){
     assert(_outproto);
     OUTPUT* o = _outproto->clone();
     assert(o);
     return o->setup(reason);
   }
-  ////BUG//// proBes, probelist ... why both?????
-  // proBes only used by fourier (s_fo.cc)
   virtual void setup(CS&);
 public:
   void do_it(CS&, CARD_LIST*);
@@ -157,9 +145,9 @@ protected:
   PROBELIST* _prb; // OUTPUT?
 }; // OUTPUT_CMD
 /*--------------------------------------------------------------------------*/
-inline void OUTPUT_CMD::setup_probelist(std::string const& reason)
+inline void OUTPUT_CMD::setup_probelist(std::string const& reason, CMD const* sim)
 {
-  _prb = &OUTPUT::prblist(reason);
+  _prb = &OUTPUT::prblist(reason, sim);
 }
 /*--------------------------------------------------------------------------*/
 #endif

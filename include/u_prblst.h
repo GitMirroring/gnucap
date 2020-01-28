@@ -28,6 +28,8 @@
 #include "u_probe.h"
 /*--------------------------------------------------------------------------*/
 class CARD_LIST;
+class CMD;
+class SIM;
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBELIST : public CKT_BASE {
 private:
@@ -40,9 +42,9 @@ private:
 
 private:
   explicit PROBELIST(const PROBELIST&p)
-    : CKT_BASE(p), bag(p.bag) {untested(); untested(); incomplete();}
+    : CKT_BASE(p), bag(p.bag), _sim(NULL) {untested(); untested(); incomplete();}
 public:
-  explicit PROBELIST() {}
+  explicit PROBELIST(CMD const* c) : _sim(c){}
   ~PROBELIST() {}
 
   void	   listing(const std::string&)const;
@@ -59,8 +61,10 @@ public:
 private:
   void	  erase(iterator b, iterator e);
   void	  push_new_probe(const std::string& param, const CKT_BASE* object);
-  bool    add_branches(const std::string&,const std::string&,const CARD_LIST*);
+  bool    add_branches(const std::string&,const std::string&, const CARD_LIST*);
   void    add_all_nodes(const std::string&);
+private:
+  CMD const* _sim;
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {
@@ -70,7 +74,7 @@ private:
   ~PROBE_LISTS();
 public:
   PROBELIST& operator[](std::string const& reason) const {untested(); return get(reason);}
-  static PROBELIST& get(std::string const& reason);
+  static PROBELIST& get(std::string const& reason, CMD const* sim=NULL);
   static void clear();
   static void purge(CKT_BASE*);
 };

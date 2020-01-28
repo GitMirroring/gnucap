@@ -73,7 +73,6 @@ protected:
 	 void	reset_timers();	
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:				/* s__out.cc */
-  PROBELIST const* outproBes() const;	////BUG//// // transitional code hack
   void out_reset();
   bool out_set(CS&);
   void out_init(TRACE);
@@ -101,6 +100,7 @@ private:
 	void	set_damp();
 	void	load_matrix();
 	void	solve_equations();
+public:
 }; // SIM
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -170,8 +170,8 @@ LOGIC_NODE& node_t::data()const
 }
 /*--------------------------------------------------------------------------*/
 double NODE::tr_probe_num(const std::string& x)const
-{
-  if (Umatch(x, "v ")) {
+{ untested();
+  if (Umatch(x, "v ")) { untested();
     // return v0(); denoised
     return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {

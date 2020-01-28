@@ -29,6 +29,41 @@
 #include "l_compar.h" // inorder
 #include "l_lib.h" // wmatch
 /*--------------------------------------------------------------------------*/
+static const double qNaN = std::numeric_limits<double>::quiet_NaN();
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+class PROBE_VALUE{
+public:
+  PROBE_VALUE(double x) : _value(x, qNaN) {}
+  explicit PROBE_VALUE(COMPLEX x) : _value(x) {}
+private:
+  double real() const{return _value.real();}
+  double imag() const{return _value.imag();}
+public:
+  bool is_real_type() const{return !(imag()==imag());}
+  operator double() const{ assert(is_real_type()); return real(); }
+  operator COMPLEX() const{ assert(!is_real_type()); return _value; }
+private:
+  friend OMSTREAM& operator<<(OMSTREAM& o, PROBE_VALUE const&v);
+  OMSTREAM& print(OMSTREAM& o) const;
+private:
+  COMPLEX _value;
+};
+/*--------------------------------------------------------------------------*/
+inline OMSTREAM& PROBE_VALUE::print(OMSTREAM& o) const
+{
+  if(is_real_type()){
+    return o<<real();
+  }else{
+    // return o<<_value;
+    return o << real() << "+i*" << imag();
+  }
+}
+/*--------------------------------------------------------------------------*/
+inline OMSTREAM& operator<<(OMSTREAM& o, PROBE_VALUE const&v)
+{
+  return v.print(o);
+}
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_BASE : public CKT_BASE {
 public:
@@ -80,8 +115,8 @@ public:
     return "NA";
   }
   virtual void set_param_by_index(int, double);
-//  virtual std::string label() const;
-  virtual double value()const = 0;
+  virtual PROBE_VALUE value()const = 0;
+  virtual bool is_complex_type() const{return false;}
   std::string const& label() const{return short_label();}
 public: // compare probes.
   bool operator==(const PROBE_BASE& p)const { untested();
@@ -127,6 +162,7 @@ public:
 private: // PROBE_BASE
   // static, actually. but then can not override
   PROBE_BASE* new_wrap(PROBE_BASE* n) const{
+    trace1("RP::new_wrap", what());
     RANGE_PROBE* x=new RANGE_PROBE(what(), n);
     return x;
   }
@@ -134,14 +170,14 @@ private: // PROBE_BASE
     return 2;
   }
   void set_param_by_index(int i, double d);
-  double value() const{
+  PROBE_VALUE value() const{
     if(PROBE_BASE const* p=prechecked_cast<PROBE_BASE const*>(brh())){
       return p->value();
     }else{ unreachable();
       // range probes cannot be attached to components.
       // PROBELIST->RANGE_PROBE->some_PROBE->COMPONENT
       // where some_PROBE is determined by COMPONENT
-      return 99;
+      return 99.;
     }
   }
   virtual std::string param_value(int i) const{
@@ -165,7 +201,7 @@ public:
     return _hi;
   }
   bool in_range()const{
-    return in_order(lo(), value(), hi());
+    return in_order(lo(), double(value()), hi());
   }
 
 private:
@@ -184,7 +220,7 @@ public:
     assert(Value);
   }
 public:
-  double value() const{
+  PROBE_VALUE value() const{
     assert(_value);
     return double(*_value);
   }

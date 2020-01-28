@@ -142,7 +142,7 @@ private: // types
       : PROBE_BASE(What, Brh) {
     }
   public:
-    double value() const{
+    PROBE_VALUE value() const{
       return OPT::bypass + 10*_sim->_bypass_ok;
     }
   public:

@@ -1,0 +1,30 @@
+some corner case fourier check 
+#Time       v(vin)     v(6)      
+ 0.         0.         0.079194  
+ 12.5u      0.03923    0.11618   
+ 25.u       0.078217   0.30608   
+ 37.5u      0.11672    0.64909   
+ 50.u       0.15451    1.1202    
+ 62.5u      0.19134    1.6945    
+ 75.u       0.227      2.315     
+ 87.5u      0.26125    2.4843    
+ 100.u      0.29389    2.4869    
+#Freq      
+ 0.        
+ 10.K      
+ 20.K      
+# v(vin)    --------- actual ---------  -------- relative --------
+#freq       value        dB      phase  value        dB      phase
+ 0.         0.13353    -17.49   90.000  1.           0.00    0.000
+ 10.K       0.098141   -20.16 -155.968  0.73495     -2.67  114.032
+ 20.K       0.052701   -25.56 -134.365  0.39467     -8.08  135.635
+# v(6)      --------- actual ---------  -------- relative --------
+#freq       value        dB      phase  value        dB      phase
+ 0.         1.0956       0.79   90.000  0.97268     -0.24 -100.996
+ 10.K       1.1263       1.03 -169.004  1.           0.00    0.000
+ 20.K       0.48546     -6.28 -132.935  0.431       -7.31   36.069
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=93, total=109
+transient timesteps: accepted=16, rejected=0, total=16
+nodes: user=9, subckt=0, model=16, total=25
+dctran density=47.5%, ac density=47.5%

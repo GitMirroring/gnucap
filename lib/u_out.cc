@@ -1,6 +1,7 @@
-/*$Id: c_comand.h 2014.11.25 $ -*- C++ -*-
- * Copyright (C) 2001 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
+/*                            -*- C++ -*-
+ * Copyright (C) 2001,2020 Albert Davis
+ *               2018-2020 Felix Salfelder
+ * Author: Felix Salfelder <felix@salfelder.org>
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -19,29 +20,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * all of the commands
+ * output
  */
-//testing=trivial 2006.07.17
-#ifndef C_COMAND_H
-#define C_COMAND_H
-#include "e_card.h"
+#include "u_out.h"
+#include "u_prblst.h"
 /*--------------------------------------------------------------------------*/
-class CS;
-class OUTPUT;
+OUTPUT& OUTPUT::setup(std::string const& reason)
+{ untested();
+  _prb = &PROBE_LISTS::get(reason);
+  return *this;
+}
 /*--------------------------------------------------------------------------*/
-class INTERFACE CMD : public CKT_BASE {
-public:
-  std::string value_name()const {return "";}
-  virtual void do_it(CS&, CARD_LIST*) = 0;
-  virtual ~CMD() {}
-  static  void  cmdproc(CS&, CARD_LIST*);
-  static  void	command(const std::string&, CARD_LIST*);
-public: // output
-  virtual void attach_output(OUTPUT*){}
-  virtual void detach_output(OUTPUT*){untested();}
-  virtual PROBE_BASE const* tap_probe(PROBE_BASE const* s) const{ return s; }
-};
+void OUTPUT_TEE::attach_output(OUTPUT* o)	
+{ untested();
+	_outputs.insert(o);
+}
+/*--------------------------------------------------------------------------*/
+void OUTPUT_TEE::detach_output(OUTPUT* o)
+{ untested();
+	trace1("tee detach", _outputs.size());
+	_outputs.erase(o);
+	trace1("tee detached", _outputs.size());
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-#endif
-// vim:ts=8:sw=2:noet:

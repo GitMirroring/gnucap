@@ -33,6 +33,7 @@
 /// dispatcher?
 
 //testing=failed 2020.01.19
+#include "c_comand.h"
 #include "e_cardlist.h"
 #include "e_node.h"
 #include "e_card.h"
@@ -68,16 +69,22 @@ void PROBE_LISTS::clear()
   }
 }
 /*--------------------------------------------------------------------------*/
-PROBELIST& PROBE_LISTS::get(std::string const& reason)
+PROBELIST& PROBE_LISTS::get(std::string const& reason, CMD const* sim)
 {
   if(PROBELIST* p=probe_dispatcher[reason]){untested();
     trace1("probelist exists", reason);
+    // assert(sim==p->_sim); need to rethink probe_dispatcher anyway.
+    //                       this might become simpler with probes attached to
+    //                       the output directly...
     return *p;
-  }else{
-    PROBELIST* q=new PROBELIST();
+  }else if(sim){
+    PROBELIST* q=new PROBELIST(sim);
     trace2("probelist new", reason, q);
     probe_dispatcher.install(reason, q);
     return *q;
+  }else{
+    unreachable();
+    return *new PROBELIST(NULL);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -270,7 +277,8 @@ void PROBELIST::add_list(CS& cmd)
   }else if (cmd.is_alnum() || cmd.match1("*?")) {
     // branches or named nodes
     unsigned here1 = cmd.cursor();
-    bool found_something = add_branches(cmd.ctos(),what,&CARD_LIST::card_list);
+    bool found_something = add_branches(cmd.ctos(), what,
+                                        &CARD_LIST::card_list);
     if (!found_something) {
       cmd.warn(bWARNING, here1, "no match");
     }else{
@@ -282,7 +290,8 @@ void PROBELIST::add_list(CS& cmd)
       }else{
       }
       unsigned here2 = cmd.cursor();
-      found_something = add_branches(cmd.ctos(),what,&CARD_LIST::card_list);
+      found_something = add_branches(cmd.ctos(), what,
+	                             &CARD_LIST::card_list);
       if (!found_something) {untested();
 	cmd.reset(here2);
 	break;
@@ -303,6 +312,10 @@ void PROBELIST::push_new_probe(const std::string& param, CKT_BASE const* obj)
 {
   assert(obj);
   PROBE_BASE const* n=obj->new_probe(param);
+  if(_sim){
+    n = _sim->tap_probe(n);
+  }else{
+  }
   bag.push_back(n);
 }
 /*--------------------------------------------------------------------------*/

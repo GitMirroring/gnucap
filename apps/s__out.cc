@@ -32,15 +32,6 @@
 #include "s__.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-PROBELIST const* SIM::outproBes() const ////BUG////transitional code
-{
-  if(_output){
-    return _output->proBes();
-  }else{untested();
-    return NULL;
-  }
-}
-/*--------------------------------------------------------------------------*/
 void SIM::out_reset()
 {
   if(_output){
@@ -79,9 +70,9 @@ void SIM::out_init(TRACE Trace)
 }
 /*--------------------------------------------------------------------------*/
 void SIM::out_head(double start, double stop, const std::string& col1)
-{
+{ untested();
   ::status.output.start();
-  if(_output){
+  if(_output){ untested();
     _output->head(start, stop, col1);
   }else{ untested();
   }
@@ -91,7 +82,7 @@ void SIM::out_head(double start, double stop, const std::string& col1)
 void SIM::out_commit(double XX, int Level)
 {
   ::status.output.start();
-  if(_output){
+  if(_output){ untested();
     _output->commit(XX, Level);
   }else{ untested();
   }
@@ -120,6 +111,7 @@ void SIM::detach_output(OUTPUT* o)
 /*--------------------------------------------------------------------------*/
 void SIM::attach_new_tee()
 {
+  // this is optional, but required to send data to multiple sinks.
   _output = new OUTPUT_TEE;
 }
 /*--------------------------------------------------------------------------*/

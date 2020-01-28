@@ -189,7 +189,7 @@ public:
     }
   }
 public:
-  double value() const{ itested();
+  PROBE_VALUE value() const{ itested();
     assert(brh());
     double x;
     if (_sim->analysis_is_ac()) {

@@ -94,7 +94,7 @@ void TRANSIENT::sweep()
   
   {
     bool printnow = (_sim->_time0 == _tstart || _trace >= tALLTIME);
-    if (printnow) {
+    if (printnow) { untested();
       out_commit(_sim->_time0, dl_STROBE);
       _sim->keep_voltages();
       _sim->reset_iteration_counter(iPRINTSTEP);
