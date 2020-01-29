@@ -1,7 +1,7 @@
-/*                            -*- C++ -*-
+/*$Id: c_prbcmd.cc,v 26.137 2010/04/10 02:37:05 al Exp $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- *               2018 Felix Salfelder
- * Author: Felix Salfelder <felix@salfelder.org>
+ *               2020 Felix Salfelder
+ * Author: Albert Davis <aldavis@gnu.org>
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -20,43 +20,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * output commands
  */
-////BUG//// this file needs to move to lib.
-// apps is a collection of plugins, all optional, all independent.
-// This is an essential part of the system, not optional.
-// This file is a library, used to build output plugins.
-// apps sources are not usually installed, so this file
-// would not be available for additional modules if left in apps.
-
-/// same with s__out, perhaps merge out_cmd into s__out?
-/// additional modules need to carry s__out anyway, but it can be adapted to
-/// what is needed.
-
-//testing=script 2020.01.16
-#include "u_sim_data.h"
-#include "u_prblst.h"
+#include "c_comand.h"
+#include "u_parameter.h"
 #include "globals.h"
-#include "u_out.h"
-#include "trace_on.h"
+#include "u_prblst.h"
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+namespace {
 /*--------------------------------------------------------------------------*/
 ////BUG//// doesn't work, crashes, due to problem in PROBE_LISTS
 // Even if it did, it is out of place in this file, because it has no connection
 // to OUTPUT_CMD.  It could exist as a stand-alone plugin.
-
-/// previously, hardwired probelists were cleared by
-///   command("alarm clear", Scope);
-///   command("plot clear", Scope);
-///   command("print clear", Scope);
-/// need global access to all PROBELISTs from here (or some stand-alone plugin).
-
-//
-class CMD_PROBES : public CMD{
+/*--------------------------------------------------------------------------*/
+class CMD_PROBES : public CMD {
 public:
   void do_it(CS& cmd, CARD_LIST*){
     if (cmd.umatch("clear ")) {
@@ -68,8 +44,11 @@ public:
       // later
     }
   }
-} cp;
-DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "probes", &cp);
+} p0;
+/*--------------------------------------------------------------------------*/
+DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "probes", &p0);
+/*--------------------------------------------------------------------------*/
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
