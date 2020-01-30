@@ -9,10 +9,6 @@ some corner case fourier check
  75.u       0.227      2.315     
  87.5u      0.26125    2.4843    
  100.u      0.29389    2.4869    
-#Freq      
- 0.        
- 10.K      
- 20.K      
 # v(vin)    --------- actual ---------  -------- relative --------
 #freq       value        dB      phase  value        dB      phase
  0.         0.13353    -17.49   90.000  1.           0.00    0.000

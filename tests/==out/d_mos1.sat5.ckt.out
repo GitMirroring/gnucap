@@ -34,5 +34,3 @@ cmosn: rsh - rs - rd conflict: using rsh
                                         ^ ? no match
 .print op v(dsb ... 1) r(dsb.m1) region(dsb.m1) 
                                         ^ ? no match
-#          
- 27.       
