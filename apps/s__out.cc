@@ -82,7 +82,7 @@ void SIM::out_head(double start, double stop, const std::string& col1)
 void SIM::out_commit(double XX, int Level)
 {
   ::status.output.start();
-  if(_output){ untested();
+  if(_output){
     _output->commit(XX, Level);
   }else{ untested();
   }

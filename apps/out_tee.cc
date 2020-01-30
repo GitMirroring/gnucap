@@ -86,7 +86,7 @@ void OUTPUT_TEE::head(double start, double stop, const std::string& col1)
 }
 /*--------------------------------------------------------------------------*/
 void OUTPUT_TEE::commit(double x, int Level)
-{ untested();
+{ itested();
   trace1("TEE::commit", _outputs.size());
   for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
     assert(*p);

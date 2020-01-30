@@ -51,7 +51,8 @@ void OUTPUT_CMD::detach_sinks()
 static void probeargs(CS& cmd,
     PROBE_BASE const* wrap,
     PROBELIST::iterator p, PROBELIST::iterator e)
-{
+{ incomplete();
+  trace2("probeargs", cmd.fullstring(), cmd.tail());
   ////BUG//// only works for 2 args.
 
   ////BUG//// This really belongs to PROBE and PROBELIST, not here.
@@ -74,11 +75,11 @@ static void probeargs(CS& cmd,
   /// to PROBE pointers, as it will simplify tinkering?
 
   double a0, a1;
-#if 1
+#if 0
   bool have_args = (cmd >> '(') && (cmd >> a0 >> a1 >> ')');
 #else
   bool have_args=false;
-  if (cmd.skip1b('(')) {
+  if (cmd.skip1b('(')) { untested();
     // extra probe parameters (such as range)
     a0 = cmd.ctof();
     a1 = cmd.ctof();
@@ -87,7 +88,7 @@ static void probeargs(CS& cmd,
       cmd.check(bWARNING, "need )");
     }else{
     }
-  }else{
+  }else{ untested();
     have_args=false;
   }
 #endif
@@ -95,12 +96,15 @@ static void probeargs(CS& cmd,
   for (; p!=e; ++p) {
     PROBE_BASE const* cP=dynamic_cast<PROBE_BASE const*>(*p);
     PROBE_BASE* P=const_cast<PROBE_BASE*>(cP);
-    if(wrap){
+    if(wrap){ untested();
+      trace0("wrap");
       P = wrap->new_wrap(P);
       *p = P;
-    }else{
+    }else{ untested();
+      trace0("wrap");
     }
-    if(have_args){
+    if(have_args){ untested();
+      trace2("probe args", a0, a1);
       P->set_param_by_index(0, a0);
       P->set_param_by_index(1, a1);
     }else{
@@ -111,11 +115,13 @@ void OUTPUT_CMD::setup(CS& cmd)
 {
   trace1("setup", cmd.tail());
   unsigned here = cmd.cursor();
-  std::string s;
-  cmd >> s;
-  if (CMD* sim = command_dispatcher[s]) {
-    trace2("attaching sink", s, short_label());
-    std::string reason=short_label() + ":" + s;
+  std::string simcmd;
+  cmd >> simcmd;
+  if (CMD* sim = command_dispatcher[simcmd]) {
+    std::string output_type = short_label();
+    assert(output_type!="");
+    std::string reason = output_type + ":" + simcmd;
+    trace2("attaching sink", reason, short_label());
 
     container_type::iterator a=_sinks.find(sim);
     OUTPUT* sink;
@@ -128,7 +134,7 @@ void OUTPUT_CMD::setup(CS& cmd)
 	unreachable();
       }
 
-      trace2("new sink", s, short_label());
+      trace2("new sink", simcmd, short_label());
 
       setup_probelist(reason, sim);
 //      assert(&probelist() == _prb);
@@ -141,18 +147,18 @@ void OUTPUT_CMD::setup(CS& cmd)
       _sinks[sim] = sink;
       assert(sink);
     }else{
-      trace2("reusing sink", s, short_label());
+      trace2("reusing sink", simcmd, short_label());
       sink = prechecked_cast<OUTPUT*>(a->second);
       assert(sink);
       //assert(&sink->probelist() != _prb);
       //assert(&sink->probelist() == _prb);
       _prb = &sink->probelist();
     }
-    sink->set_simname(s);
+    sink->set_simname(simcmd);
     sim->attach_output(sink);
     // assert(&sink->probelist() == _prb);
   }else{
-    trace2("no sim, no sink", s, short_label());
+    trace2("no sim, no sink", simcmd, short_label());
     cmd.reset(here);
     _prb = NULL;
   }
@@ -233,7 +239,7 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
 	}
 	if (action == aDELETE) {
 	  _prb->remove_list(cmd);
-	}else{
+	}else{ untested();
 	  assert(_prb);
 	  unsigned here1=cmd.cursor();
 	  try{

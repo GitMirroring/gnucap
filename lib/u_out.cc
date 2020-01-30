@@ -33,6 +33,7 @@ OUTPUT& OUTPUT::setup(std::string const& reason)
 /*--------------------------------------------------------------------------*/
 void OUTPUT_TEE::attach_output(OUTPUT* o)	
 { untested();
+	trace1("TEE attach", _outputs.size());
 	_outputs.insert(o);
 }
 /*--------------------------------------------------------------------------*/

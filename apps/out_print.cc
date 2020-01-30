@@ -78,10 +78,19 @@ private: // OUTPUT
       //sprintf(format, "%%c%%-%u.%us", width, width);
       sprintf(format, "%%c%%-%us", width);
       
-      // BUG: only print if there are real probes
-      out().form(format, '#', col1.c_str());
-      
       PROBELIST const& pr = probelist();
+      std::string newline;
+      for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
+	assert(*p);
+	if ((*p)->is_complex_type()){
+	  // not printing table header
+	}else{
+	  out().form(format, '#', col1.c_str());
+	  newline = "\n";
+	  break;
+	}
+      }
+
       _buffer.resize(0);
       _freq.resize(0);
       for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
@@ -93,19 +102,18 @@ private: // OUTPUT
 	  out().form(format, ' ', (*p)->label().c_str());
 	}
       }
-      out() << '\n';
+      out() << newline;
     }
   }
 
-  void commit(double XX, int Level)
-  {
+  void commit(double XX, int Level) { untested();
     trace2("print:commit", Level, _threshold);
-    if (Level < _threshold) {
+    if (Level < _threshold) { itested();
       // user specified, trace option
-    }else if (IO::plotout.any()) {
+    }else if (IO::plotout.any()) { untested();
       // plotting is active, suppress any other output
       ////BUG//// need a better way to do this.
-    }else{
+    }else{ untested();
       OMSTREAM o=out();
       o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
       PROBELIST const& pr = probelist();
@@ -207,7 +215,9 @@ private:
 /*--------------------------------------------------------------------------*/
 class OUTPUT_CMD_PRINT : public OUTPUT_CMD{
 public:
-  OUTPUT_CMD_PRINT(OUTPUT const* o) : OUTPUT_CMD(o) {}
+  OUTPUT_CMD_PRINT(OUTPUT const* o) : OUTPUT_CMD(o) {
+    set_label("print");
+  }
 private: ////BUG//// IO::plotset still sucks.
   void setup(CS& cmd) {IO::plotset = false; OUTPUT_CMD::setup(cmd);}
 };

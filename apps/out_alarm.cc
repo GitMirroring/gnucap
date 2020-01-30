@@ -65,8 +65,16 @@ public: // OUTPUT
   }
 }o0;
 /*--------------------------------------------------------------------------*/
-OUTPUT_CMD p0(&o0);
-OUTPUT_ALARM::probe_type OUTPUT_ALARM::_probe_proto(PROBE_BASE::_STATIC);
+RANGE_PROBE rp(PROBE_BASE::_STATIC);
+/*--------------------------------------------------------------------------*/
+class OUTPUT_CMD_ALARM : public OUTPUT_CMD{
+public:
+  OUTPUT_CMD_ALARM(OUTPUT const* o) : OUTPUT_CMD(o, &rp) {
+    set_label("alarm");
+  }
+};
+/*--------------------------------------------------------------------------*/
+OUTPUT_CMD_ALARM p0(&o0);
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "alarm", &p0);
 /*--------------------------------------------------------------------------*/
 }

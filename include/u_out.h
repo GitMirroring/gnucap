@@ -50,7 +50,7 @@ public:
   void set(OMSTREAM const& o)		{_out = o;}
 
   static void attach(OUTPUT* o, OUTPUT*& to){
-    if(to){
+    if(to){ untested();
       to->attach_output(o);
     }else{untested();
       to = o;
@@ -58,7 +58,7 @@ public:
   }
 
   static void detach(OUTPUT* o, OUTPUT*& from){
-    if(from){
+    if(from){ untested();
       from->detach_output(o);
     }else{untested();
       from = NULL;
@@ -110,10 +110,10 @@ private:
 class INTERFACE OUTPUT_CMD : public CMD {
 protected: // types
   typedef std::map<CMD*, OUTPUT*> container_type;
-  typedef PROBE_BASE probe_type;
 public:
-  OUTPUT_CMD(OUTPUT const* p) : CMD(), _outproto(p) {}
-private: // inhibuited
+  OUTPUT_CMD(OUTPUT const* p, PROBE_BASE const* pp=NULL)
+    : CMD(), _outproto(p), _probe_proto(pp) {}
+private: // inhibited
   OUTPUT_CMD(OUTPUT_CMD const& p) : CMD(p) {}
 public:
   virtual ~OUTPUT_CMD() {
@@ -125,7 +125,7 @@ public:
   }
 protected:
   void setup_probelist(std::string const& reason, CMD const* sim);
-  virtual OUTPUT& new_output(std::string const& reason){
+  virtual /*?*/ OUTPUT& new_output(std::string const& reason){
     assert(_outproto);
     OUTPUT* o = _outproto->clone();
     assert(o);
@@ -134,11 +134,13 @@ protected:
   virtual void setup(CS&);
 public:
   void do_it(CS&, CARD_LIST*);
-  virtual PROBE_BASE const* probe_proto() const{return NULL;}
+private:
+  PROBE_BASE const* probe_proto() const{return _probe_proto;}
 private: // OUTPUT
   void detach_sinks();
 private:
   OUTPUT const* _outproto;
+  PROBE_BASE const* _probe_proto;
 protected:
   container_type _sinks;
 protected:

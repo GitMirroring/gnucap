@@ -96,7 +96,13 @@ public: // OUTPUT
 private:
   WAVESTASH::INDEX* _fill;
 }o0; // OUTPUT_STORE
-OUTPUT_CMD p0(&o0);
+/*--------------------------------------------------------------------------*/
+class OUTPUT_CMD_STORE : public OUTPUT_CMD{
+public:
+  OUTPUT_CMD_STORE() : OUTPUT_CMD(&o0) {
+    set_label("store");
+  }
+}p0;
 DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "store", &p0);
 /*--------------------------------------------------------------------------*/
 }

@@ -361,7 +361,7 @@ void FOURIER::setup(CS& Cmd)
   }
 
   _tstop = _tstart + 1. / _fstep;
-  _tstrobe = 1. / (_fstep * double(_timesteps-1));
+  _tstrobe = 1. / _fstep / double(_timesteps-1);
   _time1 = _sim->_time0 = _tstart;
 
   _sim->_freq = _fstep;
