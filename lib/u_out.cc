@@ -37,11 +37,21 @@ void OUTPUT_TEE::attach_output(OUTPUT* o)
 	_outputs.insert(o);
 }
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::detach_output(OUTPUT* o)
+void OUTPUT_TEE::detach_output(CKT_BASE* b)
 { untested();
-	trace1("tee detach", _outputs.size());
-	_outputs.erase(o);
-	trace1("tee detached", _outputs.size());
+
+	bool got_it=false;
+	if(OUTPUT* o=dynamic_cast<OUTPUT*>(b)){
+		got_it = _outputs.erase(o);
+	}else{
+	}
+	if(!got_it){
+	  for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
+		 assert(*p);
+		 (*p)->detach_output(b);
+	  }
+	}else{
+	}
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

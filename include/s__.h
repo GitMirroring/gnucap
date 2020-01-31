@@ -83,7 +83,7 @@ public:
   // is this similar to COMPONENT::attach_common? who is the owner?
   // (otherwise, perhaps use a different verb, register? set?)
   void attach_output(OUTPUT*);
-  void detach_output(OUTPUT*);
+  void detach_output(CKT_BASE*);
 private:
   void attach_new_tee();
   void delete_outputs();

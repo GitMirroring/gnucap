@@ -45,7 +45,7 @@ private:
     : CKT_BASE(p), bag(p.bag), _sim(NULL) {untested(); untested(); incomplete();}
 public:
   explicit PROBELIST(CMD const* c) : _sim(c){}
-  ~PROBELIST() {}
+  ~PROBELIST();
 
   void	   listing(const std::string&)const;
   void     clear();
@@ -69,7 +69,12 @@ private:
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {
 private:
+  typedef std::map<std::string, PROBELIST*> container_type;
+  typedef container_type::iterator iterator;
+  // typedef container_type::const_iterator const_iterator;
+private:
   PROBE_LISTS(const PROBE_LISTS&) {unreachable();}
+public:
   PROBE_LISTS() {untested();}
   ~PROBE_LISTS();
 public:
@@ -77,6 +82,8 @@ public:
   static PROBELIST& get(std::string const& reason, CMD const* sim=NULL);
   static void clear();
   static void purge(CKT_BASE*);
+private:
+  static container_type _map;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

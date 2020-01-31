@@ -104,7 +104,7 @@ void SIM::attach_output(OUTPUT* o)
   OUTPUT::attach(o, _output);
 }
 /*--------------------------------------------------------------------------*/
-void SIM::detach_output(OUTPUT* o)
+void SIM::detach_output(CKT_BASE* o)
 {
   OUTPUT::detach(o, _output);
 }

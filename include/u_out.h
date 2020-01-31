@@ -49,6 +49,8 @@ public:
   virtual OUTPUT* set(CS& cmd)		{::outset(cmd, &_out); return this;}
   void set(OMSTREAM const& o)		{_out = o;}
 
+#if 1
+  // this is called from SIM...
   static void attach(OUTPUT* o, OUTPUT*& to){
     if(to){ untested();
       to->attach_output(o);
@@ -57,15 +59,19 @@ public:
     }
   }
 
-  static void detach(OUTPUT* o, OUTPUT*& from){
-    if(from){ untested();
-      from->detach_output(o);
-    }else{untested();
+  static void detach(CKT_BASE* o, OUTPUT*& from){
+    if(from==o){untested();
       from = NULL;
+    }else if(from){ untested();
+      from->detach_output(o);
+    }else{ untested();
+      // can't detach, it's not attached.
     }
   }
+#endif
+
   virtual void attach_output(OUTPUT*)		{unreachable();}
-  virtual void detach_output(OUTPUT*)		{unreachable();}
+  virtual void detach_output(CKT_BASE*)	{unreachable();}
 
   virtual void init(int, const std::string&)		{}
   virtual void head(double, double, const std::string&)	{}
@@ -95,7 +101,7 @@ public: // construct
   ~OUTPUT_TEE();
 private:
   void attach_output(OUTPUT* o);
-  void detach_output(OUTPUT* o);
+  void detach_output(CKT_BASE* o);
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
   void init(int, const std::string&);

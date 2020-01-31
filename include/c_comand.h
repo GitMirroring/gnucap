@@ -38,7 +38,7 @@ public:
   static  void	command(const std::string&, CARD_LIST*);
 public: // output
   virtual void attach_output(OUTPUT*){}
-  virtual void detach_output(OUTPUT*){untested();}
+  virtual void detach_output(CKT_BASE*) { untested();}
   virtual PROBE_BASE const* tap_probe(PROBE_BASE const* s) const{ return s; }
 };
 /*--------------------------------------------------------------------------*/

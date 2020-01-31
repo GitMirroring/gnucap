@@ -44,54 +44,45 @@
 #include "io_error.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+PROBE_LISTS::container_type PROBE_LISTS::_map;
+/*--------------------------------------------------------------------------*/
 PROBE_LISTS::~PROBE_LISTS()
 {untested();
   // clear command does that.
-  assert(probe_dispatcher.begin()==probe_dispatcher.end());
+  assert(_map.begin()==_map.end());
 }
 /*--------------------------------------------------------------------------*/
 void PROBE_LISTS::clear()
 {
-  for(DISPATCHER<CARD*>::const_iterator i=probe_dispatcher.begin();
-      i!=probe_dispatcher.end(); ++i){
-    PROBELIST* P=dynamic_cast<PROBELIST*>(i->second);
+  for(iterator i=_map.begin(); i!=_map.end(); ++i){
+    PROBELIST* P = i->second;
+    assert(P);
 
-    if(P){
-      P->clear();
-      delete P;
-      probe_dispatcher.uninstall(i);
-      assert(!i->second);
-      ////BUG//// crash later.  does not clear pointer from OUTPUT.
-    }else if(i->second){untested(); untested();
-      unreachable();
-    }else{
-    }
+    P->clear();
   }
+  _map.clear();
 }
 /*--------------------------------------------------------------------------*/
 PROBELIST& PROBE_LISTS::get(std::string const& reason, CMD const* sim)
 {
-  if(PROBELIST* p=probe_dispatcher[reason]){untested();
+  PROBELIST*& p=_map[reason];
+
+  if(p){ untested();
     trace1("probelist exists", reason);
     // assert(sim==p->_sim); need to rethink probe_dispatcher anyway.
     //                       this might become simpler with probes attached to
     //                       the output directly...
-    return *p;
   }else if(sim){
-    PROBELIST* q=new PROBELIST(sim);
-    trace2("probelist new", reason, q);
-    probe_dispatcher.install(reason, q);
-    return *q;
+    p = new PROBELIST(sim);
   }else{
     unreachable();
-    return *new PROBELIST(NULL);
   }
+  return *p;
 }
 /*--------------------------------------------------------------------------*/
 void PROBE_LISTS::purge(CKT_BASE* brh)
 {
-  for(DISPATCHER<CARD*>::const_iterator i=probe_dispatcher.begin();
-      i!=probe_dispatcher.end(); ++i){
+  for(iterator i=_map.begin(); i!=_map.end(); ++i){
     PROBELIST* l=prechecked_cast<PROBELIST*>(i->second);
     if(l){
       l->remove_one(brh);
@@ -99,6 +90,12 @@ void PROBE_LISTS::purge(CKT_BASE* brh)
       // uninstalled already
     }
   }
+}
+/*--------------------------------------------------------------------------*/
+PROBELIST::~PROBELIST()
+{ untested();
+  CMD* s=const_cast<CMD*>(_sim);
+  s->detach_output(this);
 }
 /*--------------------------------------------------------------------------*/
 void PROBELIST::listing(const std::string& label)const
@@ -121,7 +118,7 @@ void PROBELIST::listing(const std::string& label)const
 }
 /*--------------------------------------------------------------------------*/
 void PROBELIST::clear()
-{
+{ untested();
   trace2("PROBELIST::clear", bag.size(), this);
   erase(begin(), end());
   assert(begin() == end());
@@ -129,7 +126,7 @@ void PROBELIST::clear()
 /*--------------------------------------------------------------------------*/
 void PROBELIST::erase(PROBELIST::iterator b, PROBELIST::iterator e)
 {
-  for (iterator i=b; i!=e; ++i) {
+  for (iterator i=b; i!=e; ++i) { untested();
     assert (*i);
     trace1("PROBELIST::erase deleting", (*i)->short_label());
     delete(*i);

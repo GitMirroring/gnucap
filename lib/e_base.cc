@@ -38,7 +38,8 @@ static char fix_case(char c)
 double CKT_BASE::tr_probe_num(const std::string&)const {return NOT_VALID;}
 XPROBE CKT_BASE::ac_probe_ext(const std::string&)const {return XPROBE(NOT_VALID, mtNONE);}
 /*--------------------------------------------------------------------------*/
-SIM_DATA* CKT_BASE::_sim = NULL; 
+SIM_DATA* CKT_BASE::_sim = NULL;
+PROBE_LISTS* CKT_BASE::_probe_lists = NULL;
 /*--------------------------------------------------------------------------*/
 CKT_BASE::~CKT_BASE()
 {

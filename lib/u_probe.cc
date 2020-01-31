@@ -56,15 +56,16 @@ void PROBE_BASE::detach()
   if( PROBE_BASE const* p=dynamic_cast<PROBE_BASE const*>(_brh)) {
     delete p;
 //  }else if( COMPONENT const* c=dynamic_cast<COMPONENT const*>(_brh)){ untested();
-//  }else{ untested();
+  }else{ untested();
 //    unreachable();
   }
   _brh = NULL;
 }
 /*--------------------------------------------------------------------------*/
-void PROBE_BASE::set_param_by_index(int, double){ untested();
-   // pass string value, use PARAMETERs?
-  incomplete(); // currently
+void PROBE_BASE::set_param_by_index(int, double)
+{ untested();
+  incomplete();
+  unreachable();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

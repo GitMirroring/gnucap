@@ -31,6 +31,7 @@ class XPROBE;
 class WAVE;
 class OMSTREAM;
 class SIM_DATA;
+class PROBE_LISTS;
 class PROBE_BASE;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
@@ -41,6 +42,7 @@ private:
   std::string	_label;
 public:
   static SIM_DATA* _sim;
+  static PROBE_LISTS* _probe_lists;
   //--------------------------------------------------------------------
 protected: // create and destroy
   explicit CKT_BASE()			  :_probes(0), _label() {}

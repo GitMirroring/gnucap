@@ -238,6 +238,7 @@ int main(int argc, const char *argv[])
 {
   prepare_env();
   CKT_BASE::_sim = new SIM_DATA;
+  CKT_BASE::_probe_lists = new PROBE_LISTS;
   try {
   {
     SET_RUN_MODE xx(rBATCH);
