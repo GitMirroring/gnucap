@@ -31,27 +31,4 @@ OUTPUT& OUTPUT::setup(std::string const& reason)
   return *this;
 }
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::attach_output(OUTPUT* o)	
-{ untested();
-	trace1("TEE attach", _outputs.size());
-	_outputs.insert(o);
-}
-/*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::detach_output(CKT_BASE* b)
-{ untested();
-
-	bool got_it=false;
-	if(OUTPUT* o=dynamic_cast<OUTPUT*>(b)){
-		got_it = _outputs.erase(o);
-	}else{
-	}
-	if(!got_it){
-	  for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
-		 assert(*p);
-		 (*p)->detach_output(b);
-	  }
-	}else{
-	}
-}
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

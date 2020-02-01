@@ -64,7 +64,6 @@ s_tr.cc s_tr_set.cc s_tr_swp.cc
 
 # output commands etc.
 OUT_SRCS = \
-out_tee.cc \
 out_print.cc out_alarm.cc out_store.cc out_plot.cc
 
 # netlist languages

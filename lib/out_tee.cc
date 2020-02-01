@@ -21,32 +21,15 @@
  *------------------------------------------------------------------
  * attach tees to simulation commands
  */
-////BUG//// this file needs to move to lib.
-// apps is a collection of plugins, all optional, all independent.
-// This is an essential part of the system, not optional.
-// OUTPUT_TEE is acccessed directly in s__out.cc, not through the plugin mechanism.
-// Therefore it cannot be a plugin.
-
-/// it was designed to be optional. the OUTPUT_TEE was only attached to a
-/// simulation command as-needed (e.g. in the spice tests). As part of lib and
-/// attached in s__out (like now), it will no longer be possible to not
-/// use it.
-
-// It could be a plugin by giving it a name, registering with a dispatcher,
-// and always using it that way, but it would still be required
-// because the functionality is needed even in the most basic sense.
-// Examples: bm_cond.cc, bm_value.cc, d_subckt.cc
-
-/// out_tee.cc was (intended as) a plugin. there was no need for registering
-/// with a dispatcher, because it was enabled by loading it with the default
-/// plugins.
-///
-/// (either way, I don't object to hardwire it in lib, and this might simplify
-/// things.)
-
 //testing=script,complete 2020.01.14
 #include "ap.h"
 #include "u_out.h"
+/*--------------------------------------------------------------------------*/
+// namespace{
+/*--------------------------------------------------------------------------*/
+// class INTERFACE OUTPUT_TEE : public OUTPUT {
+// [..]
+// }
 /*--------------------------------------------------------------------------*/
 OUTPUT_TEE::~OUTPUT_TEE()
 {
@@ -101,6 +84,36 @@ void OUTPUT_TEE::flush()
     (*p)->flush();
   }
 }
+/*--------------------------------------------------------------------------*/
+void OUTPUT_TEE::attach_output(OUTPUT* o)
+{ untested();
+	trace1("TEE attach", _outputs.size());
+	_outputs.insert(o);
+}
+/*--------------------------------------------------------------------------*/
+void OUTPUT_TEE::detach_output(CKT_BASE* b)
+{ untested();
+
+	bool got_it=false;
+	if(OUTPUT* o=dynamic_cast<OUTPUT*>(b)){
+		got_it = _outputs.erase(o);
+	}else{
+	}
+	if(!got_it){
+	  for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
+		 assert(*p);
+		 (*p)->detach_output(b);
+	  }
+	}else{
+	}
+}
+/*--------------------------------------------------------------------------*/
+// class CMD_TEE : public CMD {
+// // ?
+// }p1;
+// DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "attach_tee", &p1);
+/*--------------------------------------------------------------------------*/
+// } // namespace
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

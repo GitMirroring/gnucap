@@ -111,7 +111,7 @@ void SIM::detach_output(CKT_BASE* o)
 /*--------------------------------------------------------------------------*/
 void SIM::attach_new_tee()
 {
-  // this is optional, but required to send data to multiple sinks.
+  // TODO: must be a plugin.
   _output = new OUTPUT_TEE;
 }
 /*--------------------------------------------------------------------------*/
