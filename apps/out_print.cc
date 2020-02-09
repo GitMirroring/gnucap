@@ -64,8 +64,7 @@ private: // OUTPUT
       
       PROBELIST const& pr = probelist();
       for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
-	assert(*p);
-	out().form(format, ' ', (*p)->label().c_str());
+	out().form(format, ' ', p->label().c_str());
       }
       out() << '\n';
     }
@@ -85,8 +84,7 @@ private: // OUTPUT
 
       PROBELIST const& pr = probelist();
       for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
-	assert(*p);
-	o << (*p)->value();
+	o << p->value();
       }
       o << '\n';
     }

@@ -36,7 +36,7 @@ namespace {
 	void	plclose(void);
 	//void	plclear(void);
 static	void	plborder(void);
-static	void	calibrate(const PROBE_BASE&);
+static	void	calibrate(const PROBE&);
 static	int	round_to_int(double);
 static	void	plhead(const PROBELIST&);
 static	int	point(double,double,double,int,int,int);
@@ -64,22 +64,22 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
 	 i =  plotlist.begin();
 	 i != plotlist.end();
 	 ++i) {
-      assert(*i);
-      val[ii] = (*i)->value();
-      RANGE_PROBE const* P=dynamic_cast<RANGE_PROBE const*>(*i);
-      if(!P){untested();
-	// user did not provide bounds, use defaults
-	lo[ii] = -5.;
-	hi[ii] = 5.;
-      }else{
-	if (P->range() != 0.) {
-	  lo[ii] = P->lo();
-	  hi[ii] = P->hi();
+      val[ii] = i->value();
+      ////RANGE_PROBE const* P=dynamic_cast<RANGE_PROBE const*>(*i);
+      
+      //if(!i){untested();
+      //	// user did not provide bounds, use defaults
+      //	lo[ii] = -5.;
+      //	hi[ii] = 5.;
+      //}else{
+	if (i->range() != 0.) {
+	  lo[ii] = i->lo();
+	  hi[ii] = i->hi();
 	}else{
 	  lo[ii] = -5.;
 	  hi[ii] = 5.;
 	}
-      }
+	// }
       ++ii;
       if (ii >= 2) {
 	break;
@@ -134,7 +134,7 @@ static void plborder(void)
 /*--------------------------------------------------------------------------*/
 /* calibrate: calibrate the y axis.  ascii plot.
  */
-static void calibrate(PROBE_BASE const& prb)
+static void calibrate(PROBE const& prb)
 {
   static char nums[20];		/* this label string        */
   static char highs[20];	/* the last label string    */
@@ -146,7 +146,8 @@ static void calibrate(PROBE_BASE const& prb)
   double markno;		/* loop counter                             */
  
   double hi, lo;
-  if(RANGE_PROBE const* A=dynamic_cast<RANGE_PROBE const*>(&prb)){
+  ////if(RANGE_PROBE const* A=dynamic_cast<RANGE_PROBE const*>(&prb)){
+  if(PROBE const* A=&prb){
     if (A->range() == 0) {
       hi = 5;
       lo = -5;
@@ -202,8 +203,7 @@ static void plhead(const PROBELIST& plotlist)
        i =  plotlist.begin();
        i != plotlist.end();
        ++i) {
-    assert(*i);
-    calibrate(**i);
+    calibrate(*i);
   }
   for (int ii = 0;  ii < CONSSCALE; ii++) {		/* build strings */
     border[ii] = '-';
@@ -287,7 +287,7 @@ static void plotarg(
 /*--------------------------------------------------------------------------*/
 class OUTPUT_CMD_PLOT : public OUTPUT_CMD {
 private: // types
-  typedef RANGE_PROBE probe_type;
+  typedef PROBE probe_type;
   static probe_type _probe_proto;
 private:
   OUTPUT_CMD_PLOT(const OUTPUT_CMD_PLOT&p) : OUTPUT_CMD(p) {}
@@ -297,7 +297,7 @@ public:
 private: // OUTPUT_CMD
   OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_PLOT(*this);}
   void setup(CS& cmd)			{IO::plotset = true; OUTPUT_CMD::setup(cmd);}
-  PROBE_BASE const* probe_proto() const	{return &_probe_proto;}
+  //PROBE const* probe_proto() const	{return &_probe_proto;}
 private: // OUTPUT
   void init(int, const std::string&) {IO::plotout = (IO::plotset) ? IO::mstdout : OMSTREAM();}
 
@@ -324,7 +324,6 @@ private: // OUTPUT
 
   void flush() {plclose();}
 }p2;
-OUTPUT_CMD_PLOT::probe_type OUTPUT_CMD_PLOT::_probe_proto(PROBE_BASE::_STATIC);
 DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "iplot|plot", &p2);
 /*--------------------------------------------------------------------------*/
 }

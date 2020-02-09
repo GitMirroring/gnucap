@@ -23,7 +23,6 @@
  */
 //testing=script 2014.07.04
 #include "ap.h"
-#include "globals.h" // data_dispatcher
 #include "u_sim_data.h"
 #include "m_wave.h"
 #include "u_prblst.h"
@@ -39,18 +38,19 @@ double CKT_BASE::tr_probe_num(const std::string&)const {return NOT_VALID;}
 XPROBE CKT_BASE::ac_probe_ext(const std::string&)const {return XPROBE(NOT_VALID, mtNONE);}
 /*--------------------------------------------------------------------------*/
 SIM_DATA* CKT_BASE::_sim = NULL; 
+PROBE_LISTS* CKT_BASE::_probe_lists = NULL;
 /*--------------------------------------------------------------------------*/
 CKT_BASE::~CKT_BASE()
 {
-  trace3("~CKT_BASE", _probes, short_label(), this);
+  trace1("~CKT_BASE", _probes);
   if (_probes == 0) {
+  }else if (!_probe_lists) {untested();
   }else if (!_sim) {untested();
   }else{
-    PROBE_LISTS::purge(this);
-    assert(!has_probes());
+    _probe_lists->purge(this);
   }
-  trace2("", _probes, short_label());
-  assert(!has_probes());
+  trace1("", _probes);
+  assert(_probes==0);
 }
 /*--------------------------------------------------------------------------*/
 const std::string CKT_BASE::long_label()const
@@ -87,11 +87,10 @@ bool CKT_BASE::help(CS& Cmd, OMSTREAM& Out)const
   }
 }
 /*--------------------------------------------------------------------------*/
-// should not be required in new code.
 double CKT_BASE::probe_num(const std::string& what)const
 {
   double x;
-  if (_sim->analysis_is_ac()) { untested();
+  if (_sim->analysis_is_ac()) {
     x = ac_probe_num(what);
   }else{
     x = tr_probe_num(what);
@@ -138,12 +137,8 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
   return xp(modifier, want_db);
 }
 /*--------------------------------------------------------------------------*/
-// used in d_subckt to collect power (dc, tran)
-// and in switch to get input (dc, tran).
 /*static*/ double CKT_BASE::probe(const CKT_BASE *This, const std::string& what)
 {
-  assert (!_sim->analysis_is_ac());
-
   if (This) {
     return This->probe_num(what);
   }else{				/* return 0 if doesn't exist */
@@ -151,68 +146,20 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
   }					/* don't have all parts */
 }
 /*--------------------------------------------------------------------------*/
-/*static*/ WAVE const* CKT_BASE::find_wave(const std::string& probe_name)
+/*static*/ WAVE* CKT_BASE::find_wave(const std::string& probe_name)
 {
-  trace2("find_wave", probe_name, _sim->label());
-
-  if (WAVESTASH* data = data_dispatcher[_sim->label()]) {
-    WAVESTASH::const_iterator wi = data->find(probe_name);
-    if (wi != data->end()) {
-      return &(wi->second);
+  int ii = 0;
+  for (PROBELIST::const_iterator
+       p  = _probe_lists->store[_sim->_mode].begin();
+       p != _probe_lists->store[_sim->_mode].end();
+       ++p) {
+    if (wmatch(p->label(), probe_name)) {
+      return &(_sim->_waves[ii]);
     }else{
-      return NULL;
     }
-  }else{untested();
-    return NULL;
+    ++ii;
   }
-}
-/*--------------------------------------------------------------------------*/
-namespace legacy{
-// do dictionary lookup at run time (legacy)
-// not required in new code.
-class string_probe : public PROBE_BASE{
-private:
-  explicit string_probe(CKT_BASE const* b, const std::string& w)
-    : PROBE_BASE(w, b)
-  {
-    assert(what()==w);
-    if(brh()){
-      set_label(w + "(" + brh()->long_label() + ")");
-    }else{
-      set_label(w);
-    }
-  }
-public:
-  ~string_probe(){
-    if(brh()){
-    }else{ untested();
-    }
-  }
-public:
-  double value() const{ itested();
-    assert(brh());
-    double x;
-    if (_sim->analysis_is_ac()) {
-      x = brh()->ac_probe_num(what());
-    }else{
-      x = brh()->tr_probe_num(what());
-    }
-    if (std::abs(x)>=1){
-       return x;
-    }else{
-      return floor(x/OPT::floor + .5) * OPT::floor;
-    }
-  }
-private:
-  friend class CKT_BASE;
-};
-} // legacy
-/*--------------------------------------------------------------------------*/
-PROBE_BASE const* CKT_BASE::new_probe(std::string const& s) const
-{
-  PROBE_BASE* n=new legacy::string_probe(this, s);
-  assert(!n->has_probes());
-  return n;
+  return NULL;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

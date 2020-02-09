@@ -79,6 +79,7 @@ struct INTERFACE SIM_DATA {
   std::deque<CARD*>  _late_evalq; /* eval after everything else */
   std::deque<CARD*>* _evalq;   /* pointer to evalq to process */
   std::deque<CARD*>* _evalq_uc;/* pointer to evalq under construction */
+  WAVE *_waves;		/* storage for waveforms "store" command*/
   std::string _label;
   SIM_MODE _has_op;
   SIM_DATA();

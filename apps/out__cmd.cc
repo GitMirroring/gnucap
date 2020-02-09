@@ -87,6 +87,7 @@ void OUTPUT_CMD::setup(CS& cmd)
   }
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 // apply extra args to (newly added) probes
 // possibly wrap probe into another one.
 static void probeargs(CS& cmd,
@@ -137,6 +138,7 @@ static void probeargs(CS& cmd,
     }
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 // former do_probe
 void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
@@ -217,10 +219,10 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
 	  assert(_prb);
 	  unsigned here1=cmd.cursor();
 	  try{
-	    int s=int(_prb->end()-_prb->begin());
+	    //int s=int(_prb->end()-_prb->begin());
 	    _prb->add_list(cmd);
-	    PROBELIST::iterator seek=_prb->begin()+s;
-	    probeargs(cmd, probe_proto(), seek, _prb->end());
+	    //PROBELIST::iterator seek=_prb->begin()+s;
+	    //probeargs(cmd, probe_proto(), seek, _prb->end());
 	  }catch(Exception_Cant_Find& e){
 	    cmd.warn(bWARNING, here1, "cannot resolve");
 	  }
@@ -243,12 +245,14 @@ void OUTPUT_CMD::detach_sinks()
   }
 }
 /*--------------------------------------------------------------------------*/
-PROBELIST& OUTPUT_CMD::prblist(std::string const& reason)
+PROBELIST& OUTPUT_CMD::prblist(std::string const& ) ////reason)
 {
-  return PROBE_LISTS::get(reason);
+  static PROBELIST x;
+  return x; ////BUG//// PROBE_LISTS::get(reason);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+#if 0
 ////BUG//// doesn't work, crashes, due to problem in PROBE_LISTS
 // Even if it did, it is out of place in this file, because it has no connection
 // to OUTPUT_CMD.  It could exist as a stand-alone plugin.
@@ -266,6 +270,7 @@ public:
   }
 } cp;
 DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "probes", &cp);
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet
