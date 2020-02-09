@@ -24,11 +24,8 @@
 //testing=script,complete 2006.07.14
 #include "e_node.h"
 #include "u_nodemap.h"
-#include "u_probe.h"
-#include "u_status.h"
-#include "io_error.h"
 /*--------------------------------------------------------------------------*/
-GROUND_NODE ground_node("0",0);
+NODE ground_node("0",0);
 /*--------------------------------------------------------------------------*/
 NODE_MAP::NODE_MAP()
   : _node_map()
@@ -102,34 +99,6 @@ NODE* NODE_MAP::new_node(std::string s)
   }
   assert(node);
   return node;
-}
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-PROBE_BASE const* GROUND_NODE::new_probe(std::string const& w)const
-{
-  assert(iPRINTSTEP - sCOUNT == 0);
-  assert(iSTEP      - sCOUNT == 1);
-  assert(iTOTAL     - sCOUNT == 2);
-  assert(iCOUNT     - sCOUNT == 3);
-  if (Umatch(w, "iter ")) {
-    return new PTR_PROBE<int>(w, this, &_sim->_iter[sCOUNT]);
-  }else if (Umatch(w, "bypass ")) {
-    return new BYPASS_PROBE(w, this);
-  }else if (Umatch(w, "control|stepcause ")) {
-    return new PTR_PROBE<int>(w, this, &::status.control);
-  }else if (Umatch(w, "damp ")) {untested();
-    return new PTR_PROBE<double>(w, this, &_sim->_damp);
-  }else if (Umatch(w, "gen{erator} ")) {untested();
-    return new PTR_PROBE<double>(w, this, &_sim->_genout);
-  }else if (Umatch(w, "hidden ")) {
-    return new PTR_PROBE<int>(w, this, &::status.hidden_steps);
-  }else if (Umatch(w, "temp{erature} ")) {
-    return new PTR_PROBE<double>(w, this, &_sim->_temp_c);
-  }else if (Umatch(w, "time ")) {
-    return new PTR_PROBE<double>(w, this, &_sim->_time0);
-  }else{
-  }
-  throw Exception_Cant_Find("0", w);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

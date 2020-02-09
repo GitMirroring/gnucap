@@ -21,7 +21,7 @@
  *------------------------------------------------------------------
  * list of probes
  */
-//testing=obsolete
+//testing=script,complete 2006.09.28
 #ifndef U_PRBLST_H
 #define U_PRBLST_H
 #include "mode.h"
@@ -31,20 +31,16 @@ class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBELIST : public CKT_BASE {
 private:
-  typedef std::vector<PROBE_BASE const*> container_type;
-public:
-  typedef container_type::iterator iterator;
-  typedef container_type::const_iterator const_iterator;
-private:
-  container_type bag;
+  typedef std::vector<PROBE> _container;
+  _container bag;
 
-private:
-  explicit PROBELIST(const PROBELIST&p)
-    : CKT_BASE(p), bag(p.bag) {untested(); untested(); incomplete();}
+  explicit PROBELIST(const PROBELIST&p) : CKT_BASE(p) {unreachable();incomplete();}
 public:
   explicit PROBELIST() {}
   ~PROBELIST() {}
 
+  typedef _container::iterator	     iterator;
+  typedef _container::const_iterator const_iterator;
   void	   listing(const std::string&)const;
   void     clear();
 
@@ -57,22 +53,19 @@ public:
   iterator begin()		{return bag.begin();}
   iterator end()		{return bag.end();}
 private:
-  void	  erase(iterator b, iterator e);
+  void	  erase(iterator b, iterator e) {bag.erase(b,e);}
   void	  push_new_probe(const std::string& param, const CKT_BASE* object);
   bool    add_branches(const std::string&,const std::string&,const CARD_LIST*);
   void    add_all_nodes(const std::string&);
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {
-private:
-  PROBE_LISTS(const PROBE_LISTS&) {unreachable();}
-  PROBE_LISTS() {untested();}
-  ~PROBE_LISTS();
 public:
-  PROBELIST& operator[](std::string const& reason) const {untested(); return get(reason);}
-  static PROBELIST& get(std::string const& reason);
-  static void clear();
-  static void purge(CKT_BASE*);
+  PROBELIST alarm[sCOUNT]; // list of alarm probes
+  PROBELIST plot[sCOUNT];  // list of plot probes
+  PROBELIST print[sCOUNT]; // list of print probes
+  PROBELIST store[sCOUNT]; // list of probes to store for postproc
+  void purge(CKT_BASE*);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

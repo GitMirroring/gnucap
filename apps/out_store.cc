@@ -59,9 +59,8 @@ public: // OUTPUT
 
     PROBELIST const& pr = probelist();
     for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
-      assert(*p);
-      trace1("--", (*p)->label());
-      WAVE& w = (*data)[(*p)->label()]; // allocate or find
+      trace1("--", p->label());
+      WAVE& w = (*data)[p->label()]; // allocate or find
       w.initialize(); // needed if reusing
       _wavep.push_back(&w); // build index
     }
@@ -86,9 +85,8 @@ public: // OUTPUT
       std::vector<WAVE*>::iterator ii=_wavep.begin();
       PROBELIST const& pr=probelist();
       for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p){
-	assert(*p);
-	trace2("commit", XX,  (*p)->value());
-	(*ii)->push(XX, (*p)->value());
+	trace2("commit", XX,  p->value());
+	(*ii)->push(XX, p->value());
 	++ii;
       }
       assert(ii==_wavep.end());

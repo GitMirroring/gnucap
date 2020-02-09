@@ -22,6 +22,7 @@
 //testing=script 2020.01.11
 #ifndef U_OUT_H
 #define U_OUT_H
+#include "u_probe.h"
 #include "io_.h"
 #include "c_comand.h"
 #include <set>
@@ -92,7 +93,7 @@ private:
 class INTERFACE OUTPUT_CMD : public OUTPUT {
 protected: // types
   typedef std::map<CMD*, OUTPUT*> container_type;
-  typedef PROBE_BASE probe_type;
+  typedef PROBE probe_type;
 public:
   OUTPUT_CMD() : OUTPUT(), _prb(NULL) {}
 protected:
@@ -121,7 +122,7 @@ public:
   void set_simname(const std::string& s){_simname = s;}
 public:
   void do_it(CS&, CARD_LIST*);
-  virtual PROBE_BASE const* probe_proto() const{return NULL;}
+  virtual PROBE const* probe_proto() const{return NULL;}
 private: // OUTPUT
   PROBELIST const* proBes() const	{return _prb;}
   void detach_sinks();

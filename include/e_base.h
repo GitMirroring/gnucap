@@ -31,16 +31,15 @@ class XPROBE;
 class WAVE;
 class OMSTREAM;
 class SIM_DATA;
-class PROBE_BASE;
+class PROBE_LISTS;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
-public:
-  virtual PROBE_BASE const* new_probe(std::string const& s) const;
 private:
   mutable int	_probes;		/* number of probes set */
   std::string	_label;
 public:
   static SIM_DATA* _sim;
+  static PROBE_LISTS* _probe_lists;
   //--------------------------------------------------------------------
 protected: // create and destroy
   explicit CKT_BASE()			  :_probes(0), _label() {}
@@ -53,9 +52,8 @@ public: // user stuff
   virtual bool	      help(CS&, OMSTREAM&)const;
   virtual std::string status()const {untested();return "";}
   //--------------------------------------------------------------------
-public: // probes. legacy access.
-	  double      probe_num(const std::string&)const;
 public: // probes
+	  double      probe_num(const std::string&)const;
 	  double      ac_probe_num(const std::string&)const;
   virtual double      tr_probe_num(const std::string&)const;
   virtual XPROBE      ac_probe_ext(const std::string&)const;
@@ -63,7 +61,7 @@ public: // probes
 	  void	      dec_probes()const	{assert(_probes>0); --_probes;}
 	  bool	      has_probes()const	{return _probes > 0;}
   static  double      probe(const CKT_BASE*,const std::string&);
-  static  WAVE const* find_wave(const std::string& probe_name);
+  static  WAVE*	      find_wave(const std::string& probe_name);
   //--------------------------------------------------------------------
 public: // label
   bool operator!=(const std::string& n)const {return strcasecmp(_label.c_str(),n.c_str())!=0;}

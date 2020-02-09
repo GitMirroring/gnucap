@@ -32,7 +32,7 @@ namespace {
 /*--------------------------------------------------------------------------*/
 class OUTPUT_CMD_ALARM : public OUTPUT_CMD {
 private:
-  typedef RANGE_PROBE probe_type;
+  typedef PROBE probe_type;
   static probe_type _probe_proto;
 private:
   OUTPUT_CMD_ALARM(OUTPUT_CMD_ALARM const&p) : OUTPUT_CMD(p) {}
@@ -41,7 +41,7 @@ public:
   virtual ~OUTPUT_CMD_ALARM()		{}
 public: // OUTPUT_CMD
   OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_ALARM(*this);}
-  PROBE_BASE const* probe_proto() const {return &_probe_proto;}
+  ////PROBE_BASE const* probe_proto() const {return &_probe_proto;}
 public: // OUTPUT
   void commit(double, int Level)
   {
@@ -51,12 +51,8 @@ public: // OUTPUT
       OMSTREAM o=out();
       o.setfloatwidth(OPT::numdgt, OPT::numdgt+6);
       for (PROBELIST::const_iterator p=probelist().begin(); p!=probelist().end(); ++p) {
-	assert(*p);
-	probe_type const* q = dynamic_cast<probe_type const*>(*p);
-	if(!q) {untested();
-	  // wrong kind of probe.  skip.
-	}else if (!q->in_range()) {
-	  o << (*p)->label() << "=" << (*p)->value() << '\n';
+	if (!p->in_range()) {
+	  o << p->label() << "=" << p->value() << '\n';
 	}else{
 	  // in range, no alarm
 	}
@@ -64,7 +60,6 @@ public: // OUTPUT
     }
   }
 }p1;
-OUTPUT_CMD_ALARM::probe_type OUTPUT_CMD_ALARM::_probe_proto(PROBE_BASE::_STATIC);
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "alarm", &p1);
 /*--------------------------------------------------------------------------*/
 }
