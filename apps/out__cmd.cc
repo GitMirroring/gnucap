@@ -34,7 +34,6 @@
 #include "u_prblst.h"
 #include "globals.h"
 #include "u_out.h"
-//#include "trace_on.h"
 /*--------------------------------------------------------------------------*/
 void OUTPUT_CMD::setup(CS& cmd)
 {
@@ -58,8 +57,10 @@ void OUTPUT_CMD::setup(CS& cmd)
       }
 
       trace2("new sink", s, short_label());
-      setup_probelist(reason);
+      _prb = new PROBELIST;
       assert(&probelist() == _prb);
+      assert(_probe_lists);
+      _probe_lists->insert(_prb);
 
       //OUTPUT_CMD* o=clone();
       //sink = prechecked_cast<OUTPUT_CMD*>(o);
@@ -86,59 +87,6 @@ void OUTPUT_CMD::setup(CS& cmd)
     _prb = NULL;
   }
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-// apply extra args to (newly added) probes
-// possibly wrap probe into another one.
-static void probeargs(CS& cmd,
-    PROBE_BASE const* wrap,
-    PROBELIST::iterator p, PROBELIST::iterator e)
-{
-  ////BUG//// only works for 2 args.
-
-  ////BUG//// This really belongs to PROBE and PROBELIST, not here.
-  // It really operates on a PROBE, so that's where it really belongs.
-  // through a PROBELIST, where PROBEs are stored.
-  // so here in OUTPUT_CMD is really two levels removed from where it belongs.
-  // Polymorphic probes need work.  Will back out for now, reverting to the old
-  // implementation of PROBE and PROBELIST.  This will make it possible to 
-  // move ahead with output plugins, which is what this is all about.
-
-  double a0, a1;
-#if 1
-  bool have_args = (cmd >> '(') && (cmd >> a0 >> a1 >> ')');
-#else
-  bool have_args=false;
-  if (cmd.skip1b('(')) {
-    // extra probe parameters (such as range)
-    a0 = cmd.ctof();
-    a1 = cmd.ctof();
-    have_args = true;
-    if (!cmd.skip1b(')')) {untested();
-      cmd.check(bWARNING, "need )");
-    }else{
-    }
-  }else{
-    have_args=false;
-  }
-#endif
-
-  for (; p!=e; ++p) {
-    PROBE_BASE const* cP=dynamic_cast<PROBE_BASE const*>(*p);
-    PROBE_BASE* P=const_cast<PROBE_BASE*>(cP);
-    if(wrap){
-      P = wrap->new_wrap(P);
-      *p = P;
-    }else{
-    }
-    if(have_args){
-      P->set_param_by_index(0, a0);
-      P->set_param_by_index(1, a1);
-    }else{
-    }
-  }
-}
-#endif
 /*--------------------------------------------------------------------------*/
 // former do_probe
 void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
@@ -219,10 +167,7 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
 	  assert(_prb);
 	  unsigned here1=cmd.cursor();
 	  try{
-	    //int s=int(_prb->end()-_prb->begin());
 	    _prb->add_list(cmd);
-	    //PROBELIST::iterator seek=_prb->begin()+s;
-	    //probeargs(cmd, probe_proto(), seek, _prb->end());
 	  }catch(Exception_Cant_Find& e){
 	    cmd.warn(bWARNING, here1, "cannot resolve");
 	  }
@@ -245,14 +190,7 @@ void OUTPUT_CMD::detach_sinks()
   }
 }
 /*--------------------------------------------------------------------------*/
-PROBELIST& OUTPUT_CMD::prblist(std::string const& ) ////reason)
-{
-  static PROBELIST x;
-  return x; ////BUG//// PROBE_LISTS::get(reason);
-}
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-#if 0
 ////BUG//// doesn't work, crashes, due to problem in PROBE_LISTS
 // Even if it did, it is out of place in this file, because it has no connection
 // to OUTPUT_CMD.  It could exist as a stand-alone plugin.
@@ -260,7 +198,7 @@ class CMD_PROBES : public CMD{
 public:
   void do_it(CS& cmd, CARD_LIST*){
     if (cmd.umatch("clear ")) {
-      PROBE_LISTS::clear();
+      CKT_BASE::_probe_lists->clear();
     }else if (cmd.umatch("list ")) {untested();
       incomplete();
     }else{untested();
@@ -270,7 +208,6 @@ public:
   }
 } cp;
 DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "probes", &cp);
-#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet

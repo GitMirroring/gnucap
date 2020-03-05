@@ -32,7 +32,6 @@
 #include "ap.h"
 #include "patchlev.h"
 #include "c_comand.h"
-#include "declare.h"	/* plclose */
 /*--------------------------------------------------------------------------*/
 struct JMP_BUF{
   sigjmp_buf p;
@@ -59,7 +58,7 @@ static void prepare_env()
                               "\0         (reserved space)                 ";
 
   std::string ldlpath = OS::getenv("LD_LIBRARY_PATH");
-  if (ldlpath != "") {
+  if (ldlpath != "") {untested();
     ldlpath += ":";
   }else{
   }
@@ -98,7 +97,7 @@ static void read_startup_files(void)
   if (OPT::language) {
     OPT::case_insensitive = OPT::language->case_insensitive();
     OPT::units            = OPT::language->units();
-  }else{ untested();
+  }else{
     OPT::case_insensitive = false;
     OPT::units            = uSI;
   }
@@ -161,7 +160,6 @@ static void setup_traps(void)
  */
 static void finish(void)
 {
-  // plclose();
   outreset();
 }
 /*--------------------------------------------------------------------------*/
@@ -169,15 +167,15 @@ static void process_cmd_line(int argc, const char *argv[])
 {
   for (int ii = 1;  ii < argc;  /*inside*/) {
     try {
-      if (strncmp(argv[ii], "--", 2) == 0) { untested();
-	if (ii < argc) { untested();
+      if (strncmp(argv[ii], "--", 2) == 0) {
+	if (ii < argc) {
 	  CS cmd(CS::_STRING, argv[ii++]+2); // command line
 	  CMD::cmdproc(cmd, &CARD_LIST::card_list); 
 	}else{untested();
 	}
-      }else if (strcasecmp(argv[ii], "-c") == 0) { untested();
+      }else if (strcasecmp(argv[ii], "-c") == 0) {
 	++ii;
-	if (ii < argc) { untested();
+	if (ii < argc) {
 	  CS cmd(CS::_STRING, argv[ii++]); // command line
 	  CMD::cmdproc(cmd, &CARD_LIST::card_list); 
 	}else{untested();
@@ -205,9 +203,9 @@ static void process_cmd_line(int argc, const char *argv[])
 	  throw Exception_Quit("");
 	}else{untested();
 	}
-      }else if (strcasecmp(argv[ii], "-a") == 0) { untested();
+      }else if (strcasecmp(argv[ii], "-a") == 0) {
 	++ii;
-	if (ii < argc) { untested();
+	if (ii < argc) {
 	  CMD::command(std::string("attach ") + argv[ii++], &CARD_LIST::card_list);
 	}else{untested();
 	}
@@ -238,6 +236,7 @@ int main(int argc, const char *argv[])
 {
   prepare_env();
   CKT_BASE::_sim = new SIM_DATA;
+  CKT_BASE::_probe_lists = new PROBE_LISTS;
   try {
   {
     SET_RUN_MODE xx(rBATCH);
@@ -281,7 +280,7 @@ int main(int argc, const char *argv[])
 	  //CMD::command("quit", &CARD_LIST::card_list);
 	  //exit(0);
 	  break;
-	}catch (Exception& e) { untested();
+	}catch (Exception& e) {
 	  error(bDANGER, e.message() + '\n');
 	  finish();
 	}
@@ -293,14 +292,14 @@ int main(int argc, const char *argv[])
   }catch (Exception_Quit&) {
   }catch (Exception& e) {untested();
     error(bDANGER, e.message() + '\n');
-  }catch(...){
-	incomplete();
   }
   
   //CARD_LIST::card_list.erase_all();
   CMD::command("clear", &CARD_LIST::card_list);
   assert(CARD_LIST::card_list.is_empty());
   CMD::command("detach_all", &CARD_LIST::card_list);
+  delete CKT_BASE::_probe_lists;
+  CKT_BASE::_probe_lists = NULL;
   delete CKT_BASE::_sim;
   CKT_BASE::_sim = NULL;
   

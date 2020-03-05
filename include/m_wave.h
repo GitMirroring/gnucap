@@ -24,6 +24,7 @@
 //testing=script 2006.07.13
 #ifndef M_WAVE_H
 #define M_WAVE_H
+#include "u_prblst.h"
 #include "l_denoise.h"
 #include "m_interp.h"
 #include "l_dispatcher.h"
@@ -53,42 +54,38 @@ public:
   const_iterator end()const {return _w.end();}
 };
 /*--------------------------------------------------------------------------*/
-class WAVESTASH : public CKT_BASE{
-public:
-  typedef std::string key_type;
-  typedef std::map<key_type, WAVE> container_type;
-  typedef container_type::const_iterator const_iterator;
+class WAVEstash {
 private:
-  WAVESTASH(const WAVESTASH&x):CKT_BASE(x){ unreachable(); }
+  PROBELIST* _prb;	////BUG//// uses without control
 public:
-  WAVESTASH() : CKT_BASE(), _container() {}
-  ~WAVESTASH() {
-  }
-public:
-  const_iterator find(const key_type& k) const{
-    return _container.find(k);
-  }
-  const_iterator end() const{
-    return _container.end();
-  }
-  void clear(){
-    _container.clear();
-  }
-  WAVE& operator[](const std::string& s){
-    return _container[s];
-  }
-//  WAVE const& operator[](const std::string& s) const{
-//    return _container[s];
-//  }
+  WAVE* _wav;
 private:
-  container_type _container;
+  explicit WAVEstash(const WAVEstash&) {unreachable();incomplete();}
+  explicit WAVEstash() {unreachable();incomplete();}
+public:
+  WAVEstash(PROBELIST* Prb) : _prb(Prb), _wav(NULL) 
+  {
+    assert(_prb);
+    _wav = new WAVE [_prb->size()];
+  }
+  ~WAVEstash() 
+  {
+    delete [] _wav;
+  }
+  WAVE* find(const std::string& probe_name)
+  {
+    int ii = 0;
+    for (PROBELIST::const_iterator p = _prb->begin(); p != _prb->end(); ++p) {
+      if (wmatch(p->label(), probe_name)) {
+	return &(_wav[ii]);
+      }else{
+      }
+      ++ii;
+    }
+    return NULL;
+  }
+  
 };
-////BUG//// too much external hacking needed.
-// OUTPUT_CMD_STORE does too much internal manipulating
-// WAVESTASH as presented has one advantage over old code .
-// .....  faster search in postprocessing.
-// but really, it's just a wrapper for map, like a typedef
-// linear indexing, if used at all, needs to be part of WAVESTASH.
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // push: insert a signal on the "input" end.
@@ -97,6 +94,7 @@ private:
 //
 inline WAVE& WAVE::push(double t, double v)
 {
+  assert(this);
   _w.push_back(DPAIR(t+_delay, v));
   return *this;
 }

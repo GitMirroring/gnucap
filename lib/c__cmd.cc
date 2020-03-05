@@ -23,7 +23,6 @@
  */
 //testing=obsolete
 #include "u_status.h"
-#include "declare.h"	/* plclose */
 #include "c_comand.h"
 #include "globals.h"
 /*--------------------------------------------------------------------------*/

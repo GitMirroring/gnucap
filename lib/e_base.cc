@@ -42,7 +42,7 @@ PROBE_LISTS* CKT_BASE::_probe_lists = NULL;
 /*--------------------------------------------------------------------------*/
 CKT_BASE::~CKT_BASE()
 {
-  trace1("~CKT_BASE", _probes);
+  trace2("~CKT_BASE", short_label(), _probes);
   if (_probes == 0) {
   }else if (!_probe_lists) {untested();
   }else if (!_sim) {untested();
@@ -148,18 +148,7 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
 /*--------------------------------------------------------------------------*/
 /*static*/ WAVE* CKT_BASE::find_wave(const std::string& probe_name)
 {
-  int ii = 0;
-  for (PROBELIST::const_iterator
-       p  = _probe_lists->store[_sim->_mode].begin();
-       p != _probe_lists->store[_sim->_mode].end();
-       ++p) {
-    if (wmatch(p->label(), probe_name)) {
-      return &(_sim->_waves[ii]);
-    }else{
-    }
-    ++ii;
-  }
-  return NULL;
+  return _sim->_waves->find(probe_name);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

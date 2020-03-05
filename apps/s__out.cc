@@ -31,16 +31,6 @@
 #include "declare.h"	/* plottr, plopen */
 #include "s__.h"
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-PROBELIST const* SIM::outproBes() const ////BUG////transitional code
-{
-  if(_output){
-    return _output->proBes();
-  }else{untested();
-    return NULL;
-  }
-}
-/*--------------------------------------------------------------------------*/
 void SIM::out_reset()
 {
   if(_output){

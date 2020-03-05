@@ -42,7 +42,6 @@ public: // construct
   OUTPUT()				{}
   virtual ~OUTPUT()			{}
 public:
-  virtual PROBELIST const* proBes() const {untested(); return NULL;}
   virtual void reset()			{_out = IO::mstdout; _out.reset();} // bug? check if needed
   virtual OUTPUT* set(CS& cmd)		{::outset(cmd, &_out); return this;}
   void set(OMSTREAM const& o)		{_out = o;}
@@ -51,7 +50,6 @@ public:
   virtual void head(double, double, const std::string&)	{}
   virtual void commit(double X, int Level)		=0;
   virtual void flush()					{}
-  static  void purge(CKT_BASE*);
 protected:
   OMSTREAM out()			{return _out;}
 private:
@@ -69,15 +67,6 @@ public: // construct
 private:
   void attach_output(OUTPUT* o)		{_outputs.insert(o);}
   void detach_output(OUTPUT* o)		{_outputs.erase(o);}
-private: // override OUTPUT
-  PROBELIST const* proBes() const{
-    if(_outputs.empty()){
-      return NULL;
-    }else{
-      // incomplete. but not better in old code.
-      return (*_outputs.begin())->proBes();
-    }
-  }
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
   void init(int, const std::string&);
@@ -98,8 +87,6 @@ public:
   OUTPUT_CMD() : OUTPUT(), _prb(NULL) {}
 protected:
   OUTPUT_CMD(OUTPUT_CMD const& p) : OUTPUT(p), _prb(p._prb)  {}
-private:
-  static PROBELIST& prblist(std::string const& reason);
 protected:
   virtual ~OUTPUT_CMD() {
     detach_sinks();
@@ -111,11 +98,8 @@ protected:
 
   virtual OUTPUT_CMD* clone() const=0;
 protected:
-  void setup_probelist(std::string const& reason) {_prb = &prblist(reason);}
   PROBELIST const& probelist() const	{assert(_prb); return *_prb;}
   PROBELIST&	   probelist()		{assert(_prb); return *_prb;}
-  ////BUG//// proBes, probelist ... why both?????
-  // proBes only used by fourier (s_fo.cc)
   virtual void setup(CS&);
 public:
   std::string const& simname() const	{return _simname;}
@@ -124,10 +108,10 @@ public:
   void do_it(CS&, CARD_LIST*);
   virtual PROBE const* probe_proto() const{return NULL;}
 private: // OUTPUT
-  PROBELIST const* proBes() const	{return _prb;}
   void detach_sinks();
 private:
   std::string _simname;
+public:
   PROBELIST* _prb;
 protected:
   container_type _sinks;
