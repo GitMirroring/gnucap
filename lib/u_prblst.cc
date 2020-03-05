@@ -31,11 +31,15 @@
 /*--------------------------------------------------------------------------*/
 void PROBE_LISTS::purge(CKT_BASE* brh)
 {
-  for (int i = 0;  i < sCOUNT;  ++i) {
-    alarm[i].remove_one(brh);
-    plot[i] .remove_one(brh);
-    print[i].remove_one(brh);
-    store[i].remove_one(brh);
+  for (std::set<PROBELIST*>::iterator ii = _set.begin(); ii != _set.end(); ++ii) {
+    (**ii).remove_one(brh);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void PROBE_LISTS::clear()
+{
+  for (std::set<PROBELIST*>::iterator ii = _set.begin(); ii != _set.end(); ++ii) {
+    (**ii).clear();
   }
 }
 /*--------------------------------------------------------------------------*/

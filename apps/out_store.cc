@@ -24,6 +24,7 @@
  * command line operations
  */
 //testing=script 2020.01.14
+#include "u_sim_data.h"
 #include "m_wave.h"
 #include "u_prblst.h"
 #include "globals.h"
@@ -42,54 +43,26 @@ public:
 public: // OUTPUT_CMD
   OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_STORE(*this);}
 public: // OUTPUT
-  void init(int, const std::string& Label)
+  void init(int, const std::string& /*Label*/)
   {
-    WAVESTASH* data = data_dispatcher[Label];
-
-    if(!data){
-      // wrong type or not there, put new one
-      data = new WAVESTASH;
-      ////BUG//// memory leak
-      data_dispatcher.install(Label, data);
+    if (_sim->_waves) {
+      delete [] _sim->_waves;
     }else{
     }
-    assert(data);
-
-    _wavep.resize(0);
-
-    PROBELIST const& pr = probelist();
-    for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p) {
-      trace1("--", p->label());
-      WAVE& w = (*data)[p->label()]; // allocate or find
-      w.initialize(); // needed if reusing
-      _wavep.push_back(&w); // build index
-    }
-    assert(int(_wavep.size()) == pr.size());
+    _sim->_waves = new WAVEstash(_prb);
   }
-
-  ////BUG//// It is possible when reusing "data" with a changed probelist
-  // that deleted probes are still there, not initialized, so contain old data.
-  // Not rebuilt, not seen, here but are still available to users of the stored data,
-  // such as "measure".
-
-  ////BUG//// This indexing should be part of WAVESTASH, not done here.
-  // Code here is more complex than old code that uses a C style array.
-  // use of dispatcher (data_dispatcher) also seems inappropriate.
-
   void commit(double XX, int Level)
   {
     if (Level < dl_ACCEPTED) {
       // only look at dl_ACCEPTED or better.
     }else{
       trace1("store out", probelist().size());
-      std::vector<WAVE*>::iterator ii=_wavep.begin();
+      int ii = 0;
       PROBELIST const& pr=probelist();
       for (PROBELIST::const_iterator p=pr.begin(); p!=pr.end(); ++p){
 	trace2("commit", XX,  p->value());
-	(*ii)->push(XX, p->value());
-	++ii;
+	_sim->_waves->_wav[ii++].push(XX, p->value());
       }
-      assert(ii==_wavep.end());
     }
   }
 

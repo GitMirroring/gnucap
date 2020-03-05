@@ -24,6 +24,7 @@
 //testing=script,complete 2006.09.28
 #ifndef U_PRBLST_H
 #define U_PRBLST_H
+#include <set>
 #include "mode.h"
 #include "u_probe.h"
 /*--------------------------------------------------------------------------*/
@@ -60,12 +61,11 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {
+  std::set<PROBELIST*> _set;
 public:
-  PROBELIST alarm[sCOUNT]; // list of alarm probes
-  PROBELIST plot[sCOUNT];  // list of plot probes
-  PROBELIST print[sCOUNT]; // list of print probes
-  PROBELIST store[sCOUNT]; // list of probes to store for postproc
   void purge(CKT_BASE*);
+  void clear();
+  void insert(PROBELIST* p) {_set.insert(p);}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

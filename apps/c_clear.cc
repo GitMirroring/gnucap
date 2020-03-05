@@ -39,7 +39,6 @@ public:
     command("unfault", Scope);
     command("unmark", Scope);
     command("probes clear", Scope);
-    command("data clear", Scope);
     command("delete all", Scope);
     command("title '", Scope);
   }

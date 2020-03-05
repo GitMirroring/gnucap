@@ -128,7 +128,7 @@ SIM_DATA::~SIM_DATA()
   _evalq_uc = NULL;
 
   if (_waves) {
-    delete [] _waves;
+    delete _waves;
     _waves = NULL;
   }else{
   }

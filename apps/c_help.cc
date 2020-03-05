@@ -38,7 +38,6 @@ namespace {
     &model_dispatcher,
     &bm_dispatcher,
     &status_dispatcher,
-    &probe_dispatcher,
     NULL };
   // the order here determines the search order
 /*--------------------------------------------------------------------------*/
