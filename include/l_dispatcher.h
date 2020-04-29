@@ -26,9 +26,9 @@
  * Also must not have any virtual functions, because the v-table has a constructor.
  * "construction" will be done on demand by check_init.
  *
- * This is suitable for static objects only!
+ * DISPATCHER is suitable for static objects only!
  */
-//testing=script 2020.04.06
+//testing=manual 2020.04.29
 #ifndef L_DISPATCHER_H
 #define L_DISPATCHER_H
 #include "e_base.h"
@@ -38,19 +38,23 @@
 /*--------------------------------------------------------------------------*/
 class DISPATCHER_BASE {
 protected:
-  std::map<std::string, CKT_BASE*> * _map;
+  std::map<std::string, CKT_BASE*> _map;
 public:
   typedef std::map<std::string, CKT_BASE*>::const_iterator const_iterator;
-
-  const_iterator begin()const		{assert(_map); return _map->begin();}
-  const_iterator end()const		{assert(_map); return _map->end();}
+private:
+  DISPATCHER_BASE(DISPATCHER_BASE const&) {unreachable();}
+public:
+  explicit DISPATCHER_BASE() {}
+  ~DISPATCHER_BASE();
+public:
+  const_iterator begin()const		{return _map.begin();}
+  const_iterator end()const		{return _map.end();}
 public:
   CKT_BASE* operator[](std::string s);
 private:
   void      uninstall(CKT_BASE* p);
   //void      uninstall(const std::string& s);
   void	    install(const std::string& s, CKT_BASE* p);
-  void      check_init();
 public:
   class INSTALL {
   private:
@@ -75,44 +79,80 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// thin wrapper controlling initialisation.
+// only static instances allowed.
 template <class TT>
-class INTERFACE DISPATCHER : public DISPATCHER_BASE {
+class INTERFACE DISPATCHER {
+public:
+  typedef typename DISPATCHER_BASE::const_iterator const_iterator;
+  typedef typename DISPATCHER_BASE::INSTALL INSTALL;
 public:
   TT* operator[](std::string s);
   TT* operator[](CS& cmd);
   TT* clone(std::string s);
+public: // forward to BASE
+  DISPATCHER_BASE* operator&() {
+    check_init();
+    return _base;
+  }
+  void install(const std::string& s, TT* p) { untested();
+    check_init();
+    return _base->install(s, p);
+  }
+  void uninstall(CKT_BASE* p) { untested();
+    assert(_base);
+    return _base->uninstall(p);
+  }
+  const_iterator begin()const {
+    assert(_base);
+    return _base->begin();
+  }
+  const_iterator end()const {
+    assert(_base);
+    return _base->end();
+  }
+#if 0 // removed, see implementation
+  void uninstall(const std::string& s) { untested();
+    return _base->uninstall(s);
+  }
+#endif
+private:
+  void check_init();
+  DISPATCHER_BASE* _base;
 };
 /*--------------------------------------------------------------------------*/
+// not sure if this is needed, could be put wherever used.
+// just drop it?
 template <class TT>
-class INTERFACE D_DISPATCHER : public DISPATCHER<TT> {
-public:
-  D_DISPATCHER() {untested(); DISPATCHER_BASE::_map = new std::map<std::string, CKT_BASE*>;}
-  ~D_DISPATCHER() {untested(); delete DISPATCHER_BASE::_map; DISPATCHER_BASE::_map = NULL;}
+class INTERFACE D_DISPATCHER : public DISPATCHER_BASE {
 };
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+inline DISPATCHER_BASE::~DISPATCHER_BASE()
+{ untested();
+#if !defined(NDEBUG)
+  for (typename std::map<std::string, CKT_BASE*>::iterator
+      ii = _map.begin();  ii != _map.end();  ++ii) { untested();
+    assert(!(ii->second));
+  }
+#endif
+}
 /*--------------------------------------------------------------------------*/
 inline CKT_BASE* DISPATCHER_BASE::operator[](std::string s)
 {
-  if (_map) {
-    CKT_BASE* rv = (*_map)[s];
-    if (!rv && OPT::case_insensitive) {
-      notstd::to_lower(&s);
-      rv = (*_map)[s];
-    }else{
-    }
-    return rv;
+  CKT_BASE* rv = _map[s];
+  if (!rv && OPT::case_insensitive) {
+    notstd::to_lower(&s);
+    rv = _map[s];
   }else{
-    return NULL;
   }
+  return rv;
 }
 /*--------------------------------------------------------------------------*/
 inline void DISPATCHER_BASE::uninstall(CKT_BASE* p)
 {
-  assert(_map);
   for (typename std::map<std::string, CKT_BASE*>::iterator
-	 ii = _map->begin();
-       ii != _map->end();
-       ++ii) {
+	 ii = _map.begin();  ii != _map.end();  ++ii) {
     if (ii->second == p) {
       ii->second = NULL;
     }else{
@@ -120,15 +160,13 @@ inline void DISPATCHER_BASE::uninstall(CKT_BASE* p)
   }
 #if !defined(NDEBUG)
   for (typename std::map<std::string, CKT_BASE*>::iterator
-	 ii = _map->begin();
-       ii != _map->end();
-       ++ii) {
+	 ii = _map.begin();  ii != _map.end();  ++ii) {
     assert(ii->second != p);
   }
 #endif
 }
 /*--------------------------------------------------------------------------*/
-#if 0
+#if 0 // OK. but need to adapt gnucsator::uninstall when removing this
 inline void DISPATCHER_BASE::uninstall(const std::string& s)
 {untested();
   assert(_map);
@@ -164,17 +202,17 @@ inline void DISPATCHER_BASE::uninstall(const std::string& s)
 }
 #endif
 /*--------------------------------------------------------------------------*/
-inline void DISPATCHER_BASE::check_init()
+template<class TT>
+void DISPATCHER<TT>::check_init()
 {
-  if (!_map) {
-    _map = new std::map<std::string, CKT_BASE*>;
+  if (!_base) {
+    _base = new DISPATCHER_BASE;
   }else{
   }
 }
 /*--------------------------------------------------------------------------*/
 inline void DISPATCHER_BASE::install(const std::string& s, CKT_BASE* p)
 {
-  check_init();
   assert(s.find(',', 0) == std::string::npos);
   trace0(s.c_str());
   // loop over all keys, separated by '|'
@@ -187,33 +225,35 @@ inline void DISPATCHER_BASE::install(const std::string& s, CKT_BASE* p)
     trace2(name.c_str(), bss, ess);
     if (name == "") {untested();
       // quietly ignore empty string
-    }else if ((*_map)[name]) {untested();
+    }else if (_map[name]) {untested();
       // duplicate .. stash the old one so we can get it back
       error(bWARNING, name + ": already installed, replacing\n");
       std::string save_name = name + ":0";
-      for (int ii = 0; (*_map)[save_name]; ++ii) {untested();
+      for (int ii = 0; _map[save_name]; ++ii) {untested();
 	save_name = name + ":" + to_string(ii);
       }
-      (*_map)[save_name] = (*_map)[name];
+      _map[save_name] = _map[name];
       error(bWARNING, "stashing as " + save_name + "\n");
     }else{
       // it's new, just put it in
     }
-    (*_map)[name] = p;
+    _map[name] = p;
   }
 }
 /*--------------------------------------------------------------------------*/
 template <class TT>
 TT* DISPATCHER<TT>::operator[](std::string s)
 {
-  assert(_map);
-  CKT_BASE* rv = (*_map)[s];
+  check_init(); // main.cc gets here first (??)
+  CKT_BASE* rv = (*_base)[s];
   if (!rv && OPT::case_insensitive) {
     notstd::to_lower(&s);
-    rv = (*_map)[s];
+    rv = (*_base)[s];
   }else{
   }
-  return prechecked_cast<TT*>(rv);
+  TT* t=prechecked_cast<TT*>(rv);
+  assert(t || !rv);
+  return(t);
 }
 /*--------------------------------------------------------------------------*/
 template <class TT>
