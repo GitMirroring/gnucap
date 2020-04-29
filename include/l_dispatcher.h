@@ -83,6 +83,13 @@ public:
   TT* clone(std::string s);
 };
 /*--------------------------------------------------------------------------*/
+template <class TT>
+class INTERFACE D_DISPATCHER : public DISPATCHER<TT> {
+public:
+  D_DISPATCHER() {untested(); DISPATCHER_BASE::_map = new std::map<std::string, CKT_BASE*>;}
+  ~D_DISPATCHER() {untested(); delete DISPATCHER_BASE::_map; DISPATCHER_BASE::_map = NULL;}
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 inline CKT_BASE* DISPATCHER_BASE::operator[](std::string s)
 {
