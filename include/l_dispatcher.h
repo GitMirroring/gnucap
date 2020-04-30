@@ -53,7 +53,6 @@ public:
   CKT_BASE* operator[](std::string s);
 private:
   void      uninstall(CKT_BASE* p);
-  //void      uninstall(const std::string& s);
   void	    install(const std::string& s, CKT_BASE* p);
 public:
   class INSTALL {
@@ -95,14 +94,6 @@ public: // forward to BASE
     check_init();
     return _base;
   }
-  void install(const std::string& s, TT* p) { untested();
-    check_init();
-    return _base->install(s, p);
-  }
-  void uninstall(CKT_BASE* p) { untested();
-    assert(_base);
-    return _base->uninstall(p);
-  }
   const_iterator begin()const {
     assert(_base);
     return _base->begin();
@@ -111,11 +102,6 @@ public: // forward to BASE
     assert(_base);
     return _base->end();
   }
-#if 0 // removed, see implementation
-  void uninstall(const std::string& s) { untested();
-    return _base->uninstall(s);
-  }
-#endif
 private:
   void check_init();
   DISPATCHER_BASE* _base;
@@ -165,42 +151,6 @@ inline void DISPATCHER_BASE::uninstall(CKT_BASE* p)
   }
 #endif
 }
-/*--------------------------------------------------------------------------*/
-#if 0 // OK. but need to adapt gnucsator::uninstall when removing this
-inline void DISPATCHER_BASE::uninstall(const std::string& s)
-{untested();
-  assert(_map);
-  // loop over all keys, separated by '|'
-  for (std::string::size_type			// bss: begin sub-string
-	 bss = 0, ess = s.find('|', bss);	// ess: end sub-string
-       bss != std::string::npos;
-       bss = (ess != std::string::npos) ? ess+1 : std::string::npos,
-	 ess = s.find('|', bss)) {untested();
-    std::string name = s.substr(bss,
-				(ess != std::string::npos) ? ess-bss : std::string::npos);
-    if (name == "") {untested();
-      // quietly ignore empty string
-    }else if ((*_map)[name]) {untested();
-      // delete, try to get back the old one
-      int ii = 0;
-      std::string save_name = name + ":0";
-      for (ii = 0; (*_map)[save_name]; ++ii) {untested();
-	save_name = name + ":" + to_string(ii);
-      }
-      if (ii > 1) {untested();
-	save_name = name + ":" + to_string(ii-2);
-	(*_map)[name] = (*_map)[save_name];
-	(*_map)[save_name] = NULL;
-	error(bWARNING, "restoring " + save_name + " as " + name + "\n");
-      }else{untested();
-	(*_map)[name] = NULL;
-      }
-    }else{untested();
-      error(bWARNING, name + ": not installed, doing nothing\n");
-    }
-  }
-}
-#endif
 /*--------------------------------------------------------------------------*/
 template<class TT>
 void DISPATCHER<TT>::check_init()
