@@ -37,7 +37,7 @@
 #include "ap.h"
 /*--------------------------------------------------------------------------*/
 class DISPATCHER_BASE {
-protected:
+private:
   std::map<std::string, CKT_BASE*> _map;
 public:
   typedef std::map<std::string, CKT_BASE*>::const_iterator const_iterator;
