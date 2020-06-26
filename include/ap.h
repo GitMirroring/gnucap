@@ -71,6 +71,10 @@ public:
   // status - non-consuming
   size_t cursor()const	{return _cnt;}
   bool	stuck(size_t* last)	{bool ok=*last<_cnt; *last=_cnt; return !ok;}
+  bool	stuck(unsigned* last)	{ untested();
+    incomplete(); // old interface,
+    bool ok=*last<_cnt; *last=unsigned(_cnt); return !ok;
+  }
   bool	gotit(size_t last)	{return last<_cnt;}
 	operator bool()const	{return _ok;}
 
