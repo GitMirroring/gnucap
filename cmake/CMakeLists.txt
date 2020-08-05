@@ -45,6 +45,7 @@ endif()
 
 # Check for dynamic library support (dlopen).
 include(FindDL.cmake)
+include(readlist.cmake)
 
 if(DL_FOUND)
     set(HAVE_DLFCN_H true)
