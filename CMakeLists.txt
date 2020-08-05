@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 11)
 # Set configuration options.
 option(DOCS "Build and install documentation" OFF)
 option(READLINE "Support command-line editing" ON)
-option(TEST "Enable regression testing" OFF)
+option(CHECK "Enable regression testing" OFF)
 
 # Set standard installation paths.
 include(GNUInstallDirs)
@@ -30,7 +30,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git/HEAD")
 endif()
 
 # Enable regression testing (if enabled).
-if(TEST)
+if(CHECK)
     enable_testing()
 endif()
 
