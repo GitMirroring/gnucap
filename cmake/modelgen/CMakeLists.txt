@@ -1,4 +1,4 @@
-add_executable(gnucap-modelgen
+set(RAW_SRCS
     mg_error.cc
     mg_in.cc
     mg_main.cc
@@ -10,6 +10,9 @@ add_executable(gnucap-modelgen
     mg_out_model.cc
     mg_out_root.cc
 )
+
+list(TRANSFORM RAW_SRCS PREPEND ../../modelgen/)
+add_executable(gnucap-modelgen ${RAW_SRCS})
 
 target_link_libraries(gnucap-modelgen gnucap)
 

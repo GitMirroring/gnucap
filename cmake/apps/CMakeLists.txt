@@ -27,6 +27,8 @@ set(MODELS
     d_bjt.model d_diode.model
 )
 
+list(TRANSFORM MODELS PREPEND ../../apps/)
+
 set(D_SRCS
     d_admit.cc d_cap.cc d_cccs.cc d_ccvs.cc d_coil.cc
     d_cs.cc d_poly_g.cc d_poly_cap.cc d_res.cc d_switch.cc
@@ -68,7 +70,7 @@ set(OTHER_SOURCES
 
 add_models(MODEL_SOURCES ${MODELS})
 
-add_library(gnucap-default-plugins MODULE
+set(ALL_SRCS
     ${D_SRCS}
     ${BM_SRCS}
     ${C_SRCS}
@@ -76,8 +78,12 @@ add_library(gnucap-default-plugins MODULE
     ${LANG_SRCS}
     ${FUNC_SRCS}
     ${OTHER_SOURCES}
-    ${MODEL_SOURCES}
 )
+
+list(TRANSFORM ALL_SRCS PREPEND ../../apps/)
+
+add_library(gnucap-default-plugins MODULE ${ALL_SRCS}
+    ${MODEL_SOURCES} )
 
 message(STATUS "Building for: ${CMAKE_SYSTEM_NAME}")
 if(APPLE)

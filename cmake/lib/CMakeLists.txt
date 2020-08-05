@@ -38,7 +38,9 @@ macro( readVariable FILENAME VARIABLE OUTVAR_NAME)
 endmacro()
 
 # Avoid build system maintenance madness. Use one list for all of them
-readVariable("Make1" "RAW_SRCS" "RAW_SRCS")
+readVariable("../../lib/Make1" "RAW_SRCS" "RAW_SRCS")
+
+list(TRANSFORM RAW_SRCS PREPEND ../../lib/)
 
 # message(STATUS "===========TEST===============")
 # message(STATUS "RAW ${RAW_SRCS}")

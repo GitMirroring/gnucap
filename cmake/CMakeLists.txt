@@ -44,7 +44,7 @@ if(READLINE)
 endif()
 
 # Check for dynamic library support (dlopen).
-include(cmake/FindDL.cmake)
+include(FindDL.cmake)
 
 if(DL_FOUND)
     set(HAVE_DLFCN_H true)
@@ -58,7 +58,7 @@ set(pkglibdir "${CMAKE_INSTALL_FULL_LIBDIR}/gnucap")
 
 # Write configuration to header file.
 configure_file(
-    "${PROJECT_SOURCE_DIR}/cmake/config.h.in"
+    "${PROJECT_SOURCE_DIR}/config.h.in"
     "${PROJECT_BINARY_DIR}/config.h"
     )
 
@@ -68,7 +68,7 @@ SET(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}) # Linux set full path to l
 
 # Tell the compiler where to find the header files.
 include_directories(${PROJECT_BINARY_DIR})
-include_directories(include)
+include_directories(../include)
 
 # Build in subdirectories.
 add_subdirectory(apps)
