@@ -1,3 +1,4 @@
+
 function(add_models output_var)
     set(result)
 
@@ -78,8 +79,12 @@ add_library(gnucap-default-plugins MODULE
     ${MODEL_SOURCES}
 )
 
+message(STATUS "Building for: ${CMAKE_SYSTEM_NAME}")
 if(APPLE)
   set(CMAKE_MODULE_LINKER_FLAGS "-undefined dynamic_lookup")
+elseif(MINGW)
+  message(STATUS "Add linker flags for libgnucap")
+  set(CMAKE_MODULE_LINKER_FLAGS "-L${CMAKE_CURRENT_BINARY_DIR}/../lib -l:libgnucap.dll")
 endif()
 
 set_target_properties(gnucap-default-plugins PROPERTIES PREFIX "")
