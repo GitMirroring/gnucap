@@ -34,7 +34,7 @@ public:
   std::string value_name()const {return "";}
   virtual void do_it(CS&, CARD_LIST*) = 0;
   virtual void attach_output(OUTPUT*){}
-  virtual void detach_output(OUTPUT*){untested();}
+  virtual void detach_output(OUTPUT*){}
   virtual ~CMD() {}
   static  void  cmdproc(CS&, CARD_LIST*);
   static  void	command(const std::string&, CARD_LIST*);

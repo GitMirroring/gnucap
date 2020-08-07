@@ -288,7 +288,6 @@ static void plotarg(
 class OUTPUT_CMD_PLOT : public OUTPUT_CMD {
 private: // types
   typedef PROBE probe_type;
-  static probe_type _probe_proto;
 private:
   OUTPUT_CMD_PLOT(const OUTPUT_CMD_PLOT&p) : OUTPUT_CMD(p) {}
 public:
@@ -297,7 +296,6 @@ public:
 private: // OUTPUT_CMD
   OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_PLOT(*this);}
   void setup(CS& cmd)			{IO::plotset = true; OUTPUT_CMD::setup(cmd);}
-  //PROBE const* probe_proto() const	{return &_probe_proto;}
 private: // OUTPUT
   void init(int, const std::string&) {IO::plotout = (IO::plotset) ? IO::mstdout : OMSTREAM();}
 

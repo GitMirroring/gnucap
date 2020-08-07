@@ -6,10 +6,10 @@ V3  1  0  SIN   freq=5k nozero nopeak
 V3  2  0 tran 0 fourier SIN freq=10k nozero nopeak
 
 .acs
-print tran v(1)
-tran 0 10u 5u
+print tran v(nodes)
+tran 0 100u
 print fourier v(nodes)
-fourier 1k 3k 1k
+fourier 5k 15k 1k
 list
 
 status notime

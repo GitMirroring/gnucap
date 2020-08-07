@@ -128,7 +128,7 @@ double PROBE::probe_node(void)const
     return ::status.hidden_steps;
   }else if (Umatch(_what, "temp{erature} ")) {
     return _sim->_temp_c;
-  }else if (Umatch(_what, "time ")) {untested();
+  }else if (Umatch(_what, "time ")) {
     return _sim->_time0;
   }else{
     return NOT_VALID;

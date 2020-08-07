@@ -109,19 +109,16 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
   // this results in NULL, if there is no SIM registered.
   setup(cmd);
 
-  if (!_prb) {
-    // go through all sims that have been mentioned
-    if (cmd.is_end()) {
-      // list probes for this output command.
-      // forall simulations
+  if (!_prb) {				// go through all sims that have been mentioned
+    if (cmd.is_end()) {			// list probes for this output command.
+					// forall simulations
       for(container_type::const_iterator i=_sinks.begin(); i!=_sinks.end(); ++i){
 	OUTPUT_CMD const* S=prechecked_cast<OUTPUT_CMD const*>(i->second);
 	assert(S);
 	PROBELIST const& pl=S->probelist();
 	pl.listing(S->simname());
       }
-    }else if (cmd.umatch("clear ")) {untested();
-      // clear all
+    }else if (cmd.umatch("clear ")) {untested();	// clear all
       for(container_type::const_iterator i=_sinks.begin(); i!=_sinks.end(); ++i){untested();
 	OUTPUT_CMD* S=prechecked_cast<OUTPUT_CMD*>(i->second);
 	assert(S);
@@ -132,7 +129,7 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
     }else{untested();
       throw Exception_CS("what's this?", cmd);
     }
-  }else{
+  }else{					/* simtype specified */
     if (cmd.is_end()) {				/* list */
       _prb->listing("");
     }else if (cmd.umatch("clear ")) {
@@ -179,8 +176,11 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
 /*--------------------------------------------------------------------------*/
 void OUTPUT_CMD::detach_sinks()
 {
+  //typedef std::map<CMD*, OUTPUT*> container_type;
   for (container_type::iterator i=_sinks.begin(); i!=_sinks.end(); ++i) {
     if (CMD* sim = i->first) {
+      assert(sim);
+      assert(i->second);	////BUG//// destruction order crash
       sim->detach_output(i->second);
     }else{untested();
       unreachable();

@@ -34,8 +34,6 @@ namespace {
 /*--------------------------------------------------------------------------*/
 class OUTPUT_CMD_STORE : public OUTPUT_CMD {
 private:
-  std::vector<WAVE*> _wavep;
-private:
   explicit OUTPUT_CMD_STORE(const OUTPUT_CMD_STORE&p) : OUTPUT_CMD(p) {}
 public:
   OUTPUT_CMD_STORE() : OUTPUT_CMD()	{set_label("store");}
@@ -46,7 +44,8 @@ public: // OUTPUT
   void init(int, const std::string& /*Label*/)
   {
     if (_sim->_waves) {
-      delete [] _sim->_waves;
+      delete _sim->_waves;
+      _sim->_waves = NULL;
     }else{
     }
     _sim->_waves = new WAVEstash(_prb);

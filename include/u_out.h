@@ -44,12 +44,14 @@ public: // construct
 public:
   virtual void reset()			{_out = IO::mstdout; _out.reset();} // bug? check if needed
   virtual OUTPUT* set(CS& cmd)		{::outset(cmd, &_out); return this;}
+  ////BUG//// ::outset called repeatedly when there are multiple outs
   void set(OMSTREAM const& o)		{_out = o;}
 
-  virtual void init(int, const std::string&)		{}
-  virtual void head(double, double, const std::string&)	{}
-  virtual void commit(double X, int Level)		=0;
-  virtual void flush()					{}
+  virtual void init(int, const std::string&)		  {}
+  virtual void head(double, double, const std::string&)	  {}
+  virtual void t_head(double, double, const std::string&) {}
+  virtual void commit(double X, int Level)		  =0;
+  virtual void flush()					  {}
 protected:
   OMSTREAM out()			{return _out;}
 private:
@@ -65,12 +67,13 @@ public: // construct
   OUTPUT_TEE()				{}
   ~OUTPUT_TEE();
 private:
-  void attach_output(OUTPUT* o)		{_outputs.insert(o);}
-  void detach_output(OUTPUT* o)		{_outputs.erase(o);}
+  void attach_output(OUTPUT* o)		{assert(o); _outputs.insert(o);}
+  void detach_output(OUTPUT* o)		{assert(o); _outputs.erase(o);}
 public: // OUTPUT. u_out.cc
   OUTPUT* set(CS& cmd);
   void init(int, const std::string&);
-  void head(double, double, std::string const& label);
+  void head(double start, double stop, std::string const& label);
+  void t_head(double start, double stop, std::string const& label);
   void commit(double X, int Level);
   void flush();
 private:
@@ -106,7 +109,6 @@ public:
   void set_simname(const std::string& s){_simname = s;}
 public:
   void do_it(CS&, CARD_LIST*);
-  virtual PROBE const* probe_proto() const{return NULL;}
 private: // OUTPUT
   void detach_sinks();
 private:
