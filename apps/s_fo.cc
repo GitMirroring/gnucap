@@ -1,4 +1,3 @@
-#if 0
 /*$Id: s_fo.cc 2016/09/26 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
@@ -32,8 +31,48 @@
 #include "declare.h"	/* plclose, plclear, fft */
 #include "u_prblst.h"
 #include "s_tr.h"
+#include "u_out.h"
 /*--------------------------------------------------------------------------*/
 namespace {
+/*--------------------------------------------------------------------------*/
+class OUTPUT_CMD_FFT : public OUTPUT_CMD {
+private:
+  int _stepno;		// count of visible (saved) steps
+  COMPLEX** _fdata;	/* storage to allow postprocessing */
+  int    _timesteps;	/* number of time steps in tran analysis, incl 0 */
+  double _fstart;	/* user start frequency */
+  double _fstop;	/* user stop frequency */
+  double _fstep;	/* fft frequecncy step */
+private:
+  explicit OUTPUT_CMD_FFT(const OUTPUT_CMD_FFT&p) : OUTPUT_CMD(p) {}
+public:
+  OUTPUT_CMD_FFT() :
+    OUTPUT_CMD(),
+    _stepno(0),
+    _fdata(NULL),
+    _timesteps(0),
+    _fstart(NOT_VALID),
+    _fstop(NOT_VALID),
+    _fstep(NOT_VALID)
+  {
+    set_label("fft");
+  }
+  virtual ~OUTPUT_CMD_FFT()		{/*assert(!_fdata);*/}
+public: // OUTPUT_CMD
+  OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_FFT(*this);}
+public: // OUTPUT
+  void init(int Level, const std::string& Label);
+  void head(double start, double stop, const std::string&);
+  void t_head(double start, double stop, const std::string&);
+  void commit(double XX, int Level);
+  void flush();
+private:
+  void	fftunallocate();
+  void	foout();
+  void	fohead(const PROBE&);
+  void	foprint(COMPLEX*);
+}; // OUTPUT_CMD_FFT
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class FOURIER : public TRANSIENT {
 public:
@@ -43,26 +82,26 @@ public:
     _fstart(0.),
     _fstop(0.),
     _fstep(0.),
-    _timesteps(0),
-    _fdata(NULL)
+    _timesteps(0)
   {}
   ~FOURIER() {}
 private:
   explicit FOURIER(const FOURIER&): TRANSIENT() {unreachable(); incomplete();}
   std::string status()const {untested();return "";}
   void	setup(CS&);	/* s_fo_set.cc */
+#if 0
   void	fftallocate();
   void	fftunallocate();
   void	foout();	/* s_fo_out.cc */
   void	fohead(const PROBE&);
   void	foprint(COMPLEX*);
   void	store_results(double); // override virtual
+#endif
 private:
   PARAMETER<double> _fstart;	/* user start frequency */
   PARAMETER<double> _fstop;	/* user stop frequency */
   PARAMETER<double> _fstep;	/* fft frequecncy step */
   int    _timesteps;	/* number of time steps in tran analysis, incl 0 */
-  COMPLEX** _fdata;	/* storage to allow postprocessing */
 };
 /*--------------------------------------------------------------------------*/
 static	int	to_pow_of_2(double);
@@ -89,22 +128,22 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
     _sim->_lu.reallocate();
     _sim->_lu.dezero(OPT::gmin);
     _sim->_lu.set_min_pivot(OPT::pivtol);
-    fftallocate();
+    ////fftallocate();
     ::status.set_up.stop();
 
     switch (ENV::run_mode) {
     case rPRE_MAIN:	unreachable();		break;
-    case rBATCH:	untested();
+    case rBATCH:
       // fall through
     case rINTERACTIVE:  itested();
       // fall through
-    case rSCRIPT:	sweep(); foout();	break;
+    case rSCRIPT:	sweep(); /*////foout();*/	break;
     case rPRESET:	untested(); /*nothing*/ break;
     }
   }catch (Exception& e) {untested();
     error(bDANGER, e.message() + '\n');
   }
-  fftunallocate();
+  ////fftunallocate();
   _sim->unalloc_vectors();
   _sim->_lu.unallocate();
   _sim->_aa.unallocate();
@@ -114,37 +153,66 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
 
   ::status.four.stop();
   ::status.total.stop();
-  
+  out_flush();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+/* allocate:  allocate space for fft
+ */
+//void FOURIER::fftallocate()
+void OUTPUT_CMD_FFT::init(int, const std::string& /*Label*/)
+{
+  _timesteps = 1000;
+  int probes = probelist().size();
+  _fdata = new COMPLEX*[probes];
+  for (int ii = 0;  ii < probes;  ++ii) {
+    _fdata[ii] = new COMPLEX[_timesteps+100];
+  }
+  _stepno = 0;
+}
+/*--------------------------------------------------------------------------*/
+void OUTPUT_CMD_FFT::head(double Tstart, double Tstop, const std::string&)
+{
+  _fstep = 1 / (Tstop - Tstart);
+}
+/*--------------------------------------------------------------------------*/
+void OUTPUT_CMD_FFT::t_head(double Fstart, double Fstop, const std::string& Xvar)
+{
+  if (Xvar == "Freq") {
+    _fstart = Fstart;
+    _fstop = Fstop;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 /* store: stash time domain data in preparation for Fourier Transform
  */
-void FOURIER::store_results(double X)
+void OUTPUT_CMD_FFT::commit(double, int Level)
 {
-  TRANSIENT::store_results(X);
-
-  if (step_cause() == scUSER) {
+  if (Level < dl_STROBE) {
+    // only look at dl_STROBE or better.
+  }else{
     int ii = 0;
+    trace2("fft::commit", _stepno, _timesteps);
     for (PROBELIST::const_iterator
-	   p=printlist().begin();  p!=printlist().end();  ++p) {
-      assert(_stepno < _timesteps);
+	   p=probelist().begin();  p!=probelist().end();  ++p) {
+      //assert(_stepno < _timesteps);
+      assert(_stepno < 1000);
       _fdata[ii][_stepno] = p->value();
       ++ii;
     }
-  }else{
+    ++_stepno;
   }
 }
 /*--------------------------------------------------------------------------*/
 /* foout:  print out the results of the transform
  */
-void FOURIER::foout()
+void OUTPUT_CMD_FFT::flush()
 {
-  plclose();
-  plclear();
+  _timesteps = _stepno;
   int ii = 0;
   for (PROBELIST::const_iterator
-	 p=printlist().begin();  p!=printlist().end();  ++p) {
+	 p=probelist().begin();  p!=probelist().end();  ++p) {
     fohead(*p);
     fft(_fdata[ii], _timesteps-1,  0);
     foprint(_fdata[ii]);
@@ -155,9 +223,9 @@ void FOURIER::foout()
 /* fo_head: print output header
  * arg is index into probe array, to select probe name
  */
-void FOURIER::fohead(const PROBE& Prob)
+void OUTPUT_CMD_FFT::fohead(const PROBE& Prob)
 {
-  _out.form("# %-10s", Prob.label().c_str())
+  out().form("# %-10s", Prob.label().c_str())
     << "--------- actual ---------  -------- relative --------\n"
     << "#freq       "
     << "value        dB      phase  value        dB      phase\n";
@@ -166,14 +234,20 @@ void FOURIER::fohead(const PROBE& Prob)
 /* fo_print: print results of fourier analysis
  * for all points at single probe
  */
-void FOURIER::foprint(COMPLEX *Data)
+void OUTPUT_CMD_FFT::foprint(COMPLEX *Data)
 {
   int startstep = stepnum(0., _fstep, _fstart);
   assert(startstep >= 0);
+
   int stopstep  = stepnum(0., _fstep, _fstop );
-  assert(stopstep < _timesteps);
+  if (stopstep == 0) {
+    stopstep = _timesteps/2 - 1;
+  }else{
+  }
+  assert(stopstep < _timesteps/2);
+
   COMPLEX maxvalue = find_max(Data, std::max(1,startstep), stopstep);
-  if (maxvalue == 0.) {untested();
+  if (maxvalue == 0.) {
     maxvalue = 1.;
   }else{
   }
@@ -185,12 +259,12 @@ void FOURIER::foprint(COMPLEX *Data)
     COMPLEX unscaled = Data[ii];
     COMPLEX scaled = unscaled / maxvalue;
     unscaled *= 2;
-    _out.form("%s%s%7.2f %8.3f %s%7.2f %8.3f\n",
-	     ftos(frequency,    11,5,_out.format()),
-        ftos(std::abs(unscaled),11,5,_out.format()),
+    out().form("%s%s%7.2f %8.3f %s%7.2f %8.3f\n",
+	     ftos(frequency,    11,5,out().format()),
+        ftos(std::abs(unscaled),11,5,out().format()),
 	     db(unscaled),
 	     phase(unscaled*COMPLEX(0.,1)),
-        ftos(std::abs(scaled),  11,5,_out.format()),
+        ftos(std::abs(scaled),  11,5,out().format()),
 	     db(scaled),
 	     phase(scaled) ) ;
   }
@@ -200,7 +274,11 @@ void FOURIER::foprint(COMPLEX *Data)
  */
 static int stepnum(double Start, double Step, double Here)
 {
-  return int((Here-Start)/Step + .5);
+  if (Here != NOT_VALID && Step != NOT_VALID && Start != NOT_VALID) {
+    return int((Here-Start)/Step + .5);
+  }else{
+    return 0;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* find_max: find the max magnitude in a COMPLEX array
@@ -315,25 +393,17 @@ void FOURIER::setup(CS& Cmd)
     // use smaller of soft values
     _sim->_dtmin = std::min(double(_dtmin_in), _dtmax/_dtratio_in);
   }
-}
-/*--------------------------------------------------------------------------*/
-/* allocate:  allocate space for fft
- */
-void FOURIER::fftallocate()
-{
-  int probes = printlist().size();
-  _fdata = new COMPLEX*[probes];
-  for (int ii = 0;  ii < probes;  ++ii) {
-    _fdata[ii] = new COMPLEX[_timesteps+100];
-  }
+  out_init(_trace);
+  //out_head(_tstart, _tstop, "Time"); // in sweep()
+  out_t_head(_fstart, _fstop, "Freq");
 }
 /*--------------------------------------------------------------------------*/
 /* unallocate:  unallocate space for fft
  */
-void FOURIER::fftunallocate()
+void OUTPUT_CMD_FFT::fftunallocate()
 {
   if (_fdata) {
-    for (int ii = 0;  ii < printlist().size();  ++ii) {
+    for (int ii = 0;  ii < probelist().size();  ++ii) {
       delete [] _fdata[ii];
     }
     delete [] _fdata;
@@ -355,10 +425,11 @@ static int to_pow_of_2(double Z)
   return y;
 }   
 /*--------------------------------------------------------------------------*/
-static FOURIER p3;
+FOURIER p3;
 DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "fourier", &p3);
+OUTPUT_CMD_FFT p0;
+DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "fft", &p0);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
-#endif

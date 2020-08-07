@@ -77,6 +77,7 @@ protected:				/* s__out.cc */
   bool out_set(CS&);
   void out_init(TRACE);
   void out_head(double start, double stop, const std::string& col1);
+  void out_t_head(double start, double stop, const std::string& col1);
   void out_commit(double x, int level);
   void out_flush();
 public:

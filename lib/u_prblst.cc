@@ -48,7 +48,7 @@ void PROBELIST::listing(const std::string& label)const
   IO::mstdout.form("%-7s", label.c_str());
   for (const_iterator p = begin();  p != end();  ++p) {
     IO::mstdout << ' ' << p->label();
-    if (p->range() != 0.) {untested();
+    if (p->range() != 0.) {
       IO::mstdout.setfloatwidth(5) 
 	<< '(' << p->lo() << ',' << p->hi() << ')';
     }else{

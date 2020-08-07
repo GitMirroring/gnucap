@@ -55,12 +55,12 @@ OUTPUT* OUTPUT_TEE::set(CS& cs)
   return this;
 }
 /*--------------------------------------------------------------------------*/
-void OUTPUT_TEE::init(int Dl, const std::string& Label)
+void OUTPUT_TEE::init(int Level, const std::string& Label)
 {
   for(outputs_type::iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
     assert(*p);
     (*p)->set(out()); // BUG? here?
-    (*p)->init(Dl, Label);
+    (*p)->init(Level, Label);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -69,6 +69,14 @@ void OUTPUT_TEE::head(double start, double stop, const std::string& col1)
   for(outputs_type::const_iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
     assert(*p);
     (*p)->head(start, stop, col1);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void OUTPUT_TEE::t_head(double start, double stop, const std::string& col1)
+{
+  for(outputs_type::const_iterator p=_outputs.begin(); p!=_outputs.end(); ++p){
+    assert(*p);
+    (*p)->t_head(start, stop, col1);
   }
 }
 /*--------------------------------------------------------------------------*/

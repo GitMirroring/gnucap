@@ -5,16 +5,16 @@ spice
 V1  1  0  SIN   freq=2 nozero nopeak
 
 .acs
-print tran v(1)
-fourier 1 2 1
-fourier 1 2 1
+print fourier v(1)
+fourier 0 2 1
+fourier 0 2 1
 
 // test if "cold" is parsed correctly if between other args
-print tran temp(0)
-print fourier temp(0)
-fourier 1 2 1 cold
-fourier 1 2 1 dtemp=10 cold
-fourier 1 2 1 cold temp=10
+print tran temp(0) v(1)
+print fourier temp(0) v(1)
+fourier 0 2 1 cold
+fourier 0 2 1 dtemp=10 cold
+fourier 0 2 1 cold temp=10
 
 status notime
 

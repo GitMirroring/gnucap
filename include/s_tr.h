@@ -102,9 +102,8 @@ protected:
   double _dtmax;	// max internal step size (step / _skip)
   bool _cold;		// flag: start time=0, all voltages=0
   bool _cont;		// flag: continue from previous run
-  int _stepno;		// count of visible (saved) steps
-private:
   TRACE _trace;		// enum: show extended diagnostics
+private:
   double _time_by_iteration_count;
   double _time_by_user_request;
   double _time_by_error_estimate;

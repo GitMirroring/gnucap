@@ -78,6 +78,16 @@ void SIM::out_head(double start, double stop, const std::string& col1)
   ::status.output.stop();
 }
 /*--------------------------------------------------------------------------*/
+void SIM::out_t_head(double start, double stop, const std::string& col1)
+{
+  ::status.output.start();
+  if(_output){
+    _output->t_head(start, stop, col1);
+  }else{ untested();
+  }
+  ::status.output.stop();
+}
+/*--------------------------------------------------------------------------*/
 void SIM::out_commit(double XX, int Level)
 {
   ::status.output.start();
@@ -109,6 +119,8 @@ void SIM::attach_output(OUTPUT* o)
 /*--------------------------------------------------------------------------*/
 void SIM::detach_output(OUTPUT* o)
 {
+  assert(o);
+  assert(_output);
   if(_output == o){untested();
     _output = NULL;
   }else{

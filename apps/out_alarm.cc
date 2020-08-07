@@ -33,7 +33,6 @@ namespace {
 class OUTPUT_CMD_ALARM : public OUTPUT_CMD {
 private:
   typedef PROBE probe_type;
-  static probe_type _probe_proto;
 private:
   OUTPUT_CMD_ALARM(OUTPUT_CMD_ALARM const&p) : OUTPUT_CMD(p) {}
 public:
@@ -41,7 +40,6 @@ public:
   virtual ~OUTPUT_CMD_ALARM()		{}
 public: // OUTPUT_CMD
   OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_ALARM(*this);}
-  ////PROBE_BASE const* probe_proto() const {return &_probe_proto;}
 public: // OUTPUT
   void commit(double, int Level)
   {

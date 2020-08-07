@@ -119,7 +119,6 @@ void TRANSIENT::sweep()
       accept();
       if (step_cause() == scUSER) {
 	assert(up_order(_sim->_time0-_sim->_dtmin, _time_by_user_request, _sim->_time0+_sim->_dtmin));
-	++_stepno;
 	_time_by_user_request += _tstrobe;	/* advance user time */
       }else{
       }
@@ -129,6 +128,29 @@ void TRANSIENT::sweep()
       assert(_time1 < _time_by_user_request);
     }
     {
+#if 0
+      if (_trace >= tREJECTED) {untested();
+	out_commit(_sim->_time0, dl_INRANGE);
+	_sim->keep_voltages();
+	_sim->reset_iteration_counter(iPRINTSTEP);
+	::status.hidden_steps = 0;
+      }else if (!_accepted) {untested();
+	out_commit(_sim->_time0, dl_REJECTED);
+      }else if (step_cause() == scUSER) {untested();
+	out_commit(_sim->_time0, dl_STROBE);
+	_sim->keep_voltages();
+	_sim->reset_iteration_counter(iPRINTSTEP);
+	::status.hidden_steps = 0;
+      }else if (!_tstrobe.has_hard_value() && _sim->_time0+_sim->_dtmin > _tstart) {untested();
+	out_commit(_sim->_time0, dl_INRANGE);
+	_sim->keep_voltages();
+	_sim->reset_iteration_counter(iPRINTSTEP);
+	::status.hidden_steps = 0;
+      }else{untested();
+	++::status.hidden_steps;
+	out_commit(_sim->_time0, dl_ACCEPTED);
+      }	
+#else
       bool printnow =
 	(_trace >= tREJECTED)
 	|| (_accepted && (_trace >= tALLTIME
@@ -145,6 +167,7 @@ void TRANSIENT::sweep()
       }else{
 	out_commit(_sim->_time0, dl_REJECTED);
       }
+#endif
     }
     
     if (!_converged && OPT::quitconvfail) {untested();
@@ -205,7 +228,6 @@ void TRANSIENT::first()
   while (!_sim->_eq.empty()) {untested();
     _sim->_eq.pop();
   }
-  _stepno = 0;
 
   //_time_by_user_request = _sim->_time0 + _tstrobe;	/* set next user step */
   //set_step_cause(scUSER);
