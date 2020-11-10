@@ -77,6 +77,15 @@ namespace OS {
     }
   }
 
+  inline void unsetenv(const std::string& Name) { itested();
+    if (Name == "") {itested();
+      throw Exception("unsetenv: bad name " + Name);
+    }else if(int err = ::unsetenv(Name.c_str())){ itested();
+      throw Exception("unsetenv: error " + std::to_string(err));
+    }else{ itested();
+    }
+  }
+
   inline void setenv(const std::string& Name, const std::string& Value, bool Overwrite=true) {
     if (Name == "") {untested();
       throw Exception("setenv: bad name " + Name);
