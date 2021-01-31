@@ -49,17 +49,20 @@ CKT_BASE* DISPATCHER_BASE::operator[](std::string s)
 void DISPATCHER_BASE::uninstall(CKT_BASE* p)
 {
   assert(_map);
-  for (typename std::map<std::string, CKT_BASE*>::iterator
-	 ii = _map->begin();  ii != _map->end();  ++ii) {
-    if (ii->second == p) {
-      ii->second = NULL;
-    }else{
+  if(p){
+    for (typename std::map<std::string, CKT_BASE*>::iterator
+  	 ii = _map->begin();  ii != _map->end();  ++ii) {
+      if (ii->second == p) {
+        ii->second = NULL;
+      }else{
+      }
     }
+  }else{ itested();
   }
 #if !defined(NDEBUG)
   for (typename std::map<std::string, CKT_BASE*>::iterator
 	 ii = _map->begin();  ii != _map->end();  ++ii) {
-    assert(ii->second != p);
+    assert(!p || (ii->second != p));
   }
 #endif
 }
