@@ -304,13 +304,23 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   cmd >> ';';
 
   // body
+  int nest = 1;
   for (;;) {
     cmd.get_line("verilog-module>");
 
     if (cmd >> "endmodule ") {
+      --nest;
+    }else if (cmd >> "module |macromodule ") {
+      cmd.warn(bDANGER, 0, x->long_label() + ": nested module not allowed");
+      ++nest;
+    }else if(nest == 1) {
+      new__instance(cmd, x, x->subckt());
+    }else{
+    }
+
+    if(!nest){
       break;
     }else{
-      new__instance(cmd, x, x->subckt());
     }
   }
   return x;

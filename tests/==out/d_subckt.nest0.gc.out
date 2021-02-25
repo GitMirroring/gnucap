@@ -1,0 +1,4 @@
+module m1( a b ); 
+^ ? root: nested module not allowed
+module test1( a b ); 
+^ ? root: nested module not allowed

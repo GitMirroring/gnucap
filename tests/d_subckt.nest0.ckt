@@ -1,6 +1,5 @@
 spice
 
-* this works as expected
 .subckt m0 a b c d
 .ends
 
@@ -8,7 +7,6 @@ spice
 X1 a b c d m0
 .ends
 
-* and this does not
 .subckt m2 a b c d
 	.subckt m3 a b c d
 	.ends

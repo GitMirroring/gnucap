@@ -1,0 +1,17 @@
+spice 
+#          
+ 0.        
+.subckt m0 ( a b c d )
+.ends m0
+.subckt m1 ( a b c d )
+X1 ( a b c d )  m0 
+.ends m1
+.subckt m2 ( a b c d )
+.subckt m3 ( a b c d )
+.ends m3
+.subckt m4 ( a b c d )
+X2 ( a b c d )  m3 
+.ends m4
+X4 ( a b c d )  m4 
+.ends m2
+X0 ( a b c d )  m2 
