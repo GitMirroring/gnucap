@@ -1,0 +1,19 @@
+verilog
+
+module m0( a b );
+endmodule
+
+module test0( a b );
+	m0 #() mm( a b );
+endmodule
+
+module root( a b );
+	module m1( a b );
+	endmodule
+
+	module test1( a b );
+		m1 #() mm( a b );
+	endmodule
+endmodule
+
+//list
