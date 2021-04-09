@@ -101,8 +101,8 @@ public: // override virtual
   bool		makes_own_scope()const  {return true;}
   CARD_LIST*	   scope()		{untested();return subckt();}
   const CARD_LIST* scope()const		{return subckt();}
+  void precalc_first();
 private: // no-ops for prototype
-  void precalc_first(){}
   void expand(){}
   void precalc_last(){}
   void map_nodes(){}
@@ -150,6 +150,13 @@ CARD* DEV_SUBCKT_PROTO::clone_instance()const
 
   assert(new_instance->is_device());
   return new_instance;
+}
+/*--------------------------------------------------------------------------*/
+void DEV_SUBCKT_PROTO::precalc_first()
+{
+  BASE_SUBCKT::precalc_first(); // skip DEV_SUBCKT
+  assert(subckt());
+  subckt()->precalc_first();
 }
 /*--------------------------------------------------------------------------*/
 DEV_SUBCKT::DEV_SUBCKT()
