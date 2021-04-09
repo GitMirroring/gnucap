@@ -1,0 +1,12 @@
+* parameters affected by precalc
+
+spice
+.model  d1  d  (  bv=50  ibv= 0.001  gparallel=1e-5 )
+.model nmos nmos level=5 mjsw = 17
+
+.subckt test 1 2 3
+.model  d1  d  (  bv=50  ibv= 0.001  gparallel=1e-5 )
+.model nmos nmos level=5 mjsw = 17
+.ends
+
+.list
