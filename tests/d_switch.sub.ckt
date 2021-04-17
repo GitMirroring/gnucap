@@ -1,0 +1,10 @@
+'
+.subckt 1 2 3
+W2   4  0  Vprobe  sss 
+.model  sss  csw  ( it= 0.  ih= .002  ron= 1.K  roff= 1.E+12 )
+.ends
+
+W2   4  0  Vprobe  sss 
+.model  sss  csw  ( it= 0.  ih= .002  ron= 1.K  roff= 1.E+12 )
+
+.list
