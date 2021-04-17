@@ -416,6 +416,7 @@ void make_model_param_is_printable(std::ofstream& out, const Model& m)
     if (!((**p).user_name().empty())) {
       out << "  case " << i++ << ":  return (";
       if (!((**p).print_test().empty())) {
+	out << (**p).code_name() << ".has_hard_value() || ";
 	out << (**p).print_test() << ");\n";
 	//}else if ((**p).default_val() == "NA" && (**p).final_default().empty()) {untested();
 	//out << (**p).code_name() << ".has_hard_value());\n"; //" != NA);\n";
@@ -436,6 +437,7 @@ void make_model_param_is_printable(std::ofstream& out, const Model& m)
        ++p) {
     out << "  case " << i++ << ":  return (";
     if (!((**p).print_test().empty())) {
+      out << (**p).code_name() << ".has_hard_value() || ";
       out << (**p).print_test() << ");\n";
     }else if ((**p).default_val() == "NA") {
       out << (**p).code_name() << ".has_value());\n";
@@ -454,6 +456,7 @@ void make_model_param_is_printable(std::ofstream& out, const Model& m)
        ++p) {
     out << "  case " << i++ << ":  return (";
     if (!((**p).print_test().empty())) {
+      out << (**p).code_name() << ".has_hard_value() || ";
       out << (**p).print_test() << ");\n";
       //}else if ((**p).default_val() == "NA" && (**p).final_default().empty()) {
       //out << (**p).code_name() << ".has_hard_value());\n"; //" != NA);\n";
@@ -749,3 +752,4 @@ void make_cc_model(std::ofstream& out, const Model& m)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+// vim:ts=8:sw=2:noet:
