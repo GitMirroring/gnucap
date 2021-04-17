@@ -11,7 +11,7 @@ W3 ( 6 0 Isig )  sss
 Isig ( 7 0 ) pwl( 0., 0.  5.,-0.005  15., 0.005  25.,-0.005 )
 Rprobe ( 7 8 )  1.K
 Vprobe ( 8 0 )  DC  0.
-.model sss csw ( it=0. ih=.002 ion=NA( 0.002) ioff=NA(-0.002) ron=1.K roff=1.E+12 tnom=NA( 27.))
+.model sss csw ( it=0. ih=.002 ion=NA( 0.) ioff=NA( 0.) ron=1.K roff=1.E+12 tnom=NA( NA))
 #           v(2)       v(4)       v(6)       v(7)       v(8)       ev(W1)     ev(W2)     ev(W3)     i(Isig)    i(Rprobe)  i(Vprobe)  iter(0)   
  0.005      1.         1.         0.5       -5.        -50.n       1.E+12     1.E+12     1.K        0.005     -0.005     -0.005      5.        
  0.004      1.         1.         0.5       -4.        -40.n       1.E+12     1.E+12     1.K        0.004     -0.004     -0.004      4.        

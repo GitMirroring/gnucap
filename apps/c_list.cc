@@ -32,8 +32,6 @@ namespace {
 /*--------------------------------------------------------------------------*/
 void list_save(CS& cmd, OMSTREAM out, CARD_LIST* scope)
 {
-  CARD_LIST::card_list.precalc_first();
-
   //out.setfloatwidth(7);
   switch (ENV::run_mode) {
   case rPRE_MAIN:
