@@ -92,15 +92,15 @@ public:
 					{return find_again(short_name, begin());}
 
   // add to it
-  CARD_LIST& push_front(CARD* c)	{_cl.push_front(c); return *this;}
-  CARD_LIST& push_back(CARD* c)		{_cl.push_back(c);  return *this;}
-  CARD_LIST& insert(CARD_LIST::iterator i, CARD* c)
+  virtual CARD_LIST& push_front(CARD* c)	{_cl.push_front(c); return *this;}
+  virtual CARD_LIST& push_back(CARD* c)		{_cl.push_back(c);  return *this;}
+  virtual CARD_LIST& insert(CARD_LIST::iterator i, CARD* c)
 					{_cl.insert(i, c);  return *this;}
 
   // take things out
-  CARD_LIST& erase(iterator i);
-  CARD_LIST& erase(CARD* c);
-  CARD_LIST& erase_all();
+  virtual CARD_LIST& erase(iterator i);
+  virtual CARD_LIST& erase(CARD* c);
+  virtual CARD_LIST& erase_all();
 
   // operations on the whole list
   CARD_LIST& set_owner(CARD* owner);
@@ -138,7 +138,7 @@ public:
 
   explicit CARD_LIST();
   explicit CARD_LIST(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
-  ~CARD_LIST();
+  virtual ~CARD_LIST();
 private:
   explicit CARD_LIST(const CARD_LIST&) {unreachable(); incomplete();}
 public:
