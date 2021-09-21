@@ -49,10 +49,10 @@ device BUILT_IN_BJT {
     sync;
     ports {c b e} {s short_to=e};
     local_nodes {
-      ic  short_to=c   short_if="!OPT::rstray || m->rc == 0.";
+      ic  short_to=c   short_if="!OPT::rstray || m->rc == 0. || c->area == 0.";
       ib short_to=b
-	short_if="!OPT::rstray || (m->rb == 0. && m->rbm == 0.)";
-      ie short_to=e  short_if="!OPT::rstray || m->re == 0.";
+	short_if="!OPT::rstray || (m->rb == 0. && m->rbm == 0.) || c->area == 0.";
+      ie short_to=e  short_if="!OPT::rstray || m->re == 0. || c->area == 0.";
     }
     // basics
     cpoly_g Ice {ic,ie  ib,ie} state=ccexxx; // cce, go, gm
@@ -62,21 +62,21 @@ device BUILT_IN_BJT {
     fpoly_cap Cbx {b ic} state=qbx; // qbx, cqbx
     fpoly_cap Cbc {ib ic} state=qbc; // qbc, cqbc
     fpoly_cap Ccs {s ic} state=qcs // qcs, cqcs
-	omit="!(_n[n_s].n_())";
+	omit="!(_n[n_s].n_()) || c->area == 0.";
     fpoly_cap Cbe {ib ie ib ic} state=qbe; // qbe, cqbe, geqbc
     // parasitics
-    resistor Rc {c ic} value="m->rc / c->area"
-	omit="!OPT::rstray || m->rc == 0."; // gcpr
-    resistor Re {e ie} value="m->re / c->area"
-	omit="!OPT::rstray || m->re == 0."; // gepr
+    resistor Rc {c ic} value="(c->area==0.)?1.: (m->rc / c->area )"
+	omit="!OPT::rstray || m->rc == 0. || c->area == 0."; // gcpr
+    resistor Re {e ie} value="(c->area==0.)?1.: (m->re / c->area)"
+	omit="!OPT::rstray || m->re == 0. || c->area == 0."; // gepr
     cpoly_g Yb {b ib} state=ixxxx // gx.  should be "eval"
-	omit="!OPT::rstray || (m->rb == 0. && m->rbm == 0.)";
+	omit="!OPT::rstray || (m->rb == 0. && m->rbm == 0.) || c->area == 0.";
     capacitor Cbcp {b c} value="m->cbcp * c->area"
-	omit="!OPT::cstray || m->cbcp == 0.";
+	omit="!OPT::cstray || m->cbcp == 0. || c->area == 0.";
     capacitor Cbep {b e} value="m->cbep * c->area"
-	omit="!OPT::cstray || m->cbep == 0.";
+	omit="!OPT::cstray || m->cbep == 0. || c->area == 0.";
     capacitor Cbs {b s} value="(m->cbsp + m->ccsp) * c->area"
-	omit="!OPT::cstray || ((m->cbsp + m->ccsp) == 0.)";
+	omit="!OPT::cstray || ((m->cbsp + m->ccsp) == 0.) || c->area == 0.";
   }
   tr_probe {
     v = "@n_c[V] - @n_e[V]";
@@ -192,8 +192,8 @@ device BUILT_IN_BJT {
       double temp_c "instance temperature" name="TEMP" default=NA;
     }
     calculated_parameters {
-      double oik  "" calculate="m->invrollofff / c->area";
-      double oikr "" calculate="m->invrolloffr / c->area";
+      double oik  "" calculate="(c->area==0.)? 1.:(m->invrollofff / c->area)";
+      double oikr "" calculate="(c->area==0.)? 1.:(m->invrolloffr / c->area)";
     }
   }
   tr_eval {
