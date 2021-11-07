@@ -110,22 +110,12 @@ void SIM::out_flush()
 /*--------------------------------------------------------------------------*/
 void SIM::attach_output(OUTPUT* o)
 {
-  if(_output){
-    _output->attach_output(o);
-  }else{untested();
-    _output = o;
-  }
+  OUTPUT::attach(o, _output);
 }
 /*--------------------------------------------------------------------------*/
 void SIM::detach_output(OUTPUT* o)
 {
-  assert(o);
-  assert(_output);
-  if(_output == o){untested();
-    _output = NULL;
-  }else{
-    _output->detach_output(o);
-  }
+  OUTPUT::detach(o, _output);
 }
 /*--------------------------------------------------------------------------*/
 void SIM::attach_new_tee()

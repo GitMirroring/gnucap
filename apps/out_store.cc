@@ -32,14 +32,15 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class OUTPUT_CMD_STORE : public OUTPUT_CMD {
+class OUTPUT_STORE : public OUTPUT {
 private:
-  explicit OUTPUT_CMD_STORE(const OUTPUT_CMD_STORE&p) : OUTPUT_CMD(p) {}
+private:
+  explicit OUTPUT_STORE(const OUTPUT_STORE&p) : OUTPUT(p) {}
 public:
-  OUTPUT_CMD_STORE() : OUTPUT_CMD()	{set_label("store");}
-  virtual ~OUTPUT_CMD_STORE()		{}
-public: // OUTPUT_CMD
-  OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_STORE(*this);}
+  OUTPUT_STORE() : OUTPUT()	{set_label("store");}
+  virtual ~OUTPUT_STORE()		{}
+public: // OUTPUT
+  OUTPUT* clone() const		{return new OUTPUT_STORE(*this);}
 public: // OUTPUT
   void init(int, const std::string& /*Label*/)
   {
@@ -65,7 +66,8 @@ public: // OUTPUT
     }
   }
 
-}p0; // OUTPUT_CMD_STORE
+}o0; // OUTPUT_STORE
+OUTPUT_CMD p0(&o0);
 DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "store", &p0);
 /*--------------------------------------------------------------------------*/
 }

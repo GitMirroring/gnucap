@@ -30,16 +30,17 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-class OUTPUT_CMD_ALARM : public OUTPUT_CMD {
+class OUTPUT_ALARM : public OUTPUT {
 private:
   typedef PROBE probe_type;
 private:
-  OUTPUT_CMD_ALARM(OUTPUT_CMD_ALARM const&p) : OUTPUT_CMD(p) {}
+  OUTPUT_ALARM(OUTPUT_ALARM const&p) : OUTPUT(p) {}
 public:
-  OUTPUT_CMD_ALARM() : OUTPUT_CMD()	{set_label("alarm");}
-  virtual ~OUTPUT_CMD_ALARM()		{}
-public: // OUTPUT_CMD
-  OUTPUT_CMD* clone() const		{return new OUTPUT_CMD_ALARM(*this);}
+  OUTPUT_ALARM() : OUTPUT()	{set_label("alarm");}
+  virtual ~OUTPUT_ALARM()		{}
+public: // OUTPUT
+  OUTPUT* clone() const		{return new OUTPUT_ALARM(*this);}
+  PROBE_BASE const* probe_proto() const {return &_probe_proto;}
 public: // OUTPUT
   void commit(double, int Level)
   {
@@ -57,7 +58,10 @@ public: // OUTPUT
       }
     }
   }
-}p1;
+}o1;
+/*--------------------------------------------------------------------------*/
+OUTPUT_CMD p1(&o1);
+OUTPUT_ALARM::probe_type OUTPUT_ALARM::_probe_proto(PROBE_BASE::_STATIC);
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "alarm", &p1);
 /*--------------------------------------------------------------------------*/
 }
