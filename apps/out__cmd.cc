@@ -38,7 +38,7 @@
 void OUTPUT_CMD::setup(CS& cmd)
 {
   trace1("setup", cmd.tail());
-  unsigned here = cmd.cursor();
+  size_t here = cmd.cursor();
   std::string s;
   cmd >> s;
   if (CMD* sim = command_dispatcher[s]) {
@@ -162,7 +162,7 @@ void OUTPUT_CMD::do_it(CS& cmd, CARD_LIST*)
 	  _prb->remove_list(cmd);
 	}else{
 	  assert(_prb);
-	  unsigned here1=cmd.cursor();
+	  size_t here1=cmd.cursor();
 	  try{
 	    _prb->add_list(cmd);
 	  }catch(Exception_Cant_Find& e){

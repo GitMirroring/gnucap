@@ -96,7 +96,7 @@ DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "iprint|probe", &p3);
 class CMD_PRINT : public CMD{
 public:
   void do_it(CS& Cmd, CARD_LIST* Scope){
-    unsigned here = Cmd.cursor();
+    size_t here = Cmd.cursor();
     if (Cmd >> "fourier ") {
       Cmd.reset(here);
       command("fft " + Cmd.tail(), Scope); 
