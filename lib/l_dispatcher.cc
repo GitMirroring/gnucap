@@ -64,6 +64,24 @@ void DISPATCHER_BASE::uninstall(CKT_BASE* p)
 #endif
 }
 /*--------------------------------------------------------------------------*/
+void DISPATCHER_BASE::uninstall(DISPATCHER_BASE::const_iterator p)
+{ untested();
+  assert(_map);
+#if !defined(NDEBUG)
+  bool found=false;
+  for (iterator ii=_map->begin();
+      ii != _map->end();
+      ++ii) { untested();
+    if(p==ii) found=true; // it's ours.
+  }
+  assert(found);
+#endif
+  // if it's ours, it is pointing to a mutable place.
+  value_type& m=const_cast<value_type&>(*p);
+
+  m.second = NULL;
+}
+/*--------------------------------------------------------------------------*/
 void DISPATCHER_BASE::check_init()
 {
   if (!_map) {

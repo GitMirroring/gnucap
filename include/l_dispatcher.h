@@ -37,17 +37,23 @@
 #include "ap.h"
 /*--------------------------------------------------------------------------*/
 class DISPATCHER_BASE {
+public:
+  typedef std::map<std::string, CKT_BASE*> container_type;
+protected:
+  typedef container_type::value_type value_type;
+  typedef container_type::iterator iterator;
+public:
+  typedef container_type::const_iterator const_iterator;
 protected:
   std::map<std::string, CKT_BASE*> * _map;
 public:
-  typedef std::map<std::string, CKT_BASE*>::const_iterator const_iterator;
-
   const_iterator begin()const		{assert(_map); return _map->begin();}
   const_iterator end()const		{assert(_map); return _map->end();}
 public:
   CKT_BASE* operator[](std::string s);
 private:
   void      uninstall(CKT_BASE* p);
+  void      uninstall(const_iterator p);
   void	    install(const std::string& s, CKT_BASE* p);
   void      check_init();
 public:
