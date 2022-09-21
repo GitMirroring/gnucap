@@ -71,6 +71,16 @@ void EVAL_BM_VALUE::tr_eval(ELEMENT* d)const
   tr_finish_tdv(d, _value);
 }
 /*--------------------------------------------------------------------------*/
+void EVAL_BM_VALUE::set_param_by_name(std::string name, std::string value)
+{ untested();
+  trace1("EVAL_BM_VALUE::set_param_by_name", this);
+  if(name == "value"){ untested();
+    _value = value;
+  }else{ untested();
+    EVAL_BM_ACTION_BASE::set_param_by_name(name, value);
+  }
+}
+/*--------------------------------------------------------------------------*/
 bool EVAL_BM_VALUE::parse_numlist(CS& cmd)
 {
   size_t here = cmd.cursor();

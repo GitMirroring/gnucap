@@ -95,6 +95,7 @@ private: // override virtual
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
   bool		is_trivial()const;
 
+  void		set_param_by_name(std::string, std::string);
   void		precalc_first(const CARD_LIST*);
   void		tr_eval(ELEMENT*)const;
   std::string	name()const		{itested();return "VALUE";}

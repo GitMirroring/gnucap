@@ -38,8 +38,6 @@ protected:
   void	   store_values()		{assert(_y[0]==_y[0]); _y1=_y[0];}
   //void   reject_values()		{ _y0 = _y1;}
 public:
-  double*  set__value()			{return _value.pointer_hack();}
-
   bool	   skip_dev_type(CS&);
 public: // override virtual
   bool	   print_type_in_spice()const {return false;}
@@ -444,6 +442,7 @@ inline void ELEMENT::tr_eval()
     common()->tr_eval(this);
   }else{
     // can get here if a simple device has probes
+    // ( or in value sweeps? )
     _y[0].f1 = value();
     _y[0].f0 = _y[0].x * _y[0].f1;
   }

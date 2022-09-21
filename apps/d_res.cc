@@ -85,7 +85,7 @@ void DEV_RESISTANCE::dc_advance()
   }else{
     assert(_m0.c0 == 0.);
     _y[0].f1 = (value() != 0.) ? value() : OPT::shortckt;
-    if(_y[0].f1 != _y1.f1){ untested();
+    if(_y[0].f1 != _y1.f1){
       store_values();
       q_load();
       _m0.c1 = 1./_y[0].f1;

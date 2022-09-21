@@ -1,0 +1,8 @@
+verilog
+
+// need "sweepval", crashes with bm_value.
+
+isource #(1) i(30,0);
+list
+dc i 0 1 1
+status notime

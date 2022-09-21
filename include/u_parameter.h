@@ -109,7 +109,6 @@ public:
   //bool	operator!=(const T& v)const {untested();
   //  return !(*this == v);
   //}
-  T*	pointer_hack()	 {return &_v;}
 private:
   T lookup_solve(const T& def, const CARD_LIST* scope)const;
 };
