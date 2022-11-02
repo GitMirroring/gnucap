@@ -444,7 +444,10 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
   _parent = p;
   for (const_iterator ci = p->begin(); ci != p->end(); ++ci) {
     trace_func_comp();
-    if ((**ci).is_device() || dynamic_cast<MODEL_CARD*>(*ci)) {
+    if ((**ci).is_device()){
+      CARD* copy = (**ci).clone_instance();
+      push_back(copy);
+    }else if(dynamic_cast<MODEL_CARD*>(*ci)) {
       CARD* copy = (**ci).clone();
       push_back(copy);
     }else{
