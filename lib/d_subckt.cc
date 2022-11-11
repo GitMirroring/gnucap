@@ -251,13 +251,6 @@ void DEV_SUBCKT::expand()
   assert(pl);
   c->_params.set_try_again(pl);
 
-  {
-    // some of these are used in debug mode in map_subckt_nodes
-    // make valgrind happy..
-    _nodes.resize(prechecked_cast<CARD const*>(_parent)->net_nodes());
-    _n = _nodes.data();
-  }
-
   renew_subckt(_parent, &(c->_params));
   subckt()->expand();
 }

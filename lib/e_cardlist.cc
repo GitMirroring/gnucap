@@ -474,7 +474,11 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
     for (int port = 0; port < model->net_nodes(); ++port) {
       assert(model->n_(port).e_() <= num_nodes_in_subckt);
       //assert(model->n_(port).e_() == port+1);
-      trace3("ports", port, model->n_(port).e_(), owner->n_(port).t_());
+      if(port<owner->net_nodes()){
+	trace3("ports", port, model->n_(port).e_(), owner->n_(port).t_());
+      }else{
+	trace1("ports, more than owner", port);
+      }
     }
     {
       // take care of the "port" nodes (external connections)
@@ -482,8 +486,13 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
       int i=0;
       for (i=1; i <= model->net_nodes(); ++i) {
 	assert(i <= num_nodes_in_subckt);
-	map[i] = owner->n_(i-1).t_();
-	trace3("ports", i, map[i], owner->n_(i-1).t_());
+	if(i-1<owner->net_nodes()){
+	  map[i] = owner->n_(i-1).t_();
+	  trace3("ports", i, map[i], owner->n_(i-1).t_());
+	}else{
+	  map[i] = INVALID_NODE;
+	  trace2("ports not in owner", i, map[i]);
+	}
       }
     
       // get new node numbers, and assign them to the remaining
