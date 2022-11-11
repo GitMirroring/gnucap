@@ -1,0 +1,12 @@
+verilog
+
+module m( a d );
+resistor #(1) r0(a,b);
+resistor #(1) r1(b,c);
+resistor #(1) r2(c,d);
+endmodule
+
+m #() mm(.a(1), .b(0));
+
+list
+end

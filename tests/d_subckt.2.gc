@@ -1,0 +1,11 @@
+verilog
+
+module m( a b c d );
+endmodule
+
+m #() mm(.c(0), .a(0), .b(0));
+
+list
+
+op
+end

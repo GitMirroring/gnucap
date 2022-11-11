@@ -209,7 +209,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  std::string name, value;
 	  cmd >> name >> '(' >> value >> ')' >> ',';
 	  x->set_port_by_name(name, value);
-	}catch (Exception_No_Match&) {untested();
+	}catch (Exception_No_Match&) {
 	  cmd.warn(bDANGER, here, "mismatch, ignored");
 	}
       }

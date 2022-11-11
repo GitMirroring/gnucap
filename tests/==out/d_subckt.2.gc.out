@@ -1,0 +1,6 @@
+module m (a,b,c,d);
+endmodule // m
+
+m #() mm (.a(0),.b(0),.c(0));
+#          
+ 27.       
