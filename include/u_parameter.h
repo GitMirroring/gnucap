@@ -218,8 +218,10 @@ public:
 
   iterator begin() {return _pl.begin();}
   iterator end() {return _pl.end();}
+  // iterator find(std::string const& k) {untested(); return _pl.find(k); }
   const_iterator begin()const {untested(); return _pl.begin();}
   const_iterator end()const {untested(); return _pl.end();}
+  const_iterator find(std::string const& k) const { return _pl.find(k); }
 private:
   map _pl;
   PARAM_LIST* _try_again; // if you don't find it, also look here

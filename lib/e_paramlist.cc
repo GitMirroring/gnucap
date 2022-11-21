@@ -54,6 +54,16 @@ std::string COMMON_PARAMLIST::param_name(int i)const
   }
 }
 /*--------------------------------------------------------------------------*/
+std::string COMMON_PARAMLIST::param_by_name(std::string const& Name)const
+{
+  PARAM_LIST::const_iterator i = _params.find(Name);
+  if(i != _params.end()){ untested();
+    return i->second.string();
+  }else{ untested();
+    throw Exception_No_Match(Name);
+  }
+}
+/*--------------------------------------------------------------------------*/
 std::string COMMON_PARAMLIST::param_name(int i, int j)const
 {untested();
   assert(i < COMMON_PARAMLIST::param_count());

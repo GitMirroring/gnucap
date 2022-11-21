@@ -40,6 +40,7 @@ public:
   static int	count()			{untested();return _count;}
 
   void set_param_by_name(std::string Name, std::string Value) {_params.set(Name, Value);}
+  std::string param_by_name(std::string const& Name) /*override?*/ const;
   bool		param_is_printable(int)const;
   std::string	param_name(int)const;
   std::string	param_name(int,int)const;
