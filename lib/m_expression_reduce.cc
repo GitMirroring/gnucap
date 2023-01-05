@@ -201,6 +201,7 @@ void Token_SYMBOL::stack_op(Expression* E)const
 #endif
       }
     }
+    untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -371,7 +372,26 @@ void Expression::reduce_copy(const Expression& Proto)
 Expression::Expression(const Expression& Proto, const CARD_LIST* Scope)
   :_scope(Scope)
 {
-  reduce_copy(Proto);
+  //BUG// is this thread-safe?
+  static int recursion = 0;
+  static Expression const* first_name;
+
+  if(recursion==0){
+    first_name = &Proto;
+  }else{
+  }
+
+  ++recursion;
+  if (recursion <= OPT::recursion) {
+    reduce_copy(Proto);
+  }else{
+    std::stringstream s;
+    first_name->dump(s);
+    //BUG// needs to show scope
+    throw Exception("parameter " + s.str() + ": recursion too deep");
+  }
+
+  --recursion;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
