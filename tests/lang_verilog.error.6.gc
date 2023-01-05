@@ -1,0 +1,20 @@
+
+simulator lang=verilog
+options trace
+
+paramset bob resistor;
+ .r=10k;
+endparamset;
+
+paramset bob resistor;
+ .r=10k;
+endparamset;
+
+module main(1,2,3,4)
+  bob  r1 (1 2);
+endmodule
+
+main m(1,2,3,0);
+
+list
+op

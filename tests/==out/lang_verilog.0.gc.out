@@ -1,0 +1,22 @@
+>>>>>module rr (a b); 
+>>>>>list 
+module rr (a,b);
+resistor #(1) R0 (.p(a),.n(i));
+resistor #(.r(1)) R1 (.n(j),.p(i));
+resistor #(.r(1)) R2 (j,b);
+endmodule // rr
+
+rr #() RR (.a(V_cc),.b(0));
+vsource #(.dc(9)) Vcc (.p(V_cc),.n(0));
+>>>>>print dc v(nodes) i(Vcc) i(RR.R*) 
+rr.R0: resistor from device_dispatcher
+rr.R0: 1 candidate found for resistor
+rr.R1: resistor from device_dispatcher
+rr.R1: 1 candidate found for resistor
+rr.R2: resistor from device_dispatcher
+rr.R2: 1 candidate found for resistor
+>>>>>dc 
+#           v(V_cc)    i(Vcc)     i(RR.R0)   i(RR.R1)   i(RR.R2)  
+new max = 9, new limit = 9.5
+ 0.         9.        -3.         3.         3.         3.        
+>>>>>end 

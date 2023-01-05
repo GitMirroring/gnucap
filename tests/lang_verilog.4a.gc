@@ -1,0 +1,19 @@
+
+options trace
+simulator lang=verilog
+paramset bob resistor;
+ .r=2;
+endparamset;
+
+module main(1,2,3,4)
+  bob  r1 (1 2);
+  isource #(1) v1 (1 2);
+endmodule
+
+main m(0,1,2,3);
+
+list
+print op v(nodes) y(m.r1)
+op
+// list
+end

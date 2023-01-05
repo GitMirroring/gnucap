@@ -1,6 +1,8 @@
 
 simulator lang=verilog
 
+options trace
+
 paramset zz npn;\
  .bf=150;\
 endparamset

@@ -114,7 +114,7 @@ Token* Token_UNARY::op(const Token* T1)const
 }
 /*--------------------------------------------------------------------------*/
 void Token_SYMBOL::stack_op(Expression* E)const
-{
+{ itested();
   assert(E);
   // replace single token with its value
   if (!E->is_empty() && dynamic_cast<const Token_PARLIST*>(E->back())) {
@@ -168,6 +168,12 @@ void Token_SYMBOL::stack_op(Expression* E)const
       // a number
       Float* n = new Float(name());
       E->push_back(new Token_CONSTANT(name(), n, ""));
+#if 0
+    }else if(!E->_scope){
+      // no scope. names are constants.
+      String* n = new String(name());
+      E->push_back(new Token_CONSTANT("_."+name()+"", n, ""));
+#endif
     }else{
       // a name
       PARAMETER<double> p = (*(E->_scope->params()))[name()];
@@ -358,9 +364,9 @@ void Expression::reduce_copy(const Expression& Proto)
   // The Proto._list is the expression in RPN.
   // Attempt to build a reduced _list here, hopefully with only one item.
   for (const_iterator i = Proto.begin(); i != Proto.end(); ++i) {
-    trace2("reducecopy", (**i).name(), (**i).data() );
-    trace1("reducecopy", dynamic_cast<const Token_CONSTANT*>(*i));
-    trace1("reducecopy", dynamic_cast<const Token_SYMBOL*>(*i));
+    // trace2("reducecopy", (**i).name(), (**i).data() );
+    // trace1("reducecopy", dynamic_cast<const Token_CONSTANT*>(*i));
+    // trace1("reducecopy", dynamic_cast<const Token_SYMBOL*>(*i));
     (**i).stack_op(this);
   }
   if (is_empty()) {untested();

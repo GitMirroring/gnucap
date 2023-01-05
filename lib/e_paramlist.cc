@@ -94,5 +94,18 @@ void COMMON_PARAMLIST::precalc_last(const CARD_LIST* Scope)
   }
 }
 /*--------------------------------------------------------------------------*/
+void COMMON_PARAMLIST::set_param_by_name(std::string Name, std::string Value)
+{
+  std::string old = "not_set";
+  auto x = _params.find(Name);
+  if(x!=_params.end()){
+    old = x->second.string();
+  }else{
+  }
+  trace3("CPL::spbn", Name, Value, old);
+
+  _params.set(Name, Value);
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

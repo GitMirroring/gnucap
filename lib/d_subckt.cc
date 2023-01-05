@@ -62,6 +62,7 @@ private: // override virtual
   int		net_nodes()const override	{return _net_nodes;}
   void		precalc_first()override;
   bool		makes_own_scope()const override  {return false;}
+  bool		is_valid() const override;
 
   void		expand() override;
 private:
@@ -91,7 +92,7 @@ public: // override virtual
   CARD*		clone_instance()const override;
   bool		print_type_in_spice()const override {unreachable(); return false;}
   std::string   value_name()const override	{untested();incomplete(); return "";}
-  std::string   dev_type()const override		{untested(); return "";}
+  std::string   dev_type()const override	{untested(); return "";}
   int		max_nodes()const override	{return PORTS_PER_SUBCKT;}
   int		min_nodes()const override	{return 0;}
   int		matrix_nodes()const override	{untested();return 0;}
@@ -223,7 +224,33 @@ void DEV_SUBCKT::expand()
   c->_params.set_try_again(pl);
 
   renew_subckt(_parent, &(c->_params));
+
   subckt()->expand();
+
+  // prune. TODO: revisit elaboration rder
+  trace1("DEV_SUBCKT::deflating in", long_label());
+  for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i){
+    CARD* s = *i;
+    CARD* d = s->deflate();
+
+    if(d == s){
+    }else{ untested();
+      // d->set_owner(this);
+      assert(d->owner() == this);
+      delete *i;
+      *i = d;
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool DEV_SUBCKT::is_valid() const
+{
+  assert(scope());
+  PARAM_LIST const* params = _parent->subckt()->params();
+  PARAMETER<double> v = params->deep_lookup(".is_valid");
+  trace1("DEV_SUBCKT::is_valid I", v.string());
+  double x = v.e_val(1., scope());
+  return x==1.;
 }
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT::precalc_first()
@@ -231,7 +258,7 @@ void DEV_SUBCKT::precalc_first()
   BASE_SUBCKT::precalc_first();
 
   if (subckt()) {
-    auto c = prechecked_cast<COMMON_PARAMLIST const*>(common());
+    COMMON_PARAMLIST const* c = prechecked_cast<COMMON_PARAMLIST const*>(common());
     assert(c);
     subckt()->attach_params(&(c->_params), scope());
     subckt()->precalc_first();

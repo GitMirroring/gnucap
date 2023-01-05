@@ -1,6 +1,6 @@
 /*$Id: lang_verilog.cc $ -*- C++ -*-
  * Copyright (C) 2007 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
+ *               2022 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -32,7 +32,10 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class LANG_VERILOG : public LANGUAGE {
-  enum MODE {mDEFAULT, mPARAMSET} _mode;
+public:
+  typedef enum MODE {mDEFAULT, mPARAMSET} mode;
+private:
+  mode _mode;
   mutable int arg_count;
   enum {INACTIVE = -1};
 public:
@@ -73,6 +76,7 @@ public: // override virtual, called by commands
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*)override;
   DEV_DOT*	parse_command(CS&, DEV_DOT*)override;
   CARD*		parse_paramset(CS&, CARD*)override;
+  COMPONENT*	parse_paramset_(CS&, BASE_SUBCKT*);
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
   std::string	find_type_in_string(CS&)override;
@@ -86,6 +90,8 @@ private: // override virtual, called by print_item
 private: // local
   void print_args(OMSTREAM&, const MODEL_CARD*);
   void print_args(OMSTREAM&, const COMPONENT*);
+  template<class T>
+  void print_args_paramset(OMSTREAM&, const T*);
 } lang_verilog;
 
 DISPATCHER<LANGUAGE>::INSTALL
@@ -100,7 +106,8 @@ static void parse_type(CS& cmd, CARD* x)
   x->set_dev_type(new_type);
 }
 /*--------------------------------------------------------------------------*/
-static void parse_args_paramset(CS& cmd, CARD* x)
+template<class T>
+static void parse_args_paramset(CS& cmd, T* x)
 {
   assert(x);
 
@@ -130,7 +137,7 @@ static void parse_args_instance(CS& cmd, CARD* x)
 	cmd >> ',';
 	try{
 	  x->set_param_by_name(name, value);
-	}catch (Exception_No_Match&) {untested();
+	}catch (Exception_No_Match&) {
 	  cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
 	}
       }
@@ -190,7 +197,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  }else{
 	    ++index;
 	  }
-	}catch (Exception_Too_Many& e) {
+	}catch (Exception_Too_Many& e) { untested();
 	  cmd.warn(bDANGER, here, e.message());
 	}
       }
@@ -213,11 +220,11 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  cmd.warn(bDANGER, here, "mismatch, ignored");
 	}
       }
-      for (int iii = 0;  iii < x->min_nodes();  ++iii) {
+      for (int iii = 0;  iii < x->min_nodes();  ++iii) { untested();
 	if (!(x->node_is_connected(iii))) {untested();
 	  cmd.warn(bDANGER, x->port_name(iii) + ": port unconnected, grounding");
 	  x->set_port_to_ground(iii);
-	}else{
+	}else{ untested();
 	}
       }
     }
@@ -228,7 +235,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
       if (!(x->node_is_connected(iii))) {
 	cmd.warn(bDANGER, x->port_name(iii) + ": port unconnected, grounding");
 	x->set_port_to_ground(iii);
-      }else{
+      }else{ untested();
 	unreachable();
       }
     }
@@ -277,11 +284,53 @@ CARD* LANG_VERILOG::parse_paramset(CS& cmd, CARD* x)
       break;
     }else if (!cmd.more()) {
       cmd.get_line("verilog-paramset>");
+    }else{
+      cmd.check(bWARNING, "what's this?");
+      break;
+    }
+  }
+  return x;
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+COMPONENT* LANG_VERILOG::parse_paramset_(CS& cmd, BASE_SUBCKT* x)
+{
+  assert(x);
+  cmd.reset();
+  cmd >> "paramset ";
+  parse_label(cmd, x);
+  parse_type(cmd, x);
+  cmd >> ';';
+
+  for (;;) {
+
+    cmd.get_line("verilog-module>");
+    if (cmd >> "parameter ") {
+      cmd.reset();
+      new__instance(cmd, x, x->subckt());
+    }else if (cmd >> "// ") { untested();
+      cmd.reset();
+      new__instance(cmd, NULL, x->subckt());
+    }else{
+      break;
+    }
+  }
+
+  for (;;) {
+    parse_args_paramset(cmd, x);
+    if (cmd >> "endparamset ") {
+      break;
+    }else if (cmd >> "// ") { untested();
+      cmd.reset();
+      new__instance(cmd, NULL, x->subckt());
+    }else if (!cmd.more()) {
+      cmd.get_line("verilog-paramset>");
     }else{untested();
       cmd.check(bWARNING, "what's this?");
       break;
     }
   }
+  trace2("LANG_VERILOG::parse_paramset_ done", x->long_label(), ((CARD*)x)->dev_type());
   return x;
 }
 /*--------------------------------------------------------------------------*/
@@ -303,14 +352,36 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   parse_ports(cmd, x, true/*all new*/);
   cmd >> ';';
 
+  bool have_instance = false;
+
   // body
   for (;;) {
-    cmd.get_line("verilog-module>");
 
+    cmd.get_line("verilog-module>");
     if (cmd >> "endmodule ") {
       break;
-    }else{
+    }else if (!have_instance && (cmd >> "parameter ")) {
+      cmd.reset();
       new__instance(cmd, x, x->subckt());
+    }else if (cmd >> "// ") {
+      cmd.reset();
+      new__instance(cmd, x, x->subckt());
+    }else if (cmd >> "paramset ") {
+      cmd.reset();
+      cmd.check(bDANGER, "ERROR: This will not work. Need top level.");
+      new__instance(cmd, x, x->subckt());
+    }else{
+      have_instance = true;
+      BASE_SUBCKT* new_instance = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("instance"));
+      assert(new_instance);
+      CARD_LIST* Scope = x->subckt();
+      trace3("parse_module instance", cmd.fullstring(), Scope, Scope->nodes());
+      assert(Scope);
+
+      new_instance->set_owner(x);
+      parse_instance(cmd, new_instance);
+
+      Scope->push_back(new_instance);
     }
   }
   return x;
@@ -352,16 +423,41 @@ void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_args(OMSTREAM& o, const MODEL_CARD* x)
 {
+  print_args_paramset(o, x);
+}
+/*--------------------------------------------------------------------------*/
+template<class T>
+void LANG_VERILOG::print_args_paramset(OMSTREAM& o, const T* x)
+{
   assert(x);
   if (x->use_obsolete_callback_print()) {untested();
-    x->print_args_obsolete_callback(o, this);  //BUG//callback//
+    unreachable();
+    // x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
-    for (int ii = x->param_count() - 1;  ii >= 0;  --ii) {
-      if (x->param_is_printable(ii)) {
-	std::string arg = " ." + x->param_name(ii) + "=" + x->param_value(ii) + ";";
-	o << arg;
-      }else{
+    // HACK. use DEV_DOT? attributes?
+    if(x->subckt()){
+      for(auto p : *x->subckt()->params()){
+	std::string const& f = p.first;
+	if(f.size() < 2 || f[0] != '_' || f[1] != '.'){
+	  o << "  parameter " << p.first << " = " << p.second.string() << ";\n";
+	}else{
+	  // hack: hide internal parameter.
+	  // move to instance?
+	}
       }
+    }else{
+    }
+
+
+    { // slow? use common->_params..?
+      for (int ii = x->param_count() - 1;  ii >= 0;  --ii) {
+	if (x->param_is_printable(ii)) {
+	  o << " ." << x->param_name(ii) << "=" << x->param_value(ii) << ";";
+//	  o << arg;
+	}else{
+	}
+      }
+//      o << "\\\n";
     }
   }
 }
@@ -375,11 +471,17 @@ void LANG_VERILOG::print_args(OMSTREAM& o, const COMPONENT* x)
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
     arg_count = INACTIVE;
   }else{
-    std::string sep = ".";
+    std::string sep = "";
     for (int ii = x->param_count() - 1;  ii >= 0;  --ii) {
       if (x->param_is_printable(ii)) {
-	o << sep << x->param_name(ii) << "(" << x->param_value(ii) << ")";
-	sep = ",.";
+	o << sep;
+	std::string pn = x->param_name(ii);
+	if(pn==""){
+	  o << x->param_value(ii);
+	}else{
+	  o << "." << pn << "(" << x->param_value(ii) << ")";
+	}
+	sep = ",";
       }else{
       }
     }
@@ -405,10 +507,15 @@ static void print_ports_long(OMSTREAM& o, const COMPONENT* x)
   assert(x);
 
   o << " (";
-  std::string sep = ".";
+  std::string sep = "";
   for (int ii = 0;  x->port_exists(ii);  ++ii) {
-    o << sep << x->port_name(ii) << '(' << x->port_value(ii) << ')';
-    sep = ",.";
+    o << sep;
+    if(x->port_name(ii) != ""){
+      o << "." << x->port_name(ii) << '(' << x->port_value(ii) << ')';
+    }else{
+      o << x->port_value(ii);
+    }
+    sep = ",";
   }
   for (int ii = 0;  x->current_port_exists(ii);  ++ii) {untested();
     o << sep << x->current_port_name(ii) << '(' << x->current_port_value(ii) << ')';
@@ -438,22 +545,34 @@ static void print_ports_short(OMSTREAM& o, const COMPONENT* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_paramset(OMSTREAM& o, const CARD* c)
 {
-  auto x = prechecked_cast<MODEL_CARD const*>(c);
-  assert(x);
-  _mode = mPARAMSET;
-  o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\n";
-  print_args(o, x);
-  o << "\n"
-    "endparamset\n\n";
-  _mode = mDEFAULT;
+  if(auto x = prechecked_cast<MODEL_CARD const*>(c)){
+    _mode = mPARAMSET;
+    o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\n";
+    print_args(o, x);
+    o << "\n"
+      "endparamset\n\n";
+    _mode = mDEFAULT;
+  }else if(auto x = prechecked_cast<COMPONENT const*>(c)){
+    o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\n";
+    print_args_paramset(o, x);
+    o << "\nendparamset\n\n";
+  }else{
+    incomplete();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 {
+
+  if(((CARD const*)x)->dev_type()!=""){
+    // tmp hack. module type is the label, so dev_type is blank.
+    return print_paramset(o, x);
+  }else{
+  }
   assert(x);
   assert(x->subckt());
 
-  o << "module " <<  x->short_label();
+  o << "module " << x->short_label();
   print_ports_short(o, x);
   o << ";\n";
   
@@ -467,11 +586,17 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
 {
-  print_type(o, x);
-  print_args(o, x);
-  print_label(o, x);
-  print_ports_long(o, x);
-  o << ";\n";
+  if(x->is_device()){
+    print_type(o, x);
+    print_args(o, x);
+    print_label(o, x);
+    print_ports_long(o, x);
+    o << ";\n";
+  }else{ untested();
+    _mode = mPARAMSET;
+    print_paramset(o, x);
+    _mode = mDEFAULT;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
@@ -491,40 +616,50 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 class CMD_PARAMSET : public CMD {
-  void do_it(CS& cmd, CARD_LIST* Scope)
-  {
+  void do_it(CS& cmd, CARD_LIST* Scope) {
+    if(Scope == &CARD_LIST::card_list){
+    }else{
+      // allowed?
+    }
     // already got "paramset"
     std::string my_name, base_name;
     cmd >> my_name;
-    size_t here = cmd.cursor();
     cmd >> base_name;
 
-    //const MODEL_CARD* p = model_dispatcher[base_name];
-    const CARD* p = lang_verilog.find_proto(base_name, NULL);
-    if (p) {
-      CARD* cl = p->clone();
-      MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(cl);
-      if (new_card) {
-	assert(!new_card->owner());
-	lang_verilog.parse_paramset(cmd, new_card);
-	Scope->push_back(new_card);
-      }else{
-	delete(cl);
-	cmd.warn(bDANGER, here, "paramset: base has incorrect type");
-      }
-    }else{untested();
-      cmd.warn(bDANGER, here, "paramset: no match");
+    assert(OPT::language);
+    const CARD* proto = OPT::language->find_proto(base_name, NULL);
+    CARD* paramset = NULL;
+
+    if(auto model=dynamic_cast<MODEL_CARD const*>(proto)){
+      trace1("CMD_PARAMSET::do_it MODEL_CARD", base_name);
+      // Spice compatibility mode. fix later.
+      // // BUG also hits paramset //
+
+      paramset = model->clone();
+      auto mc = prechecked_cast<MODEL_CARD*>(paramset);
+      assert(mc);
+      OPT::language->parse_paramset(cmd, mc);
+    }else{
+      paramset = device_dispatcher.clone("paramset");
+      assert(paramset);
+      auto dev = prechecked_cast<BASE_SUBCKT*>(paramset);
+      assert(dev);
+      //assert(dev->scope());
+
+      lang_verilog.parse_paramset_(cmd, dev);
     }
+    trace3("CMD_PARAMSET", paramset->long_label(), paramset->dev_type(), paramset);
+    Scope->push_back(paramset);
   }
 } p1;
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "paramset", &p1);
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 class CMD_MODULE : public CMD {
   void do_it(CS& cmd, CARD_LIST* Scope)
   {
-    BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("subckt"));
+    BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("module"));
     assert(new_module);
     assert(!new_module->owner());
     assert(new_module->subckt());

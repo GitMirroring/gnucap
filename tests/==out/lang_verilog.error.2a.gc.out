@@ -1,0 +1,63 @@
+>>>>>paramset zz npn;  .bf=150; endparamset 
+>>>>>module dumb_resistor (a b); 
+>>>>>parameter real r=10k; 
+>>>>>module foo (vcc in out); 
+>>>>>parameter real z=10k; 
+>>>>>parameter real r; 
+>>>>>simulator lang=spice insensitive=no 
+>>>>>.simulator lang=verilog 
+>>>>>parameter gain=.5; 
+>>>>>list 
+paramset zz npn;
+ .level=1; .kf=NA( 0.); .af=NA( 1.); .bf=150; .br=NA( 1.); .is=NA( 100.E-18); .nf=NA( 1.); .nr=NA( 1.); .c4=NA( 0.); .nc=NA( 2.); .c2=NA( 0.); .ne=NA( 1.5); .rb=NA( 0.); .re=NA( 0.); .rc=NA( 0.); .cjc=NA( 0.); .cje=NA( 0.); .cjs=NA( 0.); .mjc=NA( 0.33); .mje=NA( 0.33); .mjs=NA( 0.); .vjc=NA( 0.75); .vje=NA( 0.75); .vjs=NA( 0.75); .xcjc=NA( 1.); .itf=NA( 0.); .ptf=NA( 0.); .tf=NA( 0.); .tr=NA( 0.); .xtf=NA( 0.); .xtb=NA( 0.); .xti=NA( 3.); .eg=NA( 1.11);
+endparamset
+
+module dumb_resistor (a,b);
+resistor #(r) R1 (a,b);
+endmodule // dumb_resistor
+
+module foo (vcc,in,out);
+resistor #(.r(z)) Rc (.p(c),.n(vcc));
+zz #(.off(1)) q1 (.b(b),.c(c),.e(e));
+dumb_resistor #(.r(abs(-z)/10)) Re (e,0);
+resistor #(.r(100k)) Rb1 (b,vcc);
+dumb_resistor #(.r(r)) Rb2 (b,0);
+capacitor #(.c(1u)) Cin (b,in,vcc);
+capacitor #(.c(1u)) Cout (c);
+resistor #(.r(100k)) Rin (in,0,vcc);
+resistor #(.r(100k)) Rout (out);
+endmodule // foo
+
+foo #(.r(10k)) X1 (.vcc(V_cc),.in(amp_in),.out(out));
+resistor #(.r(10*(1-gain))) Rin1 (.p(in),.n(amp_in));
+resistor #(.r(10*gain)) Rin2 (.p(amp_in),.n(0));
+vsource #( DC  20.) Vcc (.p(V_cc),.n(0));
+vsource #( AC  0.2) Vin (.p(in),.n(0));
+>>>>>print op v(V_cc) v(in) v(out) iter(0) vc(X1.q1) vce(X1.q1) 
+foo.Rc: resistor from device_dispatcher
+foo.Rc: 1 candidate found for resistor
+foo.q1: zz from top level
+foo.q1: 1 candidate found for zz
+foo.Re: dumb_resistor from top level
+foo.Re: 1 candidate found for dumb_resistor
+foo.Rb1: resistor from device_dispatcher
+foo.Rb1: 1 candidate found for resistor
+foo.Rb2: dumb_resistor from top level
+foo.Rb2: 1 candidate found for dumb_resistor
+foo.Cin: capacitor from device_dispatcher
+foo.Cin discarded: too many: requested=3 max=2
+foo.Cin: no candidates found for capacitor
+foo.Cout: capacitor from device_dispatcher
+foo.Cout discarded: not enough nodes
+
+foo.Cout: no candidates found for capacitor
+foo.Rin: resistor from device_dispatcher
+foo.Rin discarded: too many: requested=3 max=2
+foo.Rin: no candidates found for resistor
+foo.Rout: resistor from device_dispatcher
+foo.Rout discarded: not enough nodes
+
+foo.Rout: no candidates found for resistor
+dumb_resistor.R1: resistor from device_dispatcher
+dumb_resistor.R1: 1 candidate found for resistor
+X1.Cin: no valid prototype found for capacitor

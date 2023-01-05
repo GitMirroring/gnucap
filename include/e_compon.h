@@ -102,6 +102,7 @@ public:
   virtual void set_param_by_index(int, std::string&, int);
   virtual int param_count()const {return 4;}
 public:
+  virtual bool is_valid(const COMPONENT*) const;
   virtual void precalc_first(const CARD_LIST*)	{}
   virtual void expand(const COMPONENT*)		{}
   virtual COMMON_COMPONENT* deflate()		{return this;}
@@ -168,7 +169,7 @@ public:	// "elaborate"
   void	precalc_first() override;
   void	expand() override;
   void	precalc_last() override;
-  virtual bool is_valid()const	{return true;}
+  virtual bool is_valid()const;
   //--------------------------------------------------------------------
 public:	// dc-tran
   void      tr_iwant_matrix() override;

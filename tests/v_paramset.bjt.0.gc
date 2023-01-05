@@ -1,0 +1,26 @@
+
+simulator lang=verilog
+options trace
+
+module bla(b c E)
+endmodule
+
+paramset zz npn;
+ .bf=150;
+endparamset
+
+paramset zz bla;
+	parameter off
+endparamset
+
+module foo ();
+zz            #(.off(1))       q1   (.b(b), .c(c), .e(e));
+zz            #(.off(1))       q2   (.b(b), .c(c), .E(e));
+endmodule
+
+foo #() f();
+
+list
+dc
+
+end

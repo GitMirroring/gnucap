@@ -69,11 +69,11 @@ public:
   void	parse(CS& cmd) override;
 
   std::string string()const {
-    if (_s == "#") {
+    if (_s == "#") { untested();
       return to_string(_v);
-    }else if (_s == "") {
+    }else if (_s == "") { untested();
       return "NA(" + to_string(_v) + ")";
-    }else{
+    }else{ untested();
       return _s;
     }
   }
@@ -206,6 +206,7 @@ public:
   explicit PARAM_LIST(const PARAM_LIST& p) :_pl(p._pl), _try_again(p._try_again) {}
   //explicit PARAM_LIST(PARAM_LIST* ta) :_try_again(ta) {untested();}
   ~PARAM_LIST() {}
+
   void	parse(CS& cmd);
   void	print(OMSTREAM&, LANGUAGE*)const;
   
@@ -216,6 +217,7 @@ public:
   std::string value(int)const;
 
   void	eval_copy(PARAM_LIST const&, const CARD_LIST*);
+  PARAM_LIST& operator=(PARAM_LIST const& p){_pl = p._pl; return *this;}
   bool  operator==(const PARAM_LIST& p)const{return _pl == p._pl;}
   const PARAMETER<double>& deep_lookup(std::string)const;
   const PARAMETER<double>& operator[](std::string i)const {return deep_lookup(i);}
@@ -226,7 +228,7 @@ public:
   iterator end() {return _pl.end();}
   const_iterator begin()const {itested(); return _pl.begin();}
   const_iterator end()const {itested(); return _pl.end();}
-  const_iterator find(std::string const& k) const {untested(); return _pl.find(k); }
+  const_iterator find(std::string const& k) const { return _pl.find(k); }
 };
 /*--------------------------------------------------------------------------*/
 template <>

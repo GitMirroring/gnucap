@@ -1,0 +1,45 @@
+>>>>>verilog 
+>>>>>module nmos (d,g,s,b); 
+>>>>>parameter level from [2:3] exclude 3; 
+>>>>>parameter a=2; 
+>>>>>module nmos (d,g,s,b); 
+>>>>>parameter level from [12:13], x=5; 
+>>>>>module nmos (d,g,s,b); 
+>>>>>parameter level from [1:1]; 
+>>>>>parameter a=2, b=3; 
+>>>>>module main(1,2); 
+>>>>>list 
+module nmos (d,g,s,b);
+resistor #(2.) r (d,g);
+endmodule // nmos
+
+module nmos (d,g,s,b);
+resistor #(12.) r (d,g);
+endmodule // nmos
+
+module nmos (d,g,s,b);
+resistor #(1.) r (d,g);
+endmodule // nmos
+
+module main (1,2);
+vsource #(1.) v (2,1);
+nmos #(.level(12)) n (1,2,3,4);
+endmodule // main
+
+main #() m (.1(0),.2(1));
+>>>>>print dc v(nodes) i(m.v) 
+main.v: vsource from device_dispatcher
+main.v: 1 candidate found for vsource
+main.n: nmos from top level
+main.n: nmos from top level
+main.n: nmos from top level
+main.n: nmos from model_dispatcher
+main.n discarded: no match: level
+main.n: 3 candidates found for nmos
+m.n dropped invalid candidate.
+m.n dropped invalid candidate.
+nmos.r: resistor from device_dispatcher
+nmos.r: 1 candidate found for resistor
+>>>>>dc 
+#           v(1)       i(m.v)    
+ 0.         1.        -0.083333  

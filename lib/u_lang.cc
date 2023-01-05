@@ -166,7 +166,9 @@ void LANGUAGE::print_item(OMSTREAM& o, const CARD* c)
     print_comment(o, com);
   }else if (const DEV_DOT* d = dynamic_cast<const DEV_DOT*>(c)) {untested();
     print_command(o, d);
-  }else{itested();
+  }else if (const COMPONENT* d = dynamic_cast<const COMPONENT*>(c)) {untested();
+    print_instance(o, d);
+  }else{untested();
     incomplete();
     unreachable();
   }
