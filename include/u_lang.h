@@ -56,7 +56,7 @@ public: // real public interface
 public: // called by commands and parse_item
   virtual DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*) = 0;
   virtual DEV_DOT*	parse_command(CS&, DEV_DOT*) = 0;
-  virtual MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*) = 0;
+  virtual CARD*		parse_paramset(CS&, CARD*) = 0;
   virtual BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*) = 0;
   virtual COMPONENT*	parse_instance(CS&, COMPONENT*) = 0;
   virtual std::string	find_type_in_string(CS&) = 0;
@@ -65,7 +65,7 @@ public: // called by commands and parse_item
 public: // real public interface
   virtual void print_item(OMSTREAM&, const CARD*);
 private: // called by print_item
-  virtual void print_paramset(OMSTREAM&, const MODEL_CARD*) = 0;
+  virtual void print_paramset(OMSTREAM&, const CARD*) = 0;
   virtual void print_module(OMSTREAM&, const BASE_SUBCKT*) = 0;
   virtual void print_instance(OMSTREAM&, const COMPONENT*) = 0;
   virtual void print_comment(OMSTREAM&, const DEV_COMMENT*) = 0;

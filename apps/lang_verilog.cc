@@ -72,13 +72,13 @@ public: // override virtual, called by commands
   void		parse_top_item(CS&, CARD_LIST*)override;
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*)override;
   DEV_DOT*	parse_command(CS&, DEV_DOT*)override;
-  MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override;
+  CARD*		parse_paramset(CS&, CARD*)override;
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
   std::string	find_type_in_string(CS&)override;
 
 private: // override virtual, called by print_item
-  void print_paramset(OMSTREAM&, const MODEL_CARD*)override;
+  void print_paramset(OMSTREAM&, const CARD*)override;
   void print_module(OMSTREAM&, const BASE_SUBCKT*)override;
   void print_instance(OMSTREAM&, const COMPONENT*)override;
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
@@ -100,7 +100,7 @@ static void parse_type(CS& cmd, CARD* x)
   x->set_dev_type(new_type);
 }
 /*--------------------------------------------------------------------------*/
-static void parse_args_paramset(CS& cmd, MODEL_CARD* x)
+static void parse_args_paramset(CS& cmd, CARD* x)
 {
   assert(x);
 
@@ -262,7 +262,7 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
  */
 //BUG// no paramset_item_declaration, falls back to spice mode
 
-MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
+CARD* LANG_VERILOG::parse_paramset(CS& cmd, CARD* x)
 {
   assert(x);
   cmd.reset();
@@ -436,8 +436,9 @@ static void print_ports_short(OMSTREAM& o, const COMPONENT* x)
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void LANG_VERILOG::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
+void LANG_VERILOG::print_paramset(OMSTREAM& o, const CARD* c)
 {
+  auto x = prechecked_cast<MODEL_CARD const*>(c);
   assert(x);
   _mode = mPARAMSET;
   o << "paramset " << x->short_label() << ' ' << x->dev_type() << ";\n";

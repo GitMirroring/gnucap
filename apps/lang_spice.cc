@@ -47,7 +47,7 @@ public: // override virtual, used by callback
 public: // override virtual, called by commands
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*);
   DEV_DOT*	parse_command(CS&, DEV_DOT*);
-  MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*);
+  CARD*		parse_paramset(CS&, CARD*);
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*);
   COMPONENT*	parse_instance(CS&, COMPONENT*);
   std::string	find_type_in_string(CS&);
@@ -64,7 +64,7 @@ private: // compatibility hacks
   void parse_logic_using_obsolete_callback(CS&, COMPONENT*);
 
 private: // override virtual, called by print_item
-  void print_paramset(OMSTREAM&, const MODEL_CARD*);
+  void print_paramset(OMSTREAM&, const CARD*);
   void print_module(OMSTREAM&, const BASE_SUBCKT*);
   void print_instance(OMSTREAM&, const COMPONENT*);
   void print_comment(OMSTREAM&, const DEV_COMMENT*);
@@ -539,7 +539,7 @@ DEV_DOT* LANG_SPICE_BASE::parse_command(CS& cmd, DEV_DOT* x)
   return NULL;
 }
 /*--------------------------------------------------------------------------*/
-MODEL_CARD* LANG_SPICE_BASE::parse_paramset(CS& cmd, MODEL_CARD* x)
+CARD* LANG_SPICE_BASE::parse_paramset(CS& cmd, CARD* x)
 {
   assert(x);
   cmd.reset();
@@ -694,9 +694,11 @@ static char fix_case(char c)
   return ((OPT::case_insensitive) ? (static_cast<char>(tolower(c))) : (c));
 }
 /*--------------------------------------------------------------------------*/
-void LANG_SPICE_BASE::print_paramset(OMSTREAM& o, const MODEL_CARD* x)
+void LANG_SPICE_BASE::print_paramset(OMSTREAM& o, const CARD* c)
 {
+  auto x=dynamic_cast<MODEL_CARD const*>(c);
   assert(x);
+
   o << ".model " << x->short_label() << ' ' << x->dev_type() << " (";
   print_args(o, x);
   o << ")\n";
