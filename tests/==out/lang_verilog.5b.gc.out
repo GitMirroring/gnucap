@@ -1,0 +1,11 @@
+module mod2 (d,g,s,b);
+resistor #(3.) r (d,g);
+endmodule // mod2
+
+module main (1,2);
+vsource #(1.) v (2,1);
+mod2 #(.bar(0)) n (1,2,3,4);
+resistor #(.bar(0)) n (1,4);
+endmodule // main
+
+main #() m (.1(0),.2(1));

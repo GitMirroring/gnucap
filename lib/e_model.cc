@@ -27,7 +27,7 @@
 /*--------------------------------------------------------------------------*/
 MODEL_CARD::MODEL_CARD(const COMPONENT* p)
   :CARD(),
-   _component_proto(p),
+   _component_proto(const_cast<COMPONENT*>(p)),
    _tnom_c(NOT_INPUT)
 {
   if (_sim) {
@@ -54,6 +54,17 @@ MODEL_CARD::~MODEL_CARD()
   }else{
   }
 }
+/*--------------------------------------------------------------------------*/
+#if 0
+void MODEL_CARD::set_param_by_name(std::string Name, std::string Value)
+{
+  if (_component_proto) { untested();
+    _component_proto->set_param_by_name(Name, Value);
+  }else{ untested();
+    incomplete(); // ?
+  }
+}
+#endif
 /*--------------------------------------------------------------------------*/
 void MODEL_CARD::set_param_by_index(int i, std::string& value, int offset)
 {

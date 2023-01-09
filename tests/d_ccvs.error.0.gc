@@ -1,0 +1,14 @@
+
+verilog
+
+module CCVS(1, 2, 3, 4);
+parameter G=1
+vsource #(.dc(0)) p(1, 4);
+ccvs #(.gain(G)) H(2, 3, p);
+endmodule
+
+CCVS t(1 2 3 4);
+
+list
+dc
+end

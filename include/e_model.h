@@ -43,7 +43,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class INTERFACE MODEL_CARD : public CARD{
 private:
-  explicit	MODEL_CARD() {unreachable();}
+  explicit	MODEL_CARD() = delete;
 protected:
   explicit	MODEL_CARD(const MODEL_CARD& p);
 public:
@@ -52,7 +52,7 @@ public:
 
 public: // override virtuals
   char	id_letter()const override	{untested();return '\0';}
-  CARD*	clone_instance()const override	{return (_component_proto) ? _component_proto->clone() : NULL;}
+  CARD*	clone_instance()const override;
   void	precalc_first()override;
   void	set_param_by_index(int, std::string&, int)override;
   bool  param_is_printable(int)const override;
@@ -74,6 +74,14 @@ protected:
 public:
   PARAMETER<double> _tnom_c;
 };
+/*--------------------------------------------------------------------------*/
+inline CARD* MODEL_CARD::clone_instance()const{
+  if (_component_proto) {
+    return _component_proto->clone_instance();
+  }else{
+   return NULL;
+  }
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

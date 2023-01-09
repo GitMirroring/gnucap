@@ -1,0 +1,22 @@
+>>>>>paramset bob resistor; 
+>>>>>paramset bob resistor; 
+>>>>>module main(1,2,3,4) 
+>>>>>list 
+paramset bob resistor;
+ .r=10k;
+endparamset
+
+paramset bob resistor;
+ .r=10k;
+endparamset
+
+module main (1,2,3,4);
+bob #() r1 (1,2);
+endmodule // main
+
+main #() m (.1(1),.2(2),.3(3),.4(0));
+>>>>>op 
+main.r1: bob from top level
+main.r1: bob from top level
+main.r1: 2 candidates found for bob
+m.r1: ambiguous overload: bob

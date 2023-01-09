@@ -1,0 +1,36 @@
+>>>>>module bla(b c E) 
+>>>>>paramset zz npn; 
+>>>>>paramset zz bla; 
+>>>>>parameter off 
+>>>>>module foo (); 
+>>>>>list 
+module bla (b,c,E);
+endmodule // bla
+
+paramset zz npn;
+ .level=1; .kf=NA( 0.); .af=NA( 1.); .bf=150; .br=NA( 1.); .is=NA( 100.E-18); .nf=NA( 1.); .nr=NA( 1.); .c4=NA( 0.); .nc=NA( 2.); .c2=NA( 0.); .ne=NA( 1.5); .rb=NA( 0.); .re=NA( 0.); .rc=NA( 0.); .cjc=NA( 0.); .cje=NA( 0.); .cjs=NA( 0.); .mjc=NA( 0.33); .mje=NA( 0.33); .mjs=NA( 0.); .vjc=NA( 0.75); .vje=NA( 0.75); .vjs=NA( 0.75); .xcjc=NA( 1.); .itf=NA( 0.); .ptf=NA( 0.); .tf=NA( 0.); .tr=NA( 0.); .xtf=NA( 0.); .xtb=NA( 0.); .xti=NA( 3.); .eg=NA( 1.11);
+endparamset
+
+paramset zz bla;
+  parameter off;
+
+endparamset
+
+module foo ();
+zz #(.off(1)) q1 (.b(b),.c(c),.e(e));
+zz #(.off(1)) q2 (.b(b),.c(c),.E(e));
+endmodule // foo
+
+foo #() f ();
+>>>>>dc 
+foo.q1: zz from top level
+foo.q1: zz from top level
+foo.q1 discarded: no match: e
+foo.q1: 1 candidate found for zz
+foo.q2: zz from top level
+foo.q2 discarded: no match: E
+foo.q2: zz from top level
+foo.q2: 1 candidate found for zz
+#          
+ 0.        
+>>>>>end 

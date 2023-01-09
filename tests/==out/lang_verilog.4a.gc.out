@@ -1,0 +1,23 @@
+>>>>>simulator lang=verilog 
+>>>>>paramset bob resistor; 
+>>>>>module main(1,2,3,4) 
+>>>>>list 
+paramset bob resistor;
+ .r=2;
+endparamset
+
+module main (1,2,3,4);
+bob #() r1 (1,2);
+isource #(1) v1 (1,2);
+endmodule // main
+
+main #() m (.1(0),.2(1),.3(2),.4(3));
+>>>>>print op v(nodes) y(m.r1) 
+main.r1: bob from top level
+main.r1: 1 candidate found for bob
+main.v1: isource from device_dispatcher
+main.v1: 1 candidate found for isource
+>>>>>op 
+#           v(1)       v(2)       v(3)       y(m.r1)   
+ 27.        2.         0.         0.         0.5       
+>>>>>end 

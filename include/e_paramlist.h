@@ -39,7 +39,8 @@ public:
   std::string	name()const override	{untested();return "";}
   static int	count()			{untested();return _count;}
 
-  void set_param_by_name(std::string Name, std::string Value) override {_params.set(Name, Value);}
+  void set_param_by_name(std::string Name, std::string Value) override;
+  std::string param_by_name(std::string const& Name)const /*override*/;
   bool		param_is_printable(int)const override;
   std::string	param_name(int)const override;
   std::string	param_name(int,int)const override;

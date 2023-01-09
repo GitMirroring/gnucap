@@ -1,0 +1,19 @@
+
+simulator lang=verilog
+options trace
+
+module rr (a b);
+resistor      #(.r(1)) R0   (.p(a), .N(i));
+resistor      #(.x(1)) R1   (.n(j), .p(i));
+resistor      #(.r(1)) R2   (.p(j), .n(b));
+endmodule
+
+rr      #()  RR   (V_cc 0);
+
+vsource #(.dc(9)) Vcc(V_cc 0);
+
+list
+print dc v(nodes) i(Vcc) i(RR.R*)
+dc
+
+end

@@ -21,6 +21,7 @@
  *------------------------------------------------------------------
  * module stuff
  */
+#include "u_nodemap.h"
 #include "e_node.h"
 #include "globals.h"
 #include "e_paramlist.h"
@@ -45,10 +46,10 @@ public:
 		~DEV_MODULE()		{ delete[] _n; _node_capacity = 0; }
   CARD*		clone()const override;
 private:
-  void		set_port_by_index(int Index, std::string& Value);
-  // void	set_port_by_name(std::string&, std::string&);
+  void		set_port_by_index(int Index, std::string& Value) override;
+  // void	set_port_by_name(std::string&, std::string&) override;
 private: // override virtual
-  bool		is_device()const	{return _parent;}
+  bool		is_device()const		{return _parent;}
   char		id_letter()const override	{return 'X';}
   bool		print_type_in_spice()const override {return true;}
   std::string   value_name()const override	{return "#";}
@@ -129,11 +130,26 @@ void DEV_MODULE::set_port_by_index(int Index, std::string& Value)
   BASE_SUBCKT::set_port_by_index(Index, Value);
 }
 /*--------------------------------------------------------------------------*/
+#if 0
+void DEV_MODULE::set_port_by_name(std::string& Name, std::string& Value)
+{
+  if(!is_device()){ untested();
+    BASE_SUBCKT::set_port_by_name(Name, Value);
+  }else if(_parent->max_nodes()<10){ untested();
+    BASE_SUBCKT::set_port_by_name(Name, Value);
+  }else if(NODE const* n = (*_parent->subckt()->nodes())[Name]){ untested();
+    BASE_SUBCKT::set_port_by_index(n->user_number()-1, Value);
+  }else{ untested();
+    throw Exception_No_Match(Name);
+  }
+}
+#endif
+/*--------------------------------------------------------------------------*/
 int DEV_MODULE::max_nodes() const
 {
-  if(_parent){ untested();
+  if(_parent){
     return ((CARD const*)_parent)->net_nodes();
-  }else{ untested();
+  }else{
     // allow one more, building a prototype.
     return net_nodes()+1;
   }
@@ -158,7 +174,7 @@ CARD_LIST* DEV_MODULE::scope()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_MODULE::is_valid() const
-{ untested();
+{
   trace1("DEV_MODULE::is_valid", long_label());
   assert(subckt());
   assert(_parent);
@@ -179,7 +195,7 @@ CARD* DEV_MODULE::clone()const
     // cloning from static, empty model
     // has no parent.
     new_instance->new_subckt(); // from DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO
-  }else if(_parent){ untested();
+  }else if(_parent){
     new_instance->_parent = _parent;
     assert(new_instance->is_device());
   }else{
@@ -210,7 +226,7 @@ DEV_MODULE::DEV_MODULE(const DEV_MODULE& p)
   }else{
     assert(_n == NULL);
   }
-  if(p.is_device()){ untested();
+  if(p.is_device()){
     for (int ii = 0;  ii < net_nodes();  ++ii) {
       _n[ii] = p._n[ii];
     }
@@ -236,19 +252,19 @@ void DEV_MODULE::set_param_by_name(std::string Name, std::string Value)
 }
 /*--------------------------------------------------------------------------*/
 std::string DEV_MODULE::port_name(int i)const
-{
+{ untested();
   if (const DEV_MODULE* p=dynamic_cast<const DEV_MODULE*>(_parent)) {
     if (i<p->net_nodes()){
       return p->port_value(i);
-    }else{untested(); 
+    }else{untested();
       return "";
     }
   }else if(_parent) { untested(); untested();
     // reachable?
     return "";
-  }else if(i<net_nodes()) { untested();
+  }else if(i<net_nodes()) {
     return port_value(i);
-  }else{ untested();
+  }else{
     return "";
   }
 }
@@ -277,7 +293,7 @@ void DEV_MODULE::expand()
       CARD* d = (*i)->deflate();
 
       if(d == (*i)){
-      }else{ untested();
+      }else{
 	assert(d->owner() == this);
 	delete *i;
 	*i = d;
@@ -333,7 +349,7 @@ double DEV_MODULE::tr_probe_num(const std::string& x)const
     for (CARD_LIST::const_iterator
 	   ci = subckt()->begin(); ci != subckt()->end(); ++ci) {untested();
       power += CARD::probe(*ci,"P");
-    }      
+    }
     return power;
   }else if (Umatch(x, "pd ")) {untested();
     double power = 0.;
@@ -341,7 +357,7 @@ double DEV_MODULE::tr_probe_num(const std::string& x)const
     for (CARD_LIST::const_iterator
 	   ci = subckt()->begin(); ci != subckt()->end(); ++ci) {untested();
       power += CARD::probe(*ci,"PD");
-    }      
+    }
     return power;
   }else if (Umatch(x, "ps ")) {untested();
     double power = 0.;
@@ -349,7 +365,7 @@ double DEV_MODULE::tr_probe_num(const std::string& x)const
     for (CARD_LIST::const_iterator
 	   ci = subckt()->begin(); ci != subckt()->end(); ++ci) {untested();
       power += CARD::probe(*ci,"PS");
-    }      
+    }
     return power;
   }else{
     return COMPONENT::tr_probe_num(x);

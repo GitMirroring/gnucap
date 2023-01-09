@@ -1,0 +1,7 @@
+module CCVS (1,2,3,4);
+vsource #(.dc(0)) p (1,4);
+ccvs #(.gain(G)) H (2,3,p);
+endmodule // CCVS
+
+CCVS #() t (.1(1),.2(2),.3(3),.4(4));
+t.H: can't find: *unnamed_port_2 in t

@@ -1,6 +1,10 @@
 >>>>>module ports(a, b) 
 >>>>>module main(1 2); 
 >>>>>print dc v(nodes) 
+main.p: ports from top level
+main.p: 1 candidate found for ports
+ports.c: vsource from device_dispatcher
+ports.c: 1 candidate found for vsource
 >>>>>dc 
 #           v(1)       v(2)      
  0.         2.         0.        

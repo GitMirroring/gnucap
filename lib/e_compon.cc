@@ -25,6 +25,7 @@
 #include "u_lang.h"
 #include "e_model.h"
 #include "e_elemnt.h"
+#include "e_paramlist.h"
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
   :CKT_BASE(p),
@@ -247,9 +248,9 @@ bool COMMON_COMPONENT::param_is_printable(int i)const
 std::string COMMON_COMPONENT::param_name(int i)const
 {
   switch (i) {
-  case 0:untested();  return "tnom";
-  case 1:untested();  return "dtemp";
-  case 2:itested();  return "temp";
+  case 0:  return "tnom";
+  case 1:  return "dtemp";
+  case 2:  return "temp";
   case 3:  return "m";
   default:untested(); return "";
   }
@@ -306,7 +307,7 @@ bool COMMON_COMPONENT::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
 {
-  if (has_parse_params_obsolete_callback()) {itested();
+  if (has_parse_params_obsolete_callback()) {untested();
     std::string args(Name + "=" + Value);
     CS cmd(CS::_STRING, args); //obsolete_callback
     bool ok = parse_params_obsolete_callback(cmd); //BUG//callback
@@ -326,7 +327,6 @@ void COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
 	}
       }
     }
-    untested();
     throw Exception_No_Match(Name);
   }
 }
@@ -504,6 +504,15 @@ void COMPONENT::deflate_common()
   }
 }
 /*--------------------------------------------------------------------------*/
+bool COMPONENT::is_valid() const
+{
+  if(!has_common()){
+    return true;
+  }else{
+    return common()->is_valid(this);
+  }
+}
+/*--------------------------------------------------------------------------*/
 void COMPONENT::expand()
 {
   CARD::expand();
@@ -525,9 +534,10 @@ void COMPONENT::precalc_first()
   if (has_common()) {
     try {
       mutable_common()->precalc_first(scope());
-    }catch (Exception_Precalc& e) {untested();
+    }catch (Exception_Precalc& e) {
       error(bWARNING, long_label() + ": " + e.message());
     }
+
     _mfactor = common()->mfactor();
   }else{
   }
@@ -548,6 +558,7 @@ void COMPONENT::precalc_first()
 void COMPONENT::precalc_last()
 {
   CARD::precalc_last();
+
   if (has_common()) {
     try {
       mutable_common()->precalc_last(scope());
@@ -562,6 +573,12 @@ void COMPONENT::precalc_last()
 /*--------------------------------------------------------------------------*/
 void COMPONENT::map_nodes()
 {
+  if(!is_device()){
+    // paramset?
+    assert(owner()==0);
+    return;
+  }else{
+  }
   assert(is_device());
   assert(0 <= min_nodes());
   //assert(min_nodes() <= net_nodes());
@@ -653,7 +670,7 @@ void COMPONENT::set_param_by_name(std::string Name, std::string Value)
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_param_by_index(int i, std::string& Value, int offset)
 {
-  if (has_common()) {untested();
+  if (has_common()) {
     COMMON_COMPONENT* c = common()->clone();
     assert(c);
     c->set_param_by_index(i, Value, offset);
@@ -700,7 +717,7 @@ std::string COMPONENT::param_name(int i, int j)const
   }else{
     if (j == 0) {
       return param_name(i);
-    }else if (i >= CARD::param_count()) {itested();
+    }else if (i >= CARD::param_count()) {
       return "";
     }else{untested();
       return CARD::param_name(i,j);
@@ -758,7 +775,13 @@ double COMPONENT::tr_probe_num(const std::string& x)const
 const MODEL_CARD* COMPONENT::find_model(const std::string& modelname)const
 {
   if (modelname == "") {
-    throw Exception(long_label() + ": missing args -- need model name");
+    assert(common());
+    trace2("COMPONENT::find_model overridden", long_label(), modelname);
+    if(common()->has_model()){
+      return common()->model();
+    }else{
+      throw Exception(long_label() + ": missing args -- need model name");
+    }
     unreachable();
     return NULL;
   }else{
@@ -912,7 +935,7 @@ double COMPONENT::volts_limited(const node_t & n1, const node_t & n2)
       _sim->_fulldamp = true;
       error(bTRACE, "range limit damp\n");
     }
-    if (OPT::picky <= bTRACE) {untested();
+    if (OPT::picky <= bTRACE) {
       error(bNOERROR,"node limiting (n1,n2,dif) "
 	    "was (%g %g %g) now (%g %g %g)\n",
 	    n1.v0(), n2.v0(), n1.v0() - n2.v0(), v1, v2, v1-v2);
@@ -920,6 +943,15 @@ double COMPONENT::volts_limited(const node_t & n1, const node_t & n2)
   }
 
   return dn_diff(v1,v2);
+}
+/*--------------------------------------------------------------------------*/
+bool COMMON_COMPONENT::is_valid(COMPONENT const* c) const
+{
+  if(has_model()){
+    return model()->is_valid(c);
+  }else{ untested();
+    return true;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

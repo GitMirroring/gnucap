@@ -1,0 +1,19 @@
+
+options trace
+verilog
+
+paramset myres resistor;
+ .r=1111
+endparamset
+
+module main(1,2,3);
+vsource #(1.) v(1,2);
+myres #(.r(WRONG)) R1(3,2);
+endmodule
+
+main m(0,1,2);
+
+list
+
+print dc v(nodes) i(m.v)
+dc

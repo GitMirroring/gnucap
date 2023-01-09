@@ -1,0 +1,20 @@
+>>>>>module rr (a b); 
+>>>>>list 
+module rr (a,b);
+resistor #(.r(1)) R0 (.p(a),.N(i));
+resistor #(.x(1)) R1 (.n(j),.p(i));
+resistor #(.r(1)) R2 (.p(j),.n(b));
+endmodule // rr
+
+rr #() RR (.a(V_cc),.b(0));
+vsource #(.dc(9)) Vcc (.p(V_cc),.n(0));
+>>>>>print dc v(nodes) i(Vcc) i(RR.R*) 
+rr.R0: resistor from device_dispatcher
+rr.R0 discarded: no match: N
+rr.R0: no candidates found for resistor
+rr.R1: resistor from device_dispatcher
+rr.R1 discarded: no match: x
+rr.R1: no candidates found for resistor
+rr.R2: resistor from device_dispatcher
+rr.R2: 1 candidate found for resistor
+RR.R0: no valid prototype found for resistor

@@ -125,6 +125,7 @@ void PARAM_LIST::eval_copy(PARAM_LIST const& p, const CARD_LIST* scope)
   }
 }
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 const PARAMETER<double>& PARAM_LIST::deep_lookup(std::string Name)const
 {
   if (OPT::case_insensitive) {
@@ -155,6 +156,13 @@ void PARAM_LIST::set(std::string Name, const std::string& Value)
   }
   _pl[Name] = Value;
 }
+/*--------------------------------------------------------------------------*/
+#if 0
+void PARAM_LIST::set(std::string Name, PARAMETER<double> const& p)
+{
+  _pl[Name] = p;
+}
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 bool Get(CS& cmd, const std::string& key, PARAMETER<bool>* val)

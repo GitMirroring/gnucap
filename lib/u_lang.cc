@@ -125,6 +125,7 @@ void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope)
 /*--------------------------------------------------------------------------*/
 CARD* LANGUAGE::parse_item(CS& cmd, CARD* c)
 {
+  trace1("parse item", cmd.tail());
   // See Stroustrup 15.4.5
   // If you can think of a better way, tell me.
   // It must be in the LANGUAGE class, not CARD.
@@ -140,6 +141,7 @@ CARD* LANGUAGE::parse_item(CS& cmd, CARD* c)
   }else if (DEV_COMMENT* com = dynamic_cast<DEV_COMMENT*>(c)) {
     return parse_comment(cmd, com);
   }else if (DEV_DOT* d = dynamic_cast<DEV_DOT*>(c)) {
+  trace1("parse dot", cmd.tail());
     return parse_command(cmd, d);
   }else{untested();
     incomplete();
@@ -166,7 +168,9 @@ void LANGUAGE::print_item(OMSTREAM& o, const CARD* c)
     print_comment(o, com);
   }else if (const DEV_DOT* d = dynamic_cast<const DEV_DOT*>(c)) {untested();
     print_command(o, d);
-  }else{itested();
+  }else if (const COMPONENT* d = dynamic_cast<const COMPONENT*>(c)) {untested();
+    print_instance(o, d);
+  }else{untested();
     incomplete();
     unreachable();
   }
