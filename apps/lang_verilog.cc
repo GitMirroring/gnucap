@@ -214,7 +214,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	}
       }
       for (int iii = 0;  iii < x->min_nodes();  ++iii) {
-	if (!(x->node_is_connected(iii))) {untested();
+	if (!(x->node_is_connected(iii))) {
 	  cmd.warn(bDANGER, x->port_name(iii) + ": port unconnected, grounding");
 	  x->set_port_to_ground(iii);
 	}else{

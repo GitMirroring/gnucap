@@ -29,21 +29,24 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
+// components with one node are unlikely.
+const size_t node_capacity_floor = 2;
+/*--------------------------------------------------------------------------*/
 static COMMON_PARAMLIST Default_SUBCKT(CC_STATIC);
-#define PORTS_PER_SUBCKT 100
-//BUG// fixed limit on number of ports
 /*--------------------------------------------------------------------------*/
 class DEV_MODULE : public BASE_SUBCKT {
 private:
   const BASE_SUBCKT* _parent;
-  node_t	_nodes[PORTS_PER_SUBCKT];
+  size_t _node_capacity;
 private:
   explicit	DEV_MODULE(const DEV_MODULE&);
 public:
   explicit	DEV_MODULE();
-		~DEV_MODULE()		{}
+		~DEV_MODULE()		{ delete[] _n; _node_capacity = 0; }
   CARD*		clone()const override;
-//  CARD*		clone_instance()const override;
+private:
+  void		set_port_by_index(int Index, std::string& Value);
+  // void	set_port_by_name(std::string&, std::string&);
 private: // override virtual
   bool		is_device()const	{return _parent;}
   char		id_letter()const override	{return 'X';}
@@ -96,15 +99,43 @@ private:
 
   std::string port_name(int i)const;
   void set_param_by_name(std::string Name, std::string Value) override;
+private: // base class?
+  void grow_nodes(size_t);
 } p1;
 DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "module", &p1);
 /*--------------------------------------------------------------------------*/
+void DEV_MODULE::grow_nodes(size_t Index)
+{
+  if(Index<_node_capacity){
+  }else{
+    size_t new_capacity = std::max(_node_capacity, node_capacity_floor);
+    while(new_capacity <= Index) {
+      assert(new_capacity < new_capacity * 2);
+      new_capacity *= 2;
+    }
+    node_t* new_nodes = new node_t[new_capacity];
+    for(size_t i=0; i<_node_capacity; ++i){
+      new_nodes[i] = _n[i];
+    }
+    delete[] _n;
+    _n = new_nodes;
+    _node_capacity = new_capacity;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_MODULE::set_port_by_index(int Index, std::string& Value)
+{
+  grow_nodes(Index);
+  BASE_SUBCKT::set_port_by_index(Index, Value);
+}
+/*--------------------------------------------------------------------------*/
 int DEV_MODULE::max_nodes() const
 {
-  if(_parent){
+  if(_parent){ untested();
     return ((CARD const*)_parent)->net_nodes();
-  }else{
-    return PORTS_PER_SUBCKT;
+  }else{ untested();
+    // allow one more, building a prototype.
+    return net_nodes()+1;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -119,7 +150,7 @@ int DEV_MODULE::min_nodes() const
 /*--------------------------------------------------------------------------*/
 CARD_LIST* DEV_MODULE::scope()
 {
-  if(_parent){
+  if(is_device()){
     return COMPONENT::scope();
   }else{
     return subckt();
@@ -127,7 +158,7 @@ CARD_LIST* DEV_MODULE::scope()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_MODULE::is_valid() const
-{
+{ untested();
   trace1("DEV_MODULE::is_valid", long_label());
   assert(subckt());
   assert(_parent);
@@ -146,9 +177,9 @@ CARD* DEV_MODULE::clone()const
 
   if (this == &p1){
     // cloning from static, empty model
-    // look out for _parent in expand
+    // has no parent.
     new_instance->new_subckt(); // from DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO
-  }else if(_parent){
+  }else if(_parent){ untested();
     new_instance->_parent = _parent;
     assert(new_instance->is_device());
   }else{
@@ -164,18 +195,30 @@ DEV_MODULE::DEV_MODULE()
    _parent(NULL)
 {
   attach_common(&Default_SUBCKT);
-  _n = _nodes;
+  assert(_n == NULL);
+  _node_capacity = 0;
 }
 /*--------------------------------------------------------------------------*/
 DEV_MODULE::DEV_MODULE(const DEV_MODULE& p)
   :BASE_SUBCKT(p),
    _parent(p._parent)
 {
-  //strcpy(modelname, p.modelname); in common
-  for (int ii = 0;  ii < max_nodes();  ++ii) {
-    _nodes[ii] = p._nodes[ii];
+  trace2("DEV_MODULE::DEV_MODULE", long_label(), net_nodes());
+  _node_capacity = net_nodes();
+  if(_node_capacity){
+    _n = new node_t[_node_capacity];
+  }else{
+    assert(_n == NULL);
   }
-  _n = _nodes;
+  if(p.is_device()){ untested();
+    for (int ii = 0;  ii < net_nodes();  ++ii) {
+      _n[ii] = p._n[ii];
+    }
+  }else{
+    for (int ii = 0;  ii < net_nodes();  ++ii) {
+      assert(!_n[ii].n_());
+    }
+  }
   assert(!subckt());
 }
 /*--------------------------------------------------------------------------*/
@@ -200,10 +243,12 @@ std::string DEV_MODULE::port_name(int i)const
     }else{untested(); 
       return "";
     }
-  }else if(_parent){untested(); untested();
+  }else if(_parent) { untested(); untested();
     // reachable?
     return "";
-  }else{untested();
+  }else if(i<net_nodes()) { untested();
+    return port_value(i);
+  }else{ untested();
     return "";
   }
 }
@@ -311,6 +356,8 @@ double DEV_MODULE::tr_probe_num(const std::string& x)const
   }
   /*NOTREACHED*/
 }
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 } // namespace
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

@@ -1,0 +1,11 @@
+m #() mm(.a(1), .b(0)); 
+                 ^ ? mismatch, ignored
+m #() mm(.a(1), .b(0)); 
+                     ^ ? d: port unconnected, grounding
+module m (a,d);
+resistor #(.r(1)) r0 (.p(a),.n(b));
+resistor #(.r(1)) r1 (.p(b),.n(c));
+resistor #(.r(1)) r2 (.p(c),.n(d));
+endmodule // m
+
+m #() mm (.a(1),.d(0));
