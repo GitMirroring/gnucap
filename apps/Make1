@@ -64,7 +64,7 @@ s_tr.cc s_tr_set.cc s_tr_swp.cc
 
 # netlist languages
 LANG_SRCS = \
-lang_spice.cc lang_spectre.cc lang_verilog.cc
+lang_spice.cc lang_spectre.cc lang_verilog.cc v_module.cc
 
 # parameter functions
 FUNC_SRCS = \
