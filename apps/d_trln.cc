@@ -60,7 +60,7 @@ public:
   std::string	param_value(int)const;
   int param_count()const {return (9 + COMMON_COMPONENT::param_count());}
 public:
-  void		precalc_last(const CARD_LIST*);
+  void		precalc_last(const PARAM_LIST*);
   std::string	name()const		{untested(); return "transline";}
 };
 /*--------------------------------------------------------------------------*/
@@ -310,7 +310,7 @@ std::string COMMON_TRANSLINE::param_value(int I)const
   //BUG// does not print IC
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_TRANSLINE::precalc_last(const CARD_LIST* Scope)
+void COMMON_TRANSLINE::precalc_last(const PARAM_LIST* Scope)
 {
   assert(Scope);
   COMMON_COMPONENT::precalc_last(Scope);

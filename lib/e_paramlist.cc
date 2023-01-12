@@ -76,7 +76,7 @@ std::string COMMON_PARAMLIST::param_value(int i)const
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_PARAMLIST::precalc_first(const CARD_LIST* Scope)
+void COMMON_PARAMLIST::precalc_first(const PARAM_LIST* Scope)
 {
   assert(Scope);
   COMMON_COMPONENT::precalc_first(Scope);
@@ -84,7 +84,7 @@ void COMMON_PARAMLIST::precalc_first(const CARD_LIST* Scope)
   //BUG//  _mfactor must be in precalc_first
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_PARAMLIST::precalc_last(const CARD_LIST* Scope)
+void COMMON_PARAMLIST::precalc_last(const PARAM_LIST* Scope)
 {
   assert(Scope);
   COMMON_COMPONENT::precalc_last(Scope);

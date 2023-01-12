@@ -45,7 +45,7 @@ private: // override virtual
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_TANH(*this);}
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
 
-  void		precalc_last(const CARD_LIST*);
+  void		precalc_last(const PARAM_LIST*);
   void		tr_eval(ELEMENT*)const;
   std::string	name()const		{return "tanh";}
   bool		ac_too()const		{untested();return false;}
@@ -90,7 +90,7 @@ void EVAL_BM_TANH::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)co
   EVAL_BM_ACTION_BASE::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_TANH::precalc_last(const CARD_LIST* Scope)
+void EVAL_BM_TANH::precalc_last(const PARAM_LIST* Scope)
 {
   assert(Scope);
   EVAL_BM_ACTION_BASE::precalc_last(Scope);

@@ -25,13 +25,14 @@
 #define U_FUNCTION_H
 #include "e_base.h"
 /*--------------------------------------------------------------------------*/
+class PARAM_LIST;
 class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class FUNCTION : public CKT_BASE {
   //BUG//needs constructors
   //BUG//need label support
 public:
-  virtual std::string eval(CS&, const CARD_LIST*)const = 0;
+  virtual std::string eval(CS&, const PARAM_LIST*)const = 0;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

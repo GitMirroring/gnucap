@@ -170,7 +170,7 @@ void Token_SYMBOL::stack_op(Expression* E)const
       E->push_back(new Token_CONSTANT(name(), n, ""));
     }else{
       // a name
-      PARAMETER<double> p = (*(E->_scope->params()))[name()];
+      PARAMETER<double> p = (*(E->_scope))[name()];
       if (p.has_hard_value()) {
 	CS cmd(CS::_STRING, p.string());
 	Expression pp(cmd);
@@ -369,6 +369,12 @@ void Expression::reduce_copy(const Expression& Proto)
 }
 /*--------------------------------------------------------------------------*/
 Expression::Expression(const Expression& Proto, const CARD_LIST* Scope)
+  :_scope(Scope?Scope->params():NULL)
+{
+  reduce_copy(Proto);
+}
+/*--------------------------------------------------------------------------*/
+Expression::Expression(const Expression& Proto, const PARAM_LIST* Scope)
   :_scope(Scope)
 {
   //BUG// is this thread-safe?

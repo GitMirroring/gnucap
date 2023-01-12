@@ -60,7 +60,7 @@ private: // override vitrual
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_SIN(*this);}
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
 
-  void		precalc_last(const CARD_LIST*);
+  void		precalc_last(const PARAM_LIST*);
   void		tr_eval(ELEMENT*)const;
   TIME_PAIR	tr_review(COMPONENT*)const;
   std::string	name()const		{return "sin";}
@@ -134,7 +134,7 @@ void EVAL_BM_SIN::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)con
   EVAL_BM_ACTION_BASE::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_SIN::precalc_last(const CARD_LIST* Scope)
+void EVAL_BM_SIN::precalc_last(const PARAM_LIST* Scope)
 {
   assert(Scope);
   EVAL_BM_ACTION_BASE::precalc_last(Scope);

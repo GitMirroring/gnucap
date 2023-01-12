@@ -66,6 +66,7 @@ public:
 
   operator T()const {return _v;}
   T	e_val(const T& def, const CARD_LIST* scope)const;
+  T	e_val(const T& def, const PARAM_LIST* scope)const;
   void	parse(CS& cmd) override;
 
   std::string string()const {
@@ -111,7 +112,7 @@ public:
   //}
   T*	pointer_hack()	 {return &_v;}
 private:
-  T lookup_solve(const T& def, const CARD_LIST* scope)const;
+  T lookup_solve(const T& def, const PARAM_LIST* scope)const;
 };
 /*--------------------------------------------------------------------------*/
 /* non-class interface, so non-paramaters can have same syntax */
@@ -166,17 +167,33 @@ void set_default(T* p, const T& v)
 }
 
 template <class T>
-void e_val(PARAMETER<T>* p, const PARAMETER<T>& def, const CARD_LIST* scope)
+void e_val(PARAMETER<T>* p, const PARAMETER<T>& def, const PARAM_LIST* scope)
 {
   assert(p);
   p->e_val(def, scope);
 }
 
 template <class T>
-void e_val(PARAMETER<T>* p, const T& def, const CARD_LIST* scope)
+void e_val(PARAMETER<T>* p, const T& def, const PARAM_LIST* scope)
 {
   assert(p);
   p->e_val(def, scope);
+}
+
+template <class T>
+void e_val(PARAMETER<T>* p, const PARAMETER<T>& def, const CARD_LIST* scope)
+{
+  assert(p);
+  assert(scope);
+  p->e_val(def, scope->params());
+}
+
+template <class T>
+void e_val(PARAMETER<T>* p, const T& def, const CARD_LIST* scope)
+{
+  assert(p);
+  assert(scope);
+  p->e_val(def, scope->params());
 }
 
 #if 0
@@ -215,7 +232,7 @@ public:
   std::string name(int)const;
   std::string value(int)const;
 
-  void	eval_copy(PARAM_LIST const&, const CARD_LIST*);
+  void	eval_copy(PARAM_LIST const&, const PARAM_LIST*);
   bool  operator==(const PARAM_LIST& p)const{return _pl == p._pl;}
   const PARAMETER<double>& deep_lookup(std::string)const;
   const PARAMETER<double>& operator[](std::string i)const {return deep_lookup(i);}
@@ -230,14 +247,14 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 template <>
-inline bool PARAMETER<bool>::lookup_solve(const bool&, const CARD_LIST*)const
+inline bool PARAMETER<bool>::lookup_solve(const bool&, const PARAM_LIST*)const
 {
   CS cmd(CS::_STRING, _s);
   return cmd.ctob();
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-inline T PARAMETER<T>::lookup_solve(const T& def, const CARD_LIST* scope)const
+inline T PARAMETER<T>::lookup_solve(const T& def, const PARAM_LIST* scope)const
 {
   CS cmd(CS::_STRING, _s);
   Expression e(cmd);
@@ -246,8 +263,7 @@ inline T PARAMETER<T>::lookup_solve(const T& def, const CARD_LIST* scope)const
   if (v != NOT_INPUT) {
     return v;
   }else{
-    const PARAM_LIST* pl = scope->params();
-    return T(pl->deep_lookup(_s).e_val(def, scope));
+    return T(scope->deep_lookup(_s).e_val(def, scope));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -261,9 +277,11 @@ inline T PARAMETER<T>::lookup_solve(const T& def, const CARD_LIST* scope)const
 #endif
 /*--------------------------------------------------------------------------*/
 template <class T>
-T PARAMETER<T>::e_val(const T& def, const CARD_LIST* scope)const
+T PARAMETER<T>::e_val(const T& def, const PARAM_LIST* scope)const
 {
-  assert(scope);
+  if(scope){
+  }else{
+  }
 
   static int recursion=0;
   static const std::string* first_name = NULL;
@@ -301,6 +319,13 @@ T PARAMETER<T>::e_val(const T& def, const CARD_LIST* scope)const
   }
   --recursion;
   return _v;
+}
+/*--------------------------------------------------------------------------*/
+template <class T>
+T PARAMETER<T>::e_val(const T& def, const CARD_LIST* scope)const
+{
+  assert(scope);
+  return e_val(def, scope->params());
 }
 /*--------------------------------------------------------------------------*/
 template <>

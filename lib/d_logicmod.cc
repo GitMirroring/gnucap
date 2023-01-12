@@ -71,7 +71,7 @@ void MODEL_LOGIC::precalc_first()
 {
   MODEL_CARD::precalc_first();
 
-  const CARD_LIST* par_scope = scope();
+  const PARAM_LIST* par_scope = scope()->params();
   assert(par_scope);
 
   delay.e_val(1e-9, par_scope);

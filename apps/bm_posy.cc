@@ -53,7 +53,7 @@ private: // override vitrual
   COMMON_COMPONENT* clone()const	{return new EVAL_BM_POSY(*this);}
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
 
-  void		precalc_last(const CARD_LIST*);
+  void		precalc_last(const PARAM_LIST*);
   void		tr_eval(ELEMENT*)const;
   std::string	name()const		{return "posy";}
   bool		ac_too()const		{untested();return false;}
@@ -118,7 +118,7 @@ void EVAL_BM_POSY::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)co
   EVAL_BM_ACTION_BASE::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_POSY::precalc_last(const CARD_LIST* Scope)
+void EVAL_BM_POSY::precalc_last(const PARAM_LIST* Scope)
 {
   assert(Scope);
   EVAL_BM_ACTION_BASE::precalc_last(Scope);

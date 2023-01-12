@@ -271,9 +271,11 @@ std::string COMMON_COMPONENT::param_value(int i)const
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::precalc_last(const CARD_LIST* Scope)
+void COMMON_COMPONENT::precalc_last(const PARAM_LIST* Scope)
 {
-  assert(Scope);
+  if(Scope){
+  }else{
+  }
   _tnom_c.e_val(OPT::tnom_c, Scope);
   _dtemp.e_val(0., Scope);
   _temp_c.e_val(_sim->_temp_c + _dtemp, Scope);
@@ -525,7 +527,7 @@ void COMPONENT::precalc_first()
   CARD::precalc_first();
   if (has_common()) {
     try {
-      mutable_common()->precalc_first(scope());
+      mutable_common()->precalc_first(scope()->params());
     }catch (Exception_Precalc& e) {untested();
       error(bWARNING, long_label() + ": " + e.message());
     }
@@ -535,7 +537,7 @@ void COMPONENT::precalc_first()
 
   //BUG//  _mfactor must be in precalc_first
 
-  _mfactor.e_val(1, scope());
+  _mfactor.e_val(1, scope()->params());
   trace1(long_label().c_str(), double(_mfactor));
   if (const COMPONENT* o = dynamic_cast<const COMPONENT*>(owner())) {
     _mfactor_fixed = o->mfactor() * _mfactor;
@@ -551,14 +553,14 @@ void COMPONENT::precalc_last()
   CARD::precalc_last();
   if (has_common()) {
     try {
-      mutable_common()->precalc_last(scope());
+      mutable_common()->precalc_last(scope()->params());
     }catch (Exception_Precalc& e) {
       error(bWARNING, long_label() + ": " + e.message());
     }
   }else{
   }
 
-  _value.e_val(0.,scope());
+  _value.e_val(0.,scope()->params());
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::map_nodes()
