@@ -790,7 +790,7 @@ const MODEL_CARD* COMPONENT::find_model(const std::string& modelname)const
     // found something, what is it?
     assert(c);
     const MODEL_CARD* model = dynamic_cast<const MODEL_CARD*>(c);
-    if (!model) {untested();
+    if (!model) {
       throw Exception_Type_Mismatch(long_label(), modelname, ".model");
     }else if (!model->is_valid(this)) {untested();
       error(bWARNING, long_label() + ", " + modelname
