@@ -52,7 +52,12 @@ protected: // override virtual
   bool	   use_obsolete_callback_parse()const override {return true;}
   CARD*	   clone()const override		{return new DEV_CAPACITANCE(*this);}
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_passive();}
+  void	   tr_advance()override;
+  void	   tr_regress()override;
+  void	   dc_advance()override;
   bool	   do_tr()override;
+  TIME_PAIR tr_review()override;
+  void	   tr_accept()override;
   void	   tr_load()override		{tr_load_passive();}
   void	   tr_unload()override		{tr_unload_passive();}
   double   tr_involts()const override	{return tr_outvolts();}
@@ -121,7 +126,12 @@ private: // override virtual
   bool	   f_is_value()const override	{untested();return true;}
   CARD*	   clone()const override	{return new DEV_VCCAP(*this);}
   void	   tr_iwant_matrix()override	{tr_iwant_matrix_extended();}
+  void	   dc_advance()override;
+  void	   tr_advance()override;
+  void	   tr_regress()override;
   bool     do_tr()override;
+  TIME_PAIR tr_review()override;
+  void	   tr_accept()override;
   double   tr_involts()const override	{return dn_diff(_n[IN1].v0(),_n[IN2].v0());}
   double   tr_involts_limited()const override {return volts_limited(_n[IN1],_n[IN2]);}
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_extended();}
@@ -135,25 +145,105 @@ private: // override virtual
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-bool DEV_CAPACITANCE::do_tr()
+void DEV_CAPACITANCE::dc_advance()
 {
+  STORAGE::dc_advance();
   if (using_tr_eval()) {
-    _y[0].x = tr_input_limited();
-    tr_eval();
   }else{
     _y[0].x = tr_input(); // tr_involts();
     assert(_y[0].f1 == value());
     _y[0].f0 = _y[0].x * _y[0].f1;
     assert(converged());
+    store_values();
+    q_load();
+//    trace3("q", _y[0].x, _y[0].f0, _y[0].f1);
+    _i[0] = differentiate(_y, _i, _time, _method_a);
+//    trace3("i", _i[0].x, _i[0].f0, _i[0].f1);
+    _m0 = CPOLY1(_i[0]);
   }
-  store_values();
-  q_load();
+}
+/*--------------------------------------------------------------------------*/
+void DEV_CAPACITANCE::tr_advance()
+{
+  STORAGE::tr_advance();
+  if (using_tr_eval()) {
+  }else{
+    _y[0].x = tr_input(); // tr_involts();
+    assert(_y[0].f1 == value());
+    _y[0].f0 = _y[0].x * _y[0].f1;
+    assert(converged());
+  //  store_values();
+    q_load();
+    trace3("q", _y[0].x, _y[0].f0, _y[0].f1);
+    _i[0] = differentiate(_y, _i, _time, _method_a);
+    trace3("i", _i[0].x, _i[0].f0, _i[0].f1);
+    _m0 = CPOLY1(_i[0]);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_CAPACITANCE::tr_regress()
+{
+  STORAGE::tr_regress();
+  if (using_tr_eval()) {
+  }else{
+   // void	   store_values()		{assert(_y[0]==_y[0]); _y1=_y[0];}
+    _y[0] = _y1;
+    q_load();
+    _i[0] = differentiate(_y, _i, _time, _method_a);
+    _m0 = CPOLY1(_i[0]);
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool DEV_CAPACITANCE::do_tr()
+{
+  if (using_tr_eval()) {
+    _y[0].x = tr_input_limited();
+    tr_eval();
+    store_values();
+    q_load();
 
-  trace3("q", _y[0].x, _y[0].f0, _y[0].f1);
-  _i[0] = differentiate(_y, _i, _time, _method_a);
-  trace3("i", _i[0].x, _i[0].f0, _i[0].f1);
-  _m0 = CPOLY1(_i[0]);
+    trace3("q", _y[0].x, _y[0].f0, _y[0].f1);
+    _i[0] = differentiate(_y, _i, _time, _method_a);
+    trace3("i", _i[0].x, _i[0].f0, _i[0].f1);
+    _m0 = CPOLY1(_i[0]);
+  }else if(1){
+    // auto xx = differentiate(_y, _i, _time, _method_a).c1();
+    // trace2("dotr",_i[0].c1(), xx);
+    // ...
+    assert(converged());
+  }else{
+    _y[0].x = tr_input(); // tr_involts();
+    assert(_y[0].f1 == value());
+    _y[0].f0 = _y[0].x * _y[0].f1;
+    store_values();
+    q_load();
+
+    _i[0] = differentiate(_y, _i, _time, _method_a);
+    trace3("mm?", _sim->_time0, _m0.c1, CPOLY1(_i[0]).c1);
+    _m0 = CPOLY1(_i[0]);
+  }
   return converged();
+}
+/*--------------------------------------------------------------------------*/
+TIME_PAIR DEV_CAPACITANCE::tr_review()
+{
+  if (using_tr_eval()) {
+  }else{
+    _y[0].x = tr_input(); // tr_involts();
+    trace3("trr", long_label(), _y[0].f1, value());
+    assert(_y[0].f1 == value());
+    _y[0].f0 = _y[0].x * _y[0].f1;
+    // store_values();
+    // _i[0] = differentiate(_y, _i, _time, _method_a);
+    // _m0 = CPOLY1(_i[0]);
+    q_accept();
+  }
+  return STORAGE::tr_review();
+}
+/*--------------------------------------------------------------------------*/
+void DEV_CAPACITANCE::tr_accept()
+{
+  _i[0] = differentiate(_y, _i, _time, _method_a);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_CAPACITANCE::do_ac()
@@ -184,6 +274,35 @@ double DEV_CAPACITANCE::tr_probe_num(const std::string& x)const
   }else{
     return STORAGE::tr_probe_num(x);
   }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_VCCAP::tr_accept()
+{
+  STORAGE::tr_accept();
+}
+/*--------------------------------------------------------------------------*/
+void DEV_VCCAP::dc_advance()
+{
+  // BUG?
+  STORAGE::dc_advance();
+}
+/*--------------------------------------------------------------------------*/
+void DEV_VCCAP::tr_advance()
+{
+  // BUG?
+  STORAGE::tr_advance();
+}
+/*--------------------------------------------------------------------------*/
+void DEV_VCCAP::tr_regress()
+{
+  // BUG?
+  STORAGE::tr_regress();
+}
+/*--------------------------------------------------------------------------*/
+TIME_PAIR DEV_VCCAP::tr_review()
+{
+  // BUG?
+  return STORAGE::tr_review();
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_VCCAP::do_tr()

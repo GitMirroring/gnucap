@@ -5,7 +5,7 @@ c2 2 0 1
 .list
 .print tran v(1) v(2)
 *.tran .1 1 0
-.tran 1 10 0
+.tran 1 10 0 trace=n
 *.tran 10 100 0
 .status notime
 .end

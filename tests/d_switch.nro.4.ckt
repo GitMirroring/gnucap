@@ -1,5 +1,6 @@
 * switch as negative resistance oscillator
 * Spice netlister for gnetlist
+.options itl1=99
 SW1 1 0 1 0 SWITCH1
 C1 1 0 1n
 I1 0 1 100u
