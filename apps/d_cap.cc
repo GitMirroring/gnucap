@@ -55,6 +55,7 @@ protected: // override virtual
   void	   tr_advance()override;
   void	   tr_regress()override;
   void	   dc_advance()override;
+  bool	   tr_needs_eval()const override;
   bool	   do_tr()override;
   TIME_PAIR tr_review()override;
   void	   tr_accept()override;
@@ -129,6 +130,7 @@ private: // override virtual
   void	   dc_advance()override;
   void	   tr_advance()override;
   void	   tr_regress()override;
+  bool	   tr_needs_eval()const override;
   bool     do_tr()override;
   TIME_PAIR tr_review()override;
   void	   tr_accept()override;
@@ -194,6 +196,12 @@ void DEV_CAPACITANCE::tr_regress()
   }
 }
 /*--------------------------------------------------------------------------*/
+bool DEV_CAPACITANCE::tr_needs_eval()const
+{
+  // return !is_constant(); c.f. ELEMENT
+  return using_tr_eval() && STORAGE::tr_needs_eval();
+}
+/*--------------------------------------------------------------------------*/
 bool DEV_CAPACITANCE::do_tr()
 {
   if (using_tr_eval()) {
@@ -206,21 +214,8 @@ bool DEV_CAPACITANCE::do_tr()
     _i[0] = differentiate(_y, _i, _time, _method_a);
     trace3("i", _i[0].x, _i[0].f0, _i[0].f1);
     _m0 = CPOLY1(_i[0]);
-  }else if(1){
-    // auto xx = differentiate(_y, _i, _time, _method_a).c1();
-    // trace2("dotr",_i[0].c1(), xx);
-    // ...
-    assert(converged());
   }else{
-    _y[0].x = tr_input(); // tr_involts();
-    assert(_y[0].f1 == value());
-    _y[0].f0 = _y[0].x * _y[0].f1;
-    store_values();
-    q_load();
-
-    _i[0] = differentiate(_y, _i, _time, _method_a);
-    trace3("mm?", _sim->_time0, _m0.c1, CPOLY1(_i[0]).c1);
-    _m0 = CPOLY1(_i[0]);
+    assert(converged());
   }
   return converged();
 }
@@ -303,6 +298,12 @@ TIME_PAIR DEV_VCCAP::tr_review()
 {
   // BUG?
   return STORAGE::tr_review();
+}
+/*--------------------------------------------------------------------------*/
+bool DEV_VCCAP::tr_needs_eval()const
+{
+  // BUG?
+  return STORAGE::tr_needs_eval();
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_VCCAP::do_tr()
