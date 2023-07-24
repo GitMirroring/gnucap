@@ -253,7 +253,8 @@ T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd, const T& in)
     T* row = &(l(rr,kk));
     T* col = &(u(kk,cc));
     /* for (ii = kk;   ii < dd;   ++ii) */
-    for (int ii = 0;   ii < len;   ++ii) {
+    for (int ii = len;   ii;) {
+      --ii;
       dot += row[-ii] * col[ii];
     }
   }else{
