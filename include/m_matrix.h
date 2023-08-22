@@ -1,5 +1,6 @@
-/*$Id: m_matrix.h 2017/06/07 $ -*- C++ -*-
+/*                             -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
+ *               2023 Felix Salfelder
  * Author: Albert Davis <aldavis@gnu.org>
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
@@ -234,18 +235,19 @@ T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd, const T& in)
   assert(_lownode);
   int kk = std::max(_lownode[rr], _lownode[cc]);
   int len = dd - kk;
-  T& dot = m(rr, cc);
-  dot = in;
+  T dot = 0.;
   if (len > 0) {
     T* row = &(l(rr,kk));
     T* col = &(u(kk,cc));
     /* for (ii = kk;   ii < dd;   ++ii) */
     for (int ii = 0;   ii < len;   ++ii) {
-      dot -= row[-ii] * col[ii];
+      dot += row[-ii] * col[ii];
     }
   }else{
   }
-  return dot;
+  T& result = m(rr, cc);
+  result = in - dot;
+  return result;
 }
 /*--------------------------------------------------------------------------*/
 // public implementations
