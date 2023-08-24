@@ -61,19 +61,31 @@ void Name_String::parse(CS& File)
     }
   }else{
     int bracket = 0;
+    bool angle_bracket = false;
+    if(File.match1("<")){
+      _data += File.ctoc();
+      angle_bracket = true;
+    }else{
+    }
     while (true) {
       if (File.is_alpha() || File.is_pfloat() || File.match1("_$")) {
       }else if (File.match1("[")) {
 	++bracket;
       }else if (bracket && File.match1("]")) {
 	--bracket;
+      }else if (angle_bracket && File.match1(">")) {
+	angle_bracket = false;
+	_data += File.ctoc();
+	break;
       }else{
 	break;
       }
       _data += File.ctoc();
     }
-    if(bracket){
+    if(bracket) {
       File.warn(bDANGER, "missing ]?");
+    }else if(angle_bracket) {
+      File.warn(bDANGER, "missing >?");
     }else{
     }
   }
