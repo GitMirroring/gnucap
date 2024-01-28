@@ -39,5 +39,11 @@ echo main
 (cd main; ./configure $args)
 echo apps
 (cd apps; ./configure $args)
+echo mgsrc
+(cd mgsrc; ./configure $args)
+echo mgsim
+(cd mgsim; ./configure $args)
+echo mgvams
+(cd mgvams; ./configure $args)
 echo done
 exit 0

@@ -1,4 +1,5 @@
-#$Id: lib/Make1 $ -*- Makefile -*-
+#$Id: Make1,v 26.138 2013/04/24 03:21:58 al Exp $ -*- Makefile -*-
+#
 # Copyright (C) 2001 Albert Davis
 # Author: Albert Davis <aldavis@gnu.org>
 #
@@ -6,7 +7,7 @@
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3, or (at your option)
+# the Free Software Foundation; either version 2, or (at your option)
 # any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -19,43 +20,70 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 #------------------------------------------------------------------------
-TARGET_LIB = libgnucap
-TARGET_LIB_EXT = .so
-#------------------------------------------------------------------------
-INSTALL_FILES = $(TARGET_LIB)$(TARGET_LIB_EXT)
-INSTALL_DIR = $(PREFIX)/lib
-#------------------------------------------------------------------------
-LIBS = \
--lreadline -ltermcap \
--ldl
+TARGET_EXE = gnucap-mg-vams
+LIBS = -lgnucap -L../../lib/O -L../../lib/O-DEBUG
 INCLUDE = -I. -I../../include
+#------------------------------------------------------------------------
+MANPAGE = ${TARGET}.1
+#------------------------------------------------------------------------
+INSTALL_FILES = $(TARGET_EXE)$(TARGET_EXT)
+#------------------------------------------------------------------------
+INSTALL_DIR = $(PREFIX)/bin
 #------------------------------------------------------------------------
 DELETED =
 #------------------------------------------------------------------------
-RAW_SRCS = \
-globals.cc \
-m_expression_dump.cc m_expression_in.cc m_expression_reduce.cc \
-m_base_in.cc m_base_math.cc m_fft.cc  m_spline.cc \
-ap_construct.cc ap_convert.cc ap_error.cc ap_get.cc ap_match.cc ap_skip.cc \
-l_dispatcher.cc l_ftos.cc l_pmatch.cc l_timer.cc l_trim.cc l_wmatch.cc \
-io.cc io_contr.cc io_error.cc io_findf.cc io_out.cc io_xopen.cc \
-u_lang.cc u_nodemap.cc u_opt1.cc u_opt2.cc \
-u_parameter.cc u_prblst.cc u_probe.cc u_sim_data.cc u_xprobe.cc \
-d_subckt.cc d_logicmod.cc \
-e_base.cc e_card.cc e_node.cc e_model.cc e_compon.cc \
-e_logicnode.cc e_logicval.cc \
-e_elemnt.cc e_ccsrc.cc e_storag.cc e_paramlist.cc e_cardlist.cc \
-bm_cond.cc bm_value.cc bm.cc \
-c__cmd.cc c_attach.cc c_file.cc \
-findbr.cc plot.cc
 #------------------------------------------------------------------------
-RAW_OTHER = Make1 configure test_readline.cc
+RAW_SRCS = \
+mg_code.cc \
+mg_deps.cc \
+mg_error.cc \
+mg_file.cc \
+mg_filt_acstim.cc \
+mg_filt.cc \
+mg_filt_ddx.cc \
+mg_filt_slew.cc \
+mg_func.cc \
+mg_func_pf.cc \
+mg_func_sys.cc \
+mg_impl.cc \
+mg_in_analog.cc \
+mg_in.cc \
+mg_in_discipline.cc \
+mg_in_expr.cc \
+mg_in_module.cc \
+mg_in_paramset.cc \
+mg_in_verilog.cc \
+mg_in_circuit.cc \
+mg_block.cc \
+mg_main.cc \
+mg_nodes.cc \
+mg_options.cc \
+mg_out.cc \
+mg_out_dump.cc \
+mg_out_expr.cc \
+mg_out_h.cc \
+mg_out_analog.cc \
+mg_out_module.cc \
+mg_out_common.cc \
+mg_out_dev.cc \
+mg_out_lib.cc \
+mg_out_root.cc \
+mg_pp.cc \
+mg_task.cc \
+m_expression_dump.cc \
+m_tokens.cc
+#------------------------------------------------------------------------
+RAW_HDRS = mg_.h mg_out.h
+INSTALL_HDRS = m_va.h e_va.h
+#------------------------------------------------------------------------
+RAW_OTHER = Make1 configure
 #------------------------------------------------------------------------
 RAW = $(RAW_HDRS) $(RAW_SRCS) $(RAW_OTHER)
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
 IMPORTED_SRCS =
 IMPORTED_HDRS =
+NOT_IMPORTED_HDRS =
 IMPORTED_OTHER =
 IMPORTED = $(IMPORTED_SRCS) $(IMPORTED_HDRS) $(IMPORTED_OTHER)
 #------------------------------------------------------------------------
@@ -68,7 +96,7 @@ GENERATED = $(GENERATED_HDRS) $(GENERATED_SRCS) $(GENERATED_OTHER)
 #------------------------------------------------------------------------
 GENERATED_DIST = Make.depend
 IMPORTED_DIST = $(IMPORTED)
-DIST_FILES = $(RAW) $(GENERATED_DIST) $(IMPORTED_DIST)
+DISTFILES = $(RAW) $(GENERATED_DIST) $(IMPORTED_DIST)
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
 SRCS = $(RAW_SRCS) $(GENERATED_SRCS) $(IMPORTED_SRCS)
@@ -77,9 +105,12 @@ OBJS = ${SRCS:.cc=.o}
 TARGET_DEPENDS = $(OBJS) $(RAW)
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
-MOSTLYCLEANFILES = $(OBJS) $(GENERATED)
+MOSTLYCLEANFILES = $(OBJS) $(GENERATED) ${TARGET}
 CLEANFILES = $(MOSTLYCLEANFILES)
-DISTCLEANFILES = $(CLEANFILES)
+DISTCLEANFILES = $(CLEANFILES) config.h
 MAINTAINERCLEANFILES = $(DISTCLEANFILES)
+#------------------------------------------------------------------------
+#------------------------------------------------------------------------
+EMBED_HEADERS = e_va.raw m_va.raw
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------

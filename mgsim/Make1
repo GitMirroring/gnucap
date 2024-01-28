@@ -1,0 +1,26 @@
+
+PACKAGE = mgsim
+
+TARGET = \
+  c_param.so \
+  d_va_acs.so \
+  d_va_filter.so \
+  d_va_slew.so \
+  d_vaflow.so \
+  d_vapot_br.so \
+  d_vapot.so \
+  d_vasw.so \
+  lang_verilog.so \
+  v_instance.so \
+  v_paramset.so \
+  v_module.so
+
+SRCS = ${TARGET:%.so=%.cc}
+
+INSTALL_FILES = $(TARGET)
+INSTALL_DIR = $(PREFIX)/lib/gnucap/${PACKAGE}
+
+INCLUDE = -I. -I../../include -I../../mgsrc
+MAKE_CPPFLAGS = -I ..
+
+CLEANFILES = ${TARGET}
