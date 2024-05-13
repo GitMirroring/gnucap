@@ -1,0 +1,28 @@
+Gnucap : The Gnu Circuit Analysis Package
+Never trust any version less than 1.0
+Copyright 1982-2013, Albert Davis
+Gnucap comes with ABSOLUTELY NO WARRANTY
+This is free software, and you are welcome
+to redistribute it under the terms of 
+the GNU General Public License, version 3 or later.
+See the file "COPYING" for details.
+main version: snapshot 2023.11.30
+core-lib version: snapshot 2023.11.30
+default plugins: snapshot 2023.11.30
+.title mos1 inverter 
+.print dc v(X1.Mn1.dsb) v(Mn1.dsb) v(Mp1.dsb) v(3) 
+                          ^ ? no match
+.print dc v(X1.Mn1.dsb) v(Mn1.dsb) v(Mp1.dsb) v(3) 
+                                     ^ ? no match
+#           v(X1.Mn1.Dsb) v(3)      
+ 0.         0.         5.        
+ 1.         0.         4.9726    
+ 2.         0.         4.082     
+ 3.         0.         0.19168   
+ 4.         0.         0.0068252 
+ 5.         0.         3.0232n   
+Gnucap   System status
+iterations: op=0, dc=44, tran=0, fourier=0, total=44
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=3, subckt=0, model=0, total=3
+dctran density=100.0%, ac density=100.0%
