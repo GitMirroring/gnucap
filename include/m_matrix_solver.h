@@ -88,9 +88,20 @@ private: // solver overrides
   void fbsubt(T* v)const override { untested();
     return _lu.fbsubt(v);
   }
-  void set_changed(int n, bool x = true)const override {
-    _changed[n] = x;
+private:
+  void set_changed(int i, bool j=true) const override {
+    _changed[i] = j;
   }
+//  void set_changed(int i, int j=1)const {
+//    if(i>0 && j>0){
+//      if(i<j){
+//	_changed[i] = j;
+//      }else{
+//	_changed[j] = i;
+//      }
+//    }else{
+//    }
+//  }
 private:
   bool is_changed(int n)const {
     return _changed[n];
@@ -144,7 +155,7 @@ private: // solver overrides
   void allocate() { }
   void unallocate() { }
   void set_min_pivot(double x)override { _min_pivot = x; }
-  void set_changed(int, bool x=true)const override { (void)x; }
+  void set_changed(int, bool j=true)const override { (void)j; }
   void fbsub(T* v)const override {
     return _data.fbsub(v);
   }
