@@ -274,16 +274,16 @@ void SIM::load_matrix()
 void SIM::solve_equations()
 {
   ::status.lud.start();
-  _sim->_lu.lu_decomp(_sim->_aa, bool(OPT::lubypass && _sim->is_inc_mode()));
+  _sim->_aa.lu_decomp(bool(OPT::lubypass && _sim->is_inc_mode()));
   ::status.lud.stop();
 
   ::status.back.start();
-  _sim->_lu.fbsub(_sim->_v0, _sim->_i, _sim->_v0);
+  _sim->_aa.fbsub(_sim->_v0, _sim->_i, _sim->_v0);
   ::status.back.stop();
   
   if (_sim->_nstat) {
     // mixed mode
-    for (int ii = _sim->_lu.size(); ii >= 1; --ii) {
+    for (int ii = _sim->_aa.size(); ii >= 1; --ii) {
       _sim->_nstat[ii].set_a_iter();
     }
   }else{ untested();
