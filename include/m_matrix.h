@@ -164,6 +164,7 @@ public:
   double 	density();
 }; // BSMATRIX_DATA
 /*--------------------------------------------------------------------------*/
+// BUMP/SPIKE MATRIX interface class
 template <class T>
 class BSMATRIX : private BSMATRIX_DATA<T> {
   friend class BSMATRIX_SOLVER<T>;
@@ -206,15 +207,22 @@ public:
 private:
   void init(int s=0);
   void uninit();
-  void set_changed(int i, bool x = true)const {
-    assert(_solver); return _solver->set_changed(i, x);
-  }
 public: // loading.
-  void load_diagonal_point(int i, T value);
-  void load_point(int i, int j, T value);
-  void load_couple(int i, int j, T value);
-  void load_symmetric(int i, int j, T value);
-  void load_asymmetric(int r1, int r2, int c1, int c2, T value);
+  void load_diagonal_point(int i, T value) { untested();
+    assert(_solver); return _solver->load_diagonal_point(i, value);
+  }
+  void load_point(int i, int j, T value) { untested();
+    assert(_solver); return _solver->load_point(i, j, value);
+  }
+  void load_couple(int i, int j, T value) { untested();
+    assert(_solver); return _solver->load_couple(i, j, value);
+  }
+  void load_symmetric(int i, int j, T value) { untested();
+    assert(_solver); return _solver->load_symmetric(i, j, value);
+  }
+  void load_asymmetric(int r1, int r2, int c1, int c2, T value) { untested();
+    assert(_solver); return _solver->load_asymmetric(r1, r2, c1, c2, value);
+  }
 
 public:
   BSMATRIX_DATA<T> const& data() const{ return *this; }
@@ -230,7 +238,11 @@ public:
   void iwant(int, int);
   void set_min_pivot(double x)	{assert(_solver); _solver->set_min_pivot(x);}
   void dezero(T const& o) { assert(_solver); _solver->dezero(o);}
-  T const& d(int r)const{ untested(); assert(_solver); return _solver->d(r); }
+  T const& d(int r)const{ untested();
+    BSMATRIX_SOLVER<T> const* s = _solver;
+    assert(s);
+    return s->d(r);
+  }
   void zero() { assert(_solver); _solver->zero(); }
 
 public: // "solve?"
@@ -246,6 +258,98 @@ public: // "solve?"
   }
   void fbsubt(T* v) const { untested(); assert(_solver); _solver->fbsubt(v); }
 }; // BSMATRIX
+/*--------------------------------------------------------------------------*/
+template <class T>
+class BSMATRIX_SOLVER {
+protected: // private?
+  BSMATRIX_DATA<T>& _data; // _aa, _acx and the like
+public:
+  explicit BSMATRIX_SOLVER(BSMATRIX<T>& m) : _data(m) {}
+  explicit BSMATRIX_SOLVER(BSMATRIX_SOLVER const&) = delete;
+  virtual ~BSMATRIX_SOLVER() { }
+public:
+  int  size()const { return _data.size(); }
+
+  virtual void init(int ss) = 0;
+  virtual void uninit() = 0;
+  virtual void iwant(int, int){} // LU_COPY
+  virtual void allocate() = 0;
+  virtual void unallocate() = 0;
+  virtual void dezero(T const& o);
+  virtual void set_min_pivot(double x) = 0;
+  virtual void set_changed(int n, bool x = true)const = 0;
+
+  virtual void lu_decomp(bool do_partial) = 0;
+  virtual void fbsub(T*) const { unreachable(); }
+  virtual void fbsub(T* x, const T* b, T* c = NULL) const = 0;
+  virtual void fbsubt(T*) const { unreachable(); }
+
+  T const& d(int r) const { itested();
+    return _data.d(r);
+  }
+  T const& s(int r, int c) const {
+    return _data.s(r, c);
+  }
+  virtual void zero() {
+    return _data.zero();
+  }
+
+protected: // matrix data xs
+  BSMATRIX_DATA<T> const& data_(BSMATRIX<T> const& d)const { untested();
+    return d.data();
+  }
+  BSMATRIX_DATA<T>& rw_data_(BSMATRIX<T>& d)const { untested();
+    return d.rw_data();
+  }
+  int lownode_(BSMATRIX_DATA<T> const& d, int r)const {
+    return d.lownode(r);
+  }
+  T const& u_(BSMATRIX_DATA<T> const& d, int r, int c)const {
+    return d.u_const(r,c);
+  }
+  T const& l_(BSMATRIX_DATA<T> const& d, int r, int c)const {
+    return d.l_const(r,c);
+  }
+  T const& m_(BSMATRIX_DATA<T> const& d, int r, int c)const {
+    return d.m(r,c);
+  }
+  T const& d_(BSMATRIX_DATA<T> const& d, int r)const {
+    return d.d_const(r);
+  }
+  T const& m(int r, int c)const {
+    return _data.m(r, c);
+  }
+
+private:
+  T& u(int r, int c) {
+    return _data.u(r, c);
+  }
+  T& l(int r, int c) {
+    return _data.l(r, c);
+  }
+  T& d(int r) {
+    return _data.d(r);
+  }
+  T& m(int r, int c) {
+    return _data.m(r, c);
+  }
+
+public: // load
+  virtual void load_diagonal_point(int i, T value);
+  virtual void load_point(int i, int j, T value);
+  virtual void load_couple(int i, int j, T value);
+  virtual void load_symmetric(int i, int j, T value);
+  virtual void load_asymmetric(int r1, int r2, int c1, int c2, T value);
+
+protected:
+  BSMATRIX_DATA<T> const& data() const { return _data; }
+
+protected: // non-const data xs for friends.
+  T& u_(BSMATRIX_DATA<T>& d, int r, int c) { return d.u(r,c); }
+  T& l_(BSMATRIX_DATA<T>& d, int r, int c) { return d.l(r,c); }
+  T& m_(BSMATRIX_DATA<T>& d, int r, int c) { return d.m(r,c); }
+  T& d_(BSMATRIX_DATA<T>& d, int r) { return d.d(r); }
+}; // BSMATRIX_SOLVER
 /*--------------------------------------------------------------------------*/
 // private implementations
 /*--------------------------------------------------------------------------*/
@@ -615,9 +719,10 @@ T const& BSMATRIX_DATA<T>::s(int row, int col)const
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-void BSMATRIX<T>::load_point(int i, int j, T value)
-{itested();
-  if (i > 0 && j > 0) {itested();
+void BSMATRIX_SOLVER<T>::load_point(int i, int j, T value)
+{
+  if (i > 0 && j > 0) {
+    // BUG only 1 change //
     set_changed(j);
     set_changed(i);
     m(i,j) += value;
@@ -627,7 +732,7 @@ void BSMATRIX<T>::load_point(int i, int j, T value)
 /*--------------------------------------------------------------------------*/
 // load_point(i, i, value);
 template <class T>
-void BSMATRIX<T>::load_diagonal_point(int i, T value)
+void BSMATRIX_SOLVER<T>::load_diagonal_point(int i, T value)
 {
   if (i > 0) {
     set_changed(i);
@@ -639,7 +744,7 @@ void BSMATRIX<T>::load_diagonal_point(int i, T value)
 // load_point(i, j, -value);
 // load_point(j, i, -value);
 template <class T>
-void BSMATRIX<T>::load_couple(int i, int j, T value)
+void BSMATRIX_SOLVER<T>::load_couple(int i, int j, T value)
 {
   if (j > 0) {
     set_changed(j);
@@ -658,7 +763,7 @@ void BSMATRIX<T>::load_couple(int i, int j, T value)
 // load_point(i, j, -value);	// load_couple(i, j, value);
 // load_point(j, i, -value);
 template <class T>
-void BSMATRIX<T>::load_symmetric(int i, int j, T value)
+void BSMATRIX_SOLVER<T>::load_symmetric(int i, int j, T value)
 {
   if (j > 0) {
     set_changed(j);
@@ -682,7 +787,7 @@ void BSMATRIX<T>::load_symmetric(int i, int j, T value)
 // load_point(r1, c2, -value);
 // load_point(r2, c1, -value);
 template <class T>
-void BSMATRIX<T>::load_asymmetric(int r1,int r2,int c1,int c2,T value)
+void BSMATRIX_SOLVER<T>::load_asymmetric(int r1,int r2,int c1,int c2,T value)
 {
   set_changed(c1);
   set_changed(c2);
@@ -811,77 +916,6 @@ void BSMATRIX_DATA<T>::fbsubt(T* v) const
   }
   v[1]/=d_const(1);
 }
-/*--------------------------------------------------------------------------*/
-template <class T>
-class BSMATRIX_SOLVER {
-protected: // private?
-  BSMATRIX_DATA<T>& _data; // _aa, _acx and the like
-public:
-  explicit BSMATRIX_SOLVER(BSMATRIX<T>& m) : _data(m) {}
-  explicit BSMATRIX_SOLVER(BSMATRIX_SOLVER const&) = delete;
-  virtual ~BSMATRIX_SOLVER() { }
-public:
-  int  size()const { return _data.size(); }
-
-  virtual void init(int ss) = 0;
-  virtual void uninit() = 0;
-  virtual void iwant(int, int){} // LU_COPY
-  virtual void allocate() = 0;
-  virtual void unallocate() = 0;
-  virtual void dezero(T const& o);
-  virtual void set_min_pivot(double x) = 0;
-  virtual void set_changed(int n, bool x = true)const = 0;
-
-  virtual void lu_decomp(bool do_partial) = 0;
-  virtual void fbsub(T*) const { unreachable(); }
-  virtual void fbsub(T* x, const T* b, T* c = NULL) const = 0;
-  virtual void fbsubt(T*) const { unreachable(); }
-
-  T const& d(int r) const { itested();
-    return _data.d(r);
-  }
-  T const& s(int r, int c) const {
-    return _data.s(r, c);
-  }
-  virtual void zero() {
-    return _data.zero();
-  }
-
-protected: // matrix data xs
-  BSMATRIX_DATA<T> const& data_(BSMATRIX<T> const& d)const { untested();
-    return d.data();
-  }
-  BSMATRIX_DATA<T>& rw_data_(BSMATRIX<T>& d)const { untested();
-    return d.rw_data();
-  }
-  int lownode_(BSMATRIX_DATA<T> const& d, int r)const {
-    return d.lownode(r);
-  }
-  T const& u_(BSMATRIX_DATA<T> const& d, int r, int c)const {
-    return d.u_const(r,c);
-  }
-  T const& l_(BSMATRIX_DATA<T> const& d, int r, int c)const {
-    return d.l_const(r,c);
-  }
-  T const& m_(BSMATRIX_DATA<T> const& d, int r, int c)const {
-    return d.m(r,c);
-  }
-  T const& d_(BSMATRIX_DATA<T> const& d, int r)const {
-    return d.d_const(r);
-  }
-  T const& m(int r, int c)const {
-    return _data.m(r, c);
-  }
-
-protected:
-  BSMATRIX_DATA<T> const& data() const { return _data; }
-
-protected: // non-const data xs for friends.
-  T& u_(BSMATRIX_DATA<T>& d, int r, int c) { return d.u(r,c); }
-  T& l_(BSMATRIX_DATA<T>& d, int r, int c) { return d.l(r,c); }
-  T& m_(BSMATRIX_DATA<T>& d, int r, int c) { return d.m(r,c); }
-  T& d_(BSMATRIX_DATA<T>& d, int r) { return d.d(r); }
-}; // BSMATRIX_SOLVER
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
