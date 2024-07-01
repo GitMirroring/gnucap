@@ -28,6 +28,7 @@
 #include "u_status.h"
 #include "declare.h"	/* gen */
 #include "s_tr.h"
+#include "e_card.h"
 /*--------------------------------------------------------------------------*/
 //	void	TRANSIENT::sweep(void);
 //	void	TRANSIENT::first(void);

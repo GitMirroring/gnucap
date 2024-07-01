@@ -29,6 +29,7 @@
 
 #include "globals.h"
 #include "e_cardlist.h"
+#include "e_card.h"
 #include "c_comand.h"
 /*--------------------------------------------------------------------------*/
 namespace {

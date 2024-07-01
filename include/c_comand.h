@@ -24,9 +24,10 @@
 //testing=trivial 2006.07.17
 #ifndef C_COMAND_H
 #define C_COMAND_H
-#include "e_card.h"
+#include "e_base.h"
 /*--------------------------------------------------------------------------*/
 class CS;
+class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CMD : public CKT_BASE {
 public:

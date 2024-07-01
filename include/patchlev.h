@@ -1,1 +1,1 @@
-#define PATCHLEVEL "build 2024.06.10"
+#define PATCHLEVEL "card 2024.07.01"

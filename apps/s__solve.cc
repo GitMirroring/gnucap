@@ -23,6 +23,7 @@
  */
 //testing=script 2006.07.14
 #include "e_cardlist.h"
+#include "e_card.h"
 #include "u_status.h"
 #include "e_logicnode.h"
 #include "s__.h"
