@@ -82,8 +82,6 @@ ${PWD}/constants.vams:
 ${PWD}/sub:
 	-${LN_S} ${srcdir}/sub
 
-include ${top_srcdir}/include/Make3
-
 symlinks: ${TEST_SYMLINKS:%=${PWD}/%}
 
 ${TEST_SYMLINKS:%=${PWD}/%} : ${PWD}/%:
