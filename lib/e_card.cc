@@ -24,6 +24,7 @@
 //testing=script 2014.07.04
 #include "u_time_pair.h"
 #include "e_cardlist.h"
+#include "u_prblst.h"
 #include "e_node.h"
 #include "e_card.h"
 /*--------------------------------------------------------------------------*/
@@ -53,6 +54,14 @@ CARD::~CARD()
 {
   // purge();
   delete _subckt;
+
+  if (_probes == 0) {
+  }else if (!_probe_lists) {untested();
+  }else if (!_sim) {untested();
+  }else{
+    _probe_lists->purge(this);
+  }
+  assert(_probes==0);
 }
 /*--------------------------------------------------------------------------*/
 void CARD::purge()

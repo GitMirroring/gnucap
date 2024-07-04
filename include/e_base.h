@@ -36,7 +36,6 @@ class PROBE_LISTS;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
 private:
-  mutable int	_probes;		/* number of probes set */
   std::string	_label;
 public:
   static SIM_DATA* _sim;
@@ -45,9 +44,9 @@ private:
   static INDIRECT<ATTRIB_LIST_p> _attribs;
   //--------------------------------------------------------------------
 protected: // create and destroy
-  explicit CKT_BASE()			  :_probes(0), _label() {}
-  explicit CKT_BASE(const std::string& s) :_probes(0), _label(s) {}
-  explicit CKT_BASE(const CKT_BASE& p)	  :_probes(0), _label(p._label) {}
+  explicit CKT_BASE()			  :_label() {}
+  explicit CKT_BASE(const std::string& s) :_label(s) {}
+  explicit CKT_BASE(const CKT_BASE& p)	  :_label(p._label) {}
   virtual  ~CKT_BASE();
   virtual void	      purge() {}
   //--------------------------------------------------------------------
@@ -72,9 +71,9 @@ public: // probes
 	  double      ac_probe_num(const std::string&)const;
   virtual double      tr_probe_num(const std::string&)const;
   virtual XPROBE      ac_probe_ext(const std::string&)const;
-	  void	      inc_probes()const	{++_probes;}
-	  void	      dec_probes()const	{assert(_probes>0); --_probes;}
-	  bool	      has_probes()const	{return _probes > 0;}
+  virtual void	      inc_probes()const {unreachable();}
+  virtual void	      dec_probes()const {unreachable();}
+  virtual bool	      has_probes()const {unreachable(); return false;}
   virtual double      noise_num(const std::string&)const;
   static  double      probe(const CKT_BASE*,const std::string&);
   static  WAVE*	      find_wave(const std::string& probe_name);
