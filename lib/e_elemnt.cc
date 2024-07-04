@@ -86,6 +86,7 @@ void ELEMENT::set_value(double v, COMMON_COMPONENT* c)
 /*--------------------------------------------------------------------------*/
 int ELEMENT::set_param_by_name(std::string Name, std::string Value)
 {
+  trace3("ELEMENT::spbn", Name, value_name(), Value);
   if(Name == value_name()){
     _value = Value;
     return ELEMENT::param_count() - 1; // BUG?
@@ -176,7 +177,9 @@ bool ELEMENT::skip_dev_type(CS& cmd)
 void ELEMENT::precalc_last()
 {
   COMPONENT::precalc_last();
+  trace3("ELEMENT::precalc_last", long_label(), _value, _value.string());
   _value.e_val(0.,scope());
+  trace3("ELEMENT::precalc_last", long_label(), _value, _value.string());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_begin()
