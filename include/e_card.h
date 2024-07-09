@@ -42,6 +42,7 @@ private:
   CARD_LIST*	_subckt;
   CARD* 	_owner;
   bool		_constant;	// eval stays the same every iteration
+  mutable int   _probes{0};
 protected:
   node_t*	_n;
 public:
@@ -102,6 +103,10 @@ public:	// state, aux data
 
   void	set_constant(bool c)	{_constant = c;}
   bool	is_constant()const	{return _constant;}
+
+  void  inc_probes()const override {++_probes;}
+  void  dec_probes()const override {assert(_probes>0); --_probes;}
+  bool  has_probes()const override {return _probes > 0;}
   //--------------------------------------------------------------------
 public: // owner, scope
   virtual CARD_LIST*	   scope();

@@ -42,16 +42,6 @@ PROBE_LISTS* CKT_BASE::_probe_lists = NULL;
 /*--------------------------------------------------------------------------*/
 CKT_BASE::~CKT_BASE()
 {
-  trace1("~CKT_BASE", _probes);
-  if (_probes == 0) {
-  }else if (!_probe_lists) {untested();
-  }else if (!_sim) {untested();
-  }else{
-    _probe_lists->purge(this);
-  }
-  trace1("", _probes);
-  assert(_probes==0);
-
   if (has_attributes(id_tag())) {untested();
     unreachable();    // needs purge();
     erase_attributes(id_tag());

@@ -26,6 +26,7 @@
 #include "e_card.h"
 #include "u_nodemap.h"
 #include "e_aux.h"
+#include "u_prblst.h"
 #include "u_xprobe.h"
 #include "e_logicnode.h"
 /*--------------------------------------------------------------------------*/
@@ -218,5 +219,15 @@ void node_t::map_subckt_node(int* m, const CARD* d)
   assert(node_is_valid(_ttt));
 }
 /*--------------------------------------------------------------------------*/
+NODE::~NODE()
+{
+  if (_probes == 0) {
+  }else if (!_probe_lists) {untested();
+  }else if (!_sim) {untested();
+  }else{ untested();
+    _probe_lists->purge(this);
+  }
+  assert(_probes==0);
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

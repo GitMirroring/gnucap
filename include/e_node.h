@@ -41,6 +41,7 @@ private:
   int	_user_number;
   //int	_flat_number;
   //int	_matrix_number;
+  mutable int _probes{0};
 protected:
   explicit NODE();
 private: // inhibited
@@ -48,7 +49,7 @@ private: // inhibited
 public:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
   explicit NODE(const std::string& s, int n);
-  ~NODE() {}
+  ~NODE();
 
 public: // raw data access (rvalues)
   int	user_number()const	{return _user_number;}
@@ -87,6 +88,11 @@ public: // virtuals
     assert(m_() <= _sim->_total_nodes);
     return _sim->_ac[m_()];
   }
+
+public: // probes
+  void  inc_probes()const override {++_probes;}
+  void  dec_probes()const override {assert(_probes>0); --_probes;}
+  bool  has_probes()const override {untested();return _probes > 0;}
 };
 extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
