@@ -242,8 +242,9 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	try{
 	  int Index = x->set_port_by_name(Name, value);
 	  store_attributes(attribs,  x->port_id_tag(Index));
-	}catch (Exception_No_Match&) {untested();
+	}catch (Exception_No_Match&) {
 	  cmd.warn(bDANGER, here, x->long_label() + ": mismatch " + Name + " ignored");
+	  trace2("ignored", Name, x->net_nodes());
 	}catch (Exception_Clash&) {untested();
 	  cmd.warn(bDANGER, here, x->long_label() + ": already set " + Name + ", ignored");
 	}
@@ -506,11 +507,14 @@ void LANG_VERILOG::print_ports_long(OMSTREAM& o, const COMPONENT* x)
 
   o << " (";
   std::string sep = "";
-  for (int ii = 0;  x->port_exists(ii);  ++ii) {
-    o << sep;
-    print_attributes(o, x->port_id_tag(ii));
-    o << '.' << x->port_name(ii) << '(' << x->port_value(ii) << ')';
-    sep = ',';
+  for (int ii = 0;  ii < x->net_nodes();  ++ii) {
+    if(x->node_is_connected(ii)) {
+	o << sep;
+	print_attributes(o, x->port_id_tag(ii));
+	o << '.' << x->port_name(ii) << '(' << x->port_value(ii) << ')';
+	sep = ',';
+    }else{
+    }
   }
   for (int ii = 0;  x->current_port_exists(ii);  ++ii) {untested();
     o << sep;

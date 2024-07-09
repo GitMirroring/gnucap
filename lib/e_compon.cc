@@ -459,6 +459,7 @@ bool COMPONENT::node_is_connected(int i)const
 /*--------------------------------------------------------------------------*/
 int COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
 {
+  trace3("spbn", int_name, ext_name, net_nodes());
   for (int i=0; i<max_nodes(); ++i) {
     if (int_name == port_name(i)) {
       set_port_by_index(i, ext_name);
@@ -466,8 +467,9 @@ int COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
     }else{
     }
   }
-  itested();
-  throw Exception_No_Match(int_name);
+  {
+    throw Exception_No_Match(int_name);
+  }
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_port_by_index(int num, std::string& ext_name)
