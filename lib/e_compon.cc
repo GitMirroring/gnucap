@@ -491,7 +491,7 @@ void COMPONENT::set_port_to_ground(int num)
     _n[num].set_to_ground(this);
     if (num+1 > _net_nodes) {
       _net_nodes = num+1;
-    }else{untested();
+    }else{
     }
   }else{untested();
     throw Exception_Too_Many(num+1, max_nodes(), 0/*offset*/);
