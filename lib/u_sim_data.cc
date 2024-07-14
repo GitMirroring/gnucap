@@ -26,6 +26,7 @@
 #include "e_logicnode.h"
 #include "u_nodemap.h"
 #include "e_cardlist.h"
+#include "u_prblst.h"
 #include "u_status.h"
 /*--------------------------------------------------------------------------*/
 SIM_DATA::SIM_DATA()
@@ -270,6 +271,7 @@ void SIM_DATA::init(CARD_LIST* scope)
   }else{
     scope->precalc_first();
   }
+  restore_probes();
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_hold_vectors:
@@ -295,6 +297,12 @@ void SIM_DATA::alloc_hold_vectors()
 
   assert(_nstat);
   assert(_vdc);
+}
+/*--------------------------------------------------------------------------*/
+void SIM_DATA::restore_probes()
+{
+  assert(CKT_BASE::_probe_lists);
+  CKT_BASE::_probe_lists->restore(&CARD_LIST::card_list);
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_vectors:
@@ -345,6 +353,8 @@ void SIM_DATA::unalloc_vectors()
  */
 void SIM_DATA::uninit()
 {
+  CKT_BASE::_probe_lists->store_();
+
   if (_vdc) {
     _acx.reinit(0);
     _lu.reinit(0);
