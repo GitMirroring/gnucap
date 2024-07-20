@@ -541,6 +541,12 @@ void COMPONENT::deflate_common()
 /*--------------------------------------------------------------------------*/
 void COMPONENT::expand()
 {
+  for(int i = 0; i < min_nodes(); ++i){
+    if(!_n[i].is_connected()){
+      throw Exception(long_label() + ": invalid nodes");
+    }else{
+    }
+  }
   CARD::expand();
   if (has_common()) {
     COMMON_COMPONENT* new_common = common()->clone();
