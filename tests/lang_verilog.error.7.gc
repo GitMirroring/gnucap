@@ -11,7 +11,6 @@ resistor #(r) R1 (a b);
 endmodule
 
 module foo (vcc in out);
-// ground 0 // todo
 parameter real z=10k;
 parameter real r;
 resistor      #(.r(z))         Rc   (.p(c), .n(vcc));
@@ -20,9 +19,9 @@ dumb_resistor #(.r(abs(-z)/10) Re   (e 0);
 resistor      #(.r(100k))      Rb1  (b vcc);
 dumb_resistor #(.r(r))         Rb2  (b 0);
 capacitor     #(.c(1u))        Cin  (b in vcc);
-capacitor     #(.c(1u))        Cout (c, 0);
+capacitor     #(.c(1u))        Cout (c);
 resistor      #(.r(100k))      Rin  (in 0 vcc);
-resistor      #(.r(100k))      Rout (out, 0);
+resistor      #(.r(100k))      Rout (out);
 endmodule
 
 foo      #(.r(10k))         X1   (V_cc amp_in out);
