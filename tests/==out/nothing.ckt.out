@@ -24,5 +24,5 @@ function ----- last -- total
      total     0.00     0.00
 iterations: op=0, dc=0, tran=0, fourier=0, total=0
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=0, subckt=0, model=0, total=0
+nodes: user=0, module=0, model=0, logic=0, matrix=0, total=0
 dctran density=0.0%, ac density=0.0%

@@ -250,7 +250,7 @@ static void make_device(std::ofstream& out, const Device& d)
     "  void      precalc_first()override {COMPONENT::precalc_first(); if(subckt()) subckt()->precalc_first();}\n"
     "  void      expand()override;\n"
     "  void      precalc_last()override;\n"
-    "  //void    map_nodes();         //BASE_SUBCKT\n"
+    "  void      map_nodes()override;\n"
     "  //void    tr_begin();          //BASE_SUBCKT\n"
     "  //void    tr_restore();        //BASE_SUBCKT\n";
   if (d.tr_eval().is_empty()) {
@@ -280,6 +280,9 @@ static void make_device(std::ofstream& out, const Device& d)
     "  //void    do_ac();             //BASE_SUBCKT\n"
     "  //void    ac_load();           //BASE_SUBCKT\n"
     "  //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing\n"
+    "public:\n"
+    "  CARD_LIST* scope()override;\n"
+    "  CARD_LIST const* scope()const override;\n"
     "public:\n"
     "  static int  count() {return _count;}\n"
     "public: // may be used by models\n";
@@ -341,13 +344,17 @@ static void make_device(std::ofstream& out, const Device& d)
        ++p) {
     out << ", n_" << (**p).name();
   }
-  size_t total_nodes = d.circuit().req_nodes().size() + d.circuit().opt_nodes().size()
-    + d.circuit().local_nodes().size();
+  size_t port_nodes = d.circuit().req_nodes().size() + d.circuit().opt_nodes().size();
+  size_t total_nodes = port_nodes + d.circuit().local_nodes().size();
   out << "};\n"
-    "  node_t _nodes[" << total_nodes << "];\n"
+    "  node_t _n[" << total_nodes << "];\n"
+    "  node_t const& n_(int i)const override {assert(i<"<<total_nodes<<"); return _n[i];}\n"
+    "  node_t& node(int i)override {assert(i<"<<total_nodes<<"); return _n[i];}\n"
+    "  NODE_P& ni(int i);\n"
     "  std::string port_name(int i)const override {\n"
     "    assert(i >= 0);\n"
-    "    assert(i < " << d.circuit().req_nodes().size() + d.circuit().opt_nodes().size() << ");\n"
+    "    assert(i < " << port_nodes << ");\n"
+	 " // TODO: ask nodemap\n"
     "    static std::string names[] = {";
   for (Port_List::const_iterator
 	 p = d.circuit().req_nodes().begin();

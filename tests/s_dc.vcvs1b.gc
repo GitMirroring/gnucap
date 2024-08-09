@@ -1,5 +1,7 @@
 verilog
 
+ground 0
+
 param ee 3
 
 module vcvs_(1 2 3 4)

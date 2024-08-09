@@ -33,7 +33,9 @@
 class WAVE;
 class CARD;
 class CARD_LIST;
-class LOGIC_NODE;
+class NODE;
+class MATRIX_NODE;
+class LOGIC_NODE; // BUG
 /*--------------------------------------------------------------------------*/
 enum TRI_STATE {tsNO=0, tsYES=1, tsBAD=-1};
 /*--------------------------------------------------------------------------*/
@@ -49,10 +51,22 @@ struct INTERFACE SIM_DATA {
   double _last_time;	/* time at which "volts" is valid */
   bool _freezetime;	/* flag: don't advance stored time */
   int _iter[iCOUNT];
-  int _user_nodes;
-  int _subckt_nodes;
-  int _model_nodes;
-  int _total_nodes;
+private:
+  int _user_nodes{0};      // number of nodes at top level aka $root.
+  int _logic_nodes{0};     // number of LOGIC_NODEs.
+  int _module_nodes{0};    // number of module internal nodes
+  int _model_nodes{0};     // counting unmapped nodes (does it?)
+  int _matrix_nodes{0};     // number of electrical/matrix nodes.
+public:
+  int user_nodes()const   {return  _user_nodes;  }   // number of nodes at top level aka $root.
+  int logic_nodes()const  {return  _logic_nodes; }   // number of LOGIC_NODEs.
+  int module_nodes()const {return  _module_nodes;}
+  int model_nodes()const  {return  _model_nodes; }
+ // int total_nodes()const  {return  _total_nodes; }   // misleading. only matrix nodes.
+  int matrix_nodes()const {
+            assert(_matrix_nodes == int(_mstat.size()));
+            return int(_mstat.size()); }  // number of electrical/matrix nodes.
+  int total_nodes()const { return matrix_nodes(); } // remove?
   COMPLEX _jomega;	/* AC frequency to analyze at (radians) */
   bool _limiting;	/* flag: node limiting */
   double _vmax;
@@ -68,7 +82,7 @@ struct INTERFACE SIM_DATA {
 			/*  used to restore after rejected step	*/
   COMPLEX *_ac;		/* ac right side			*/
   COMPLEX *_noise;	/* noise vector				*/
-  LOGIC_NODE* _nstat;	/* digital data				*/
+  std::vector<MATRIX_NODE const*> _mstat; /* matrix nodes       */
   double *_vdc;		/* saved dc voltages			*/
   BSMATRIX<double> _aa;	/* raw matrix for DC & tran */
   BSMATRIX<double> _lu;	/* decomposed matrix for DC & tran */
@@ -85,9 +99,11 @@ struct INTERFACE SIM_DATA {
   SIM_MODE _has_op;
   SIM_DATA();
   ~SIM_DATA();
-  bool is_first_expand() {return !_nstat;}
+  bool is_first_expand() {return !_vdc;}
   void alloc_hold_vectors(); /* s__init.cc */
   void alloc_vectors();
+  void map_subckt_nodes(CARD_LIST* scope);
+  void deflate_nodes(CARD_LIST* scope);
   void unalloc_vectors();
   void init(CARD_LIST* scope);
   void uninit();
@@ -102,11 +118,20 @@ struct INTERFACE SIM_DATA {
   void order_reverse();
   void order_forward();
   void order_auto();
-  int init_node_count(int user, int sub, int mod) {
-    _user_nodes=user; _subckt_nodes=sub; _model_nodes=mod; return (_total_nodes=user+sub+mod);
+  void init_node_count(int user, int sub, int mod) {
+    _user_nodes=user; _module_nodes=sub; _model_nodes=mod;
+    // assert(_mstat.empty()); d_mos1.bin1.ckt
+    _logic_nodes = 0;
+    _matrix_nodes = 0;
   }
-  int newnode_subckt() {++_subckt_nodes; return ++_total_nodes;}
-  int newnode_model()  {++_model_nodes;  return ++_total_nodes;}
+  int newnode_matrix() {return _matrix_nodes++;}
+  NODE* newnode_matrix(NODE const*);
+  NODE* newnode_matrix(CARD*);
+  int newnode_module() {return _module_nodes++;}
+  int newnode_model()  {return _model_nodes++;}
+  int newnode_user()   {return _user_nodes++;}
+  int newnode_logic()  {return _logic_nodes++;}
+
   bool is_inc_mode()	 {return _inc_mode;}
   bool inc_mode_is_no()	 {return _inc_mode == tsNO;}
   bool inc_mode_is_bad() {return _inc_mode == tsBAD;}

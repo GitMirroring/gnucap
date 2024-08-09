@@ -34,5 +34,5 @@ Mutual inductance test circuit  --  lo-z drive
 Gnucap   System status
 iterations: op=0, dc=0, tran=467, fourier=0, total=610
 transient timesteps: accepted=122, rejected=3, total=125
-nodes: user=12, subckt=0, model=3, total=15
+nodes: user=12, module=0, model=0, logic=0, matrix=15, total=15
 dctran density=37.8%, ac density=37.8%

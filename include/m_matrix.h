@@ -113,6 +113,14 @@
 /*--------------------------------------------------------------------------*/
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
+namespace{
+struct BSMATRIX_WARN {
+  virtual void operator()(int mm)const {
+    error(bWARNING, "open circuit: internal node %u\n", mm);
+  }
+}default_warn;
+}
+/*--------------------------------------------------------------------------*/
 template <class T>
 class BSMATRIX {
 private:
@@ -164,8 +172,9 @@ public:
   void		load_symmetric(int i, int j, T value);
   void		load_asymmetric(int r1, int r2, int c1, int c2, T value);
   
-  void		lu_decomp(const BSMATRIX<T>&, bool do_partial);
-  void		lu_decomp();
+  void		lu_decomp(const BSMATRIX<T>&, bool do_partial,
+                      BSMATRIX_WARN const* w = &default_warn);
+  void		lu_decomp(BSMATRIX_WARN const* w = &default_warn);
   void		fbsub(T* v) const;
   void		fbsub(T* x, const T* b, T* c = NULL) const;
   void		fbsubt(T* v) const;
@@ -645,7 +654,8 @@ void BSMATRIX<T>::load_asymmetric(int r1,int r2,int c1,int c2,T value)
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial)
+void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial,
+    BSMATRIX_WARN const* warn)
 {
   int prop = 0;   /* change propagation indicator */
   assert(_lownode);
@@ -672,7 +682,7 @@ void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial)
 	{ /* jj == mm */
 	  /* d(mm,mm) = aa.d(mm,mm) - dot(mm,mm,mm); then test */
 	  if (subtract_dot_product(mm,mm,mm,aa.d(mm,mm)) == 0.) {
-	    error(bWARNING, "open circuit: internal node %u\n", mm);
+	    (*warn)(mm);
 	    d(mm,mm) = _min_pivot;
 	  }else{
 	  }
@@ -690,7 +700,7 @@ void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial)
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-void BSMATRIX<T>::lu_decomp()
+void BSMATRIX<T>::lu_decomp(BSMATRIX_WARN const* warn)
 {
   assert(_lownode);
   for (int mm = 1;   mm <= size();   ++mm) {
@@ -708,7 +718,7 @@ void BSMATRIX<T>::lu_decomp()
       { /* jj == mm */
 	/* m(mm,mm) -= dot(mm,mm,mm); then test */
 	if (subtract_dot_product(mm,mm,mm) == 0.) {itested();
-	  error(bWARNING, "open circuit: internal node %u\n", mm);
+	  (*warn)(mm);
 	  d(mm,mm) = _min_pivot;
 	}else{
 	}

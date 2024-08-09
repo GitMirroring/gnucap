@@ -40,6 +40,7 @@ class MODEL_CARD;
 class CS;
 class ELEMENT;
 class CARD_LIST;
+class node_t;
 /*--------------------------------------------------------------------------*/
 inline bool conchk(double o, double n,
 		   double a=OPT::abstol, double r=OPT::reltol)
@@ -58,6 +59,8 @@ enum {CC_STATIC=27342}; // mid-sized arbitrary positive int
 // so it won't be deleted
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_COMPONENT : public CKT_BASE {
+private:
+  std::string _label;
 protected: // probably obsolete
   PARAMETER<double>	_tnom_c;  // specification temperature
   PARAMETER<double>	_dtemp;   // rise over enclosing temperature
@@ -71,6 +74,10 @@ public:
   static void attach_common(COMMON_COMPONENT* c, COMMON_COMPONENT** to);
   static void detach_common(COMMON_COMPONENT** from);
   bool is_shared()const {return _attach_count > 1;}
+public:	// label -- in CKT_BASE
+  /*virtual*/ std::string long_label()const final {return _label;}
+  std::string const& short_label()const final override {return _label;}
+  void	set_label(const std::string& s)final {_label=s;}
 private:
   COMMON_COMPONENT& operator=(const COMMON_COMPONENT&)
 			      {unreachable(); return *this;}
@@ -277,7 +284,7 @@ public: // parameters
   virtual void set_parameters(const std::string& Label, CARD* Parent,
 			      COMMON_COMPONENT* Common, double Value,
 			      int state_count, double state[],
-			      int node_count, const node_t nodes[]);
+			      int node_count, const NODE_P nodes[]);
 private: // implementation
   int set_hsparam(std::string const&, std::string const&);
   HS_PARAM& hsparam();

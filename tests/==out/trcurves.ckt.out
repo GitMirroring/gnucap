@@ -73,5 +73,5 @@ TRANSFER curve tracer, ig-spice
 Gnucap   System status
 iterations: op=0, dc=346, tran=0, fourier=0, total=353
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=6, subckt=0, model=4, total=10
+nodes: user=6, module=4, model=0, logic=0, matrix=10, total=10
 dctran density=76.0%, ac density=76.0%

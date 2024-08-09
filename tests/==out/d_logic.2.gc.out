@@ -1,9 +1,9 @@
 #           v(1)       v(2)       v(3)       v(4)       v(5)       v(6)       v(7)       v(8)       logic(1)   logic(2)   logic(3)   logic(4)   logic(5)   logic(6)   logic(7)   logic(8)  
- 27.        0.         5.         66.926n    5.         66.926n    5.         66.926n    5.         0.01       3.01       0.01       3.01       0.01       3.01       0.01       4.21      
+ 27.        0.         5.         66.926n    5.         66.926n    5.         66.926n    5.         0.01       3.01       0.01       3.01       0.01       3.01       0.01       0.        
 Gnucap   System status
 iterations: op=12, dc=0, tran=0, fourier=0, total=12
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=8, subckt=6, model=0, total=14
+nodes: user=8, module=0, model=0, logic=7, matrix=14, total=14
 dctran density=56.1%, ac density=56.1%
 .model mos logic ( delay=1n vmax=5. vmin=0. unknown=NA( 2.5) rise=1n fall=1n rs=100. rw=1.G thh=0.75 thl=0.25 mr=5. mf=5. over=10k tnom=NA( 27.))
 Vdd ( 8 0 )  DC  5.
@@ -24,6 +24,7 @@ M2 ( 2 3 1 1 )  pmos  l=100.u w=100.u nrd=1. nrs=1.
 *'.option trace 
 *'.print tran v(nodes) l(nodes) 
 *'.tran 0 10 .05 
+
 paramset mos logic;
  .delay=1n; .vmax=5.; .vmin=0.; .unknown=NA( 2.5); .rise=1n; .fall=1n; .rs=100.; .rw=1.G; .thh=0.75; .thl=0.25; .mr=5.; .mf=5.; .over=10k; .tnom=NA( 27.);
 endparamset
@@ -36,6 +37,7 @@ inv #(.model(mos)) U4 (.out(4),.in1(3));
 inv #(.model(mos)) U5 (.out(5),.in1(4));
 inv #(.model(mos)) U6 (.out(6),.in1(5));
 inv #(.model(mos)) U7 (.out(7),.in1(6));
+
 module mosinv1 (2,3);
 vsource #( DC  5.) Vdd (.p(1),.n(0));
 nmos #(.l(100.u),.w(100.u),.nrd(1.),.nrs(1.)) M1 (.d(2),.g(3),.s(0),.b(0));

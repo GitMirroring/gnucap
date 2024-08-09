@@ -74,5 +74,5 @@ r3: short circuit
 Gnucap   System status
 iterations: op=0, dc=0, tran=9, fourier=0, total=29
 transient timesteps: accepted=7, rejected=0, total=7
-nodes: user=1, subckt=0, model=0, total=1
+nodes: user=1, module=0, model=0, logic=0, matrix=1, total=1
 dctran density=100.0%, ac density=100.0%

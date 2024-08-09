@@ -45,8 +45,14 @@ protected: // override virtual
   //CARD* clone()const			//CARD/null
   //void  precalc_first()	{assert(subckt()); subckt()->precalc();}
   //void  expand()			//COMPONENT
+  void  expand_first()override;
+  void  setup_nodes();
+  void  expand_ports_first();
+  void  expand_ports();
+  void  expand_nodes();
+  void  expand_model_nodes();
   //void  precalc_last()	{assert(subckt()); subckt()->precalc();}
-  //void  map_nodes();
+  void	  map_nodes()override;
   void	  tr_begin()override	{assert(subckt()); subckt()->tr_begin();}
   void	  tr_restore()override	{assert(subckt()); subckt()->tr_restore();}
   void	  dc_advance()override	{assert(subckt()); subckt()->dc_advance();}
@@ -65,6 +71,20 @@ protected: // override virtual
   void	  do_ac()override	{assert(subckt()); subckt()->do_ac();}
   void	  ac_load()override	{assert(subckt()); subckt()->ac_load();}
   double  noise_num(std::string const& n)const override {itested(); assert(subckt()); return subckt()->noise_num(n);}
+
+public:
+  NODE* new_logic_node(NODE const* proto)override {
+    NODE* l = CARD::new_logic_node(proto);
+    _sim->newnode_module(); // bump module node counter.
+    return l;
+   // assert(prechecked_cast<LOGIC_NODE*>(l));
+   // return prechecked_cast<LOGIC_NODE*>(l);
+  }
+  NODE* new_matrix_node(NODE const* proto)override {
+    NODE* l = CARD::new_matrix_node(proto);
+    CKT_BASE::_sim->newnode_module(); // bump module node counter.
+    return l;
+  }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -1,0 +1,12 @@
+verilog
+
+ground 0
+ground x
+
+vsource #(.dc(1)) v(1, 0);
+vsource #(.dc(1)) v(2, x);
+
+list
+print dc v(nodes)
+dc
+status notime
