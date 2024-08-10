@@ -43,7 +43,7 @@ NODE::NODE(const NODE* p) : CKT_BASE(*p)
   assert(p);
   if(p){
     _user_number = p->_user_number;
-  }else{
+  }else{ untested();
     // hmm anonymous matrix node.
     _user_number = -1;
   }
@@ -106,19 +106,6 @@ node_t& node_t::operator=(const NODE_P& p)
   return *this;
 }
 /*--------------------------------------------------------------------------*/
-NODE const& NODE_P::data() const
-{
-  CONST_NODE_PS nn(this);
-  assert(nn.is_node());
-  return *nn.node();
-}
-/*--------------------------------------------------------------------------*/
-NODE& NODE_P::data()
-{
-  NODE_PS nn(this);
-  assert(nn.is_node());
-  return *nn.node();
-}
 /*--------------------------------------------------------------------------*/
 double NODE::tr_probe_num(const std::string& x)const
 {
@@ -128,7 +115,7 @@ double NODE::tr_probe_num(const std::string& x)const
     return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {
     return port_impedance(node_t(const_cast<NODE*>(this)), node_t(&ground_node), _sim->_lu, 0.);
-  }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) {
+  }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) { untested();
     incomplete();
 //    assert(_sim->_nstat);
 //    return _sim->_nstat[matrix_number()].tr_probe_num(x);
@@ -170,7 +157,7 @@ XPROBE NODE::ac_probe_ext(const std::string& x)const
   }else if (Umatch(x, "z ")) {
     return XPROBE(port_impedance(node_t(const_cast<NODE*>(this)),
  				 node_t(&ground_node), _sim->_acx, COMPLEX(0.)));
-  }else{
+  }else{ untested();
     return CKT_BASE::ac_probe_ext(x);
   }
 }
@@ -206,8 +193,7 @@ void NODE_P::set_to_ground(CARD const* d)
   //assert(!_nnn); //BUG// fails on MUTUAL_L::expand after clone
 
   if(is_link()){ untested();
-    NODE_PS n(this);
-    n.set_to_ground(d);
+    root().set_to_ground(d);
     assert(is_grounded());
   }else if(is_none()){
     // naked ground. formerly taken from d->scope()->nodes();
@@ -271,11 +257,11 @@ NODE_P& NODE_P::new_model_node(const std::string& node_name, CARD* d)
  //   set_own(d->new_matrix_node(NULL));
  // }else
   if(cl) {
-    if(is_none()) {
+    if(is_none()) { untested();
       assert(!is_number());
       // create anonymous node
       incomplete();
-    }else if(is_node()) {
+    }else if(is_node()) { untested();
       assert(dynamic_cast<USER_NODE const*>(n_()));
     }else{
       incomplete();
@@ -324,9 +310,9 @@ NODE_P& NODE_P::set_to(NODE_P& n, CARD* c)
   operator=(n);
   return *this;
 
-  if(is_none()) {
+  if(is_none()) { untested();
     set_io_link();
-  }else{
+  }else{ untested();
   }
   set_next(&n);
   return *this;
@@ -359,7 +345,7 @@ void NODE_P::req_type(int t)
       incomplete();
 
     }
-  }else{
+  }else{ untested();
     unreachable();
   }
 }
@@ -382,10 +368,10 @@ void NODE_P::map_subckt_node(NODE_P* m, CARD const* d)
     // assert(n_() == m[u].n_());
     // re-run? clear type?
     set_node(m[u].n_());
-  }else if(!d && is_link() && next()->is_node()) {
-    if(next()->n_() == m[u].n_()){
+  }else if(!d && is_link() && next()->is_node()) { untested();
+    if(next()->n_() == m[u].n_()){ untested();
       incomplete(); // ?
-    }else{
+    }else{ untested();
       incomplete(); // ?
       unreachable();
     }
@@ -406,14 +392,14 @@ void NODE_P::map_subckt_node(NODE_P* m, CARD const* d)
     auto un = prechecked_cast<USER_NODE*>(m[u].n_());
     assert(un);
     *this = m[u];
-  }else if(n_()){
+  }else if(n_()){ untested();
     assert(d);
     throw Exception(d->long_label() + ": need more nodes");
     incomplete(); // modelgen?
 		  unreachable(); // d_subckt.error3.ckt?
-  }else if(d){
+  }else if(d){ untested();
     throw Exception(d->long_label() + ": need more nodes");
-  }else{
+  }else{ untested();
     unreachable();
     // top level?
     incomplete();
@@ -426,8 +412,8 @@ void NODE_P::expand(CARD* owner)
 {
   if(is_node()) {
  //   n_()->expand(); // (_conn, NULL);
-  }else if(is_link()) {
-  }else{
+  }else if(is_link()) { untested();
+  }else{ untested();
     unreachable();
   }
 
@@ -439,14 +425,14 @@ void NODE_P::expand(CARD* owner)
 NODE_P& NODE_P::map()
 {
   if(!is_link()){
-  }else if(this == next()){
+  }else if(this == next()){ untested();
     incomplete();
   }else{
     trace2("NODE_P::map", this, next());
-    NODE_PS t(this);
+    NODE_P& t = root();
     if(t.is_node()){
-      set_node(t.root().n_());
-    }else{
+      set_node(t.n_());
+    }else{ untested();
       // assert(t.is_link());
      // assert(t.next() == t);?
     }
@@ -463,19 +449,19 @@ NODE_P& NODE_P::map()
      //  assert(user_number == n_()->user_number());
     }else{
     }
-  }else{
+  }else{ untested();
   }
 
   return *this;
 }
 /*--------------------------------------------------------------------------*/
 void NODE_P::deflate(CARD* owner)
-{
-  if(!owner){
+{ untested();
+  if(!owner){ untested();
     unreachable();
     assert(!is_own_node());
     // need to retain user node.
-  }else{
+  }else{ untested();
     unreachable();
   }
 
@@ -483,19 +469,19 @@ void NODE_P::deflate(CARD* owner)
     assert(!type());
     incomplete();
     return;
-  }else{
+  }else{ untested();
   }
 
   assert(n_());
   NODE* nn = n_()->deflate(this /*??*/, owner);
 
-  if(!owner){
+  if(!owner){ untested();
     auto un = prechecked_cast<USER_NODE*>(n_());
     assert(un);
     assert(nn!=un);
     unreachable();
     // un->set(nn);
-  }else{
+  }else{ untested();
   }
 
   if(is_own_node()){ untested();
@@ -524,12 +510,12 @@ void NODE_P::deflate(CARD* owner)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void GROUND_NODE::connect(NODE_P*to)
-{
+{ untested();
   USER_NODE::connect(to);
 
-  if(auto n = dynamic_cast<USER_NODE*>(to->n_())){
+  if(auto n = dynamic_cast<USER_NODE*>(to->n_())){ untested();
     n->set_ground();
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -571,28 +557,9 @@ NODE_P& NODE_P::merge(NODE_P* o)
   return *this;
 }
 /*--------------------------------------------------------------------------*/
-int CONST_NODE_PS::type() const
-{
-  assert(_root);
-  return _root->type();
-}
-/*--------------------------------------------------------------------------*/
-bool CONST_NODE_PS::is_grounded() const
-{
-  assert(_root);
-  if(_root->is_node()){
-    return _root->n_()->is_grounded();
-  }else if(_root->is_link()){
-    return _root->is_ground();
-  }else{ untested();
-    return false;
-  }
-
-}
-/*--------------------------------------------------------------------------*/
 #if 0
 NODE_PS& NODE_PS::add(NODE_P* n)
-{
+{ untested();
   assert(n);
   assert(n->is_link());
   NODE_PS o(n);
@@ -601,10 +568,10 @@ NODE_PS& NODE_PS::add(NODE_P* n)
 }
 /*--------------------------------------------------------------------------*/
 NODE* USER_NODE::more() const
-{
-  if(!_connections){
+{ untested();
+  if(!_connections){ untested();
     return NULL;
-  }else{
+  }else{ untested();
     return _connections->n_();
   }
 }
@@ -615,14 +582,14 @@ NODE::~NODE()
   if (_probes == 0) {
   }else if (!_probe_lists) {untested();
   }else if (!_sim) {untested();
-  }else{
+  }else{ untested();
     _probe_lists->purge(this);
   }
   assert(_probes==0);
 }
 /*--------------------------------------------------------------------------*/
 NODE* NODE::deflate(NODE_P*, CARD*)
-{
+{ untested();
   unreachable();
   // re-run.
   incomplete();
@@ -647,7 +614,7 @@ node_t& node_t::map()
   if(is_node()) { // is connected?
     assert(n_());
     _m = n_()->matrix_number(); // leave it to NODE
-  }else{
+  }else{ untested();
     // unreachable();
     // not used.
   }
@@ -655,10 +622,10 @@ node_t& node_t::map()
 #if 0
   if (dynamic_cast<GROUND_NODE const*>(n_())){ // BUG.
     _m = 0;
-  }else if (t_() != INVALID_NODE) {
+  }else if (t_() != INVALID_NODE) { untested();
     assert(n_());
     _m=to_internal(t_());
-  }else{
+  }else{ untested();
     assert(_m == INVALID_NODE);
   }
 #endif
@@ -686,9 +653,10 @@ bool NODE_P::is_short_to(NODE_P const& n) const
     // multiple ground nodes...?
     return true;
   }else if(is_link() && n.is_link()) {
-    CONST_NODE_PS a(this);
-    CONST_NODE_PS b(&n);
-    return a == b;
+    return root() == n.root();
+    //CONST_NODE_PS a(this);
+    //CONST_NODE_PS b(&n);
+    //return a == b;
   }else{ untested();
     incomplete(); // err on the safe sde.
     unreachable();
@@ -732,34 +700,6 @@ std::string NODE::long_label()const
     return "$root." + short_label();
   }
 }
-/*--------------------------------------------------------------------------*/
-CONST_NODE_PS::CONST_NODE_PS(NODE_P const* node)
-{
-  assert(node);
-  while(node->is_link() && node != node->next()) {
-    node = node->next();
-  }
-  _root = const_cast<NODE_P*>(node);
-}
-/*--------------------------------------------------------------------------*/
-NODE_PS::NODE_PS(NODE_P* node) : CONST_NODE_PS()
-{
-  assert(node);
-  while(node->is_link() && node != node->next()) {
-    // TODO: compress.
-    node = node->next();
-  }
-  if(node->is_link()){
-  }else if(node->is_node()){
-  }
-  set_root(node);
-}
-/*--------------------------------------------------------------------------*/
-// NODE_PS& NODE_PS::operator=(NODE* n)
-// { untested();
-//   *_root = n;
-//   return *this;
-// }
 /*--------------------------------------------------------------------------*/
 int MATRIX_NODE::flat_number() const
 {

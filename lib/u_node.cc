@@ -79,7 +79,7 @@ USER_NODE::USER_NODE(USER_NODE const* proto) : NODE(proto)
 NODE* USER_NODE::deflate(NODE_P*n, CARD* owner)
 {
   assert(n);
-  NODE_PS conn(n); // const?
+  NODE_P& conn = n->root(); // const?
   if(n == &_conn){
   }else{
     assert(owner);
@@ -331,8 +331,8 @@ NODE& USER_NODE::merge(NODE_P*p)
     unreachable();
   }
 
-  CONST_NODE_PS c(&_conn);
-  if(c.is_grounded()) {
+ // CONST_NODE_PS c(&_conn);
+  if(_conn.root().is_grounded()) {
     set_ground();
   }else{
   }
@@ -346,9 +346,7 @@ double USER_NODE::tr_probe_num(const std::string& x) const
  // if(_pb.is_node()){ untested();
  //   return _pb->tr_probe_num(x);
   if (_conn.is_link()){
-    CONST_NODE_PS c(&_conn);
-    assert(c.is_node());
-    return c->tr_probe_num(x);
+    return _conn->tr_probe_num(x);
   }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) {
     if(auto l = dynamic_cast<LOGIC_NODE const*>(node())){
       return l->tr_probe_num(x);
@@ -365,8 +363,8 @@ bool USER_NODE::is_grounded() const
 {
   if(_conn.is_link()){
     if(1|| _conn.operator->() != this){
-      CONST_NODE_PS c(&_conn);
-      return c.is_grounded();
+      //CONST_NODE_PS c(&_conn);
+      return _conn.root().is_grounded();
     }else{
       return _conn.is_ground();
     }
@@ -382,8 +380,8 @@ bool USER_NODE::is_grounded() const
 /*--------------------------------------------------------------------------*/
 int USER_NODE::type() const
 {
-  CONST_NODE_PS c(&_conn);
-  return c.type();
+ // CONST_NODE_PS c(&_conn);
+  return _conn.root().type();
 }
 /*--------------------------------------------------------------------------*/
 void USER_NODE::set_ground()
@@ -394,7 +392,9 @@ void USER_NODE::set_ground()
     unreachable();
     incomplete();
   }else if(_conn.is_link()){ untested();
-    NODE_PS(&_conn).set_to_ground(NULL);
+    //DE_PS(&_conn).set_to_ground(NULL);
+    //_root->set_to_ground(d);
+    _conn.root().set_to_ground(NULL);
   }else if(_conn.is_node()){
     _conn.set_ground();
   }else{ untested();
@@ -450,7 +450,8 @@ bool USER_NODE::is_short_to(NODE_P const& n) const
     assert(_conn.root().is_node());
     return _conn->is_short_to(n);
   }else if(_conn.is_link()) { untested();
-    return CONST_NODE_PS(&_conn) == CONST_NODE_PS(&n);
+    return _conn.root() == n.root();//
+   // return CONST_NODE_PS(&_conn) == CONST_NODE_PS(&n);
   }else if(n.is_node()) {
     return _conn.root() == n.root();
     //CONST_NODE_PS(&_conn) == CONST_NODE_PS(&n);

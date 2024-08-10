@@ -255,35 +255,15 @@ private:
   bool is_output()const { return direction() & d_output; }
 protected:
   NODE* node_ptr() {
-    assert(!direction());
+    // assert(!direction());
     if(is_node()){
       // assert((_int << 16 >> 16) == _int);
-      assert(direction() == 0);
       return NODE_P_BITS::node_safe();
     }else{
       return NULL;
     }
   }
-#if 0
-  NODE* __node_ptr() { untested();
-    if(is_node()){ untested();
-      // uintptr_t mask = uintptr_t(-1) >> 16;
-      // return (NODE*)(_uint & mask & ~uintptr_t(4));
-      assert(!type()); // really?
-      assert(!is_inout());
-      return NODE_P_BITS::node();
-    }else{ untested();
-      return NULL;
-    }
-  }
-#endif
 public: // BUG. internal
-  // NODE_P& set_ref(NODE* p){ untested();
-  //   _ptr = p;
-  //   assert(!(_uint & 7));
-  //   assert(p == n_());
-  //   return *this;
-  // }
   NODE_P& set_own(bool x=true){
     assert(is_node());
     NODE_P_BITS::set_own(x);
@@ -298,8 +278,10 @@ public: // BUG. internal
   }
 public:
   bool operator==(NODE_P const& p )const {
-    if(is_link()){ untested();
-      assert(p.is_link());
+    //return NODE_P_BITS::operator==(p)?
+    if(is_link() != p.is_link()){
+	return false;
+    }else if(is_link()){
       return next() == p.next();
     }else if(is_node()){
       return node() == p.node();
@@ -308,18 +290,8 @@ public:
     }
     return false;
   }
- //  void set_link(int dir){
- //    assert(dir);
- //    assert(dir<=3);
- //     assert(is_inout()); // why?
- //    return NODE_P_BITS::set_link(dir);
- //  }
-  bool is_link()const {
-    return NODE_P_BITS::is_link();
-  }
-  bool is_number()const {
-    return NODE_P_BITS::is_number();
-  }
+  bool is_link()const { return NODE_P_BITS::is_link(); }
+  bool is_number()const { return NODE_P_BITS::is_number(); }
   void set_io_link() {
     assert(is_node() || is_none() || is_number());
     set_inout();
@@ -365,40 +337,15 @@ public:
     assert(is_link());
     return NODE_P_BITS::next();
   }
- // operator bool()const {return _ptr;}
   void map_subckt_node(NODE_P* map, CARD const*);
-  // void connect(NODE_P* node);
-  // bool links_to(NODE_P const& p)const;
   NODE_P& merge(NODE_P* p);
- // void	new_node(const std::string&, CARD*);
- // void	new_node(const std::string&, NODE_MAP*);
 
-  // NODE_P& reset(int i, CARD*);
-  // NODE_P& new_node(const std::string&, CARD_LIST*);
   void new_node(const std::string&, CARD const*);
   NODE_P& new_model_node(const std::string& n, CARD*);
   NODE_P& set_to(NODE_P& n, CARD*);
 
   void set_to_ground(CARD const*);
   void set_next(NODE_P* const& p) {
-#if 0
-    assert(p);
-    assert(is_link() || is_none());
-    // assert(p->is_link());
-    if(is_link()){
-    }else if(is_node()){ untested();
-    }else if(is_none()){ untested();
-    }
-    assert(is_link() || is_none());
-    // assert(!_nnn || _int & 3);
-    // assert(!_nnn || is_link());
-    uintptr_t P = uintptr_t(p);
-
-    assert(! (P & (uintptr_t(-1) << 48)));
-    assert(! (P & uintptr_t(7)));
-    assert(P == uintptr_t(p));
-#endif
-
     NODE_P_BITS::set_next(p);
     assert(!p || !is_none());
   }
@@ -416,17 +363,8 @@ public:
       return -1;
     }
   }
-  void set_type(int t) {
-    assert(t<16000);
-    NODE_P_BITS::set_type(t);
-  }
+  void set_type(int t) { NODE_P_BITS::set_type(t); }
   int type()const { return NODE_P_BITS::type(); }
- //  int flat_number()const {
- //    incomplete();
- //    return -1;
- //   // return _nnn.flat_number();
- //  }
-  // int size()const;
 
   void set_ground();
 public:
@@ -461,83 +399,8 @@ private:
   NODE_P& root();
   bool is_root()const;
   friend class USER_NODE;
-  //NODE_P& root();
   static NODE_P& merge(NODE_P& a, NODE_P& b);
 }; // NODE_P
-/*--------------------------------------------------------------------------*/
-// embed into NODE_P? maybe a little messy
-//    (maybe not.)
-class CONST_NODE_PS {
-protected:
-  NODE_P* _root{NULL};
-protected:
-  explicit CONST_NODE_PS() {}
-public:
-  explicit CONST_NODE_PS(NODE_P const* node);
-  bool operator==(CONST_NODE_PS const& p)const {
-    return _root == p._root;
-  }
-  bool intersects(CONST_NODE_PS const& p)const {
-    return _root == p._root;
-  }
-  bool is_node()const {
-    assert(_root);
-    return _root->is_node();
-  }
-  NODE const* operator->()const {
-    assert(_root);
-    assert(is_node());
-    return _root->n_();
-  }
-  NODE_P const* node_p()const { untested();
-    return _root;
-  }
-  NODE const* node()const {
-    assert(_root);
-    assert(_root->is_node());
-    return _root->n_();
-  }
-public: // USER_NODE
-  int type()const;
-  bool is_grounded()const;
-protected:
-  void set_root(NODE_P* r) { _root = r; }
-}; // CONST_NODE_PS
-/*--------------------------------------------------------------------------*/
-class NODE_PS : public CONST_NODE_PS {
-public:
-  explicit NODE_PS(NODE_P* node);
-public:
-  NODE_P& root(){assert(_root); return *_root;}
-public: // modify
- // void merge(NODE_PS& b);
-  NODE_PS& add(NODE_P* b);
-  NODE* node() {
-    assert(_root);
-    assert(_root->is_node());
-    return _root->n_();
-  }
-  void set_to_ground(CARD const*d) { untested();
-    assert(_root);
-    _root->set_to_ground(d);
-  }
-
-  NODE_PS& operator=(NODE* n) {
-    assert(_root);
-    if(_root->is_link()){
-    }else if(_root->is_node()){
-    }else{
-    }
-    _root->set_node(n);
-    return *this;
-  }
-
-  NODE* operator->() {
-    assert(_root);
-    assert(is_node());
-    return _root->n_();
-  }
-};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 inline std::string NODE_P::short_label() const
@@ -545,23 +408,14 @@ inline std::string NODE_P::short_label() const
   if (is_node()){
     return ::short_label(n_());
   }else if(is_link()){
-    CONST_NODE_PS nn(this);
-    return nn->short_label();
+    NODE_P const& r = root();
+    assert(r.is_node());
+    assert(r.n_());
+    return r.n_()->short_label();
   }else{
     return "?????";
   }
 }
-/*--------------------------------------------------------------------------*/
-#if 0
-inline NODE_P& NODE_P::clear()
-{
-  incomplete();
-  // unreachable();
-
-  NODE_P_BITS::clear();
-  return *this;
-}
-#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class LOGIC_NODE;
@@ -587,9 +441,7 @@ public:
     return _m;
   }
 
-  //int	      t_()const
-
-  bool	is_grounded()const {return false;}
+  bool	is_grounded()const {untested(); return false;}
 
   node_t&     map();
 
@@ -627,15 +479,6 @@ public:
     assert(m_() <= NODE::_sim->total_nodes());
     return NODE::_sim->_i[m_()];
   }
-#if 0
-  COMPLEX&    iac() {untested();
-    assert(n_());
-    assert(n_()->m_() == m_());
-    assert(n_()->iac() == NODE::_ac[m_()]);
-    //return n_()->iac();
-    return NODE::_sim->_ac[m_()];
-  }
-#endif
 
   // top level kludge.
   // n_() may be a USER_NODE, shortened to n.n_(), but n_() != n.n_()
@@ -656,7 +499,7 @@ inline bool NODE_P::is_root() const
     return true;
   }else if(is_link()) {
     return next() == this;
-  }else{ untested();
+  }else{
     return false;
   }
 }
@@ -705,22 +548,13 @@ inline NODE_P& NODE_P::merge(NODE_P& A, NODE_P& B)
   NODE_P* new_root = NULL;
   NODE_P* sub_root = NULL;
 
-  if(a.is_none()) { untested();
-    new_root = &b;
-    sub_root = &a;
-  }else if(b.is_none()) { untested();
-    new_root = &a;
-    sub_root = &b;
-  }else if(a.is_node()) {
-    // assert(!dynamic_cast<USER_NODE const*>(a->n_()));
-    // assert(!b->is_node());
+  assert(!a.is_none());
+  assert(!b.is_none());
 
+  if(a.is_node()) {
     new_root = &a;
     sub_root = &b;
   }else if(b.is_node()) {
-    // assert(!dynamic_cast<USER_NODE const*>(b->n_()));
-    // assert(!a->is_node());
-
     new_root = &b;
     sub_root = &a;
   }else{
@@ -740,38 +574,24 @@ inline NODE_P& NODE_P::merge(NODE_P& A, NODE_P& B)
   }
 
   assert(new_root);
-  {
-    assert(sub_root);
-    if(new_root->is_node()){
-    }else if(new_root->is_none()){ untested();
-    }else{
-    }
-    // if(sub_root->is_node()){
-    //   sub_root->set_io_link();
-    // }else if(sub_root->is_none()){ untested();
-    //   incomplete();
-    //   sub_root->set_io_link();
-    // }else{
-    // }
-    *sub_root = *new_root;
+  assert(sub_root);
+  *sub_root = *new_root;
 
-    // sub_root->set_next(new_root); //
-    // if(sub_root->type()){ untested();
-    //   new_root->set_type(sub_root->type());
-    // }else{
-    // }
-    // if(sub_root->is_grounded()){ untested();
-    //   new_root->set_ground();
-    // }else{
-    // }
-
-    // if(new_root->is_link()){
-    // }else if(new_root->is_node()){
-    // }else{
-    //   unreachable();
-    // }
-  }
   return *new_root;
+}
+/*--------------------------------------------------------------------------*/
+inline NODE const& NODE_P::data() const
+{
+  NODE_P const& r = root();
+  assert(r.is_node());
+  return *r.node();
+}
+/*--------------------------------------------------------------------------*/
+inline NODE& NODE_P::data()
+{
+  NODE_P& r = root();
+  assert(r.is_node());
+  return *r.node();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

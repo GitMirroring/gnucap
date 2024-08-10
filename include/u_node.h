@@ -61,19 +61,15 @@ public: // conn
   int type()const;
 public:
   NODE& data() {
-    NODE_PS a(&_conn);
-    assert(a.is_node());
-    return *a.node();
+    return _conn.data();
   }
   NODE const& data()const {
-    CONST_NODE_PS a(&_conn);
-    assert(a.is_node());
-    return *a.node();
+    return _conn.data();
   }
   NODE const* node()const {
-    CONST_NODE_PS a(&_conn);
-    assert(a.is_node());
-    return a.node();
+    NODE_P const& r = _conn.root();
+    assert(r.is_node());
+    return r.node();
   }
 
   void req_type(int i);
@@ -136,9 +132,9 @@ inline int USER_NODE::matrix_number() const
       return(_conn.n_()->matrix_number());
     }
   }else if(_conn.is_link()){
-    CONST_NODE_PS a(&_conn);
-    assert(a.is_node());
-    return a->matrix_number();
+    // CONST_NODE_PS a(&_conn);
+    // assert(a.is_node());
+    return _conn->matrix_number();
   }else if(_conn.is_none()){
     unreachable();
   }else{

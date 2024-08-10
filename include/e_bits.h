@@ -194,7 +194,7 @@ private:
     m_node = 1,
     m_link = 2,
     m_number = 3
-  } _mode;
+  } _mode{m_none};
   int _type{0};
 
   // in NODE_P
