@@ -220,7 +220,7 @@ void COMMON_COMPONENT::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lan
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::set_param_by_index(int i, std::string& Value, int Offset)
-{
+{ untested();
   switch (i) {
   case 0:untested();  _tnom_c = Value; break;
   case 1:untested();  _dtemp = Value; break;
@@ -259,7 +259,7 @@ std::string COMMON_COMPONENT::param_name(int i, int j)const
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_COMPONENT::param_value(int i)const
-{
+{ untested();
   switch (i) {
   case 0:itested();  return _tnom_c.string();
   case 1:itested();  return _dtemp.string();
@@ -493,7 +493,7 @@ void COMPONENT::set_port_to_ground(int num)
     _n[num].set_to_ground(this);
     if (num+1 > _net_nodes) {
       _net_nodes = num+1;
-    }else{
+    }else{ untested();
     }
   }else{untested();
     throw Exception_Too_Many(num+1, max_nodes(), 0/*offset*/);
@@ -694,15 +694,15 @@ int COMPONENT::set_hsparam(std::string const& Name, std::string const& Value)
     which = 1;
   }else if(  Name == "$yposition") {
     which = 2;
-  }else if(  Name == "$zposition") {
+  }else if(  Name == "$zposition") { untested();
     which = 3;
-  }else if(  Name == "$hflip") {
+  }else if(  Name == "$hflip") { untested();
     which = 4;
-  }else if(  Name == "$vflip") {
+  }else if(  Name == "$vflip") { untested();
     which = 5;
-  }else if(  Name == "$bflip") {
+  }else if(  Name == "$bflip") { untested();
     which = 6;
-  }else if(  Name == "$angle") {
+  }else if(  Name == "$angle") { untested();
     which = 7;
   }else{
   }
@@ -772,7 +772,7 @@ bool COMPONENT::param_is_printable(int i)const
     }
   }else if (has_common()) {
     return common()->param_is_printable(i);
-  }else{
+  }else{ untested();
     return CARD::param_is_printable(i);
   }
 }
@@ -813,7 +813,7 @@ std::string COMPONENT::param_name(int i, int j)const
   }else{ untested();
     if (j == 0) { untested();
       return param_name(i);
-    }else if (i >= CARD::param_count()) {
+    }else if (i >= CARD::param_count()) { untested();
       return "";
     }else{untested();
       return CARD::param_name(i,j);

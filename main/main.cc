@@ -62,7 +62,7 @@ static void prepare_env()
   std::string ldlpath = OS::getenv("LD_LIBRARY_PATH");
   if (ldlpath != "") {
     ldlpath += ":";
-  }else{
+  }else{itested();
   }
   assert(strlen("PLUGPATH=") == 9);
   OS::setenv("GNUCAP_PLUGPATH", ldlpath + (plugpath+9), false);
@@ -219,7 +219,7 @@ static void process_cmd_line(int argc, const char *argv[])
       }else{
 	try {
 	  CMD::command(std::string("include ") + argv[ii++], &CARD_LIST::card_list);
-	}catch (Exception& e) {
+	}catch (Exception& e) { untested();
 	  error(bDANGER, e.message() + '\n');
 	  finish();
 	}

@@ -243,7 +243,7 @@ CARD_LIST* DEV_MODULE::scope()
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_MODULE::is_valid() const
-{
+{ untested();
   trace1("DEV_MODULE::is_valid", long_label());
   assert(subckt());
   assert(_parent);
@@ -341,9 +341,9 @@ std::string DEV_MODULE::port_name(int i)const
   }else if(_parent) { untested(); untested();
     // reachable?
     return "";
-  }else if(i<net_nodes()) {
+  }else if(i<net_nodes()) { untested();
     return port_value(i);
-  }else{
+  }else{ untested();
     return "";
   }
 }
@@ -399,7 +399,7 @@ void DEV_MODULE::expand()
       CARD* d = (*i)->deflate();
 
       if(d == (*i)){
-      }else{
+      }else{ untested();
 	assert(d->owner() == this);
 	delete *i;
 	*i = d;
@@ -465,7 +465,7 @@ void DEV_MODULE::precalc_last()
 }
 /*--------------------------------------------------------------------------*/
 double DEV_MODULE::tr_probe_num(const std::string& x)const
-{ untested();
+{
   if (Umatch(x, "p ")) {untested();
     double power = 0.;
     assert(subckt());
@@ -490,7 +490,7 @@ double DEV_MODULE::tr_probe_num(const std::string& x)const
       power += CARD::probe(*ci,"PS");
     }
     return power;
-  }else{ untested();
+  }else{
     return COMPONENT::tr_probe_num(x);
   }
   /*NOTREACHED*/

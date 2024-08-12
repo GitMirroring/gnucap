@@ -133,18 +133,18 @@ protected:
 /*--------------------------------------------------------------------------*/
 class LOGIC_AND : public COMMON_LOGIC {
 private:
-  explicit LOGIC_AND(const LOGIC_AND& p) :COMMON_LOGIC(p){itested();++_count;}
-  COMMON_COMPONENT* clone()const override{itested();return new LOGIC_AND(*this);}
+  explicit LOGIC_AND(const LOGIC_AND& p) :COMMON_LOGIC(p){++_count;}
+  COMMON_COMPONENT* clone()const override{return new LOGIC_AND(*this);}
 public:
   explicit LOGIC_AND(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n,  int incount)const override {itested();
+  LOGICVAL logic_eval(const node_t* n,  int incount)const override {
     LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {itested();
+    for (int ii=1; ii<incount; ++ii) {
       out &= n[ii]->lv();
     }
     return out;
   }
-  std::string name()const override	  {itested();return "and";}
+  std::string name()const override	  {return "and";}
 };
 /*--------------------------------------------------------------------------*/
 class LOGIC_NAND : public COMMON_LOGIC {
@@ -153,9 +153,9 @@ private:
   COMMON_COMPONENT* clone()const override {return new LOGIC_NAND(*this);}
 public:
   explicit LOGIC_NAND(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override {itested();
+  LOGICVAL logic_eval(const node_t* n, int incount)const override {
     LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {itested();
+    for (int ii=1; ii<incount; ++ii) {
       out &= n[ii]->lv();
     }
     return ~out;
