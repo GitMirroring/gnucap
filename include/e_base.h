@@ -35,8 +35,6 @@ struct SIM_DATA;
 class PROBE_LISTS;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
-private:
-  std::string	_label;
 public:
   static SIM_DATA* _sim;
   static PROBE_LISTS* _probe_lists;
@@ -44,9 +42,8 @@ private:
   static INDIRECT<ATTRIB_LIST_p> _attribs;
   //--------------------------------------------------------------------
 protected: // create and destroy
-  explicit CKT_BASE()			  :_label() {}
-  explicit CKT_BASE(const std::string& s) :_label(s) {}
-  explicit CKT_BASE(const CKT_BASE& p)	  :_label(p._label) {}
+  explicit CKT_BASE()			  {}
+  explicit CKT_BASE(const CKT_BASE&)	  {}
   virtual  ~CKT_BASE();
   virtual void	      purge() {}
   //--------------------------------------------------------------------
@@ -71,18 +68,19 @@ public: // probes
 	  double      ac_probe_num(const std::string&)const;
   virtual double      tr_probe_num(const std::string&)const;
   virtual XPROBE      ac_probe_ext(const std::string&)const;
-  virtual void	      inc_probes()const {unreachable();}
-  virtual void	      dec_probes()const {unreachable();}
-  virtual bool	      has_probes()const {unreachable(); return false;}
   virtual double      noise_num(const std::string&)const;
   static  double      probe(const CKT_BASE*,const std::string&);
   static  WAVE*	      find_wave(const std::string& probe_name);
   //--------------------------------------------------------------------
+  virtual void        inc_probes()const {unreachable();}
+  virtual void        dec_probes()const {unreachable();}
+  virtual bool        has_probes()const {unreachable();return false;}
+
 public: // label
   bool operator!=(const std::string& n)const;
-  virtual const std::string long_label()const;
-  const std::string&  short_label()const {return _label;}
-  void	set_label(const std::string& s) {_label = s;}
+  virtual std::string long_label()const;
+  virtual std::string const& short_label()const = 0;
+  virtual void	set_label(const std::string& s) = 0;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

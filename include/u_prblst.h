@@ -29,6 +29,8 @@
 /*--------------------------------------------------------------------------*/
 class CARD_LIST;
 /*--------------------------------------------------------------------------*/
+std::string const pllabel("incomplete");
+/*--------------------------------------------------------------------------*/
 class INTERFACE PROBELIST : public CKT_BASE {
 private:
   typedef std::vector<PROBE> _container;
@@ -58,7 +60,10 @@ private:
   void	  erase(iterator b, iterator e) {bag.erase(b,e);}
   void	  push_new_probe(const std::string& param, const CKT_BASE* object);
   bool    add_branches(const std::string&, const std::string&, const CARD_LIST*);
-  void    add_all_nodes(const std::string&, CARD_LIST*);
+  void    add_all_nodes(const std::string&, CARD_LIST const*);
+public: // unused?
+  std::string const&  short_label()const override {return pllabel;}
+  void	set_label(const std::string&)override {incomplete();}
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {

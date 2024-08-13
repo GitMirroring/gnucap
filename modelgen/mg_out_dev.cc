@@ -98,25 +98,39 @@ void make_dev_default_constructor(std::ofstream& out,const Device& d)
     out << ",\n   _" << (**p).name() << "(0)";
   }
 
-  out << "\n{\n"
-    "  _n = _nodes;\n"
+
+  out << "\n{\n";
+
+
+  out <<
+    "  assert(!subckt());\n"
+    "  new_subckt();\n"
+    "  assert(subckt()->nodes());\n";
+
+  for (Port_List::const_iterator
+	 p = d.circuit().req_nodes().begin();
+       p != d.circuit().req_nodes().end();
+       ++p) {
+    out << "  subckt()->nodes()->new_node(\"" << (**p).name() << "\", this);\n";
+  }
+  for (Port_List::const_iterator
+       p = d.circuit().opt_nodes().begin();
+       p != d.circuit().opt_nodes().end();
+       ++p) {
+    out << "  subckt()->nodes()->new_node(\"" << (**p).name() << "\", this);\n";
+  }
+  for (Port_List::const_iterator
+       p = d.circuit().local_nodes().begin();
+       p != d.circuit().local_nodes().end();
+       ++p) {
+    out << "  subckt()->nodes()->new_node(\"" << (**p).name() << "\", this);\n";
+  }
+
+  out <<
     "  attach_common(&Default_" << d.name() << ");\n"
     "  ++_count;\n";
 
-  out << "  // overrides\n";
-  for (Parameter_List::const_iterator
-       p = d.device().override().begin();
-       p != d.device().override().end();
-       ++p) {untested();
-    if (!((**p).final_default().empty())) {untested();
-      out << "  " << (**p).code_name() << " = NA;\n";
-    }else{untested();
-    }
-    if (!((**p).default_val().empty())) {untested();
-      out << "  " << (**p).code_name() << " = " << (**p).default_val() <<";\n";
-    }else{untested();
-    }
-  }
+
   out << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -144,10 +158,26 @@ void make_dev_copy_constructor(std::ofstream& out, const Device& d)
   }
 
   out << "\n{\n"
-    "  _n = _nodes;\n"
-    "  for (int ii = 0; ii < max_nodes() + int_nodes(); ++ii) {\n"
+    "  int ii = 0;\n"
+    "  for (; ii < net_nodes(); ++ii) {\n"
     "    _n[ii] = p._n[ii];\n"
     "  }\n"
+#if 0
+    "  for (; ii < max_nodes()+int_nodes(); ++ii) {\n"
+    "    // cf. NODE_P::clone in NODE_MAP::clone.\n"
+    "    // prepare internal connections\n"
+    "    if(_n[ii].n_()){untested();\n"
+    "      assert(_n[ii].user_number() == ii);\n"
+    "    }else{untested();\n"
+    "      _n[ii].set_io(3);\n"
+    "      _n[ii].set_user_number(ii);\n" // reference to node_map
+    "      assert(_n[ii].user_number() == ii);\n"
+    "    }\n"
+    "  }\n"
+#endif
+    "  // prepare node map?\n"
+    "    auto& p0 = DEV_" << d.name() << "_DISPATCHER::p0;\n"
+    "    renew_subckt(&p0, NULL);\n" // clone node map
     "  ++_count;\n";
 
   out << "  // overrides\n";
@@ -210,13 +240,16 @@ static void make_dev_expand_one_element(std::ofstream& out, const Element& e)
   
   if (!(e.reverse().empty())) {
     out << "      if (" << e.reverse() << ") {\n";
-    out << "        node_t nodes[] = {";
+    out << "        NODE_P nodes[] = {";
     
     Port_List::const_iterator p = e.ports().begin();
     if (p != e.ports().end()) {
       Port_List::const_iterator even = p;
       ++p;
       assert(p != e.ports().end());
+		// need to do what map_sckt_nodes does.
+		// nodes just carry user numbers?
+     // out<< "ni(n_" << (**p).name() << "), ni(n_" << (**even).name() << ")";
       out<< "_n[n_" << (**p).name() << "], _n[n_" << (**even).name() << "]";
       bool even_node = true;
       while (++p != e.ports().end()) {untested();
@@ -225,7 +258,8 @@ static void make_dev_expand_one_element(std::ofstream& out, const Element& e)
 	  even = p;
 	}else{untested();
 	  even_node = true;
-	  out<< ", _n[n_"<< (**p).name()<< "], _n[n_"<<(**even).name()<< "]";
+     // out<< ",&ni(n_" << (**p).name() << "), &ni(n_" << (**even).name() << ")";
+	  out<< ", _n[n_" << (**p).name() << "], _n[n_" << (**even).name() << "]";
 	}
       }
     }else{untested();
@@ -238,13 +272,15 @@ static void make_dev_expand_one_element(std::ofstream& out, const Element& e)
     out << "      {\n";
   }
   
-  out << "        node_t nodes[] = {";
+  out << "        NODE_P nodes[] = {";
   
   Port_List::const_iterator p = e.ports().begin();
   if (p != e.ports().end()) {
     assert(*p);
+    //out << "ni(n_" << (**p).name() << ")";
     out << "_n[n_" << (**p).name() << "]";
     while (++p != e.ports().end()) {
+      //out << ", ni(n_" << (**p).name() << ")";
       out << ", _n[n_" << (**p).name() << "]";
     }
   }else{untested();
@@ -261,8 +297,9 @@ static void make_dev_allocate_local_nodes(std::ofstream& out, const Port& p)
   make_tag();
   if (p.short_if().empty()) {
     out <<
-      "    if (!(_n[n_" << p.name() << "].n_())) {\n"
-      "      _n[n_" << p.name() << "] = _n[n_" << p.short_to() << "];\n"
+      "    if (!(_n[n_" << p.name() << "].is_connected())) {\n"
+      "      _n[n_" << p.name() << "].set_to(_n[n_" << p.short_to() << "], this); // (A)\n"
+		"      assert(_n[n_" << p.name() << "].is_connected());\n"
       "    }else{\n"
       "    }\n";
     //BUG// generates bad code if no short_to
@@ -271,16 +308,19 @@ static void make_dev_allocate_local_nodes(std::ofstream& out, const Port& p)
       "    //assert(!(_n[n_" << p.name() << "].n_()));\n"
       "    //BUG// this assert fails on a repeat elaboration after a change.\n"
       "    //not sure of consequences when new_model_node called twice.\n"
-      "    if (!(_n[n_" << p.name() << "].n_())) {\n"
+      "    if (!_n[n_" << p.name() << "].is_connected()) {\n"
       "      if (" << p.short_if() << ") {\n"
-      "        _n[n_" << p.name() << "] = _n[n_" << p.short_to() << "];\n"
+      "        // assert(_n[n_" << p.short_to() << "].is_link());\n"
+      "        _n[n_" << p.name() << "].set_to(_n[n_" << p.short_to() << "], this); // (B)\n"
+		"        assert(_n[n_" << p.name() << "].is_connected());\n"
       "      }else{\n"
       "        _n[n_" << p.name() << "].new_model_node(\".\" + long_label() + \"." << p.name() 
 			   << "\", this);\n"
+		"        assert(_n[n_" << p.name() << "].is_connected());\n"
       "      }\n"
       "    }else{\n"
       "      if (" << p.short_if() << ") {\n"
-      "        assert(_n[n_" << p.name() << "] == _n[n_" << p.short_to() << "]);\n"
+      "        assert(ni(n_" << p.name() << ").is_short_to(ni(n_" << p.short_to() << ")));\n"
       "      }else{\n"
       "        //_n[n_" << p.name() << "].new_model_node(\"" << p.name() 
 		 << ".\" + long_label(), this);\n"
@@ -308,12 +348,35 @@ static void make_dev_expand(std::ofstream& out, const Device& d)
     "  const SDP_" << d.model_type() << "* s = prechecked_cast<const SDP_"
       << d.model_type() << "*>(c->sdp());\n"
     "  assert(s);\n"
+    "  assert(subckt());\n"
     "  if (!subckt()) {\n"
     "    new_subckt();\n"
     "  }else{\n"
     "  }\n"
     "\n"
     "  if (_sim->is_first_expand()) {\n"
+	 "    setup_nodes();\n"
+    "    for (int ii=0; ii < min_nodes(); ++ii) {\n"
+	 "      // assert(_n[ii].is_link());\n"
+    "    }\n"
+	 "  // TODO: nodemap->clone instead.\n"
+    "    for (int ii=max_nodes(); ii < max_nodes()+int_nodes(); ++ii) {\n"
+    "      if(_n[ii].is_number()){\n"
+    "        assert(_n[ii].user_number() == ii);\n"
+    "      }else{\n"
+    "      }\n"
+    "    }\n"
+    "\n"
+    "  int ii = 0;\n"
+    "    for (ii = 0; ii < max_nodes(); ++ii) {\n"
+    " //     assert(!_n[ii].is_link());\n"
+    "    }\n"
+    "    for (ii = max_nodes(); ii < max_nodes()+int_nodes(); ++ii) {\n"
+    "      // known internal node, same as in a module instance.\n"
+    "//      assert(_n[ii].is_number());\n"
+    "      assert(!_n[ii].is_connected());\n"
+    "    }\n"
+
     "    precalc_first();\n"
     "    precalc_last();\n"
     "    // optional nodes\n";
@@ -344,12 +407,14 @@ static void make_dev_expand(std::ofstream& out, const Device& d)
     "  }\n"
     "  //precalc();\n"
     "  subckt()->expand();\n"
+    "  expand_ports();\n"
     "  //subckt()->precalc();\n"
     "  assert(!is_constant());\n";
   if (d.circuit().sync()) {
     out << "  subckt()->set_slave();\n";
   }else{
   }
+  out << "expand_model_nodes();\n";
   out << "}\n"
     "/*--------------------------------------"
     "------------------------------------*/\n";
@@ -488,6 +553,49 @@ void make_cc_dev(std::ofstream& out, const Device& d)
   make_dev_precalc_last(out, d);
   make_dev_probe(out, d);
   make_dev_aux(out, d);
+  out << "/*--------------------------------------"
+    "------------------------------------*/\n";
+
+  size_t port_nodes = d.circuit().req_nodes().size() + d.circuit().opt_nodes().size();
+  size_t total_nodes = port_nodes + d.circuit().local_nodes().size();
+  out << "  NODE_P& DEV_" << d.name() << "::ni(int i)\n{\n"
+	  "assert(i<"<<total_nodes<<"); return subckt()->nodes()->map()[i];\n}\n";
+  out << "/*--------------------------------------"
+    "------------------------------------*/\n";
+
+  out << "CARD_LIST* DEV_" << d.name() << "::scope()\n{\n"
+  //"  if(this == &p0) ..." // doesn't work, multiple prototypes.
+  "  if(!has_common()){\n" // workaround. attaching common after
+									// building node name map
+  "    return subckt();\n"
+  "  }else{\n"
+  "    return BASE_SUBCKT::scope();\n"
+  "  }\n"
+  "}\n";
+  out << "/*--------------------------------------"
+    "------------------------------------*/\n";
+
+  out << "CARD_LIST const* DEV_" << d.name() << "::scope()const\n{\n"
+  "  return const_cast<DEV_" << d.name() << "*>(this)->scope();\n"
+  "}\n";
+  out << "/*--------------------------------------"
+    "------------------------------------*/\n";
+
+  out << "void DEV_" << d.name() << "::map_nodes()\n{\n"
+  "  assert(is_device());\n"
+  "  for (int ii = 0; ii < ext_nodes()+int_nodes(); ++ii) {\n"
+  "    _n[ii].map();\n"
+  "    if(ii<min_nodes()){\n"
+  "     assert(_n[ii].is_node());\n"
+  "     assert(_n[ii].n_());\n"
+  "    }else{\n"
+  "    }\n"
+  "  }\n"
+  "  if (subckt()) {\n"
+  "    subckt()->map_nodes();\n"
+  "  }else{\n"
+  "  }\n"
+  "}\n";
   out << "/*--------------------------------------"
     "------------------------------------*/\n";
 }

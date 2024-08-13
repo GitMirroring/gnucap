@@ -443,18 +443,16 @@ COMPONENT::~COMPONENT()
 /*--------------------------------------------------------------------------*/
 bool COMPONENT::node_is_grounded(int i)const 
 {
-  assert(_n);
   assert(i >= 0);
   assert(i < net_nodes());
-  return _n[i].is_grounded();
+  return n_(i).is_grounded();
 }
 /*--------------------------------------------------------------------------*/
 bool COMPONENT::node_is_connected(int i)const 
 {
-  assert(_n);
   assert(i >= 0);
   assert(i < net_nodes());
-  return _n[i].is_connected();
+  return n_(i).is_connected();
 }
 /*--------------------------------------------------------------------------*/
 int COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
@@ -474,14 +472,21 @@ int COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_port_by_index(int num, std::string& ext_name)
 {
+  trace2("spbi", num, ext_name);
   if (num < max_nodes()) {
-    _n[num].new_node(ext_name, this);
+    node(num).new_node(ext_name, this);
+    assert(node(num)->short_label() == ext_name);
+    // assert(node(num).short_label() == ext_name);
+    trace2("spbi", num, node(num).user_number());
+
     if (num+1 > _net_nodes) {
       // make the list bigger
       _net_nodes = num+1;
     }else{
       // it's already big enough, probably assigning out of order
     }
+    trace1("spbi", node(num).short_label());
+    trace1("spbi", node(num).short_label());
   }else{
     throw Exception_Too_Many(num+1, max_nodes(), 0/*offset*/);
   }
@@ -490,7 +495,7 @@ void COMPONENT::set_port_by_index(int num, std::string& ext_name)
 void COMPONENT::set_port_to_ground(int num)
 {
   if (num < max_nodes()) {
-    _n[num].set_to_ground(this);
+    node(num).set_to_ground(this);
     if (num+1 > _net_nodes) {
       _net_nodes = num+1;
     }else{ untested();
@@ -559,6 +564,8 @@ void COMPONENT::precalc_first()
 {
   for(int i = 0; i < min_nodes(); ++i){
     if(!node_is_connected(i)) {
+      trace2("not connected", long_label(), i);
+      unreachable(); //WIP
       throw Exception(long_label() + ": invalid nodes");
     }else{
     }
@@ -612,11 +619,14 @@ void COMPONENT::map_nodes()
   assert(is_device());
   assert(0 <= min_nodes());
   //assert(min_nodes() <= net_nodes());
+  trace3("COMPONENT::map_nodes", long_label(), net_nodes(), max_nodes());
   assert(net_nodes() <= max_nodes());
   //assert(ext_nodes() + int_nodes() == matrix_nodes());
 
   for (int ii = 0; ii < ext_nodes()+int_nodes(); ++ii) {
-    _n[ii].map();
+    // incomplete(); probably not. nothing to do if n[ii] is a NODE_P
+    //_n[ii].map();
+    // node(ii).map();
   }
 
   if (subckt()) {
@@ -654,7 +664,7 @@ void COMPONENT::ac_iwant_matrix()
 void COMPONENT::set_parameters(const std::string& Label, CARD *Owner,
 			       COMMON_COMPONENT *Common, double Value,
 			       int , double [],
-			       int node_count, const node_t Nodes[])
+			       int node_count, const NODE_P Nodes[])
 {
   set_label(Label);
   set_owner(Owner);
@@ -662,7 +672,11 @@ void COMPONENT::set_parameters(const std::string& Label, CARD *Owner,
   attach_common(Common);
 
   assert(node_count <= net_nodes());
-  notstd::copy_n(Nodes, node_count, _n);
+  // notstd::copy_n(nodes, net_nodes(), _n); ?
+  for(int i=0; i<node_count; ++i){
+    trace3("set_parameters", long_label(), i, Nodes[i].is_link());
+    node(i) = Nodes[i];
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* set_slave: force evaluation whenever the owner is evaluated.
@@ -845,10 +859,9 @@ std::string COMPONENT::param_value(int i)const
 /*--------------------------------------------------------------------------*/
 const std::string COMPONENT::port_value(int i)const 
 {
-  assert(_n);
   assert(i >= 0);
   assert(i < net_nodes());
-  return _n[i].short_label();
+  return n_(i).short_label();
 }
 /*--------------------------------------------------------------------------*/
 const std::string COMPONENT::current_port_value(int)const 
@@ -863,7 +876,7 @@ double COMPONENT::tr_probe_num(const std::string& x)const
   CS cmd(CS::_STRING, x);
   if (cmd.umatch("v")) {
     int nn = cmd.ctoi();
-    return (nn > 0 && nn <= net_nodes()) ? _n[nn-1].v0() : NOT_VALID;
+    return (nn > 0 && nn <= net_nodes()) ? n_(nn-1)->v0() : NOT_VALID;
   }else if (Umatch(x, "error{time} |next{time} ")) {
     return (_time_by._error_estimate < BIGBIG) ? _time_by._error_estimate : 0;
   }else if (Umatch(x, "timef{uture} ")) {
@@ -981,7 +994,7 @@ bool COMPONENT::use_obsolete_callback_parse()const
 {
   if (has_common()) {
     return common()->use_obsolete_callback_parse();
-  }else{untested();
+  }else{
     return false;
   }
 }
@@ -1028,7 +1041,7 @@ double COMPONENT::volts_limited(const node_t & n1, const node_t & n2)
       error(bTRACE, "range limit damp\n");
     }else{
     }
-    if (OPT::picky <= bTRACE) {itested();
+    if (OPT::picky <= bTRACE) {
       error(bNOERROR,"node limiting (n1,n2,dif) "
 	    "was (%g %g %g) now (%g %g %g)\n",
 	    n1.v0(), n2.v0(), n1.v0() - n2.v0(), v1, v2, v1-v2);

@@ -1,0 +1,22 @@
+
+verilog
+
+ground gnd
+
+isource #(.dc(1)) i(gnd, 2);
+
+resistor #(1.) r1(gnd,2);
+print op v(nodes)
+op
+resistor #(1.) r1(gnd,2);
+op
+status notime
+
+resistor #(1.) r1(gnd,1);
+resistor #(1.) r1(3,1);
+isource #(.dc(1)) i(gnd, 3);
+print op v(nodes)
+op
+status notime
+
+end

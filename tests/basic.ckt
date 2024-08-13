@@ -10,4 +10,5 @@ r5 5 0 10000k
 .op
 .op basic
 .list
+.status notime
 .end

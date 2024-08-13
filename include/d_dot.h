@@ -28,6 +28,7 @@
 class DEV_DOT : public CARD {
 private:
   std::string	_s;
+protected:
   explicit DEV_DOT(const DEV_DOT& p) :CARD(p), _s(p._s) {set_constant(true);}
 public:
   explicit	DEV_DOT()		:CARD() {set_constant(true);}
@@ -38,7 +39,7 @@ private: // override virtual
   CARD*		clone()const override		{return new DEV_DOT(*this);}
 public:
   void set(const std::string& S) {_s = S;}
-  const std::string& s()const {itested();return _s;}
+  const std::string& s()const {return _s;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

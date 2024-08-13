@@ -69,7 +69,7 @@ public: // override virtual
 #endif
   TIME_PAIR tr_review() override;
 
-  //void   map_nodes();
+  void   map_nodes()override;
   void	   tr_iwant_matrix() override = 0;
   void	   ac_iwant_matrix() override = 0;
   double   tr_probe_num(const std::string&)const override;
@@ -172,6 +172,10 @@ protected:
 protected:
   PARAMETER<double> _value;	// value, for simple parts
   int      _loaditer;	// load iteration number
+  node_t*  _n;
+  node_t& node(int i)override { return _n[i]; }
+public:
+  NODE_P& n_(int i)const override { return _n[i];}
 private:
   node_t   _nodes[NODES_PER_BRANCH]; // nodes (0,1:out, 2,3:in)
 public:

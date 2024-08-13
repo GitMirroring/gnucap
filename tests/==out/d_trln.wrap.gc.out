@@ -1,3 +1,5 @@
+ground 0 
+         ^ ? expecting ';'
 #Freq       v(out1)    v(out2)    vp(out1)   vp(out2)  
  100.K      1.         1.        -0.0075052 -0.0075052 
  1.Meg      1.         1.        -0.075052  -0.075052  

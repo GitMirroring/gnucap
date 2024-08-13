@@ -30,7 +30,8 @@
 class CARD;
 /*--------------------------------------------------------------------------*/
 // external
-class node_t;
+class NODE;
+class NODE_P;
 class CARD_LIST;
 class PARAM_LIST;
 class LANGUAGE;
@@ -38,13 +39,15 @@ struct TIME_PAIR;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CARD : public CKT_BASE {
 private:
+  std::string	_label;
+private:
   mutable int	_evaliter;	// model eval iteration number
   CARD_LIST*	_subckt;
   CARD* 	_owner;
   bool		_constant;	// eval stays the same every iteration
   mutable int   _probes{0};
-protected:
-  node_t*	_n;
+//protected:
+//  virtual NODE const* node(int) const {unreachable(); return NULL;}
 public:
   int		_net_nodes;	// actual number of "nodes" in the netlist
   //--------------------------------------------------------------------
@@ -125,19 +128,23 @@ public: // subckt
   void	  renew_subckt(const CARD* model, PARAM_LIST const* p);
   //void     new_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
   //void     renew_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
+public: // from SIM_DATA.
+  virtual NODE* new_matrix_node(NODE const* proto);
+  virtual NODE* new_logic_node(NODE const* proto);
   //--------------------------------------------------------------------
 public:	// type
   virtual std::string dev_type()const	{unreachable(); return "";}
   virtual void set_dev_type(const std::string&);
   //--------------------------------------------------------------------
 public:	// label -- in CKT_BASE
-  // non-virtual void set_label(const std::string& s) //BASE
-  // non-virtual const std::string& short_label()const //BASE
-  /*virtual*/ const std::string long_label()const final;
+  /*virtual*/ std::string long_label()const final;
+  std::string const& short_label()const final override {return _label;}
+  void	set_label(const std::string& s)final {_label=s;}
   //--------------------------------------------------------------------
 public:	// ports -- mostly defer to COMPONENT
-  node_t& n_(int i)const;
-  int     connects_to(const node_t& node)const;
+  virtual NODE_P const& n_(int i)const;
+  virtual NODE_P& node(int i);
+  int     connects_to(const NODE_P& node)const;
   //--------------------------------------------------------------------
 public: // parameters
   virtual int  set_param_by_name(std::string, std::string);
