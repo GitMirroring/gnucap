@@ -123,9 +123,10 @@ echo "ENV = LD_LIBRARY_PATH=../lib\${LD_LIBRARY_PATH:%=:%}" >>Make2
 echo "LDFLAGS = -L../lib" >>Make2
 echo "GNUCAP_CONF = ../conf/gnucap-conf" >>Make2
 #------------------------------------------------------------------------
-# "MAKE_CPPFLAGS": hardwired, not overridden in Make2.*
-#                  and not a user variable, like CPPFLAGS
-echo "MAKE_CPPFLAGS = -I${top_srcdir_}/include" >>Make2
+# "MAKE_CPPFLAGS": not a user variable like CPPFLAGS
+#                  add ${INCLUDE} when overriding in Make2.*
+echo "INCLUDE = -I${top_srcdir_}/include" >>Make2
+echo "MAKE_CPPFLAGS = \${INCLUDE}" >>Make2
 #------------------------------------------------------------------------
 echo "PRESET = ${preset}" >> Make2
 echo "include ${top_srcdir_}/include/Make2.\${PRESET}" >>Make2
