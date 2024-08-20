@@ -246,6 +246,19 @@ T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd)
   return in;
 }
 /*--------------------------------------------------------------------------*/
+template<class T>
+struct longer{
+  typedef T type;
+};
+template<>
+struct longer< std::complex<double> > {
+  typedef std::complex<long double> type;
+};
+template<>
+struct longer<double> {
+  typedef long double type;
+};
+/*--------------------------------------------------------------------------*/
 template <class T>
 T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd, const T& in)
 {
