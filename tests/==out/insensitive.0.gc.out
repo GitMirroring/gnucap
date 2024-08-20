@@ -1,3 +1,4 @@
+ground 0 
 module aaa (1,2);
 vsource #(.dc(0)) vs (.p(1),.n(2));
 endmodule // aaa

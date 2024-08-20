@@ -1,5 +1,6 @@
 # "Qucsator style" diode
 
+ground 0
 simulator lang=spice
 .options noinsensitive
 .subckt spice_diode 1 2

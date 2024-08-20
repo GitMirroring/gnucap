@@ -47,3 +47,8 @@
 V1 ( 1 0 )  AC  1.
 R2 ( 1 2 )  1.
 C3 ( 2 0 ) complex( 0., 1.)
+Gnucap   System status
+iterations: op=0, dc=0, tran=0, fourier=0, total=43
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=2, module=0, model=0, logic=0, matrix=2, total=2
+dctran density=100.0%, ac density=100.0%

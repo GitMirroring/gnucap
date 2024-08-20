@@ -1,2 +1,7 @@
 TEST_SYMLINKS = d_cccs.1.ckt c_lib.1.ckt
 REFDIR = ${srcdir}/==out
+
+SRCS = d_short.cc
+# OBJS = ${SRCS:.cc=.o}
+
+# d_short.so: d_short.o

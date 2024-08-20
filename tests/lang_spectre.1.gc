@@ -1,4 +1,5 @@
 
+ground 0
 simulator lang=spectre
 
 model zz npn bf=150
@@ -10,6 +11,7 @@ ends
 
 subckt foo (vcc in out)
 - parameters z=10k
+- ground 0
 parameters r
 Rc   (c vcc) resistor      r=z
 q1   (c b e) zz		   off=1

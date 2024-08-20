@@ -20,12 +20,12 @@ D1 ( 2 0 )  ddd  area=1
 Gnucap   System status
 iterations: op=9, dc=56, tran=0, fourier=0, total=65
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=2, subckt=0, model=0, total=2
+nodes: user=2, module=0, model=0, logic=0, matrix=2, total=2
 dctran density=100.0%, ac density=100.0%
 #           v(1)       v(2)       i(V1)      i(R1)      id(D1)     vd(D1)     req(D1)    cd(D1)     z(D1)      zraw(D1)   gd(D1)     z(2)      
  27.        10.        0.59396   -94.061u    94.06u     94.06u     0.59396    274.97     1.5471p    100.K      274.22     0.0036367  274.22    
 Gnucap   System status
 iterations: op=9, dc=56, tran=0, fourier=0, total=74
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=2, subckt=0, model=0, total=2
+nodes: user=2, module=0, model=0, logic=0, matrix=2, total=2
 dctran density=100.0%, ac density=100.0%

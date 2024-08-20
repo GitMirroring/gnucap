@@ -1,5 +1,7 @@
 verilog
 
+ground 0
+
 module aaa(1 2);
 vsource #(0) vs(1 2)
 endmodule

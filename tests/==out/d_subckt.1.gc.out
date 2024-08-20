@@ -1,7 +1,9 @@
-#           v(1)      
- 0.         0.1       
+#           v(1)       v(gnd)    
+ 0.         0.049989  -0.050011  
+#           v(1)       v(gnd)    
+ 0.         0.1        0.        
 Gnucap   System status
-iterations: op=0, dc=2, tran=0, fourier=0, total=2
+iterations: op=0, dc=2, tran=0, fourier=0, total=4
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=1, subckt=0, model=0, total=1
+nodes: user=1, module=0, model=0, logic=0, matrix=1, total=1
 dctran density=100.0%, ac density=100.0%

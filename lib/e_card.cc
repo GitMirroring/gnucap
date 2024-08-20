@@ -25,7 +25,9 @@
 #include "u_time_pair.h"
 #include "e_cardlist.h"
 #include "e_node.h"
+#include "e_logicnode.h" // avoid?
 #include "e_card.h"
+#include "u_prblst.h"
 /*--------------------------------------------------------------------------*/
 CARD::CARD()
   :CKT_BASE(),
@@ -33,26 +35,44 @@ CARD::CARD()
    _subckt(0),
    _owner(0),
    _constant(false),
-   _n(0),
    _net_nodes(0)
 {
 }
 /*--------------------------------------------------------------------------*/
 CARD::CARD(const CARD& p)
   :CKT_BASE(p),
+   _label(p._label),
    _evaliter(-100),
    _subckt(0), //BUG// isn't this supposed to copy????
    _owner(0),
    _constant(p._constant),
-   _n(0),
    _net_nodes(p._net_nodes)
 {
 }
 /*--------------------------------------------------------------------------*/
 CARD::~CARD()
 {
+  trace1("~CKT_BASE", _probes);
+  if (_probes == 0) {
+  }else if (!_probe_lists) {untested();
+  }else if (!_sim) {untested();
+  }else{
+    _probe_lists->purge(this);
+  }
+  trace1("", _probes);
+  assert(_probes==0);
+
   // purge();
   delete _subckt;
+  _subckt = NULL;
+
+  if (_probes == 0) {
+  }else if (!_probe_lists) {untested();
+  }else if (!_sim) {untested();
+  }else{
+    _probe_lists->purge(this);
+  }
+  assert(_probes==0);
 }
 /*--------------------------------------------------------------------------*/
 void CARD::purge()
@@ -61,7 +81,7 @@ void CARD::purge()
   CKT_BASE::purge();
 }
 /*--------------------------------------------------------------------------*/
-const std::string CARD::long_label()const
+std::string CARD::long_label()const
 {
   std::string buffer(short_label());
   for (const CARD* brh = owner();  brh;  brh = brh->owner()) {
@@ -75,15 +95,16 @@ const std::string CARD::long_label()const
  * returns: how many times this part connects to it.
  * does not traverse subcircuits
  */
-int CARD::connects_to(const node_t& node)const
+int CARD::connects_to(const NODE_P&)const
 {untested();
   int count = 0;
   if (is_device()) {untested();
     for (int ii = 0;  ii < net_nodes();  ++ii) {untested();
-      if (node.n_() == _n[ii].n_()) {untested();
-        ++count;
-      }else{untested();
-      }
+      incomplete(); // not needed right now.
+//      if (node.n_() == _n[ii].n_()) {untested();
+//        ++count;
+//      }else{untested();
+//      }
     }
   }else{untested();
   }
@@ -214,15 +235,10 @@ void CARD::renew_subckt(const CARD* Model, PARAM_LIST const* Params)
 {
   if (_sim->is_first_expand()) {
     new_subckt(Model, Params);
-  }else{untested();
+  }else{ untested();
     assert(subckt());
     subckt()->attach_params(Params, scope());
   }
-}
-/*--------------------------------------------------------------------------*/
-node_t& CARD::n_(int i)const
-{
-  return _n[i];
 }
 /*--------------------------------------------------------------------------*/
 int CARD::set_param_by_name(std::string Name, std::string Value)
@@ -262,6 +278,54 @@ bool CARD::evaluated()const
     _evaliter = _sim->iteration_tag();
     return false;
   }
+}
+/*--------------------------------------------------------------------------*/
+NODE_P const& CARD::n_(int i) const
+{
+  incomplete(); // missing override
+  assert(0);
+  return const_cast<CARD*>(this)->node(i);
+}
+/*--------------------------------------------------------------------------*/
+NODE_P& CARD::node(int)
+{
+  unreachable(); // need to override.
+  assert(0);
+  static NODE_P n;
+  return n;
+}
+/*--------------------------------------------------------------------------*/
+// NODE* CARD::new_digital_node(std::string const& node_name) // later
+/*--------------------------------------------------------------------------*/
+NODE* CARD::new_matrix_node(NODE const* proto)
+{
+//  MATRIX_NODE* new_node = new MATRIX_NODE();
+  NODE* m;
+  if(proto){
+    m = _sim->newnode_matrix(proto);
+  }else{
+    // anonumous matrix node (good idea?)
+    m = _sim->newnode_matrix(this);
+  }
+  m->set_owner(this);
+  return m;
+}
+/*--------------------------------------------------------------------------*/
+NODE* CARD::new_logic_node(NODE const* proto)
+{
+
+  LOGIC_NODE* new_node = new LOGIC_NODE(proto);
+
+  CKT_BASE::_sim->newnode_logic(); // bump counter.
+  //new_node->set_flat_number(CKT_BASE::_sim->newnode_user());
+
+  // move to LOGIC_NODE::allocate?
+  NODE* m = CARD::new_matrix_node(proto);
+  MATRIX_NODE *mm = prechecked_cast<MATRIX_NODE*>(m);
+  assert(mm);
+  new_node->_matrix_node = mm;
+
+  return new_node;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

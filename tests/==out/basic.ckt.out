@@ -10,3 +10,8 @@ v4 ( 4 0 )  DC  0.001
 r4 ( 4 0 )  10.Meg
 v5 ( 5 0 )  DC  1.n
 r5 ( 5 0 )  10.Meg
+Gnucap   System status
+iterations: op=4, dc=0, tran=0, fourier=0, total=8
+transient timesteps: accepted=0, rejected=0, total=0
+nodes: user=5, module=0, model=0, logic=0, matrix=5, total=5
+dctran density=20.0%, ac density=20.0%

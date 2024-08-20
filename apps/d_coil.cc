@@ -236,7 +236,7 @@ void DEV_INDUCTANCE::expand()
     }else{
       _n[IN1].new_model_node(long_label() + ".i", this);
     }
-  }else{untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

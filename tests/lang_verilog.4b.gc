@@ -1,0 +1,19 @@
+
+verilog
+option list
+
+ground 0
+
+module open2 (n0 n1 n2 n3 n4);
+endmodule
+
+module open (n0 n1 n2 n3 n4);
+open2 #() o(n0 n1)
+endmodule
+
+vsource #(.dc(1)) v1(1, 0);
+open X1 (1 2);
+
+print op i(v1)
+op
+end

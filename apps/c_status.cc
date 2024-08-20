@@ -89,10 +89,12 @@ public:
       }
     }
     IO::mstdout
-      << "nodes: user=" << _sim->_user_nodes
-      << ", subckt=" << _sim->_subckt_nodes
-      << ", model=" << _sim->_model_nodes
-      << ", total=" << _sim->_total_nodes
+      << "nodes: user=" << _sim->user_nodes()
+      << ", module=" << _sim->module_nodes()
+      << ", model=" << _sim->model_nodes()
+      << ", logic=" << _sim->logic_nodes()
+      << ", matrix=" << _sim->matrix_nodes()
+      << ", total=" << _sim->total_nodes()
       << "\n";  
     IO::mstdout.form("dctran density=%.1f%%, ac density=%.1f%%\n",
 		 _sim->_aa.density()*100., _sim->_acx.density()*100.);

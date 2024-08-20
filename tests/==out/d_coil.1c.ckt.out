@@ -100,5 +100,5 @@ r3b ( 12 0 ) Rload
 Gnucap   System status
 iterations: op=0, dc=0, tran=378, fourier=0, total=515
 transient timesteps: accepted=125, rejected=3, total=128
-nodes: user=9, subckt=2, model=3, total=14
+nodes: user=9, module=2, model=0, logic=0, matrix=14, total=14
 dctran density=42.9%, ac density=42.9%

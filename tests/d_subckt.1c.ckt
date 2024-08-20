@@ -1,0 +1,23 @@
+'
+V1   t2  0  1.
+X1   t2  t1  t3 zzz
+X2   t2  t4  t5 zzz
+.subckt zzz  1 2 4
+R1   1  2  1.
+R2   2  0  1.
+R3   2  3  1.
+R4   3  0  1.
+r5 3 4 1
+r6 4 0 1
+.ends zzz
+.width out=160
+.print op v(nodes)
+.op
+.list
+*>.status notime
+*.print op clear
+.delete X1
+.op
+.list
+*>.status notime
+.end

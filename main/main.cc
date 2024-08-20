@@ -131,11 +131,11 @@ extern "C" {
  */
 extern "C" {
   static void sig_int(SIGNALARGS)
-  {itested();
+  {
     signal(SIGINT,sig_int);
     if (ENV::run_mode == rBATCH) {itested();
       exit(1);
-    }else{itested();
+    }else{
       IO::error << '\n';
       siglongjmp(env.p,1);
     }
@@ -264,7 +264,7 @@ int main(int argc, const char *argv[])
 	exit(0);
       }
 #endif
-    }else{ untested();
+    }else{
       finish();		/* error clean up (from longjmp()) */
       //CMD::command("quit", &CARD_LIST::card_list);
       exit(0);

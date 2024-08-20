@@ -31,6 +31,7 @@ static void make_header(std::ofstream& out, const File& in,
       << in.cc_headers() << 
     "#include \"globals.h\"\n"
     "#include \"e_elemnt.h\"\n"
+    "#include \"u_nodemap.h\"\n"
     "#include \"" << dump_name << ".h\"\n"
     "/*--------------------------------------"
     "------------------------------------*/\n"

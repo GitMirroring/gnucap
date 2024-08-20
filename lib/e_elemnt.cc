@@ -60,11 +60,17 @@ ELEMENT::ELEMENT(const ELEMENT& p)
 {
   trace0(long_label().c_str());
   _n = _nodes;
+  trace1("ELEMENT::ELEMENT", p.long_label());
+  trace1("ELEMENT::ELEMENT", long_label());
   if (p._n == p._nodes) {
     for (int ii = 0;  ii < NODES_PER_BRANCH;  ++ii) {
       _n[ii] = p._n[ii];
+      trace2("ELEMENT::ELEMENT node", ii, p.n_(ii).user_number());
+      trace2("ELEMENT::ELEMENT node", ii, p._n[ii].user_number());
+      assert(_n[ii].user_number() == p._n[ii].user_number());
     }
   }else{
+    trace1("ELEMENT::ELEMENT??", p.long_label());
     assert(p._nodes);
     // the constructor for a derived class will take care of it
   }
@@ -295,7 +301,10 @@ void ELEMENT::tr_iwant_matrix_passive()
   assert(matrix_nodes() == 2);
   assert(is_device());
   //assert(!subckt()); ok for subckt to exist for logic
-  trace2(long_label().c_str(), _n[OUT1].m_(), _n[OUT2].m_());
+  trace3("ELEMENT::tr_iwant_matrix_passive", long_label(), _n[OUT1].short_label(), _n[OUT2].short_label());
+ // trace3("ELEMENT::tr_iwant_matrix_passive", long_label(), _n[OUT1].flat_number(), _n[OUT1].user_number());
+ // trace3("ELEMENT::tr_iwant_matrix_passive", long_label(), _n[OUT2].flat_number(), _n[OUT2].user_number());
+  trace3("ELEMENT::tr_iwant_matrix_passive", long_label(), _n[OUT1].m_(), _n[OUT2].m_());
 
   assert(_n[OUT1].m_() != INVALID_NODE);
   assert(_n[OUT2].m_() != INVALID_NODE);
@@ -595,6 +604,28 @@ void ELEMENT::obsolete_move_parameters_from_common(const COMMON_COMPONENT* dc)
 
   _value   = dc->value();
   // _mfactor = dc->mfactor();
+}
+/*--------------------------------------------------------------------------*/
+void ELEMENT::map_nodes()
+{
+  trace2("ELEMENT::map node", long_label(),  ext_nodes()+int_nodes());
+  assert(is_device());
+  assert(0 <= min_nodes());
+  //assert(min_nodes() <= net_nodes());
+  assert(net_nodes() <= max_nodes());
+  //assert(ext_nodes() + int_nodes() == matrix_nodes());
+
+  for (int ii = 0; ii < ext_nodes()+int_nodes(); ++ii) {
+    trace2("map node", long_label(), ii);
+    _n[ii].map();
+    trace3("mapped node", long_label(), _n[ii].short_label(), _n[ii]->matrix_number());
+  }
+
+  if (subckt()) {
+    unreachable();
+  //  subckt()->map_nodes();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -173,5 +173,5 @@ V4 ( 4 0 ) sin offset=NA( 0.) amplitude=NA( 1.) frequency= 1.K delay=NA( 0.) dam
 Gnucap   System status
 iterations: op=0, dc=0, tran=500, fourier=0, total=667
 transient timesteps: accepted=167, rejected=0, total=167
-nodes: user=3, subckt=0, model=0, total=3
+nodes: user=3, module=0, model=0, logic=0, matrix=3, total=3
 dctran density=33.3%, ac density=33.3%
