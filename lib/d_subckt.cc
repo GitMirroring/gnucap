@@ -77,7 +77,12 @@ private: // override virtual
   int		ext_nodes()const override {return int(_node_capacity);}
   int		min_nodes()const override {return 0;}
   int		matrix_nodes()const override	{return 0;}
-  // int	net_nodes()const override	{return _net_nodes;}
+  // int	net_nodes()const override	{return _net_nodes;} // e_subckt.h
+#if 0 // not virtual (yet?)
+  bool		port_exists(int i)const override { untested();
+                      assert(i < _node_capacity); return _n[i].n_();
+  }
+#endif
   void		precalc_first()override;
   bool		makes_own_scope()const override;
   bool		is_valid()const override;
@@ -282,7 +287,7 @@ DEV_MODULE::DEV_MODULE(const DEV_MODULE& p)
    _parent(p._parent)
 {
   trace2("DEV_MODULE::DEV_MODULE", long_label(), net_nodes());
-  _node_capacity = net_nodes();
+  _node_capacity = net_nodes(); // max_nodes?
   if(_node_capacity){
     _n = new node_t[_node_capacity];
   }else{
