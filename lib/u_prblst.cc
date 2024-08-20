@@ -30,12 +30,47 @@
 #include "u_prblst.h"
 /*--------------------------------------------------------------------------*/
 void PROBE_LISTS::purge(CKT_BASE* brh)
-{
-  for (int i = 0;  i < sCOUNT;  ++i) {
+{ untested();
+  for (int i = 0;  i < sCOUNT;  ++i) { untested();
     alarm[i].remove_one(brh);
     plot[i] .remove_one(brh);
     print[i].remove_one(brh);
     store[i].remove_one(brh);
+  }
+}
+/*--------------------------------------------------------------------------*/
+// detach probes so they won't get deleted when components are deleted.
+void PROBE_LISTS::store_()
+{
+  for (int i = 0;  i < sCOUNT;  ++i) {
+    alarm[i].store();
+    plot[i] .store();
+    print[i].store();
+    store[i].store();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void PROBE_LISTS::restore(CARD_LIST const* c)
+{
+  for (int i = 0;  i < sCOUNT;  ++i) {
+    alarm[i].restore(c);
+    plot[i] .restore(c);
+    print[i].restore(c);
+    store[i].restore(c);
+  }
+}
+/*--------------------------------------------------------------------------*/
+void PROBELIST::store()
+{
+  for (iterator p=begin();  p!=end(); ++p) {
+    p->store();
+  }
+}
+/*--------------------------------------------------------------------------*/
+void PROBELIST::restore(CARD_LIST const* scope)
+{
+  for (iterator p=begin();  p!=end(); ++p) {
+    p->restore(scope);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -127,6 +162,8 @@ void PROBELIST::remove_one(CKT_BASE *brh)
  * but not "v(r4) v(r5)" which has two parameters.
  * It also takes care of setting the range for plot or alarm.
  */
+extern CKT_BASE* prb0;
+/*--------------------------------------------------------------------------*/
 void PROBELIST::add_list(CS& cmd, CARD_LIST* scope)
 {
   assert(scope);
@@ -146,7 +183,7 @@ void PROBELIST::add_list(CS& cmd, CARD_LIST* scope)
     add_all_nodes(what, scope);
   }else if (cmd.umatch("0")) {
     // node 0 means system stuff
-    push_new_probe(what, 0);
+    push_new_probe(what, prb0);
   }else if (cmd.is_alnum() || cmd.match1("*?")) {
     // branches or named nodes
     size_t here1 = cmd.cursor();

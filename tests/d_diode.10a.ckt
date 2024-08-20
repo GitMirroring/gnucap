@@ -1,8 +1,9 @@
 '
+.options trace
 i1 (0 1) dc 1
 d1 (1 0) my_diode
 .model my_diode d is=2e-14
-.probe op v(1)
+.probe op v(1) i(d1)
 .op
 .delete my_diode
 .model my_diode d is=1e-14
