@@ -61,7 +61,7 @@ void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
   assert(to);
   if (c == *to) {
     // The new and old are the same object.  Do nothing.
-  }else if (!c) {itested();
+  }else if (!c) {
     // There is no new common.  probably a simple element
     detach_common(to);
   }else if (!*to) {
@@ -733,7 +733,7 @@ int COMPONENT::set_param_by_name(std::string Name, std::string Value)
   }else if(!common()->is_shared()) {
     // it's us!
     return mutable_common()->set_param_by_name(Name, Value);
-  }else{itested();
+  }else{
     COMMON_COMPONENT* c = common()->clone();
     assert(c);
     int index = c->set_param_by_name(Name, Value);
