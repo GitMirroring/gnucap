@@ -62,7 +62,7 @@ static void prepare_env()
   std::string ldlpath = OS::getenv("LD_LIBRARY_PATH");
   if (ldlpath != "") {
     ldlpath += ":";
-  }else{
+  }else{itested();
   }
   assert(strlen("PLUGPATH=") == 9);
   OS::setenv("GNUCAP_PLUGPATH", ldlpath + (plugpath+9), false);

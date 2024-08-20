@@ -139,15 +139,15 @@ std::string ELEMENT::param_name(int i)const
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_name(int i, int j)const
-{
+{ untested();
   if (has_common()) {untested();
     return COMPONENT::param_name(i);
-  }else{
-    if (j == 0) {
+  }else{ untested();
+    if (j == 0) { untested();
       return param_name(i);
     }else if (i >= ELEMENT::param_count()) {untested();
       return "";
-    }else{
+    }else{ untested();
       return COMPONENT::param_name(i,j);
     }
   }
