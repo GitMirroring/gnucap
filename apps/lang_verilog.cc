@@ -77,10 +77,10 @@ public: // override virtual, called by commands
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
   std::string	find_type_in_string(CS&)override;
 private: // local
-  void skip_attributes(CS& cmd);
   std::string  parse_attributes(CS& cmd);
   void store_attributes(std::string attrib_string, tag_t x);
-  void parse_attributes(CS& cmd, tag_t x);
+  CS& parse_attributes(CS& cmd, tag_t x);
+  void move_attributes(tag_t from, tag_t to);
   void parse_type(CS& cmd, CARD* x);
   void parse_args_paramset(CS& cmd, MODEL_CARD* x);
   void parse_args_instance(CS& cmd, CARD* x); 
@@ -107,13 +107,6 @@ DISPATCHER<LANGUAGE>::INSTALL
 	d(&language_dispatcher, lang_verilog.name(), &lang_verilog);
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-void LANG_VERILOG::skip_attributes(CS& cmd)
-{
-  while (cmd >> "(*") {
-    cmd.skipto1('*') && (cmd >> "*)");
-  }
-}
-/*--------------------------------------------------------------------------*/
 std::string LANG_VERILOG::parse_attributes(CS& cmd)
 {
   std::string attrib_string = "";
@@ -130,6 +123,7 @@ std::string LANG_VERILOG::parse_attributes(CS& cmd)
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::store_attributes(std::string attrib_string, tag_t x)
 {
+  trace1("store_attr", attrib_string);
   assert(x);
   if(attrib_string!=""){
     set_attributes(x).add_to(attrib_string, x);
@@ -137,10 +131,13 @@ void LANG_VERILOG::store_attributes(std::string attrib_string, tag_t x)
   }
 }
 /*--------------------------------------------------------------------------*/
-void LANG_VERILOG::parse_attributes(CS& cmd, tag_t x)
+CS& LANG_VERILOG::parse_attributes(CS& cmd, tag_t x)
 {
   assert(x);
-  store_attributes(parse_attributes(cmd), x);
+  std::string attr = parse_attributes(cmd);
+  store_attributes(attr, x);
+
+  return cmd;
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::parse_type(CS& cmd, CARD* x)
@@ -164,6 +161,20 @@ void LANG_VERILOG::parse_args_paramset(CS& cmd, MODEL_CARD* x)
     }catch (Exception_No_Match&) {untested();
       cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + Name + " ignored");
     }
+  }
+}
+/*--------------------------------------------------------------------------*/
+void LANG_VERILOG::move_attributes(tag_t from, tag_t to)
+{
+  if(has_attributes(to)){ untested();
+    // unreachable();
+    // erase_attributes(to, to+1);
+  }else{
+  }
+  if(has_attributes(from)){
+    set_attributes(to).add_to(attributes(from)->string(tag_t(0)), to);
+    erase_attributes(from, from+1);
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -385,10 +396,13 @@ MODEL_CARD* LANG_VERILOG::parse_paramset(CS& cmd, MODEL_CARD* x)
 BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 {
   assert(x);
+  if(has_attributes(cmd.id_tag())) {
+  }else{
+  }
+  assert (!(cmd >> "(*"));
 
   // header
-  cmd.reset();
-  parse_attributes(cmd, x->id_tag());
+  move_attributes(cmd.id_tag(), x->id_tag());
   (cmd >> "module |macromodule ");
   parse_label(cmd, x);
   parse_ports(cmd, x, true/*all new*/);
@@ -397,6 +411,12 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   // body
   for (;;) {
     cmd.get_line("verilog-module>");
+    while (parse_attributes(cmd, cmd.id_tag())) {
+      cmd.get_line("verilog-module>");
+    }
+    if(has_attributes(cmd.id_tag())){
+    }else{
+    }
 
     if (cmd >> "endmodule ") {
       break;
@@ -410,8 +430,11 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
 {
   assert(x);
-  cmd.reset();
-  parse_attributes(cmd, x->id_tag());
+  if(has_attributes(cmd.id_tag())){
+  }else{
+  }
+  assert (!(cmd >> "(*"));
+  move_attributes(cmd.id_tag(), x->id_tag());
   parse_type(cmd, x);
   parse_args_instance(cmd, x);
   parse_label(cmd, x);
@@ -423,7 +446,8 @@ COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
 /*--------------------------------------------------------------------------*/
 std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 {
-  skip_attributes(cmd);
+  assert (!(cmd >> "(*"));
+
   size_t here = cmd.cursor();
   std::string type;
   if ((cmd >> "//")) {
@@ -439,8 +463,12 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
   cmd.get_line("gnucap-verilog>");
+  while(!parse_attributes(cmd, cmd.id_tag()).more()) { untested();
+    cmd.get_line("gnucap-verilog>");
+  }
   new__instance(cmd, NULL, Scope);
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_attributes(OMSTREAM& o, tag_t x)
