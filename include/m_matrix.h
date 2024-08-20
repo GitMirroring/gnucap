@@ -692,7 +692,7 @@ void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial)
 	}
 	{ /* jj == mm */
 	  /* d(mm,mm) = aa.d(mm,mm) - dot(mm,mm,mm); then test */
-	  if (subtract_dot_product(mm,mm,mm,aa.d(mm,mm)) == 0.) {
+	  if (subtract_dot_product(mm,mm,mm,aa.d(mm,mm)) == 0.) { untested();
 	    error(bWARNING, "open circuit: internal node %u\n", mm);
 	    d(mm,mm) = _min_pivot;
 	  }else{
@@ -700,7 +700,7 @@ void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial)
 	}
       }else{    /* bn == mm */
 	d(mm,mm) = aa.d(mm,mm);
-	if (d(mm,mm)==0.) {
+	if (d(mm,mm)==0.) { untested();
 	  d(mm,mm) = _min_pivot;
 	}else{
 	}
