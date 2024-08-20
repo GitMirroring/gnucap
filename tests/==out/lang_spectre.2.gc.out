@@ -1,5 +1,7 @@
 parameters z=10k  > boo.parameters
                   ^ ? syntax error
+Re   (e 0 vcc)   dumb_resistor r=abs(-z)/10 
+          ^ ? too many: requested=3 max=2
 Cin  (b in vcc)  capacitor     c=1u 
            ^ ? too many: requested=3 max=2
 Cout (c) capacitor     c=1u 
@@ -18,7 +20,7 @@ ends dumb_resistor
 subckt foo (vcc in out)
 Rc (c vcc) resistor  r=z
 q1 (c b e) zz  area=NA( 1.)
-Re (e 0 vcc) dumb_resistor  r=abs(-z)/10
+Re (e 0) dumb_resistor  r=abs(-z)/10
 Rb1 (b vcc) resistor  r=100k
 Rb2 (b 0) dumb_resistor  r=r
 Cin (b in) capacitor  c=1u
