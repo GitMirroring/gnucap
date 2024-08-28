@@ -62,6 +62,7 @@ sed -e "s#@prefix@#$prefix#" \
 
 fill_template < $srcdir/config.h.in > config.h
 fill_template < $srcdir/gnucap-conf.in > gnucap-conf
+fill_template < $srcdir/gnucap-default-plugins.in > ../gnucap-default-plugins
 
 chmod +x gnucap-conf
 

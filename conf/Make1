@@ -27,6 +27,9 @@ INSTALL_DIR_1 = $(PREFIX)/bin
 # INSTALL_FILES_2 = gnucap.conf
 # INSTALL_DIR_2 = $(PREFIX)/etc
 #------------------------------------------------------------------------
+INSTALL_FILES_2 = ../gnucap-default-plugins
+INSTALL_DIR_2 = $(PREFIX)/lib/gnucap
+#------------------------------------------------------------------------
 LIBS =
 INCLUDE = -I. -I../include -I../../include
 #------------------------------------------------------------------------

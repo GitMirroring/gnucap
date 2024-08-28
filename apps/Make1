@@ -23,7 +23,7 @@ TARGET_LIB = gnucap-default-plugins
 TARGET_LIB_EXT = .so
 #------------------------------------------------------------------------
 INSTALL_FILES = $(TARGET_LIB)$(TARGET_LIB_EXT)
-INSTALL_DIR = $(PREFIX)/lib/gnucap
+INSTALL_DIR = $(PREFIX)/lib/gnucap/apps
 INCLUDE = -I. -I../include -I../../include
 #------------------------------------------------------------------------
 # These source files can be omitted, and supplied as plugins.
