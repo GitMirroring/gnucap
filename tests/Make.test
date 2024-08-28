@@ -16,7 +16,7 @@ TARGETDIR = check
 ref = ${REFDIR}
 
 GNUCAP = ../main/gnucap
-TESTENV = GNUCAP_PLUGPATH=${top_builddir}:${top_builddir}/apps \
+TESTENV = GNUCAP_PLUGPATH=${top_builddir} \
 	   LD_LIBRARY_PATH=${top_builddir}/lib${LD_LIBRARY_PATH:%=:%}
 
 glob_ckt = $(shell cd ${srcdir}; ls *.ckt)
