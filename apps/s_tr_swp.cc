@@ -235,7 +235,7 @@ void TRANSIENT::first()
 #define check_consistency2() {						\
     assert(newtime > _time1);						\
     assert(new_dt > 0.);						\
-    assert(new_dt >= _sim->_dtmin * .9999999);				\
+    assert(new_dt >= _sim->_dtmin);				\
     assert(newtime <= _time_by_user_request + _sim->_dtmin);		\
     /*assert(newtime == _time_by_user_request	*/			\
     /*	   || newtime < _time_by_user_request - _sim->_dtmin);*/	\
@@ -604,16 +604,22 @@ void TRANSIENT::accept()
     _sim->_eq.pop();
   }
   bool pruned = false;
-  while (!_sim->_eq.empty() && _sim->_eq.top() < _sim->_time0 + _sim->_dtmin) {untested();
-    // near duplicate events in the queue.  overclocked?
+  while (!_sim->_eq.empty() && _sim->_eq.top() - _sim->_time0 <= _sim->_dtmin) {itested();
+    // need "<=" so "==" will be grouped and re-owned, too    ^^
+    // near duplicate events in the queue. move a little.
     trace1("eq-prune", _sim->_eq.top());
     _sim->_eq.pop();
-    pruned = true;
+    pruned = true; // TODO: put aside, or adjust time instead.
   }
-  if(pruned){untested();
+  if(pruned){itested();
+    double newtime = _sim->_time0 + _sim->_dtmin;
+    if(newtime - _sim->_time0 < _sim->_dtmin) { itested();
+      newtime = std::nextafter(newtime, std::numeric_limits<double>::max());
+    }else{ untested();
+    }
+    assert(newtime - _sim->_time0 >= _sim->_dtmin);
     // comment out to put devices under stress
-    //_sim->_eq.push(_sim->_time0 + _sim->_dtmin);
-    _sim->new_event(_sim->_time0 + _sim->_dtmin, this);
+    _sim->new_event(newtime, this);
   }else{
   }
 
