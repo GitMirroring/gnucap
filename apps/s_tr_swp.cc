@@ -235,7 +235,7 @@ void TRANSIENT::first()
 #define check_consistency2() {						\
     assert(newtime > _time1);						\
     assert(new_dt > 0.);						\
-    assert(new_dt >= _sim->_dtmin);				\
+    assert(new_dt >= _sim->_dtmin * .9999999);				\
     assert(newtime <= _time_by_user_request + _sim->_dtmin);		\
     /*assert(newtime == _time_by_user_request	*/			\
     /*	   || newtime < _time_by_user_request - _sim->_dtmin);*/	\
@@ -473,10 +473,15 @@ bool TRANSIENT::next()
   }else if (up_order(newtime-_sim->_dtmin, _time_by_user_request, newtime+_sim->_dtmin)) {
     // approx time match, other control
     if (new_control == scTE) {
-    }else{untested();
+    }else{itested();
     }
-    newtime = _time_by_user_request;
-    new_dt = newtime - reftime;
+    if (new_control == scEVENTQ){itested();
+      // do not move newtime.
+    }else{
+      // leave it there, to avoid noise in ==out
+      newtime = _time_by_user_request;
+      new_dt = newtime - reftime;
+    }
     new_control = scUSER;
     check_consistency();
   }else{
