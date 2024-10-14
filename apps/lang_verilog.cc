@@ -336,12 +336,23 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
   x->set(cmd.fullstring());
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
   cmd.reset();
-  cmd.skipbl();
+  parse_attributes(cmd, x->id_tag());
+
   if(cmd.peek() == '`'){
   }else{
     // "module" etc gets here.
   }
-  parse_attributes(cmd, x->id_tag());
+
+  size_t here = cmd.cursor();
+
+  std::string s;
+  cmd >> s;
+  cmd.reset(here);
+  if (!command_dispatcher[s]) {
+    cmd.skip();
+  }else{
+  }
+
   CMD::cmdproc(cmd, scope);
   x->purge();
   delete x;
@@ -435,6 +446,12 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
     type = "dev_comment";
   }else{
     cmd >> type;
+    if(type.c_str()[0] != '`'){
+    }else if (!command_dispatcher[type]) {
+      type = type.substr(1);
+      ++here;
+    }else{
+    }
   }
   cmd.reset(here); // where the type is.
   return type;
