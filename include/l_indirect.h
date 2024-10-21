@@ -44,7 +44,7 @@ public:
       // null tag, not allowed here
     }else if (_map.count(x) == 0) {
       // first use of this tag
-    }else{ untested();
+    }else{
       // repeat, adding or replacing
       // possible collision
     }

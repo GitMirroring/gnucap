@@ -62,7 +62,7 @@ static void prepare_env()
   std::string ldlpath = OS::getenv("LD_LIBRARY_PATH");
   if (ldlpath != "") {
     ldlpath += ":";
-  }else{itested();
+  }else{
   }
   assert(strlen("PLUGPATH=") == 9);
   OS::setenv("GNUCAP_PLUGPATH", ldlpath + (plugpath+9), false);
@@ -131,11 +131,11 @@ extern "C" {
  */
 extern "C" {
   static void sig_int(SIGNALARGS)
-  {
+  {itested();
     signal(SIGINT,sig_int);
     if (ENV::run_mode == rBATCH) {itested();
       exit(1);
-    }else{
+    }else{itested();
       IO::error << '\n';
       siglongjmp(env.p,1);
     }
@@ -219,7 +219,7 @@ static void process_cmd_line(int argc, const char *argv[])
       }else{
 	try {
 	  CMD::command(std::string("include ") + argv[ii++], &CARD_LIST::card_list);
-	}catch (Exception& e) { untested();
+	}catch (Exception& e) {itested();
 	  error(bDANGER, e.message() + '\n');
 	  finish();
 	}
@@ -264,7 +264,7 @@ int main(int argc, const char *argv[])
 	exit(0);
       }
 #endif
-    }else{
+    }else{ untested();
       finish();		/* error clean up (from longjmp()) */
       //CMD::command("quit", &CARD_LIST::card_list);
       exit(0);

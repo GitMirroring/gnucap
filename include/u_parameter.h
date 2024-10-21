@@ -243,9 +243,9 @@ public:
 
   iterator begin() {return _pl.begin();}
   iterator end() {return _pl.end();}
-  const_iterator begin()const { return _pl.begin();}
-  const_iterator end()const { return _pl.end();}
-  const_iterator find(std::string const& k) const { return _pl.find(k); }
+  const_iterator begin()const {itested(); return _pl.begin();}
+  const_iterator end()const {itested(); return _pl.end();}
+  const_iterator find(std::string const& k) const {itested(); return _pl.find(k); }
 };
 /*--------------------------------------------------------------------------*/
 template <>
