@@ -186,8 +186,8 @@ class Integer : public Base {
   friend class Float;
   friend class vInteger;
 protected:
-  int32_t _data;
-  bool _input;
+  int32_t _data{0};
+  bool _input{false};
 private:
   void dump(std::ostream& o)const override {itested();
     if (!_input) { untested();
@@ -200,9 +200,8 @@ public:
   /*implicit*/ Integer(const Integer& p) :Base(), _data(p._data), _input(p._input) { }
   explicit Integer(CS& file)		{untested();parse(file);}
   explicit Integer(const std::string& s)	{CS cs(CS::_STRING, s); parse(cs);}
-  Integer(Base::NOT_INPUT) :_data(0), _input(false) {}
+  Integer(Base::NOT_INPUT = _NOT_INPUT) {}
   Integer(int32_t x) :_data(x), _input(true) {}
-  Integer() : _input(false) {}
   void parse(CS&) override;
   int32_t value()const			{return _data;}
   operator int32_t()const		{return _data;}
