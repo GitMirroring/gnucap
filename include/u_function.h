@@ -28,13 +28,8 @@
 class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class FUNCTION : public CKT_BASE {
-  std::string _label;
   //BUG//needs constructors
-public:	// label -- in CKT_BASE
   //BUG//need label support
-  std::string long_label()const final { return _label;}
-  std::string const& short_label()const final override {return _label;}
-  void	set_label(const std::string& s)final {_label=s;}
 public:
   virtual std::string eval(CS&, const CARD_LIST*)const = 0;
 };

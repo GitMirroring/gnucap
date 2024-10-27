@@ -27,12 +27,9 @@
 #include "e_base.h"
 #include "l_compar.h" // inorder
 /*--------------------------------------------------------------------------*/
-class CARD_LIST;
-/*--------------------------------------------------------------------------*/
 class INTERFACE PROBE : public CKT_BASE {
-  std::string _label; // reallt?
 private:
-  std::string	_what;
+  std::string	_what;    
   const CKT_BASE* _brh;
   double	_lo,_hi;
   explicit  PROBE() {unreachable(); incomplete();}
@@ -43,22 +40,17 @@ public:
 
   void	    set_limit(double Lo,double Hi)	{_lo = Lo; _hi = Hi;}
   void	    detach();
-  void	    store();
-  void restore(CARD_LIST const* scope);
   PROBE&    operator=(const PROBE& p);
 
-public:	// label -- in CKT_BASE
-  /*virtual*/ std::string long_label()const final{return _label;}
-  std::string const& short_label()const final override {return _label;}
-  void	set_label(const std::string& s)final {_label=s;}
   const std::string label()const;
-
   double	  value()const;
-  CKT_BASE const* object()const	 {return _brh;}
+  const CKT_BASE* object()const	 {return _brh;}
   double	  lo()const	 {return _lo;}
   double	  hi()const	 {return _hi;}
   double	  range()const	 {return hi()-lo();}
   bool		  in_range()const{return in_order(lo(),value(),hi());}
+private:
+  double	  probe_node()const;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

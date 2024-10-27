@@ -25,7 +25,6 @@
 #ifndef AP_H
 #define AP_H
 #include "md.h"
-#include "l_indirect.h" // tag_t
 /*--------------------------------------------------------------------------*/
 INTERFACE char* getcmd(const char*,char*,int);
 /*--------------------------------------------------------------------------*/
@@ -160,9 +159,6 @@ public:
   CS&	      operator>>(const char& x)	{return skip1b(x);}
   CS&	      operator>>(const char* x)	{return umatch(x);}
   CS&	      operator>>(const std::string& x)	{itested();return umatch(x);}
-
-public:
-  tag_t			id_tag()const		{return tag_t(this);}
 };	
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

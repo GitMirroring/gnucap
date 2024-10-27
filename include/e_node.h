@@ -55,10 +55,7 @@ public:
   ~NODE();
 
 public: // label
-  std::string const& short_label()const final override;
-  std::string long_label()const final override;
   void set_user_number(int i) {_user_number = i;}
-  void set_label(const std::string& s)final {assert(short_label() == s);}
   void set_owner(CARD const* c) {
     assert(!_owner || _owner == c || !c);
     _owner = c;
@@ -105,11 +102,6 @@ public: // virtuals
     assert(m_() <= _sim->matrix_nodes());
     return _sim->_ac[m_()];
   }
-
-public: // probes
-  void  inc_probes()const override {++_probes;}
-  void  dec_probes()const override {assert(_probes>0); --_probes;}
-  bool  has_probes()const override {untested();return _probes > 0;}
 }; // NODE
 /*--------------------------------------------------------------------------*/
 class MATRIX_NODE : public NODE {

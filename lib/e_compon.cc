@@ -475,7 +475,8 @@ void COMPONENT::set_port_by_index(int num, std::string& ext_name)
   trace2("spbi", num, ext_name);
   if (num < max_nodes()) {
     node(num).new_node(ext_name, this);
-    assert(node(num)->short_label() == ext_name);
+    untested();
+    ////////////////assert(node(num)->short_label() == ext_name);
     // assert(node(num).short_label() == ext_name);
     trace2("spbi", num, node(num).user_number());
 

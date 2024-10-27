@@ -24,9 +24,9 @@
 //testing=script 2014.07.04
 #include "u_sim_data.h"
 #include "m_wave.h"
+#include "u_prblst.h"
 #include "u_xprobe.h"
 #include "e_base.h"
-#include "u_prblst.h"
 /*--------------------------------------------------------------------------*/
 static char fix_case(char c)
 {
@@ -42,6 +42,16 @@ PROBE_LISTS* CKT_BASE::_probe_lists = NULL;
 /*--------------------------------------------------------------------------*/
 CKT_BASE::~CKT_BASE()
 {
+  trace1("~CKT_BASE", _probes);
+  if (_probes == 0) {
+  }else if (!_probe_lists) {untested();
+  }else if (!_sim) {untested();
+  }else{
+    _probe_lists->purge(this);
+  }
+  trace1("", _probes);
+  assert(_probes==0);
+
   if (has_attributes(id_tag())) {untested();
     unreachable();    // needs purge();
     erase_attributes(id_tag());
@@ -50,7 +60,7 @@ CKT_BASE::~CKT_BASE()
   assert(!has_attributes(id_tag()));
 }
 /*--------------------------------------------------------------------------*/
-std::string CKT_BASE::long_label()const
+const std::string CKT_BASE::long_label()const
 {
   //incomplete();
   std::string buffer(short_label());
@@ -162,9 +172,9 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
 bool CKT_BASE::operator!=(const std::string& n)const
 {
   if(OPT::case_insensitive){
-    return strcasecmp(short_label().c_str(),n.c_str())!=0;
+    return strcasecmp(_label.c_str(),n.c_str())!=0;
   }else{
-    return n != short_label();
+    return strcmp(_label.c_str(),n.c_str())!=0;
   }
 }
 /*--------------------------------------------------------------------------*/

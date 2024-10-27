@@ -283,7 +283,7 @@ void SIM_DATA::init(CARD_LIST* scope)
   }else{
     scope->precalc_first();
   }
-  restore_probes();
+  ////////restore_probes();
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_hold_vectors:
@@ -304,11 +304,11 @@ void SIM_DATA::alloc_hold_vectors()
   assert(_vdc);
 }
 /*--------------------------------------------------------------------------*/
-void SIM_DATA::restore_probes()
-{
-  assert(CKT_BASE::_probe_lists);
-  CKT_BASE::_probe_lists->restore(&CARD_LIST::card_list);
-}
+////////void SIM_DATA::restore_probes()
+////////{
+  ////////assert(CKT_BASE::_probe_lists);
+  ////////CKT_BASE::_probe_lists->restore(&CARD_LIST::card_list);
+/////////}
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::deflate_nodes( CARD_LIST* scope )
 {
@@ -450,8 +450,8 @@ void SIM_DATA::unalloc_vectors()
  */
 void SIM_DATA::uninit()
 {
-  CKT_BASE::_probe_lists->store_();
-
+  ////////CKT_BASE::_probe_lists->store_();
+  ////////
   if (_vdc) {
     _acx.reinit(0);
     _lu.reinit(0);

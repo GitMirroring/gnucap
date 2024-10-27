@@ -407,13 +407,13 @@ void LANG_VERILOG::parse_ground(CS& cmd, BASE_SUBCKT* x) const
 BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 {
   assert(x);
-  if(has_attributes(cmd.id_tag())) {
+  if(has_attributes(id_tag())) {
   }else{
   }
   assert (!(cmd >> "(*"));
 
   // header
-  move_attributes(cmd.id_tag(), x->id_tag());
+  move_attributes(id_tag(), x->id_tag());
   (cmd >> "module |macromodule ");
   parse_label(cmd, x);
   parse_ports(cmd, x, true/*all new*/);
@@ -422,10 +422,10 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   // body
   for (;;) {
     cmd.get_line("verilog-module>");
-    while (parse_attributes(cmd, cmd.id_tag())) {
+    while (parse_attributes(cmd, id_tag())) {
       cmd.get_line("verilog-module>");
     }
-    if(has_attributes(cmd.id_tag())){
+    if(has_attributes(id_tag())){
     }else{
     }
 
@@ -444,11 +444,11 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
 {
   assert(x);
-  if(has_attributes(cmd.id_tag())){
+  if(has_attributes(id_tag())){
   }else{
   }
   assert (!(cmd >> "(*"));
-  move_attributes(cmd.id_tag(), x->id_tag());
+  move_attributes(id_tag(), x->id_tag());
   parse_type(cmd, x);
   parse_args_instance(cmd, x);
   parse_label(cmd, x);
@@ -477,7 +477,7 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
   cmd.get_line("gnucap-verilog>");
-  while(!parse_attributes(cmd, cmd.id_tag()).more()) { untested();
+  while(!parse_attributes(cmd, id_tag()).more()) { untested();
     cmd.get_line("gnucap-verilog>");
   }
   new__instance(cmd, NULL, Scope);

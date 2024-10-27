@@ -28,7 +28,6 @@
 #include "e_node.h"
 #include "e_logicnode.h" // avoid?
 #include "e_card.h"
-#include "u_prblst.h"
 /*--------------------------------------------------------------------------*/
 CARD::CARD()
   :CKT_BASE(),
@@ -42,7 +41,6 @@ CARD::CARD()
 /*--------------------------------------------------------------------------*/
 CARD::CARD(const CARD& p)
   :CKT_BASE(p),
-   _label(p._label),
    _evaliter(-100),
    _subckt(0), //BUG// isn't this supposed to copy????
    _owner(0),
@@ -53,27 +51,8 @@ CARD::CARD(const CARD& p)
 /*--------------------------------------------------------------------------*/
 CARD::~CARD()
 {
-  trace1("~CKT_BASE", _probes);
-  if (_probes == 0) {
-  }else if (!_probe_lists) {untested();
-  }else if (!_sim) {untested();
-  }else{
-    _probe_lists->purge(this);
-  }
-  trace1("", _probes);
-  assert(_probes==0);
-
   // purge();
   delete _subckt;
-  _subckt = NULL;
-
-  if (_probes == 0) {
-  }else if (!_probe_lists) {untested();
-  }else if (!_sim) {untested();
-  }else{
-    _probe_lists->purge(this);
-  }
-  assert(_probes==0);
 }
 /*--------------------------------------------------------------------------*/
 void CARD::purge()
@@ -82,7 +61,7 @@ void CARD::purge()
   CKT_BASE::purge();
 }
 /*--------------------------------------------------------------------------*/
-std::string CARD::long_label()const
+const std::string CARD::long_label()const
 {
   std::string buffer(short_label());
   for (const CARD* brh = owner();  brh;  brh = brh->owner()) {

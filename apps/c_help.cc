@@ -86,9 +86,6 @@ public:
 DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "help", &p0);
 /*--------------------------------------------------------------------------*/
 class HELP_ERROR_TEST : public CKT_BASE {
-  std::string _label;
-  std::string const& short_label()const override {untested(); return _label;}
-  void	set_label(const std::string&)override {untested();}
 } p1;
 DISPATCHER<CKT_BASE>::INSTALL d1(&help_dispatcher, "help_error_test_with_no_help", &p1);  
 /*--------------------------------------------------------------------------*/
