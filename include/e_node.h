@@ -43,7 +43,6 @@ private:
   CARD const* _owner{NULL};
   int _user_number{-1}; // unneeded? //
 			// owner->nodes[u] == this ...
-  mutable int _probes{0};
 protected:
   explicit NODE(CARD const*, int u);
 private:
@@ -52,9 +51,11 @@ protected:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
   // explicit NODE(const std::string& s);
 public:
-  ~NODE();
+  ~NODE() {}
 
 public: // label
+  std::string const& short_label()const final override;
+  std::string const  long_label()const final override;
   void set_user_number(int i) {_user_number = i;}
   void set_owner(CARD const* c) {
     assert(!_owner || _owner == c || !c);

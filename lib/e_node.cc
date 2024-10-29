@@ -557,6 +557,7 @@ NODE_P& NODE_P::merge(NODE_P* o)
   return *this;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 NODE::~NODE()
 {
   if (_probes == 0) {
@@ -567,6 +568,7 @@ NODE::~NODE()
   }
   assert(_probes==0);
 }
+#endif
 /*--------------------------------------------------------------------------*/
 NODE* NODE::deflate(NODE_P*, CARD*)
 { untested();
@@ -644,7 +646,6 @@ bool NODE_P::is_short_to(NODE_P const& n) const
   }
 }
 /*--------------------------------------------------------------------------*/
-#if 0
 std::string const& NODE::short_label()const
 {
   if(_user_number<0) { untested();
@@ -672,7 +673,7 @@ std::string const& NODE::short_label()const
   return unknown;
 }
 /*--------------------------------------------------------------------------*/
-std::string NODE::long_label()const
+std::string const NODE::long_label()const
 {
   if(_owner) {
     return _owner->long_label() + "." + short_label();
@@ -681,7 +682,6 @@ std::string NODE::long_label()const
     return "$root." + short_label();
   }
 }
-#endif
 /*--------------------------------------------------------------------------*/
 int MATRIX_NODE::flat_number() const
 {
