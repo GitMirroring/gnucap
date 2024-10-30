@@ -46,12 +46,17 @@ void TRANSIENT::allocate()
  */
 void TRANSIENT::setup(CS& Cmd)
 {
+  trace5("TRANSIENT::setup0", _dtmin, _last_time, _time0, _time1, is_first_expand());
+  assert(command_is_tran());
   _tstart.e_val(NOT_INPUT, _scope);
   _tstop.e_val(NOT_INPUT, _scope);
   _tstrobe.e_val(NOT_INPUT, _scope);
 
-  if (_sim->is_first_expand()) {
-    _sim->_last_time = 0;
+  // TODO: _scope->is_first_expand()
+  if (!CKT_BASE::_sim) { untested();
+    _last_time = 0;
+  }else if (CKT_BASE::_sim->is_first_expand()) {
+    _last_time = 0;
   }else{
   }
 
@@ -98,7 +103,7 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstop  = arg2;
 	/* _tstrobe unchanged */
       }else if (arg1 >= arg2) {		    /* 2 args: _tstop, _tstrobe */
-	_tstart = _sim->_last_time;
+	_tstart = _last_time;
 	_tstop  = arg1;
 	_tstrobe  = arg2;
       }else{				    /* 2 args: _tstrobe, _tstop */
@@ -110,8 +115,8 @@ void TRANSIENT::setup(CS& Cmd)
     }else{				    /* 1 arg */
       assert(arg1.has_hard_value());
       arg1.e_val(0.,_scope);
-      if (arg1 > _sim->_last_time) {	    /* 1 arg: _tstop */
-	_tstart = _sim->_last_time;
+      if (arg1 > _last_time) {	    /* 1 arg: _tstop */
+	_tstart = _last_time;
 	_tstop  = arg1;
 	/* _tstrobe unchanged */
       }else if (arg1 == 0.) {untested();    /* 1 arg: _tstart */
@@ -120,18 +125,18 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstop  = oldrange;
 	/* _tstrobe unchanged */
       }else{			     /* 1 arg: _tstrobe */
-	assert(arg1 <= _sim->_last_time);
+	assert(arg1 <= _last_time);
 	assert(arg1 > 0.);
 	double oldrange = _tstop - _tstart;
-	_tstart = _sim->_last_time;
-	_tstop  = _sim->_last_time + oldrange;
+	_tstart = _last_time;
+	_tstop  = _last_time + oldrange;
 	_tstrobe  = arg1;
       }
     }
   }else{ /* no args */
     double oldrange = _tstop - _tstart;
-    _tstart = _sim->_last_time;
-    _tstop  = _sim->_last_time + oldrange;
+    _tstart = _last_time;
+    _tstop  = _last_time + oldrange;
     /* _tstrobe unchanged */
   }
   if (Cmd.match1("'\"({") || Cmd.is_pfloat()) {
@@ -155,14 +160,14 @@ void TRANSIENT::setup(CS& Cmd)
   }
   _tstrobe.e_val(_tstop-_tstart, _scope);
 
-  if  (_cold || _tstart < _sim->_last_time  ||  _sim->_last_time <= 0.) {
+  if  (_cold || _tstart < _last_time  ||  _last_time <= 0.) {
     _cont = false;
-    _time1 = _sim->_time0 = 0.;
+    _time1 = _time0 = 0.;
   }else{
     _cont = true;
-    _time1 = _sim->_time0 = _sim->_last_time;
+    _time1 = _time0 = _last_time;
   }
-  _sim->_freq = ((_tstop > _tstart) ? (1 / (_tstop - _tstart)) : (0.));
+  _freq = ((_tstop > _tstart) ? (1 / (_tstop - _tstart)) : (0.));
 
   if (_dtmax_in.has_hard_value()) {
     _dtmax = _dtmax_in;
@@ -173,13 +178,16 @@ void TRANSIENT::setup(CS& Cmd)
   }
 
   if (_dtmin_in.has_hard_value()) {untested();
-    _sim->_dtmin = _dtmin_in;
+    _dtmin = _dtmin_in;
   }else if (_dtratio_in.has_hard_value()) {untested();
-    _sim->_dtmin = _dtmax / _dtratio_in;
+    _dtmin = _dtmax / _dtratio_in;
   }else{
     // use larger of soft values
-    _sim->_dtmin = std::max(double(_dtmin_in), _dtmax/_dtratio_in);
+    _dtmin = std::max(double(_dtmin_in), _dtmax/_dtratio_in);
   }
+
+  trace4("TRANSIENT::setup", _dtmin, _last_time, _time0, _time1);
+  assert(_dtmin);
 }
 /*--------------------------------------------------------------------------*/
 /* tr_options: set options common to transient and fourier analysis
@@ -188,15 +196,17 @@ void TRANSIENT::options(CS& Cmd)
 {
   _out = IO::mstdout;
   _out.reset(); //BUG// don't know why this is needed
-  _sim->_temp_c = OPT::temp_c;
+  _temp_c = OPT::temp_c;
+
   bool ploton = IO::plotset  &&  plotlist().size() > 0;
-  _sim->_uic = _cold = false;
+  trace1("TRANSIENT::options", plotlist().size());
+  _uic = _cold = false;
   _trace = tNONE;
   size_t here = Cmd.cursor();
   do{
     ONE_OF
       || Get(Cmd, "c{old}",	   &_cold)
-      || Get(Cmd, "dte{mp}",	   &_sim->_temp_c,  mOFFSET, OPT::temp_c)
+      || Get(Cmd, "dte{mp}",	   &_temp_c,  mOFFSET, OPT::temp_c)
       || Get(Cmd, "dtma{x}",	   &_dtmax_in)
       || Get(Cmd, "dtmi{n}",	   &_dtmin_in)
       || Get(Cmd, "dtr{atio}",	   &_dtratio_in)
@@ -205,8 +215,8 @@ void TRANSIENT::options(CS& Cmd)
       || Get(Cmd, "sta{rt}",	   &_tstart)
       || Get(Cmd, "sto{p}",	   &_tstop)
       || Get(Cmd, "str{obeperiod}",&_tstrobe)
-      || Get(Cmd, "te{mperature}", &_sim->_temp_c)
-      || Get(Cmd, "uic",	   &_sim->_uic)
+      || Get(Cmd, "te{mperature}", &_temp_c)
+      || Get(Cmd, "uic",	   &_uic)
       || (Cmd.umatch("tr{ace} {=}") &&
 	  (ONE_OF
 	   || Set(Cmd, "n{one}",      &_trace, tNONE)

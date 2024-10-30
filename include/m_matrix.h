@@ -127,6 +127,9 @@ private:
   T	_min_pivot;	// minimum pivot value
 private:
   explicit	BSMATRIX(const BSMATRIX<T>&) {incomplete();unreachable();}
+public:
+  BSMATRIX& operator=(BSMATRIX&& b);
+private:
   void		uninit();
   void		init(int s=0);
   T&		subtract_dot_product(int r, int c, int d);
@@ -828,6 +831,32 @@ void BSMATRIX<T>::fbsubt(T* v) const
     }
   }
   v[1]/=d(1,1);
+}
+/*--------------------------------------------------------------------------*/
+template <class T>
+BSMATRIX<T>& BSMATRIX<T>::operator=(BSMATRIX<T>&& b)
+{
+  _changed =   b._changed;
+  _lownode =   b._lownode;
+  _space =     b._space;
+  _diaptr =    b._diaptr;
+  _nzcount =   b._nzcount;
+  _size =      b._size;
+  _zero =      b._zero;
+  _trash =     b._trash;
+  _min_pivot = b._min_pivot;
+
+  b._changed =   nullptr;
+  b._lownode =   nullptr;
+  b._space =     nullptr;
+  b._diaptr =    nullptr;
+  b._nzcount =   0;
+  b._size =      0;
+ // _zero =      nullptr;
+ // _trash =     nullptr;
+ // _min_pivot = nullptr;
+
+  return *this;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

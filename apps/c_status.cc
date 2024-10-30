@@ -70,14 +70,16 @@ public:
       }
       IO::mstdout << ::status.total;
     }
-    
-    IO::mstdout
-      << "iterations: op=" << _sim->_iter[s_OP]
-      << ", dc=" << _sim->_iter[s_DC]
-      << ", tran=" << _sim->_iter[s_TRAN]
-      << ", fourier=" << _sim->_iter[s_FOURIER]
-      << ", total=" << _sim->_iter[iTOTAL]
-      << "\n";    
+    if(_sim) {
+      IO::mstdout
+	<< "iterations: op=" << _sim->_iter[s_OP]
+	<< ", dc=" << _sim->_iter[s_DC]
+	<< ", tran=" << _sim->_iter[s_TRAN]
+	<< ", fourier=" << _sim->_iter[s_FOURIER]
+	<< ", total=" << _sim->_iter[iTOTAL]
+	<< "\n";    
+    }else{
+    }
     for(DISPATCHER<CKT_BASE>::const_iterator
 	  i = status_dispatcher.begin();
 	i != status_dispatcher.end();
@@ -88,14 +90,17 @@ public:
       }else{ untested();
       }
     }
-    IO::mstdout
-      << "nodes: user=" << _sim->_user_nodes
-      << ", subckt=" << _sim->_subckt_nodes
-      << ", model=" << _sim->_model_nodes
-      << ", total=" << _sim->_total_nodes
-      << "\n";  
-    IO::mstdout.form("dctran density=%.1f%%, ac density=%.1f%%\n",
-		 _sim->_aa.density()*100., _sim->_acx.density()*100.);
+    if(_sim) {
+      IO::mstdout
+	<< "nodes: user=" << _sim->_user_nodes
+	<< ", subckt=" << _sim->_subckt_nodes
+	<< ", model=" << _sim->_model_nodes
+	<< ", total=" << _sim->_total_nodes
+	<< "\n";  
+      IO::mstdout.form("dctran density=%.1f%%, ac density=%.1f%%\n",
+		_sim->_aa.density()*100., _sim->_acx.density()*100.);
+    }else{
+    }
   }
 } p;
 DISPATCHER<CMD>::INSTALL d(&command_dispatcher, "status", &p);

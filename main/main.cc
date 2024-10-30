@@ -242,7 +242,6 @@ static void process_cmd_line(int argc, const char *argv[])
 int main(int argc, const char *argv[])
 {
   prepare_env();
-  CKT_BASE::_sim = new SIM_DATA;
   CKT_BASE::_probe_lists = new PROBE_LISTS;
   try {
   {
@@ -307,8 +306,6 @@ int main(int argc, const char *argv[])
   CMD::command("detach_all", &CARD_LIST::card_list);
   delete CKT_BASE::_probe_lists;
   CKT_BASE::_probe_lists = nullptr;
-  delete CKT_BASE::_sim;
-  CKT_BASE::_sim = nullptr;
   
   return 0;
 }

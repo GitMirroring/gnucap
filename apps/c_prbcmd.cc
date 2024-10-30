@@ -31,20 +31,85 @@
 #ifdef TRACE_UNTESTED
 #include "e_cardlist.h" // not actually used.
 #endif
+#include <set> // to keep track (kludge)
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-void do_probe(CS& cmd, PROBELIST *probes, CARD_LIST *scope)
+class OUTPUT_CMD : public CMD {
+protected:
+  SIM* _sim{nullptr};
+  void set_sim(CS& cmd, CARD_LIST *scope);
+  void do_probe(CS& cmd, std::string const& what, CARD_LIST *scope);
+};
+/*--------------------------------------------------------------------------*/
+void OUTPUT_CMD::set_sim(CS& cmd, CARD_LIST *scope)
 {
-  assert(probes);
+
+  trace1("set_sim", cmd.tail());
+  size_t here = cmd.cursor();
+  CMD* c = command_dispatcher[cmd];
+  if (SIM* sim = dynamic_cast<SIM*>(c)) {
+    trace1("set_sim1", sim->short_label());
+    _sim = sim;
+    _sim->load(scope);
+    assert(CKT_BASE::_sim == _sim);
+    trace1("set_sim1b", sim->short_label());
+    _sim->init(scope);
+  }else{
+    trace1("set_sim2", cmd.fullstring());
+    // leave CKT_BASE::_sim intact.
+    cmd.reset(here);
+    _sim = nullptr;
+  }
+}
+/*--------------------------------------------------------------------------*/
+void list_all(std::string const& what)
+{
+  std::set<void*> track;
+  for(auto i : command_dispatcher){
+    if(auto s = dynamic_cast<SIM*>(i.second)){
+      PROBELIST const* probes_simtype = nullptr;
+      bool done = !track.insert(s).second;
+      if(done){
+      }else if(what=="alarm") { untested();
+	probes_simtype = &s->alarmlist();
+      }else if(what=="print") {
+	probes_simtype = &s->printlist();
+      }else if(what=="store") { untested();
+	probes_simtype = &s->storelist();
+      }else if(what=="plot") { untested();
+	probes_simtype = &s->plotlist();
+      }else{ untested();
+	incomplete();
+	throw Exception("no such probelist");
+      }
+      if(probes_simtype){
+      probes_simtype->listing(i.second->short_label());
+      }else{
+      }
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+void clear_all()
+{
+  for(auto i : command_dispatcher){
+    if(auto s = dynamic_cast<SIM*>(i.second)){
+      s->probe_lists().alarm.clear();
+      s->probe_lists().plot .clear();
+      s->probe_lists().print.clear();
+      s->probe_lists().store.clear();
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
+void OUTPUT_CMD::do_probe(CS& cmd, std::string const& what, CARD_LIST *scope)
+{
   assert(scope);
-#ifdef TRACE_UNTESTED
   if (scope == &CARD_LIST::card_list) {
   }else{itested();
   }
-#endif
 
-  CKT_BASE::_sim->set_command_none();
   enum {aADD, aDELETE, aNEW} action;
   SIM_MODE simtype = s_NONE;
 
@@ -58,35 +123,40 @@ void do_probe(CS& cmd, PROBELIST *probes, CARD_LIST *scope)
     action = aNEW;		/* .probe ac + ..... 		    */
   }				/* which will not clear first	    */
 
-  ONE_OF
-    || Set(cmd, "tr{ansient}", &simtype, s_TRAN)
-    || Set(cmd, "ac",	       &simtype, s_AC)
-    || Set(cmd, "dc",	       &simtype, s_DC)
-    || Set(cmd, "op",	       &simtype, s_OP)
-    || Set(cmd, "fo{urier}",   &simtype, s_FOURIER)
-    ;
+  PROBELIST* probes_simtype = nullptr;
+  assert(scope);
+  set_sim(cmd, scope);
+  if(!_sim){
+    trace1("no sim name arg", cmd.fullstring());
+  }else if(what=="alarm") {
+    probes_simtype = &_sim->probe_lists().alarm;
+  }else if(what=="print") {
+    probes_simtype = &_sim->probe_lists().print;
+  }else if(what=="plot") {
+    probes_simtype = &_sim->probe_lists().plot;
+  }else if(what=="store") {
+    probes_simtype = &_sim->probe_lists().store;
+  }else{ untested();
+    incomplete();
+    throw Exception("no such probelist");
+  }
+
+  trace1("do_probe", simtype);
   
-  if (!simtype) {			/* must be all simtypes */
-    if (cmd.is_end()) {			/* list all */
-      probes[s_TRAN].listing("tran");
-      probes[s_AC].listing("ac");
-      probes[s_DC].listing("dc");
-      probes[s_OP].listing("op");
-      probes[s_FOURIER].listing("fourier");
+  if (!probes_simtype) {			/* must be all simtypes */
+    if (cmd.is_end()) {		/* list all */
+      list_all(what);
     }else if (cmd.umatch("clear ")) {		/* clear all */
-      for (int ii = sSTART;  ii < sCOUNT;  ++ii) {
-	probes[ii].clear();
-      }
+      clear_all();
     }else{itested();				/* error */
       throw Exception_CS("what's this?", cmd);
     }
   }else{
     if (cmd.is_end()) {untested();		/* list */
-      probes[simtype].listing("");
+      probes_simtype->listing(_sim->short_label());
     }else if (cmd.umatch("clear ")) {itested();/* clear */
-      probes[simtype].clear();
-    }else{					/* add/remove */
-      CKT_BASE::_sim->init(scope);
+      probes_simtype->clear();
+    }else{				/* add/remove */
       if (cmd.match1('-')) {itested();		/* setup cases like: */
 	action = aDELETE;			/* .probe ac + ....  */
 	cmd.skip();
@@ -96,7 +166,7 @@ void do_probe(CS& cmd, PROBELIST *probes, CARD_LIST *scope)
       }else{
       }
       if (action == aNEW) {			/* no +/- here or at beg. */
-	probes[simtype].clear();		/* means clear first	  */
+	probes_simtype->clear();		/* means clear first	  */
 	action = aADD;
       }else{
       }
@@ -110,16 +180,16 @@ void do_probe(CS& cmd, PROBELIST *probes, CARD_LIST *scope)
 	}else{
 	}
 	if (action == aDELETE) {
-	  probes[simtype].remove_list(cmd);
+	  probes_simtype->remove_list(cmd);
 	}else{
-	  probes[simtype].add_list(cmd, scope);
+	  probes_simtype->add_list(cmd, scope);
 	}
       }
     }
   }
 }
 /*--------------------------------------------------------------------------*/
-class CMD_STORE : public CMD {
+class CMD_STORE : public OUTPUT_CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     assert(Scope);
@@ -129,13 +199,12 @@ public:
     }
 #endif
     assert(_probe_lists);
-    assert(_probe_lists->store);
-    do_probe(cmd, _probe_lists->store, Scope);
+    do_probe(cmd, "store", Scope);
   }
 } p0;
 DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "store|`store", &p0);
 /*--------------------------------------------------------------------------*/
-class CMD_ALARM : public CMD {
+class CMD_ALARM : public OUTPUT_CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     assert(Scope);
@@ -145,13 +214,12 @@ public:
     }
 #endif
     assert(_probe_lists);
-    assert(_probe_lists->alarm);
-    do_probe(cmd, _probe_lists->alarm, Scope);
+    do_probe(cmd, "alarm", Scope);
   }
 } p1;
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "alarm|`alarm", &p1);
 /*--------------------------------------------------------------------------*/
-class CMD_PLOT : public CMD {
+class CMD_PLOT : public OUTPUT_CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     assert(Scope);
@@ -162,13 +230,12 @@ public:
 #endif
     IO::plotset = true;
     assert(_probe_lists);
-    assert(_probe_lists->plot);
-    do_probe(cmd, _probe_lists->plot, Scope);
+    do_probe(cmd, "plot", Scope);
   }
 } p2;
 DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "iplot|plot|`iplot|`plot", &p2);
 /*--------------------------------------------------------------------------*/
-class CMD_PRINT : public CMD {
+class CMD_PRINT : public OUTPUT_CMD {
 public:
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     assert(Scope);
@@ -179,8 +246,7 @@ public:
 #endif
     IO::plotset = false;
     assert(_probe_lists);
-    assert(_probe_lists->print);
-    do_probe(cmd, _probe_lists->print, Scope);
+    do_probe(cmd, "print", Scope);
   }
 } p3;
 DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "iprint|print|probe|`iprint|`print|`probe", &p3);

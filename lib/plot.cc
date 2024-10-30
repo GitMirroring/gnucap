@@ -59,6 +59,7 @@ void plottr(double xx, const PROBELIST& plotlist) /* plot a data point,	    */
     plotarg(xx, val[0], val[1],
 	    xstart, lo[0], lo[1],
 	    xstop,  hi[0], hi[1]);
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -68,10 +69,12 @@ int plopen(double start, double stop, const PROBELIST& plotlist)
 {
   if (start == stop) {
     IO::plotout = OMSTREAM();
+  }else{
   }
   if (!IO::plotout.any()) {
     plclear();
     return false;
+  }else{
   }
   xstart  = start;
   xstop   = stop;

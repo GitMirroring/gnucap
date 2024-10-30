@@ -37,7 +37,7 @@ double CKT_BASE::tr_probe_num(const std::string&)const {return NOT_VALID;}
 XPROBE CKT_BASE::ac_probe_ext(const std::string&)const {return XPROBE(NOT_VALID, mtNONE);}
 double CKT_BASE::noise_num(const std::string&)const {itested(); return 0.;}
 /*--------------------------------------------------------------------------*/
-SIM_DATA* CKT_BASE::_sim = nullptr; 
+SIM* CKT_BASE::_sim = nullptr;
 PROBE_LISTS* CKT_BASE::_probe_lists = nullptr;
 /*--------------------------------------------------------------------------*/
 CKT_BASE::~CKT_BASE()
@@ -45,7 +45,7 @@ CKT_BASE::~CKT_BASE()
   trace1("~CKT_BASE", _probes);
   if (_probes == 0) {
   }else if (!_probe_lists) {untested();
-  }else if (!_sim) {untested();
+  // }else if (!_sim) {untested();
   }else{
     _probe_lists->purge(this);
   }
@@ -151,22 +151,6 @@ double CKT_BASE::ac_probe_num(const std::string& what)const
   }else{				/* return 0 if doesn't exist */
     return 0.0;				/* happens when optimized models */
   }					/* don't have all parts */
-}
-/*--------------------------------------------------------------------------*/
-/*static*/ WAVE* CKT_BASE::find_wave(const std::string& probe_name)
-{
-  int ii = 0;
-  for (PROBELIST::const_iterator
-       p  = _probe_lists->store[_sim->_mode].begin();
-       p != _probe_lists->store[_sim->_mode].end();
-       ++p) {
-    if (wmatch(p->label(), probe_name)) {
-      return &(_sim->_waves[ii]);
-    }else{
-    }
-    ++ii;
-  }
-  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 bool CKT_BASE::operator!=(const std::string& n)const

@@ -501,7 +501,6 @@ CARD* LANG_SPICE_BASE::parse_command(CS& cmd, CARD* x)
     dot->set(cmd.fullstring());
   }else{
     parse_type(cmd, x);
-    x->set_label(x->dev_type());
   }
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 
@@ -524,8 +523,12 @@ CARD* LANG_SPICE_BASE::parse_command(CS& cmd, CARD* x)
   //  dot->set("");
     delete x;
     x = nullptr;
-  }else if(auto c=dynamic_cast<CMD*>(x)) { untested();
-    trace1("got CMD", cmd.fullstring());
+  }else if(auto c=dynamic_cast<CMD*>(x)) {
+    trace2("got CMD", x->short_label(), cmd.fullstring());
+    if(cmd >> ("." + x->dev_type())) {
+    }else{ untested();
+    }
+    trace2("run CMD", x->short_label(), cmd.tail());
     CMD::cmdproc(cmd, scope, c);
   }else{
     unreachable();
@@ -766,7 +769,7 @@ void LANG_SPICE_BASE::print_command(OMSTREAM& o, const CARD* x)
   }else if(auto cc = dynamic_cast<CMD const*>(x)){
     o << "." << x->dev_type();
     ::print_args(o, cc);
-    if( x->dev_type() != cc->short_label() ){ untested();
+    if( x->dev_type() != cc->short_label() ){
       o << " label=\"" << cc->short_label() << "\"";
     }else{
     }

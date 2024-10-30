@@ -7,12 +7,15 @@ endmodule // foo
 
 // BUG still need {} in c_param 
 foo #(.fs("testvalue")) f ();
+`op label="op"
 module foo ();
 endmodule // foo
 
 // BUG still need {} in c_param 
 foo #(.fs("testvalue")) f ();
+`op label="op"
 .subckt foo (  )
 .ends foo
 *// BUG still need {} in c_param 
 f (  )  foo  fs="testvalue"
+.`op label="op"

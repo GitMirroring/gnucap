@@ -25,7 +25,23 @@
 #include "u_function.h"
 #include "c_comand.h"
 #include "globals.h"
+#include "s__.h"
+#include "u_prblst.h"
+#include "m_wave.h"
 /*--------------------------------------------------------------------------*/
+/*static*/ WAVE* CKT_BASE::find_wave(const std::string& probe_name)
+{
+  assert(_sim);
+  int ii = 0;
+  for (auto const& p : _sim->probe_lists().store) {
+    if (wmatch(p.label(), probe_name)) {
+      return &(_sim->_waves[ii]);
+    }else{
+    }
+    ++ii;
+  }
+  return nullptr;
+}
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/

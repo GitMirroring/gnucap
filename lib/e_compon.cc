@@ -421,7 +421,7 @@ COMPONENT::COMPONENT(const COMPONENT& p)
 {
   if (_sim) {
     _sim->uninit();
-  }else{untested();
+  }else{
   }
   if(p._hsparam){
     _hsparam = p._hsparam->clone();

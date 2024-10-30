@@ -90,6 +90,7 @@ double sweep_fix(CS& cmd, const CARD *brh)
 /*--------------------------------------------------------------------------*/
 void modify_fault(CS& cmd, WHATTODO command, CARD_LIST* scope)
 {
+  assert(CKT_BASE::_sim);
   CKT_BASE::_sim->uninit();
   while (cmd.is_alpha()) {
     size_t mark = cmd.cursor();
@@ -154,12 +155,15 @@ DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "restore", &p3);
 /*--------------------------------------------------------------------------*/
 class CMD_UNFAULT : public CMD {
 public:
-  void do_it(CS&, CARD_LIST*)override {
+  void do_it(CS&, CARD_LIST* /*scope*/)override {
     while (!faultstack.empty()) {
       faultstack.back().restore();
       faultstack.pop_back();
     }
-    _sim->uninit();
+    if(_sim) {
+      _sim->uninit();
+    }else{
+    }
   }
 } p4;
 DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "unfault", &p4);

@@ -32,7 +32,7 @@ MODEL_CARD::MODEL_CARD(const COMPONENT* p)
 {
   if (_sim) {
     _sim->uninit();
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -43,7 +43,7 @@ MODEL_CARD::MODEL_CARD(const MODEL_CARD& p)
 {
   if (_sim) {
     _sim->uninit();
-  }else{untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -86,40 +86,7 @@ private:
   void	finish()override;
 
 protected:
-  explicit DCOP(const DCOP& d) :
-    SIM(d),
-    _n_sweeps(d._n_sweeps),
-    _cont(d._cont),
-    _trace(d._trace),
-    _have_param(d._have_param) {
-
-     for (int ii = 0; ii < DCNEST; ++ii) {
-       _start[ii] =      d._start[ii];
-       _stop[ii] =       d._stop[ii];
-       _step_in[ii] =    d._step_in[ii];
-       _step[ii] =       d._step[ii];
-       _linswp[ii] =     d._linswp[ii];
-       _loop[ii] =       d._loop[ii];
-       _reverse_in[ii] = d._reverse_in[ii];
-       _reverse[ii] =    false; // d._reverse[ii];
-
-       _param[ii] = d._param[ii];
-       _sweepval[ii] = d._sweepval[ii];
-
-       if(_sweepval[ii] == &d._param[ii]) {
-	 // rebase
-	 _sweepval[ii] = &_param[ii];
-       }else{
-       }
-
-       _zap[ii] = d._zap[ii];;
-       assert(!_zap[ii]);
-       _ctrl[ii] = d._ctrl[ii];
-       assert(!_ctrl[ii]);
-
-       _stepmode[ii] = d._stepmode[ii];
-     }
-   }
+  explicit DCOP(const DCOP& d);
 protected:
   void set_sweepval(int i, double d){
     ::status.set_up.start();
@@ -146,7 +113,8 @@ protected:
 protected:
   explicit DCOP();
   ~DCOP() {}
-  
+  SIM& operator=(SIM&& ex)override { untested(); return SIM::operator=(std::move(ex)); }
+
 protected:
   enum {DCNEST = 4};
   int _n_sweeps;
@@ -176,24 +144,34 @@ private:
 /*--------------------------------------------------------------------------*/
 class DC : public DCOP {
 public:
-  explicit DC(): DCOP() {}
+  explicit DC(): DCOP() {
+    set_label("dc");
+  }
   ~DC() {}
+  SIM& operator=(SIM&& ex)override { return SIM::operator=(std::move(ex)); }
   CARD* clone()const override {return new DC(*this);}
   void	do_it(CS&, CARD_LIST*)override;
 private:
   void	setup(CS&)override;
-  explicit DC(const DC& x): DCOP(x) { }
+  explicit DC(const DC& x): DCOP(x) {
+    set_label("dc");
+  }
 };
 /*--------------------------------------------------------------------------*/
 class OP : public DCOP {
 public:
-  explicit OP(): DCOP() {}
+  explicit OP(): DCOP() {
+    set_label("op");
+  }
   ~OP() {}
+  SIM& operator=(SIM&& ex)override { return SIM::operator=(std::move(ex)); }
   CARD* clone()const override {return new OP(*this);}
   void	do_it(CS&, CARD_LIST*)override;
 private:
   void	setup(CS&)override;
-  explicit OP(const OP& x): DCOP(x) { }
+  explicit OP(const OP& x): DCOP(x) {
+    set_label("op");
+  }
 };
 /*--------------------------------------------------------------------------*/
 void DCOP::allocate()
@@ -214,28 +192,33 @@ void DC::do_it(CS& Cmd, CARD_LIST* Scope)
   }else{untested();
   }
   _scope = Scope;
-  _sim->_time0 = 0.;
-  _sim->set_command_dc();
-  _sim->_phase = p_INIT_DC;
+
+  _time0 = 0.;
+  set_command_dc();
+  _phase = p_INIT_DC;
+
   ::status.dc.reset().start();
   command_base(Cmd);
-  _scope = nullptr;
+  // _scope = nullptr;
   ::status.dc.stop();
 }
 /*--------------------------------------------------------------------------*/
 void OP::do_it(CS& Cmd, CARD_LIST* Scope)
 {
+  trace1("OP::do_it", Cmd.tail());
   assert(Scope);
   if (Scope == &CARD_LIST::card_list) {
   }else{untested();
   }
   _scope = Scope;
-  _sim->_time0 = 0.;
-  _sim->set_command_op();
-  _sim->_phase = p_INIT_DC;
+
+  _time0 = 0.;
+  set_command_op();
+  _phase = p_INIT_DC;
+
   ::status.op.reset().start();
   command_base(Cmd);
-  _scope = nullptr;
+  // _scope = nullptr;
   ::status.op.stop();
 }
 /*--------------------------------------------------------------------------*/
@@ -246,23 +229,60 @@ DCOP::DCOP()
    _cont(false),
    _trace(tNONE)
 {
-
   for (int ii = 0; ii < DCNEST; ++ii) {
     _loop[ii] = false;
     _reverse_in[ii] = false;
     _reverse[ii] = false;
     _step[ii]=0.;
     _linswp[ii]=true;
-    _sweepval[ii]=&_sim->_genout;
+    _sweepval[ii]=&_genout;
     _zap[ii] = nullptr;
     _ctrl[ii] = nullptr;
     _stepmode[ii] = ONE_PT;
     _param[ii] = NOT_VALID;
   }
   //BUG// in SIM.  should be initialized there.
-  //_sim->_genout=0.;
+  //_genout=0.;
   _out=IO::mstdout;
-  //_sim->_uic=false;
+  //_uic=false;
+}
+/*--------------------------------------------------------------------------*/
+DCOP::DCOP(const DCOP& d) :
+  SIM(d),
+  _n_sweeps(d._n_sweeps),
+  _cont(d._cont),
+  _trace(d._trace),
+  _have_param(d._have_param) {
+
+  for (int ii = 0; ii < DCNEST; ++ii) {
+    _start[ii] =      d._start[ii];
+    _stop[ii] =       d._stop[ii];
+    _step_in[ii] =    d._step_in[ii];
+    _step[ii] =       d._step[ii];
+    _linswp[ii] =     d._linswp[ii];
+    _loop[ii] =       d._loop[ii];
+    _reverse_in[ii] = d._reverse_in[ii];
+    _reverse[ii] =    d._reverse[ii];
+
+    _param[ii] = d._param[ii];
+
+    if(d._sweepval[ii] == &d._param[ii]) {
+      // rebase
+      _sweepval[ii] = &_param[ii];
+    }else if(d._sweepval[ii] == &d._temp_c) {
+      assert(ii==0);
+      _sweepval[ii] = &_temp_c;
+    }else{
+      _sweepval[ii] = &_param[ii];
+    }
+
+    _zap[ii] = d._zap[ii];;
+    assert(!_zap[ii]);
+    _ctrl[ii] = d._ctrl[ii];
+    assert(!_ctrl[ii]);
+
+    _stepmode[ii] = d._stepmode[ii];
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::finish(void)
@@ -289,7 +309,17 @@ void DCOP::finish(void)
 /*--------------------------------------------------------------------------*/
 void OP::setup(CS& Cmd)
 {
-  _sim->_temp_c = OPT::temp_c;
+  trace1("OP::setup", Cmd.tail());
+  if(Cmd >> ("." + short_label())) { untested();
+    // spice mode?
+  }else if(Cmd >> ("`" + short_label())) { untested();
+    // verilog.
+  }else if(Cmd >> short_label()) { untested();
+    // other, acs?
+  }else{
+    // hmm
+  }
+  _temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
   _out = IO::mstdout;
@@ -297,7 +327,7 @@ void OP::setup(CS& Cmd)
   bool ploton = IO::plotset  &&  plotlist().size() > 0;
 
   _zap[0] = nullptr;
-  _sweepval[0] = &(_sim->_temp_c);
+  _sweepval[0] = &(_temp_c);
   _have_param = true; // temp requires precalc
 
   if (Cmd.match1("'\"({") || Cmd.is_float()) {
@@ -311,24 +341,35 @@ void OP::setup(CS& Cmd)
   }
   
   _step[0] = 0.;
-  _sim->_genout = 0.;
+  _genout = 0.;
 
   options(Cmd,0);
 
   _n_sweeps = 1;
   Cmd.check(bWARNING, "what's this?");
-  _sim->_freq = 0;
+  _freq = 0;
 
   IO::plotout = (ploton) ? IO::mstdout : OMSTREAM();
   initio(_out);
 
   _start[0].e_val(OPT::temp_c, _scope);
   fix_args(0);
+  trace3("OP::setup", _temp_c, **_sweepval, _start[0]);
 }
 /*--------------------------------------------------------------------------*/
 void DC::setup(CS& Cmd)
 {
-  _sim->_temp_c = OPT::temp_c;
+  trace3("DC::setup", _n_sweeps, Cmd.tail(), short_label());
+  if(Cmd >> ("." + short_label())) { untested();
+    // spice mode?
+  }else if(Cmd >> ("`" + short_label())) { untested();
+    // verilog.
+  }else if(Cmd >> short_label()) { untested();
+    // other, acs?
+  }else{
+    // hmm
+  }
+  _temp_c = OPT::temp_c;
   _cont = false;
   _trace = tNONE;
   _out = IO::mstdout;
@@ -377,7 +418,7 @@ void DC::setup(CS& Cmd)
 	// leave it as it was .. repeat Cmd with no args
       }
       
-      _sim->_genout = 0.;
+      _genout = 0.;
       options(Cmd,_n_sweeps);
       trace2("DCOP::new", _n_sweeps, _step[1]);
     }
@@ -404,10 +445,10 @@ void DC::setup(CS& Cmd)
     }else if (_param_name[ii] != "") {
       _sweepval[ii] = &_param[ii];
     }else{ // generator
-      _sweepval[ii] = &_sim->_genout;			// point to value to patch
+      _sweepval[ii] = &_genout;			// point to value to patch
     }
   }
-  _sim->_freq = 0;
+  _freq = 0;
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::fix_args(int Nest)
@@ -462,7 +503,7 @@ void DCOP::fix_args(int Nest)
 /*--------------------------------------------------------------------------*/
 void DCOP::options(CS& Cmd, int Nest)
 {
-  _sim->_uic = _loop[Nest] = _reverse_in[Nest] = false;
+  _uic = _loop[Nest] = _reverse_in[Nest] = false;
   size_t here = Cmd.cursor();
   do{
     ONE_OF
@@ -477,10 +518,10 @@ void DCOP::options(CS& Cmd, int Nest)
       || (Get(Cmd, "lin",	  &_step_in[Nest]) && (_stepmode[Nest] = LIN_PTS))
       || (Get(Cmd, "o{ctave}",	  &_step_in[Nest]) && (_stepmode[Nest] = OCTAVE))
       || Get(Cmd, "c{ontinue}",   &_cont)
-      || Get(Cmd, "dt{emp}",	  &(_sim->_temp_c),   mOFFSET, OPT::temp_c)
+      || Get(Cmd, "dt{emp}",	  &(_temp_c),   mOFFSET, OPT::temp_c)
       || Get(Cmd, "lo{op}", 	  &_loop[Nest])
       || Get(Cmd, "re{verse}",	  &_reverse_in[Nest])
-      || Get(Cmd, "te{mperature}",&(_sim->_temp_c))
+      || Get(Cmd, "te{mperature}",&(_temp_c))
       || (Cmd.umatch("tr{ace} {=}") &&
 	  (ONE_OF
 	   || Set(Cmd, "n{one}",      &_trace, tNONE)
@@ -499,14 +540,15 @@ void DCOP::options(CS& Cmd, int Nest)
 /*--------------------------------------------------------------------------*/
 void DCOP::sweep()
 {
+  trace2("OP::sweep", _temp_c, **_sweepval);
   head(_start[0], _stop[0], " ");
-  _sim->_bypass_ok = false;
-  _sim->set_inc_mode_bad();
+  _bypass_ok = false;
+  set_inc_mode_bad();
   if (_cont) {untested();
-    _sim->restore_voltages();
+    restore_voltages();
     _scope->tr_restore();
   }else{
-    _sim->clear_limit();
+    clear_limit();
     _scope->tr_begin();
   }
   try {
@@ -552,10 +594,11 @@ void DCOP::sweep_recursive(int Nest)
       }else{
       }
       ::status.accept.start();
-      _sim->set_limit();
+      set_limit();
       _scope->tr_accept();
       ::status.accept.stop();
-      _sim->_has_op = _sim->_mode;
+      _has_op = _mode;
+      trace2("OP::sweep_recursive", _temp_c, **_sweepval);
       outdata(*_sweepval[Nest], ofPRINT | ofSTORE | ofKEEP);
       itl = OPT::DCXFER;
     }else{
@@ -572,6 +615,7 @@ void DCOP::first(int Nest)
   assert(_sweepval);
   assert(_sweepval[Nest]);
 
+  trace4("DCOP::first", Nest, _temp_c, **_sweepval, _start[Nest]);
   set_sweepval(Nest, _start[Nest]);
   _reverse[Nest] = false;
   if (_reverse_in[Nest]) {untested();
@@ -582,14 +626,14 @@ void DCOP::first(int Nest)
     next(Nest);
   }else{
   }
-  _sim->_phase = p_INIT_DC;
+  _phase = p_INIT_DC;
 }
 /*--------------------------------------------------------------------------*/
 bool DCOP::next(int Nest)
 {
   double sweepval = NOT_VALID;
   bool ok = false;
-  trace2("DCOP::next", Nest, _step[Nest]);
+  trace4("DCOP::next", Nest, _start[Nest], _step[Nest], _stop[Nest]);
 
   if (_linswp[Nest]) {
     double fudge = _step[Nest] / 10.;
@@ -656,10 +700,11 @@ bool DCOP::next(int Nest)
       }
     }
   }
-  _sim->_phase = p_DC_SWEEP;
+  _phase = p_DC_SWEEP;
   if (ok) {
     assert(sweepval != NOT_VALID);
     set_sweepval(Nest, sweepval);
+    trace3("dc::next", Nest, sweepval, _step[0]);
     return true;
   }else{
     //assert(sweepval == NOT_VALID);
