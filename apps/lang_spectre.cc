@@ -183,7 +183,7 @@ CARD* LANG_SPECTRE::parse_command(CS& cmd, CARD* x)
   if(auto dot = dynamic_cast<DEV_DOT*>(x)){ untested();
     dot->set(cmd.fullstring());
   }else if(auto cc = dynamic_cast<CMD*>(x)){ untested();
-    cc->set_dev_type(cmd.tail());
+    parse_type(cmd, x);
   }else{ untested();
   }
 
