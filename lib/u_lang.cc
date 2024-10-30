@@ -139,8 +139,13 @@ CARD* LANGUAGE::parse_item(CS& cmd, CARD* c)
     return parse_paramset(cmd, m);
   }else if (DEV_COMMENT* com = dynamic_cast<DEV_COMMENT*>(c)) {
     return parse_comment(cmd, com);
+  }else if (CMD* cc = dynamic_cast<CMD*>(c)) { untested();
+    return parse_command(cmd, cc);
   }else if (DEV_DOT* d = dynamic_cast<DEV_DOT*>(c)) {
-    return parse_command(cmd, d);
+    CARD* xx = parse_command(cmd, d);
+  //   assert(xx = d); // for now.
+  //   d->set(""); // HACK.
+    return xx;
   }else{untested();
     incomplete();
     unreachable();
@@ -164,6 +169,8 @@ void LANGUAGE::print_item(OMSTREAM& o, const CARD* c)
     print_paramset(o, m);
   }else if (const DEV_COMMENT* com = dynamic_cast<const DEV_COMMENT*>(c)) {
     print_comment(o, com);
+  }else if (const CMD* cc = dynamic_cast<const CMD*>(c)) {itested();
+    print_command(o, cc);
   }else if (const DEV_DOT* d = dynamic_cast<const DEV_DOT*>(c)) {itested();
     print_command(o, d);
   }else{itested();

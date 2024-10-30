@@ -47,7 +47,7 @@ public: // override virtual, used by callback
 public: // override virtual, called by commands
   void		parse_top_item(CS&, CARD_LIST*)override;
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*)override;
-  DEV_DOT*	parse_command(CS&, DEV_DOT*)override;
+  CARD*		parse_command(CS&, CARD*)override;
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override;
   BASE_SUBCKT*	parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
@@ -58,7 +58,7 @@ private: // override virtual, called by print_item
   void print_module(OMSTREAM&, const BASE_SUBCKT*)override;
   void print_instance(OMSTREAM&, const COMPONENT*)override;
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
-  void print_command(OMSTREAM& o, const DEV_DOT* c)override;
+  void print_command(OMSTREAM& o, const CARD* c)override;
 private: // local
   void print_args(OMSTREAM&, const CARD*);
 } lang_spectre;
@@ -177,21 +177,27 @@ DEV_COMMENT* LANG_SPECTRE::parse_comment(CS& cmd, DEV_COMMENT* x)
   return x;
 }
 /*--------------------------------------------------------------------------*/
-DEV_DOT* LANG_SPECTRE::parse_command(CS& cmd, DEV_DOT* x)
+CARD* LANG_SPECTRE::parse_command(CS& cmd, CARD* x)
 {
   assert(x);
-  x->set(cmd.fullstring());
+  if(auto dot = dynamic_cast<DEV_DOT*>(x)){ untested();
+    dot->set(cmd.fullstring());
+  }else if(auto cc = dynamic_cast<CMD*>(x)){ untested();
+    cc->set_dev_type(cmd.tail());
+  }else{ untested();
+  }
+
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 
   cmd.reset().skipbl();
-  if ((cmd >> "model |simulator |parameters |subckt ")) {
+  if ((cmd >> "model |simulator |parameters |subckt ")) { untested();
     cmd.reset();
     CMD::cmdproc(cmd, scope);
-  }else{
+  }else{ untested();
     std::string label;
     cmd >> label;
     
-    if (label != "-") {
+    if (label != "-") { untested();
       size_t here = cmd.cursor();
       std::string command;
       cmd >> command;
@@ -200,12 +206,16 @@ DEV_DOT* LANG_SPECTRE::parse_command(CS& cmd, DEV_DOT* x)
       std::string s = cmd.tail() + " > " + file_name;
       CS augmented_cmd(CS::_STRING, s);
       CMD::cmdproc(augmented_cmd, scope);
-    }else{
+    }else{ untested();
       CMD::cmdproc(cmd, scope);
     }
   }
-  delete x;
-  return nullptr;
+  if(dynamic_cast<DEV_DOT*>(x)){
+    delete x;
+    x = nullptr;
+  }else{
+  }
+  return x;
 }
 /*--------------------------------------------------------------------------*/
 MODEL_CARD* LANG_SPECTRE::parse_paramset(CS& cmd, MODEL_CARD* x)
@@ -400,10 +410,16 @@ void LANG_SPECTRE::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
   o << x->comment() << '\n';
 }
 /*--------------------------------------------------------------------------*/
-void LANG_SPECTRE::print_command(OMSTREAM& o, const DEV_DOT* x)
+void LANG_SPECTRE::print_command(OMSTREAM& o, const CARD* x)
 {untested();
   assert(x);
-  o << x->s() << '\n';
+  if(auto dot = dynamic_cast<DEV_DOT const*>(x)){ untested();
+    o << dot->s() << '\n';
+  }else{
+    o << " - " << x->dev_type();
+    print_args(o, x);
+    o << " label=\"" << x->short_label() << "\"\n";
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

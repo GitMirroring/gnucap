@@ -125,7 +125,7 @@ protected:
     ::status.set_up.start();
     assert(_sweepval[i]);
     std::string n = _param_name[i];
-    if(n!=""){
+    if(n!=""){ untested();
       PARAM_LIST* pl = _scope->params();
       assert(pl);
       pl->set(n, d);
@@ -352,11 +352,11 @@ void DC::setup(CS& Cmd)
 	size_t here = Cmd.cursor();
         Cmd >> pname;
 	PARAM_INSTANCE zap = _scope->params()->deep_lookup(pname);
-	if(zap.has_hard_value()){
+	if(zap.has_hard_value()){ untested();
 	  _param_zap[_n_sweeps] = zap;
 	  _param_name[_n_sweeps] = pname;
 	  _have_param = true;
-	}else{
+	}else{ untested();
 	  // possibly not a parameter. go on
 	  Cmd.reset(here);
 	}
@@ -370,7 +370,7 @@ void DC::setup(CS& Cmd)
 	_start[_n_sweeps].obsolete_parse(Cmd);
         _stop[_n_sweeps].obsolete_parse(Cmd);
 	_step[_n_sweeps] = 0.;
-      }else{
+      }else{ untested();
 	// leave it as it was .. repeat Cmd with no args
       }
       
@@ -396,7 +396,7 @@ void DC::setup(CS& Cmd)
       assert(_ctrl[ii]);
       _zap[ii]->attach_common(_ctrl[ii]);	// take control
       _sweepval[ii] = &_param[ii];
-    }else if (_param_name[ii] != "") {
+    }else if (_param_name[ii] != "") { untested();
       _sweepval[ii] = &_param[ii];
     }else{ // generator
       _sweepval[ii] = &_sim->_genout;			// point to value to patch
@@ -542,7 +542,7 @@ void DCOP::sweep_recursive(int Nest)
     if (Nest == 0) {
       precalc();
       int converged = solve_with_homotopy(itl,_trace);
-      if (!converged) {
+      if (!converged) { untested();
 	error(bWARNING, "did not converge\n");
       }else{
       }
@@ -553,7 +553,7 @@ void DCOP::sweep_recursive(int Nest)
       _sim->_has_op = _sim->_mode;
       outdata(*_sweepval[Nest], ofPRINT | ofSTORE | ofKEEP);
       itl = OPT::DCXFER;
-    }else{
+    }else{ untested();
       sweep_recursive(Nest);
     }
   } while (next(Nest));
@@ -598,18 +598,18 @@ bool DCOP::next(int Nest)
 	sweepval = *(_sweepval[Nest]) + _step[Nest];
 	fixzero(&sweepval, _step[Nest]);
 	ok = in_order(_start[Nest]-fudge, sweepval, _stop[Nest]+fudge);
-	if (!ok  &&  _loop[Nest]) {
+	if (!ok  &&  _loop[Nest]) { untested();
 	  // turn around
 	  _reverse[Nest] = true;
 	}else{
 	  // forward
 	}
-      }else{
+      }else{ untested();
 	assert(_reverse[Nest]);
 	assert(!ok);
 	assert(sweepval == NOT_VALID);
       }
-      if (_reverse[Nest]) {
+      if (_reverse[Nest]) { untested();
 	assert(!ok);
 	//assert(sweepval == NOT_VALID);
 	sweepval = *(_sweepval[Nest]) - _step[Nest];
