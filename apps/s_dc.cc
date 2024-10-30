@@ -84,7 +84,41 @@ private:
   void	final()override		{_scope->dc_final();}
   void	finish()override;
 
-  explicit DCOP(const DCOP&): SIM() {unreachable(); incomplete();}
+protected:
+  explicit DCOP(const DCOP& d) :
+    SIM(d),
+    _n_sweeps(d._n_sweeps),
+    _cont(d._cont),
+    _trace(d._trace),
+    _have_param(d._have_param) {
+
+     for (int ii = 0; ii < DCNEST; ++ii) {
+       _start[ii] =      d._start[ii];
+       _stop[ii] =       d._stop[ii];
+       _step_in[ii] =    d._step_in[ii];
+       _step[ii] =       d._step[ii];
+       _linswp[ii] =     d._linswp[ii];
+       _loop[ii] =       d._loop[ii];
+       _reverse_in[ii] = d._reverse_in[ii];
+       _reverse[ii] =    false; // d._reverse[ii];
+
+       _param[ii] = d._param[ii];
+       _sweepval[ii] = d._sweepval[ii];
+
+       if(_sweepval[ii] == &d._param[ii]) {
+	 // rebase
+	 _sweepval[ii] = &_param[ii];
+       }else{
+       }
+
+       _zap[ii] = d._zap[ii];;
+       assert(!_zap[ii]);
+       _ctrl[ii] = d._ctrl[ii];
+       assert(!_ctrl[ii]);
+
+       _stepmode[ii] = d._stepmode[ii];
+     }
+   }
 protected:
   void set_sweepval(int i, double d){
     ::status.set_up.start();
@@ -140,20 +174,22 @@ class DC : public DCOP {
 public:
   explicit DC(): DCOP() {}
   ~DC() {}
+  //CARD* clone()const override {return new DC(*this);}
   void	do_it(CS&, CARD_LIST*)override;
 private:
   void	setup(CS&)override;
-  explicit DC(const DC&): DCOP() {unreachable(); incomplete();}
+  explicit DC(const DC& x): DCOP(x) { }
 };
 /*--------------------------------------------------------------------------*/
 class OP : public DCOP {
 public:
   explicit OP(): DCOP() {}
   ~OP() {}
+  //CARD* clone()const override {return new OP(*this);}
   void	do_it(CS&, CARD_LIST*)override;
 private:
   void	setup(CS&)override;
-  explicit OP(const OP&): DCOP() {unreachable(); incomplete();}
+  explicit OP(const OP& x): DCOP(x) { }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -537,6 +573,7 @@ bool DCOP::next(int Nest)
 {
   double sweepval = NOT_VALID;
   bool ok = false;
+  trace2("DCOP::next", Nest, _step[Nest]);
 
   if (_linswp[Nest]) {
     double fudge = _step[Nest] / 10.;
