@@ -36,7 +36,7 @@ public:
   virtual ~CMD() {}
   static  void  cmdproc(CS&, CARD_LIST*);
   static  void	command(const std::string&, CARD_LIST*);
-  CARD*   clone()const override {untested(); return new DEV_DOT;} // //BUG// memory leak ?
+  CARD*   clone()const override { return new DEV_DOT;} // //BUG// memory leak ?
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
