@@ -128,6 +128,7 @@ void CMD::set_dev_type(std::string const& s)
   static int idx;
   _type = s;
   set_label(_type + to_string(++idx));
+  trace1("CMD::set_dev_type", short_label());
 }
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

@@ -587,5 +587,16 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
   delete[] map;
 }
 /*--------------------------------------------------------------------------*/
+CARD* CARD_LIST::find__(const std::string& short_name)
+{
+  list::reverse_iterator i = _cl.rbegin();
+  assert(i!=_cl.rend());
+  while(**i != short_name) {
+    assert(i!=_cl.rend());
+    ++i;
+  }
+  return *i;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

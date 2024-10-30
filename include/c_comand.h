@@ -33,7 +33,7 @@ class INTERFACE CMD : public CARD {
   std::string _type;
 protected:
   explicit CMD() : CARD() {}
-  explicit CMD(CMD const& p) : CARD(p) {untested();}
+  explicit CMD(CMD const& p) : CARD(p) {}
 public:
   std::string value_name()const {return "";}
   virtual void do_it(CS&, CARD_LIST*) = 0;

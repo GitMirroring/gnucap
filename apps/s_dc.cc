@@ -125,7 +125,7 @@ protected:
     ::status.set_up.start();
     assert(_sweepval[i]);
     std::string n = _param_name[i];
-    if(n!=""){ untested();
+    if(n!=""){
       PARAM_LIST* pl = _scope->params();
       assert(pl);
       pl->set(n, d);
@@ -169,13 +169,16 @@ protected:
   TRACE _trace;			/* enum: show extended diagnostics */
   enum {ONE_PT, LIN_STEP, LIN_PTS, TIMES, OCTAVE, DECADE} _stepmode[DCNEST];
   bool _have_param;             /* sweep a param */
+
+
+private:
 };
 /*--------------------------------------------------------------------------*/
 class DC : public DCOP {
 public:
   explicit DC(): DCOP() {}
   ~DC() {}
-  //CARD* clone()const override {return new DC(*this);}
+  CARD* clone()const override {return new DC(*this);}
   void	do_it(CS&, CARD_LIST*)override;
 private:
   void	setup(CS&)override;
@@ -186,7 +189,7 @@ class OP : public DCOP {
 public:
   explicit OP(): DCOP() {}
   ~OP() {}
-  //CARD* clone()const override {return new OP(*this);}
+  CARD* clone()const override {return new OP(*this);}
   void	do_it(CS&, CARD_LIST*)override;
 private:
   void	setup(CS&)override;
@@ -243,6 +246,7 @@ DCOP::DCOP()
    _cont(false),
    _trace(tNONE)
 {
+
   for (int ii = 0; ii < DCNEST; ++ii) {
     _loop[ii] = false;
     _reverse_in[ii] = false;
@@ -255,7 +259,6 @@ DCOP::DCOP()
     _stepmode[ii] = ONE_PT;
     _param[ii] = NOT_VALID;
   }
-  
   //BUG// in SIM.  should be initialized there.
   //_sim->_genout=0.;
   _out=IO::mstdout;
@@ -352,11 +355,11 @@ void DC::setup(CS& Cmd)
 	size_t here = Cmd.cursor();
         Cmd >> pname;
 	PARAM_INSTANCE zap = _scope->params()->deep_lookup(pname);
-	if(zap.has_hard_value()){ untested();
+	if(zap.has_hard_value()){
 	  _param_zap[_n_sweeps] = zap;
 	  _param_name[_n_sweeps] = pname;
 	  _have_param = true;
-	}else{ untested();
+	}else{
 	  // possibly not a parameter. go on
 	  Cmd.reset(here);
 	}
@@ -370,14 +373,16 @@ void DC::setup(CS& Cmd)
 	_start[_n_sweeps].obsolete_parse(Cmd);
         _stop[_n_sweeps].obsolete_parse(Cmd);
 	_step[_n_sweeps] = 0.;
-      }else{ untested();
+      }else{
 	// leave it as it was .. repeat Cmd with no args
       }
       
       _sim->_genout = 0.;
       options(Cmd,_n_sweeps);
+      trace2("DCOP::new", _n_sweeps, _step[1]);
     }
   }else{
+    trace2("DCOP::cont'd", _n_sweeps, _step[1]);
   }
   Cmd.check(bWARNING, "what's this?");
 
@@ -396,7 +401,7 @@ void DC::setup(CS& Cmd)
       assert(_ctrl[ii]);
       _zap[ii]->attach_common(_ctrl[ii]);	// take control
       _sweepval[ii] = &_param[ii];
-    }else if (_param_name[ii] != "") { untested();
+    }else if (_param_name[ii] != "") {
       _sweepval[ii] = &_param[ii];
     }else{ // generator
       _sweepval[ii] = &_sim->_genout;			// point to value to patch
@@ -542,7 +547,7 @@ void DCOP::sweep_recursive(int Nest)
     if (Nest == 0) {
       precalc();
       int converged = solve_with_homotopy(itl,_trace);
-      if (!converged) { untested();
+      if (!converged) {
 	error(bWARNING, "did not converge\n");
       }else{
       }
@@ -553,7 +558,7 @@ void DCOP::sweep_recursive(int Nest)
       _sim->_has_op = _sim->_mode;
       outdata(*_sweepval[Nest], ofPRINT | ofSTORE | ofKEEP);
       itl = OPT::DCXFER;
-    }else{ untested();
+    }else{
       sweep_recursive(Nest);
     }
   } while (next(Nest));
@@ -598,18 +603,18 @@ bool DCOP::next(int Nest)
 	sweepval = *(_sweepval[Nest]) + _step[Nest];
 	fixzero(&sweepval, _step[Nest]);
 	ok = in_order(_start[Nest]-fudge, sweepval, _stop[Nest]+fudge);
-	if (!ok  &&  _loop[Nest]) { untested();
+	if (!ok  &&  _loop[Nest]) {
 	  // turn around
 	  _reverse[Nest] = true;
 	}else{
 	  // forward
 	}
-      }else{ untested();
+      }else{
 	assert(_reverse[Nest]);
 	assert(!ok);
 	assert(sweepval == NOT_VALID);
       }
-      if (_reverse[Nest]) { untested();
+      if (_reverse[Nest]) {
 	assert(!ok);
 	//assert(sweepval == NOT_VALID);
 	sweepval = *(_sweepval[Nest]) - _step[Nest];

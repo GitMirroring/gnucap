@@ -27,5 +27,5 @@ print op v(V_cc) v(in) v(out) iter(0)
 op
 
 print tran v(V_cc) v(in) v(out) iter(0)
-tran 1
+`tran 1
 list

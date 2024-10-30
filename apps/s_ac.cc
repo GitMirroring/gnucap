@@ -58,7 +58,7 @@ private:
     _prevopppoint(a._prevopppoint),
     _stepmode(a._stepmode)
   { }
-  // CARD* clone()const override {return new AC(*this);}
+  CARD* clone()const override {return new AC(*this);}
   void	setup(CS&)override;
   void	allocate()override;
   void	sweep()override;
@@ -105,6 +105,7 @@ static int needslinfix;	// flag: lin option needs patch later (spice compat)
 /*--------------------------------------------------------------------------*/
 void AC::setup(CS& Cmd)
 {
+  trace1("AC::setup", Cmd.tail());
   _out = IO::mstdout;
   _out.reset(); //BUG// don't know why this is needed
   

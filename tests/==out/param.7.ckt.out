@@ -13,3 +13,4 @@ v2 ( b c ) xxx
 .ends foo
 x1 ( 1 0 3 )  foo  xxx=b zzz=a
 x2 ( 2 0 4 )  foo  xxx=a zzz=83
+.op

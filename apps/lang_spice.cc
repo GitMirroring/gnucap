@@ -501,6 +501,7 @@ CARD* LANG_SPICE_BASE::parse_command(CS& cmd, CARD* x)
     dot->set(cmd.fullstring());
   }else{
     parse_type(cmd, x);
+    x->set_label(x->dev_type());
   }
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 
@@ -509,7 +510,7 @@ CARD* LANG_SPICE_BASE::parse_command(CS& cmd, CARD* x)
 
   size_t here = cmd.cursor();
 
-  if(dynamic_cast<DEV_DOT*>(x)){ untested();
+  if(dynamic_cast<DEV_DOT*>(x)){
     trace1("lang_spice: DEV_DOT fallback", cmd.fullstring());
     std::string s;
     cmd >> s;
@@ -745,13 +746,31 @@ void LANG_SPICE_BASE::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
   // These are generated as a way to display calculated values.
 }
 /*--------------------------------------------------------------------------*/
+static void print_args(OMSTREAM& o, const CMD* x)
+{
+  assert(x);
+  for (int ii = x->param_count() - 1;  ii >= x->param_count_dont_print();  --ii) {
+    if (x->param_is_printable(ii)) {
+      std::string arg = " " + x->param_name(ii) + "=" + x->param_value(ii);
+      o << arg;
+    }else{
+    }
+  }
+}
+/*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_command(OMSTREAM& o, const CARD* x)
 {itested();
   assert(x);
   if(auto dot = dynamic_cast<DEV_DOT const*>(x)){ untested();
     o << dot->s() << '\n';
-  }else if(auto cmd = dynamic_cast<CMD const*>(x)){
-    o << "." << x->dev_type() << " label=\"" << cmd->short_label() << "\"\n";
+  }else if(auto cc = dynamic_cast<CMD const*>(x)){
+    o << "." << x->dev_type();
+    ::print_args(o, cc);
+    if( x->dev_type() != cc->short_label() ){ untested();
+      o << " label=\"" << cc->short_label() << "\"";
+    }else{
+    }
+    o << "\n";
   }else{ untested();
     unreachable();
     // incomplete. maybe

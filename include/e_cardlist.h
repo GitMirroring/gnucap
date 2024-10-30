@@ -37,6 +37,7 @@ class LANGUAGE;
 struct TIME_PAIR;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CARD_LIST {
+  typedef std::list<CARD*> list;
 private:
   const CARD_LIST* _parent;
   mutable NODE_MAP* _nm;
@@ -89,6 +90,7 @@ public:
   iterator find_again(const std::string& short_name, iterator);
   iterator find_(const std::string& short_name) 
 					{return find_again(short_name, begin());}
+  CARD* find__(const std::string& short_name);
 
   // return a const_iterator
   const_iterator begin()const		{return _cl.begin();}

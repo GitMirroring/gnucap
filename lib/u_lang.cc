@@ -58,6 +58,10 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
     }else{
       assert(!p);
     }
+
+    if(dynamic_cast<CMD const*>(p)) {
+      p = CARD_LIST::card_list.find__(Name);
+    }
   }
   
   if (p) {
@@ -111,6 +115,7 @@ void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope)
 	CARD* x = parse_item(cmd, new_instance);
 	if (x) {
 	  assert(Scope);
+	  trace2("LANGUAGE::ni", x->short_label(), x);
 	  Scope->push_back(x);
 	}else{
 	}
@@ -139,7 +144,7 @@ CARD* LANGUAGE::parse_item(CS& cmd, CARD* c)
     return parse_paramset(cmd, m);
   }else if (DEV_COMMENT* com = dynamic_cast<DEV_COMMENT*>(c)) {
     return parse_comment(cmd, com);
-  }else if (CMD* cc = dynamic_cast<CMD*>(c)) { untested();
+  }else if (CMD* cc = dynamic_cast<CMD*>(c)) {
     return parse_command(cmd, cc);
   }else if (DEV_DOT* d = dynamic_cast<DEV_DOT*>(c)) {
     CARD* xx = parse_command(cmd, d);
