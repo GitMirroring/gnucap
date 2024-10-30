@@ -30,7 +30,7 @@
 /* cmdproc: process a command
  * parse, and act on, a command string
  */
-void CMD::cmdproc(CS& cmd, CARD_LIST* scope)
+void CMD::cmdproc(CS& cmd, CARD_LIST* scope, CMD* c)
 {
   bool get_timer_was_running = ::status.get.is_running();
   ::status.get.stop();
@@ -53,7 +53,8 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope)
   // Map possible short names to full ones.
   // If this if/else block is removed, the only loss is the short names.
   // Although it looks like it can be used to make aliases, don't.
-  if (cmd.umatch("'|*|#|//|\""))	{	     s = "xxxxcomment";}
+  if (c){ untested(); /* already got it */ }
+  else if (cmd.umatch("'|*|#|//|\""))	{	     s = "xxxxcomment";}
   else if (cmd.umatch("b{uild} "))      {itested();  s = "build";}
   else if (cmd.umatch("del{ete} "))     {            s = "delete";}
   else if (cmd.umatch("fo{urier} "))    {            s = "fourier";}
@@ -76,10 +77,13 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope)
     didsomething = false;
   }
 
-  if (s == "xxxxcomment") {
+  if (c) { untested();
+    c->do_it(cmd, scope);
+    didsomething = true;
+  }else if (s == "xxxxcomment") {
     // nothing
   }else if (s != "") {
-    CMD* c = command_dispatcher[s];
+    c = command_dispatcher[s];
     if (c) {
       c->do_it(cmd, scope);
       didsomething = true;

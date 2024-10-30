@@ -31,6 +31,7 @@
 #include "e_model.h"
 #include "e_elemnt.h"
 #include "bm.h"
+#include "declare.h"	/* plclose */
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -508,21 +509,25 @@ CARD* LANG_SPICE_BASE::parse_command(CS& cmd, CARD* x)
 
   size_t here = cmd.cursor();
 
-  std::string s;
-  cmd >> s;
-  cmd.reset(here);
-  if (!command_dispatcher[s]) {
-    cmd.skip();
-    ++here;
-  }else{
-  }
-  CMD::cmdproc(cmd, scope);
-
-  if(dynamic_cast<DEV_DOT*>(x)){
+  if(dynamic_cast<DEV_DOT*>(x)){ untested();
+    trace1("lang_spice: DEV_DOT fallback", cmd.fullstring());
+    std::string s;
+    cmd >> s;
+    cmd.reset(here);
+    if (!command_dispatcher[s]) {
+      cmd.skip();
+      ++here;
+    }else{
+    }
+    CMD::cmdproc(cmd, scope);
   //  dot->set("");
     delete x;
     x = nullptr;
+  }else if(auto c=dynamic_cast<CMD*>(x)) { untested();
+    trace1("got CMD", cmd.fullstring());
+    CMD::cmdproc(cmd, scope, c);
   }else{
+    unreachable();
   }
   return x;
 }
