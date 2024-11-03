@@ -150,15 +150,15 @@ protected:
   T&	   d(int r);
   T&	   m(int r, int c);
 protected: // const xs
-  T const& u(int r, int c)const { untested();
+  T const& u(int r, int c)const {
     auto& x = const_cast<BSMATRIX_DATA<T>&>(*this);
     return x.u(r, c);
   }
-  T const& l(int r, int c)const { untested();
+  T const& l(int r, int c)const {
     auto& x = const_cast<BSMATRIX_DATA<T>&>(*this);
     return x.l(r, c);
   }
-  T const& d(int r)const { untested();
+  T const& d(int r)const {
     auto& x = const_cast<BSMATRIX_DATA<T>&>(*this);
     return x.d(r);
   }
