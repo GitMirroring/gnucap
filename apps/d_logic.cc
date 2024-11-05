@@ -34,7 +34,7 @@
 #include "u_nodemap.h"
 #include "u_node.h"
 /*--------------------------------------------------------------------------*/
-const int MODEL_LOGIC::_type_number = 12345;
+//const int MODEL_LOGIC::_type_number = 12345;
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -139,8 +139,8 @@ private: // override virtuals
   std::string dev_type()const override{assert(has_common()); return common()->name();}
   void set_port_by_index(int num, std::string& ext_name) {
     COMPONENT::set_port_by_index(num, ext_name);
-    _n[num].set_type(MODEL_LOGIC::_type_number);
-    assert(_n[num].type() == MODEL_LOGIC::_type_number);
+    _n[num].set_type(12345);
+    assert(_n[num].type() == 12345);
     // later.
     // if(num){
     //   _n[num].set_output();

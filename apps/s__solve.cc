@@ -271,29 +271,10 @@ void SIM::load_matrix()
   ::status.load.stop();
 }
 /*--------------------------------------------------------------------------*/
-namespace{
-struct mywarn : BSMATRIX_WARN {
-  MATRIX_NODE const** _nodes{NULL};
-  explicit mywarn(MATRIX_NODE const** p) : _nodes(p) { }
-  void operator()(int mm)const override {
-    // assert(_nodes);
-    if(mm >= CKT_BASE::_sim->matrix_nodes()){
-      error(bWARNING, "open circuit: internal node %u\n", mm);
-    }else if(CKT_BASE::_sim->_mstat[mm]){ untested();
-      // todo _nm?
-      error(bWARNING, "open circuit: " + CKT_BASE::_sim->_mstat[mm]->long_label() + "\n");
-    }else{ untested();
-      error(bWARNING, "open circuit: unknown node %u\n", mm);
-    }
-  }
-};
-}
-/*--------------------------------------------------------------------------*/
 void SIM::solve_equations()
 {
-  mywarn w(_sim->_mstat.data());
   ::status.lud.start();
-  _sim->_lu.lu_decomp(_sim->_aa, bool(OPT::lubypass && _sim->is_inc_mode()), &w);
+  _sim->_lu.lu_decomp(_sim->_aa, bool(OPT::lubypass && _sim->is_inc_mode()));
   ::status.lud.stop();
 
   ::status.back.start();

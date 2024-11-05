@@ -30,6 +30,7 @@
 class CARD;
 /*--------------------------------------------------------------------------*/
 // external
+class node_t;
 class NODE;
 class NODE_P;
 class CARD_LIST;

@@ -1,6 +1,5 @@
-/*                             -*- C++ -*-
+/*$Id: m_matrix.h 2017/06/07 $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- *               2023, 2024 Felix Salfelder
  * Author: Albert Davis <aldavis@gnu.org>
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
@@ -113,14 +112,6 @@
 /*--------------------------------------------------------------------------*/
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
-namespace{
-struct BSMATRIX_WARN {
-  virtual void operator()(int mm)const {
-    error(bWARNING, "open circuit: internal node %u\n", mm);
-  }
-}default_warn;
-}
-/*--------------------------------------------------------------------------*/
 template <class T>
 class BSMATRIX {
 private:
@@ -172,9 +163,8 @@ public:
   void		load_symmetric(int i, int j, T value);
   void		load_asymmetric(int r1, int r2, int c1, int c2, T value);
   
-  void		lu_decomp(const BSMATRIX<T>&, bool do_partial,
-                      BSMATRIX_WARN const* w = &default_warn);
-  void		lu_decomp(BSMATRIX_WARN const* w = &default_warn);
+  void		lu_decomp(const BSMATRIX<T>&, bool do_partial);
+  void		lu_decomp();
   void		fbsub(T* v) const;
   void		fbsub(T* x, const T* b, T* c = NULL) const;
   void		fbsubt(T* v) const;
@@ -234,39 +224,24 @@ T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd)
   return dot;
 }
 /*--------------------------------------------------------------------------*/
-template<class T>
-struct longer{
-  typedef T type;
-};
-template<>
-struct longer< std::complex<double> > {
-  typedef std::complex<long double> type;
-};
-template<>
-struct longer<double> {
-  typedef long double type;
-};
-/*--------------------------------------------------------------------------*/
 template <class T>
 T& BSMATRIX<T>::subtract_dot_product(int rr, int cc, int dd, const T& in)
 {
   assert(_lownode);
   int kk = std::max(_lownode[rr], _lownode[cc]);
   int len = dd - kk;
-  typedef typename longer<T>::type longertype;
-  longertype dot = 0.;
+  T& dot = m(rr, cc);
+  dot = in;
   if (len > 0) {
     T* row = &(l(rr,kk));
     T* col = &(u(kk,cc));
     /* for (ii = kk;   ii < dd;   ++ii) */
     for (int ii = 0;   ii < len;   ++ii) {
-      dot += row[-ii] * col[ii];
+      dot -= row[-ii] * col[ii];
     }
   }else{
   }
-  T& result = m(rr, cc);
-  result = T(in - dot);
-  return result;
+  return dot;
 }
 /*--------------------------------------------------------------------------*/
 // public implementations
@@ -654,8 +629,7 @@ void BSMATRIX<T>::load_asymmetric(int r1,int r2,int c1,int c2,T value)
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial,
-    BSMATRIX_WARN const* warn)
+void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial)
 {
   int prop = 0;   /* change propagation indicator */
   assert(_lownode);
@@ -681,15 +655,15 @@ void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial,
 	}
 	{ /* jj == mm */
 	  /* d(mm,mm) = aa.d(mm,mm) - dot(mm,mm,mm); then test */
-	  if (subtract_dot_product(mm,mm,mm,aa.d(mm,mm)) == 0.) {
-	    (*warn)(mm);
+	  if (subtract_dot_product(mm,mm,mm,aa.d(mm,mm)) == 0.) {itested();
+	    error(bWARNING, "open circuit: internal node %u\n", mm);
 	    d(mm,mm) = _min_pivot;
 	  }else{
 	  }
 	}
       }else{    /* bn == mm */
 	d(mm,mm) = aa.d(mm,mm);
-	if (d(mm,mm)==0.) { untested();
+	if (d(mm,mm)==0.) {itested();
 	  d(mm,mm) = _min_pivot;
 	}else{
 	}
@@ -700,7 +674,7 @@ void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial,
 }
 /*--------------------------------------------------------------------------*/
 template <class T>
-void BSMATRIX<T>::lu_decomp(BSMATRIX_WARN const* warn)
+void BSMATRIX<T>::lu_decomp()
 {
   assert(_lownode);
   for (int mm = 1;   mm <= size();   ++mm) {
@@ -718,7 +692,7 @@ void BSMATRIX<T>::lu_decomp(BSMATRIX_WARN const* warn)
       { /* jj == mm */
 	/* m(mm,mm) -= dot(mm,mm,mm); then test */
 	if (subtract_dot_product(mm,mm,mm) == 0.) {itested();
-	  (*warn)(mm);
+	  error(bWARNING, "open circuit: internal node %u\n", mm);
 	  d(mm,mm) = _min_pivot;
 	}else{
 	}

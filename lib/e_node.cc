@@ -67,7 +67,7 @@ node_t::node_t(const node_t& p)
   :NODE_P(p, 0),
    // _ttt(p._ttt),
    _m(p._m)
-{ untested();
+{
   // used when initialising node arrays for set_parameters.
   //assert(_ttt == _nnn->flat_number());
 }

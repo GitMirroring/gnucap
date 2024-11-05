@@ -40,7 +40,6 @@ class MODEL_CARD;
 class CS;
 class ELEMENT;
 class CARD_LIST;
-class node_t;
 /*--------------------------------------------------------------------------*/
 inline bool conchk(double o, double n,
 		   double a=OPT::abstol, double r=OPT::reltol)
@@ -258,7 +257,7 @@ public:	// ports
   virtual bool	f_is_value()const	{return false;}
 
   bool		node_is_grounded(int i)const;
-  virtual bool	node_is_connected(int i)const; // $port_connected
+  virtual bool	node_is_connected(int i)const;
   //--------------------------------------------------------------------
 public: // parameters
   int  set_param_by_name(std::string, std::string) override;
@@ -278,7 +277,7 @@ public: // parameters
   virtual void set_parameters(const std::string& Label, CARD* Parent,
 			      COMMON_COMPONENT* Common, double Value,
 			      int state_count, double state[],
-			      int node_count, const NODE_P nodes[]);
+			      int node_count, const node_t nodes[]);
 private: // implementation
   int set_hsparam(std::string const&, std::string const&);
   HS_PARAM& hsparam();

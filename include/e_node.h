@@ -37,7 +37,7 @@ enum {
 };
 /*--------------------------------------------------------------------------*/
 class NODE_P;
-class NODE_MAP;
+//class NODE_MAP;
 class NODE : public CKT_BASE /*CARD?*/ {
 private:
   CARD const* _owner{NULL};
@@ -152,7 +152,7 @@ public:
     n.set_none();
   };
   explicit NODE_P(NODE_P const& n, int)
-    : NODE_P_BITS(n){ incomplete(); } // needed?
+    : NODE_P_BITS(n){ } // needed?
   ~NODE_P();
 
   NODE_P& operator=(NODE_P const& n) {
