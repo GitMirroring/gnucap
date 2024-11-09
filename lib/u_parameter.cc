@@ -105,7 +105,7 @@ std::string PARAM_LIST::value(int i)const
   return "";
 }
 /*--------------------------------------------------------------------------*/
-void PARAM_LIST::eval_copy(PARAM_LIST const& p, const CARD_LIST* scope)
+void PARAM_LIST::eval_copy(PARAM_LIST const& p, const PARAM_LIST* scope)
 {
   assert(scope);
   assert(!_try_again);
@@ -175,7 +175,7 @@ const PARAM_INSTANCE& PARAM_LIST::deep_lookup(std::string Name)const
   }
 }
 /*--------------------------------------------------------------------------*/
-Base const* PARAM_INSTANCE::e_val(Base const* def, const CARD_LIST* scope) const
+Base const* PARAM_INSTANCE::e_val(Base const* def, const PARAM_LIST* scope) const
 {
   static int recursion;
   if (++recursion > OPT::recursion) {itested();
@@ -282,7 +282,7 @@ bool Get(CS& cmd, const std::string& key, PARAMETER<int>* val)
 /*--------------------------------------------------------------------------*/
 // similar in PARAMETER<T>
 // make it all Base* and move to PARA_BASE?
-void PARAM_INSTANCE::PARAM_ANY::lookup_solve(const CARD_LIST* scope) const
+void PARAM_INSTANCE::PARAM_ANY::lookup_solve(const PARAM_LIST* scope) const
 {
   CS cmd(CS::_STRING, _s);
   Expression e(cmd);
@@ -305,8 +305,7 @@ void PARAM_INSTANCE::PARAM_ANY::lookup_solve(const CARD_LIST* scope) const
   if (_v) {
     // OK
   }else{itested();
-    const PARAM_LIST* pl = scope->params();
-    Base const* b = pl->deep_lookup(_s).e_val(nullptr, scope);
+    Base const* b = scope->deep_lookup(_s).e_val(nullptr, scope);
     if(b && !b->is_NA()){ untested();
       error(bWARNING, "parameter " + _s +  "  specified\n");
       _v = b->clone();
@@ -320,11 +319,9 @@ void PARAM_INSTANCE::PARAM_ANY::lookup_solve(const CARD_LIST* scope) const
 /*--------------------------------------------------------------------------*/
 // duplicate of PARAMETER<T>::e_val_
 // make it all Base* and move to PARA_BASE?
-Base const* PARAM_INSTANCE::PARAM_ANY::e_val_(const Base* Def, const CARD_LIST*
+Base const* PARAM_INSTANCE::PARAM_ANY::e_val_(const Base* Def, const PARAM_LIST*
     scope, int recurse) const
 {
-  assert(scope);
-
   if (_s == "") {itested();
     delete _v;
     _v = nullptr;

@@ -1,0 +1,11 @@
+
+.subckt a 1 2
+.parameter x=y
+.parameter y=x
+v1 1 2 x
+.ends
+
+x1 1 2 a
+
+.op
+.end

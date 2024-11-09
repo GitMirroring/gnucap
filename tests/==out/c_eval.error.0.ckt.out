@@ -1,8 +1,8 @@
 * unknown parameter check 
 .eval z 
-      ^ ? parameter z: recursion too deep
+      ^ ? parameter (zz + 3): recursion too deep
 .eval z 
-      ^ ? parameter z: recursion too deep
+      ^ ? parameter (zz + 3): recursion too deep
 .eval z 
-      ^ ? parameter z: recursion too deep
+      ^ ? parameter (zz + 3): recursion too deep
 a= 1.

@@ -139,7 +139,7 @@ public:
 
   NODE_MAP*   nodes()const {assert(_nm); return _nm;}
   PARAM_LIST* params();
-  PARAM_LIST* params()const;
+  PARAM_LIST const* params()const;
 
   // more complex stuff
   void attach_params(PARAM_LIST const* p, const CARD_LIST* scope);

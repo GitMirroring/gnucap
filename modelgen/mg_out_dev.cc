@@ -363,7 +363,7 @@ static void make_dev_precalc_last(std::ofstream& out, const Device& d)
     "  CARD::precalc_last();\n"
     "  assert(_n);\n"
     "  assert(common());\n"
-    "  mutable_common()->precalc_last(scope());\n"
+    "  mutable_common()->precalc_last(scope()->params());\n"
 	 "  assert(subckt());\n"
 	 "  subckt()->precalc_last();\n";
   out << "}\n"
