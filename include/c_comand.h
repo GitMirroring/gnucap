@@ -42,7 +42,7 @@ public:
   static  void	command(const std::string&, CARD_LIST*);
   CARD*   clone()const override { return new DEV_DOT;} // //BUG// memory leak ?
 public:	 // not a "dev". but still a type...
-  void set_dev_type(std::string const& s)override {_type = s;}
+  void set_dev_type(std::string const& s)override;
   std::string dev_type()const override {return _type;}
 };
 /*--------------------------------------------------------------------------*/

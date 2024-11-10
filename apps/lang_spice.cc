@@ -499,6 +499,7 @@ CARD* LANG_SPICE_BASE::parse_command(CS& cmd, CARD* x)
   if(auto dot = dynamic_cast<DEV_DOT*>(x)){
     dot->set(cmd.fullstring());
   }else{
+    parse_type(cmd, x);
   }
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 
@@ -745,7 +746,7 @@ void LANG_SPICE_BASE::print_command(OMSTREAM& o, const CARD* x)
   if(auto dot = dynamic_cast<DEV_DOT const*>(x)){ untested();
     o << dot->s() << '\n';
   }else if(auto cmd = dynamic_cast<CMD const*>(x)){
-    o << x->dev_type() << " label=\"" << cmd->short_label() << "\"\n";
+    o << "." << x->dev_type() << " label=\"" << cmd->short_label() << "\"\n";
   }else{ untested();
     unreachable();
     // incomplete. maybe
