@@ -48,7 +48,17 @@ public:
 
   ~AC() {}
 private:
-  explicit AC(const AC&):SIM() {unreachable(); incomplete();}
+  explicit AC(const AC&a) :
+    SIM(a),
+    _start(a._start),
+    _stop(a._stop),
+    _step_in(a._step_in),
+    _step(a._step),
+    _linswp(a._linswp),
+    _prevopppoint(a._prevopppoint),
+    _stepmode(a._stepmode)
+  { }
+  // CARD* clone()const override {return new AC(*this);}
   void	setup(CS&)override;
   void	sweep()override;
   void	first();
