@@ -38,7 +38,7 @@ public:
   std::string value_name()const {return "";}
   virtual void do_it(CS&, CARD_LIST*) = 0;
   virtual ~CMD() {}
-  static  void  cmdproc(CS&, CARD_LIST*);
+  static  void  cmdproc(CS&, CARD_LIST*, CMD* c=nullptr);
   static  void	command(const std::string&, CARD_LIST*);
   CARD*   clone()const override { return new DEV_DOT;} // //BUG// memory leak ?
 public:	 // not a "dev". but still a type...
