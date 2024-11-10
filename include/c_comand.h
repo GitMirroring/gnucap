@@ -44,6 +44,7 @@ public:
 public:	 // not a "dev". but still a type...
   void set_dev_type(std::string const& s)override;
   std::string dev_type()const override {return _type;}
+  virtual void uninit() {unreachable();}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

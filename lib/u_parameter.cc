@@ -57,9 +57,9 @@ void PARAM_LIST::obsolete_parse(CS& cmd)
 }
 /*--------------------------------------------------------------------------*/
 void PARAM_LIST::print(OMSTREAM& o, LANGUAGE* lang)const
-{itested();
-  for (const_iterator i = _pl.begin(); i != _pl.end(); ++i) {itested();
-    if (i->second.has_hard_value()) {itested();
+{
+  for (const_iterator i = _pl.begin(); i != _pl.end(); ++i) {
+    if (i->second.has_hard_value()) {
       print_pair(o, lang, i->first, i->second);
     }else{ untested();
     }

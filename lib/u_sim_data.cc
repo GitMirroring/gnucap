@@ -1,6 +1,5 @@
 /*$Id: u_sim_data.cc 2016/03/23 al $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
- * Author: Albert Davis <aldavis@gnu.org>
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -21,13 +20,14 @@
  *------------------------------------------------------------------
  * aux functions associated with the SIM class
  */
-//testing=script 2015.01.28
+#include "s__.h"
 #include "m_wave.h"
 #include "e_logicnode.h"
 #include "u_nodemap.h"
 #include "e_cardlist.h"
 #include "u_status.h"
 /*--------------------------------------------------------------------------*/
+<<<<<<< HEAD
 SIM_DATA::SIM_DATA()
   :_time0(0.),
    _freq(0.),
@@ -79,50 +79,53 @@ SIM_DATA::SIM_DATA()
   _evalq_uc = &_evalq2;
   std::fill_n(_iter, iCOUNT, 0);
 
-  _aa_solver = new LU_COPY<double>(_aa);
-  _aa.set_solver(_aa_solver);
-  _acx_solver = new LU_INPLACE<COMPLEX>(_acx);
-  _acx.set_solver(_acx_solver);
+=======
+/*--------------------------------------------------------------------------*/
+bool SIM::is_first_expand()
+{
+  return !_nstat;
+>>>>>>> 01b5ca126 (rearrange SIM_DATA into SIM)
 }
 /*--------------------------------------------------------------------------*/
-SIM_DATA::~SIM_DATA()
+void SIM::sim_data_cleanup()
 {
-  if (_nm) {unreachable();
+// was SIM_DATA::
+  if (_nm) {
     delete [] _nm;
     _nm = nullptr;
   }else{
   }
-  if (_i) {unreachable();
+  if (_i) {
     delete [] _i;
     _i = nullptr;
   }else{
   }
-  if (_v0) {unreachable();
+  if (_v0) {
     delete [] _v0;
     _v0 = nullptr;
   }else{
   }
-  if (_vt1) {unreachable();
+  if (_vt1) {
     delete [] _vt1;
     _vt1 = nullptr;
   }else{
   }
-  if (_ac) {unreachable();
+  if (_ac) {
     delete [] _ac;
     _ac = nullptr;
   }else{
   }
-  if (_noise) {unreachable();
+  if (_noise) {
     delete [] _noise;
     _noise = nullptr;
   }else{
   }
-  if (_nstat) {unreachable();
+  if (_nstat) {
     delete [] _nstat;
     _nstat = nullptr;
   }else{
   }
-  if (_vdc) {unreachable();
+  if (_vdc) {
     delete [] _vdc;
     _vdc = nullptr;
   }else{
@@ -151,15 +154,15 @@ SIM_DATA::~SIM_DATA()
   delete _acx_solver;
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-void SIM_DATA::set_limit()
+// was SIM_DATA::
+void SIM::set_limit()
 {
   for (int ii = 1;  ii <= _total_nodes;  ++ii) {
     set_limit(_v0[ii]);
   }
 }
 /*--------------------------------------------------------------------------*/
-void SIM_DATA::set_limit(double v)
+void SIM::set_limit(double v)
 {
   if (v+.4 > _vmax) {
     _vmax = v+.5;
@@ -171,13 +174,13 @@ void SIM_DATA::set_limit(double v)
   }
 }
 /*--------------------------------------------------------------------------*/
-void SIM_DATA::clear_limit()
+void SIM::clear_limit()
 {
   _vmax = OPT::vmax;
   _vmin = OPT::vmin;
 }
 /*--------------------------------------------------------------------------*/
-void SIM_DATA::keep_voltages()
+void SIM::keep_voltages()
 {
   if (!_freezetime) {
     for (int ii = 1;  ii <= _total_nodes;  ++ii) {
@@ -189,14 +192,15 @@ void SIM_DATA::keep_voltages()
   }
 }
 /*--------------------------------------------------------------------------*/
-void SIM_DATA::restore_voltages()
+void SIM::restore_voltages()
 {
   for (int ii = 1;  ii <= _total_nodes;  ++ii) {
     _vt1[ii] = _v0[ii] = _vdc[ii];
   }
 }
 /*--------------------------------------------------------------------------*/
-void SIM_DATA::zero_voltages()
+// was SIM_DATA::
+void SIM::zero_voltages()
 {
   for (int ii = 1;  ii <= _total_nodes;  ++ii) {
     _vt1[ii] = _v0[ii] = _vdc[ii] = _i[ii] = 0.;
@@ -208,7 +212,7 @@ void SIM_DATA::zero_voltages()
  * Ideally, this function would find some near-optimal order
  * and squash out gaps.
  */
-void SIM_DATA::map__nodes()
+void SIM::map__nodes()
 {
   _nm = new int[_total_nodes+1];
   ::status.order.reset().start();
@@ -226,7 +230,7 @@ void SIM_DATA::map__nodes()
 /* order_reverse: force ordering to reverse of user ordering
  *  subcircuits at beginning, results on border at the bottom
  */
-void SIM_DATA::order_reverse()
+void SIM::order_reverse()
 {
   _nm[0] = 0;
   for (int node = 1;  node <= _total_nodes;  ++node) {
@@ -237,7 +241,7 @@ void SIM_DATA::order_reverse()
 /* order_forward: use user ordering, with subcircuits added to end
  * results in border at the top (worst possible if lots of subcircuits)
  */
-void SIM_DATA::order_forward()
+void SIM::order_forward()
 {
   _nm[0] = 0;
   for (int node = 1;  node <= _total_nodes;  ++node) {
@@ -248,7 +252,7 @@ void SIM_DATA::order_forward()
 /* order_auto: full automatic ordering
  * reverse, for now
  */
-void SIM_DATA::order_auto()
+void SIM::order_auto()
 {
   _nm[0] = 0;
   for (int node = 1;  node <= _total_nodes;  ++node) {
@@ -256,18 +260,39 @@ void SIM_DATA::order_auto()
   }
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 /* init: allocate, set up, etc ... for any type of simulation
  * also called by status and probe for access to internals and subckts
  */
-void SIM_DATA::init(CARD_LIST* scope)
+void SIM::sim_data_init()
 {
-  assert(scope);
+  assert(_scope);
+  CARD_LIST* scope = _scope;
   if (scope == &CARD_LIST::card_list) {
   }else{itested();
+    incomplete();
   }
+
+  SIM* previous = /* BUG: scope */ CKT_BASE::_sim;
+
+  if (!previous) { untested();
+    // nothing there, nothing to do.
+  }else if (previous != this) { untested();
+    // import "is_first_expand" from previous.
+    // i.e. re-use data, if applicable.
+    assert(previous->_scope == _scope);
+    trace1("init: prev move", previous->is_first_expand());
+    bool tmp = previous->is_first_expand();
+    *this = std::move(*previous);
+    assert(tmp==is_first_expand());
+  }else{
+  }
+
+  CKT_BASE::_sim = this;
+
+  trace1("SIM::sim_data_init..", is_first_expand());
   if (is_first_expand()) {
-    uninit();
+    sim_data_uninit();
+    assert(CKT_BASE::_sim);
     init_node_count(scope->nodes()->how_many(), 0, 0);
     scope->expand();
     map__nodes();
@@ -275,12 +300,72 @@ void SIM_DATA::init(CARD_LIST* scope)
     alloc_hold_vectors();
     _aa.reinit(_total_nodes);
     _acx.reinit(_total_nodes);
-    scope->tr_iwant_matrix();
+    scope->tr_iwant_matrix(); // TODO: tr_set
     scope->ac_iwant_matrix();
     _last_time = 0;
   }else{
     scope->precalc_first();
   }
+}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/* load: load sim data from sequence
+ * .tran (*)
+ * .op   (**)
+ * .tran // run (*) again, but circuit state set in (**). go get it.
+ */
+void SIM::sim_data_load()
+{
+  SIM* prev = /* BUG: scope */ CKT_BASE::_sim;
+
+  if (prev == this) {
+    unreachable();
+    // no need.
+  }else if (prev) {
+   // _time0       = prev->_time0;
+/// _freq        = prev->_freq;
+/// _temp_c      = prev->_temp_c;
+/// _damp        = prev->_damp;
+/// _dtmin       = prev->_dtmin;
+/// _genout      = prev->_genout;
+    _bypass_ok   = prev->_bypass_ok;
+    _fulldamp    = prev->_fulldamp;
+    _last_time   = prev->_last_time;
+    _freezetime  = prev->_freezetime;
+    std::copy_n(   prev->_iter, iCOUNT, _iter);
+   // _user_nodes  = prev->_user_nodes;
+   // _subckt_nodes= prev->_subckt_nodes;
+   // _model_nodes = prev->_model_nodes;
+   // _total_nodes = prev->_total_nodes;
+    _jomega      = prev->_jomega;
+    _limiting    = prev->_limiting;
+    _vmax        = prev->_vmax;
+    _vmin        = prev->_vmin;
+    //_uic         = prev->_uic;
+    _inc_mode    = prev->_inc_mode;
+   // _mode        = prev->_mode; overriden before try/catch block
+    _phase       = prev->_phase;
+
+    _has_op = prev->_has_op;
+
+  // std::fill_n(_iter, iCOUNT, 0);
+  //
+    // move "held vectors"
+    *this = std::move(*prev);
+#if 0
+    assert(!_vdc);
+    assert(!_nstat);
+
+    _vdc = prev->_vdc;
+    _nstat = prev->_nstat;
+
+    prev->_vdc = nullptr;
+    prev->_nstat = nullptr;
+#endif
+  }else{
+  }
+
+  CKT_BASE::_sim = this;
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_hold_vectors:
@@ -290,8 +375,9 @@ void SIM_DATA::init(CARD_LIST* scope)
  * but after mapping
  * if they already exist, leave them alone to save data
  */
-void SIM_DATA::alloc_hold_vectors()
+void SIM::alloc_hold_vectors()
 {
+  trace1("SIM::alloc_hold_vectors", _total_nodes);
   assert(is_first_expand());
 
   assert(!_nstat);
@@ -311,7 +397,7 @@ void SIM_DATA::alloc_hold_vectors()
 /* alloc_vectors:
  * these are new with every run and are discarded after the run.
  */
-void SIM_DATA::alloc_vectors()
+void SIM::alloc_vectors()
 {
   assert(_evalq1.empty());
   assert(_evalq2.empty());
@@ -334,7 +420,8 @@ void SIM_DATA::alloc_vectors()
   std::fill_n(_vt1,_total_nodes+1, 0);
 }
 /*--------------------------------------------------------------------------*/
-void SIM_DATA::unalloc_vectors()
+// was SIM_DATA
+void SIM::unalloc_vectors()
 {
   _evalq1.clear();
   _evalq2.clear();
@@ -354,7 +441,7 @@ void SIM_DATA::unalloc_vectors()
  * called when the circuit changes after a run, so it needs a restart
  * may be called multiple times without damage to make sure it is clean
  */
-void SIM_DATA::uninit()
+void SIM::sim_data_uninit()
 {
   if (_vdc) {
     _acx.reinit(0);
@@ -373,6 +460,7 @@ void SIM_DATA::uninit()
   }
   _has_op = s_NONE;
 }
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

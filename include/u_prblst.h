@@ -60,11 +60,19 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE_LISTS {
+  PROBE_LISTS* _next{nullptr};
 public:
-  PROBELIST alarm[sCOUNT]; // list of alarm probes
-  PROBELIST plot[sCOUNT];  // list of plot probes
-  PROBELIST print[sCOUNT]; // list of print probes
-  PROBELIST store[sCOUNT]; // list of probes to store for postproc
+  explicit PROBE_LISTS() {}
+  PROBE_LISTS* new_probelists();
+  ~PROBE_LISTS();
+  // PROBE_LISTS const* operator->()const {
+  //   return this;
+  // }
+
+  PROBELIST alarm; // list of alarm probes
+  PROBELIST plot;  // list of plot probes
+  PROBELIST print; // list of print probes
+  PROBELIST store; // list of probes to store for postproc
   void purge(CKT_BASE*);
 };
 /*--------------------------------------------------------------------------*/

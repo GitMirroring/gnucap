@@ -28,7 +28,7 @@
 #include "s_tr.h"
 namespace {
   TRANSIENT p5;
-  DISPATCHER<CMD>::INSTALL      d5(&command_dispatcher, "transient|`tr|`tran|`transient", &p5);
+  DISPATCHER<CMD>::INSTALL      d5(&command_dispatcher, "transient|tran|tr|`transient|`tran|`tr", &p5);
   DISPATCHER<CKT_BASE>::INSTALL d6(&status_dispatcher,  "transient", &p5);
 }
 /*--------------------------------------------------------------------------*/
@@ -43,10 +43,11 @@ void TRANSIENT::do_it(CS& Cmd, CARD_LIST* Scope)
   }else{untested();
   }
   _scope = Scope;
-  _sim->set_command_tran();
+  set_command_tran();
+  assert(command_is_tran());
   ::status.tran.reset().start();
   command_base(Cmd);
-  _scope = nullptr;
+  // _scope = nullptr;
   ::status.tran.stop();
 }
 /*--------------------------------------------------------------------------*/

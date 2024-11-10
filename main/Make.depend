@@ -5,7 +5,7 @@ main.o: main.cc ../include/globals.h ../include/l_dispatcher.h \
  ../include/mode.h ../include/io_.h ../include/l_lib.h \
  ../include/u_prblst.h ../include/u_probe.h ../include/l_compar.h \
  ../include/u_sim_data.h ../include/constant.h \
- ../include/m_matrix_solver.h ../include/m_matrix.h \
+ ../include/m_matrix_solver.h ../include/m_matrix.h ../include/s__.h \
+ ../include/c_comand.h ../include/e_card.h ../include/d_dot.h \
  ../include/e_cardlist.h ../include/u_lang.h ../include/ap.h \
- ../include/patchlev.h ../include/c_comand.h ../include/e_card.h \
- ../include/d_dot.h ../include/declare.h
+ ../include/patchlev.h ../include/c_comand.h ../include/declare.h

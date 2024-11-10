@@ -411,9 +411,9 @@ CARD* LANG_VERILOG::parse_command(CS& cmd, CARD* x)
   }else{
     // "module" etc gets here.
   }
-  if(auto dot = dynamic_cast<DEV_DOT*>(x)){ untested();
+  if(auto dot = dynamic_cast<DEV_DOT*>(x)){
     // dot->set(cmd.fullstring());
-  }else{ untested();
+  }else{
     // parse_type
     parse_type(cmd, x);
     if(x->dev_type()[0]=='`'){
@@ -422,7 +422,7 @@ CARD* LANG_VERILOG::parse_command(CS& cmd, CARD* x)
       x->set_label(x->dev_type());
     }
   }
-  if(auto c = dynamic_cast<CMD*>(x)){ untested();
+  if(auto c = dynamic_cast<CMD*>(x)){
     // run command and stash.
     CMD::cmdproc(cmd, scope, c);
   }else{

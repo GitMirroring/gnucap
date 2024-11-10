@@ -23,7 +23,6 @@
  */
 //testing=script 2008.08.06
 #include "globals.h"
-#include "u_sim_data.h"
 #include "u_status.h"
 #include "u_parameter.h"
 #include "u_prblst.h"
@@ -44,7 +43,9 @@ public:
     _linswp(false),
     _prevopppoint(false),
     _stepmode(ONE_PT)
-  {}
+  {
+    set_label("ac");
+  }
 
   ~AC() {}
 private:
@@ -57,8 +58,13 @@ private:
     _linswp(a._linswp),
     _prevopppoint(a._prevopppoint),
     _stepmode(a._stepmode)
-  { }
+  {
+    set_label("ac");
+  }
   CARD* clone()const override {return new AC(*this);}
+  SIM& operator=(SIM&& ex)override {
+    return SIM::operator=(std::move(ex));
+  }
   void	setup(CS&)override;
   void	allocate()override;
   void	sweep()override;
@@ -93,9 +99,10 @@ void AC::do_it(CS& Cmd, CARD_LIST* Scope)
   }else{untested();
   }
   _scope = Scope;
-  _sim->set_command_ac();
+  set_command_ac();
   command_base(Cmd);
-  _scope = nullptr;
+  _acx.unallocate();
+  unalloc_vectors();
   ::status.ac.stop();
   ::status.total.stop();
 }
@@ -150,12 +157,12 @@ void AC::setup(CS& Cmd)
       || (Get(Cmd, "ti{mes}",	  &_step_in) && (_stepmode = TIMES))
       || (Get(Cmd, "lin",	  &_step_in) && (_stepmode = LIN_PTS))
       || (Get(Cmd, "o{ctave}",	  &_step_in) && (_stepmode = OCTAVE))
-      || Get(Cmd, "dt{emp}",	  &_sim->_temp_c,  mOFFSET, OPT::temp_c)
+      || Get(Cmd, "dt{emp}",	  &_temp_c,  mOFFSET, OPT::temp_c)
       || Get(Cmd, "pl{ot}",	  &ploton)
       || Get(Cmd, "pr{evoppoint}",&_prevopppoint)
       || Get(Cmd, "sta{rt}",	  &_start)
       || Get(Cmd, "sto{p}",	  &_stop)
-      || Get(Cmd, "te{mperature}",&_sim->_temp_c)
+      || Get(Cmd, "te{mperature}",&_temp_c)
       || outset(Cmd,&_out)
       ;
   }while (Cmd.more() && !Cmd.stuck(&here));
@@ -226,21 +233,21 @@ void AC::setup(CS& Cmd)
 /*--------------------------------------------------------------------------*/
 void AC::solve()
 {
-  _sim->_acx.zero();
-  std::fill_n(_sim->_ac, _sim->_total_nodes+1, 0.);
+  _acx.zero();
+  std::fill_n(_ac, _total_nodes+1, 0.);
 
   ::status.load.start();
-  _sim->count_iterations(iTOTAL);
+  count_iterations(iTOTAL);
   _scope->do_ac();
   _scope->ac_load();
   ::status.load.stop();
 
   ::status.lud.start();
-  _sim->_acx.lu_decomp();
+  _acx.lu_decomp();
   ::status.lud.stop();
 
   ::status.back.start();
-  _sim->_acx.fbsub(_sim->_ac);
+  _acx.fbsub(_ac);
   ::status.back.stop();
 }
 /*--------------------------------------------------------------------------*/
@@ -251,10 +258,10 @@ void AC::sweep()
   _scope->ac_begin();
   try {
     do {
-      _sim->_jomega = COMPLEX(0., _sim->_freq * M_TWO_PI);
+      _jomega = COMPLEX(0., _freq * M_TWO_PI);
       solve();
-      outdata(_sim->_freq, ofPRINT | ofSTORE);
-      _sim->_has_op = s_AC;
+      outdata(_freq, ofPRINT | ofSTORE);
+      _has_op = s_AC;
     } while (next());
   }catch (Exception& e) {untested();
     error(bDANGER, e.message() + '\n');
@@ -263,7 +270,7 @@ void AC::sweep()
 /*--------------------------------------------------------------------------*/
 void AC::first()
 {
-  _sim->_freq = _start;
+  _freq = _start;
 }
 /*--------------------------------------------------------------------------*/
 bool AC::next()
@@ -271,15 +278,15 @@ bool AC::next()
   double realstop = (_linswp)
     ? _stop - _step/100.
     : _stop / pow(_step,.01);
-  if (!in_order(double(_start), _sim->_freq, realstop)) {
+  if (!in_order(double(_start), _freq, realstop)) {
     return false;
   }else{
   }
 
-  _sim->_freq = (_linswp)
-    ? _sim->_freq + _step
-    : _sim->_freq * _step;
-  if (in_order(_sim->_freq, double(_start), double(_stop))) {
+  _freq = (_linswp)
+    ? _freq + _step
+    : _freq * _step;
+  if (in_order(_freq, double(_start), double(_stop))) {
     return false;
   }else{
     return true;

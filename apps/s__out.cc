@@ -29,23 +29,25 @@
 #include "declare.h"	/* plottr, plopen */
 #include "s__.h"
 /*--------------------------------------------------------------------------*/
+// TODO, in limbo. make virtual. remove most of this
+/*--------------------------------------------------------------------------*/
 /* SIM::____list: access probe lists
  */
 const PROBELIST& SIM::alarmlist()const
 {
-  return _probe_lists->alarm[_sim->_mode];
+  return probe_lists().alarm;
 }
 const PROBELIST& SIM::plotlist()const
 {
-  return _probe_lists->plot[_sim->_mode];
+  return probe_lists().plot;
 }
 const PROBELIST& SIM::printlist()const
 {
-  return _probe_lists->print[_sim->_mode];
+  return probe_lists().print;
 }
 const PROBELIST& SIM::storelist()const
 {
-  return _probe_lists->store[_sim->_mode];
+  return probe_lists().store;
 }
 /*--------------------------------------------------------------------------*/
 /* SIM::out: output the data, "keep" for ac reference
@@ -81,8 +83,8 @@ void SIM::outdata(double x, int outflags)
  */
 void SIM::head(double start, double stop, const std::string& col1)
 {
-  if (_sim->_waves) {
-    delete [] _sim->_waves;
+  if (_waves) {
+    delete [] _waves;
   }else{
   }
 

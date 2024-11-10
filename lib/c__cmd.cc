@@ -53,7 +53,7 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope, CMD* c)
   // Map possible short names to full ones.
   // If this if/else block is removed, the only loss is the short names.
   // Although it looks like it can be used to make aliases, don't.
-  if (c){ untested(); /* already got it */ }
+  if (c){ /* already got it */ }
   else if (cmd.umatch("'|*|#|//|\""))	{	     s = "xxxxcomment";}
   else if (cmd.umatch("b{uild} "))      {itested();  s = "build";}
   else if (cmd.umatch("del{ete} "))     {            s = "delete";}
@@ -77,7 +77,7 @@ void CMD::cmdproc(CS& cmd, CARD_LIST* scope, CMD* c)
     didsomething = false;
   }
 
-  if (c) { untested();
+  if (c) {
     c->do_it(cmd, scope);
     didsomething = true;
   }else if (s == "xxxxcomment") {
@@ -125,9 +125,9 @@ void CMD::command(const std::string& cs, CARD_LIST* scope)
 /*--------------------------------------------------------------------------*/
 void CMD::set_dev_type(std::string const& s)
 {
-  static int idx;
+ // static int idx;
   _type = s;
-  set_label(_type + to_string(++idx));
+ // set_label(_type + to_string(++idx));
   trace1("CMD::set_dev_type", short_label());
 }
 /*--------------------------------------------------------------------------*/

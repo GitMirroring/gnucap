@@ -31,11 +31,13 @@
 /*--------------------------------------------------------------------------*/
 void PROBE_LISTS::purge(CKT_BASE* brh)
 {
-  for (int i = 0;  i < sCOUNT;  ++i) {
-    alarm[i].remove_one(brh);
-    plot[i] .remove_one(brh);
-    print[i].remove_one(brh);
-    store[i].remove_one(brh);
+  alarm.remove_one(brh);
+  plot .remove_one(brh);
+  print.remove_one(brh);
+  store.remove_one(brh);
+  if(_next){
+    _next->purge(brh);
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -315,6 +317,25 @@ bool PROBELIST::add_branches(const std::string&device,
   }
 
   return found_something;
+}
+/*--------------------------------------------------------------------------*/
+PROBE_LISTS::~PROBE_LISTS()
+{
+  alarm.clear();
+  plot .clear();
+  print.clear();
+  store.clear();
+
+  delete _next;
+  _next = nullptr;
+}
+/*--------------------------------------------------------------------------*/
+PROBE_LISTS* PROBE_LISTS::new_probelists()
+{
+  PROBE_LISTS* n = new PROBE_LISTS();
+  n->_next = _next;
+  _next = n;
+  return n;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

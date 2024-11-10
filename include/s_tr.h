@@ -60,8 +60,10 @@ public:
     _converged(false),
     _accepted(false)
   {
+    set_label("tran");
   }
   ~TRANSIENT() {}
+  using SIM::operator=;
   CMD* clone()const override {return new TRANSIENT(*this);}
 public:
   void	do_it(CS&, CARD_LIST* scope)override;
@@ -73,9 +75,11 @@ private:		// s_tr_rev.cc
   bool	review();
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 private:		// s_tr_set.cc
+ // void	load()override;
   void	setup(CS&)override;
 protected:
   void	allocate()override;
+  void  get_state(std::string const& label);
   void	options(CS&);
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:		// s_tr_swp.cc
@@ -106,6 +110,7 @@ protected: // fourier...
     _cold(t._cold),
     _cont(t._cont),
     _stepno(t._stepno) {
+    set_label("tran");
   }
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 protected:
@@ -138,6 +143,51 @@ public:
   static int steps_rejected() {return steps_rejected_;}
   static int steps_total()    {return steps_total_;}
 };
+/*--------------------------------------------------------------------------*/
+/* May need to get state from previous run, before setup.
+ * this is, because the state may be concealed in a SIM object
+ * with a different label...
+ *
+ * TODO. get state directly from a SIM instance
+ * by label provided by the user.
+ */
+inline void TRANSIENT::get_state(std::string const& label)
+{
+  SIM* s = nullptr;
+  if(label==""){
+    s = _sim;
+  }else{ untested();
+    unreachable();
+    incomplete();
+  }
+
+  if(auto t = dynamic_cast<TRANSIENT*>(s)) {
+    _last_time  = t->_last_time;
+    _time0      = t->_time0;
+    _time1      = t->_time1;
+    _tstart     = t->_tstart;
+    _tstop      = t->_tstop;
+    _tstrobe    = t->_tstrobe;
+    _dtratio_in = t->_dtratio_in;
+    _dtmin_in   = t->_dtmin_in;
+    _dtmax_in   = t->_dtmax_in;
+    _skip_in    = t->_skip_in;
+    _dtmax      = t->_dtmax;
+    _cold       = t->_cold;
+    _cont       = t->_cont;
+    _stepno     = t->_stepno;
+    trace4("get_state", _last_time, _tstart, _time0, _time1);
+
+    _trace      = t->_trace;
+    _time_by_user_request    = t->_time_by_user_request;
+    _time_by_error_estimate  = t->_time_by_error_estimate;
+    _time_by_ambiguous_event = t->_time_by_ambiguous_event;
+    _converged  = t->_converged;
+    _accepted   = t->_accepted;
+  }else{ untested();
+    // incomplete();
+  }
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

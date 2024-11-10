@@ -26,6 +26,9 @@
 #define S___H
 #include "u_opt.h"
 #include "c_comand.h"
+#include "constant.h" // NEVER
+#include "l_compar.h" // up_order
+#include "m_matrix.h" // TODO
 /*--------------------------------------------------------------------------*/
 class CARD;
 class CARD_LIST;
@@ -33,6 +36,25 @@ class CS;
 class PROBELIST;
 class COMPONENT;
 class WAVE;
+class LOGIC_NODE;
+class CKT_BASE;
+/*--------------------------------------------------------------------------*/
+enum TRI_STATE {tsNO=0, tsYES=1, tsBAD=-1};
+class EVENT {
+private:
+  double    _time  {NEVER};
+  const CKT_BASE* _owner {nullptr};
+  EVENT() = delete;
+public:
+  EVENT(double Time, const CKT_BASE* Owner)
+    : _time(Time), _owner(Owner) {}
+  EVENT(const EVENT& E)
+    : _time(E._time), _owner(E._owner) {}
+  ~EVENT() {}
+  operator double() const {return _time;}
+  double time() const     {return _time;}
+  const CKT_BASE* owner() const {untested(); assert(_owner); return _owner;}
+};
 /*--------------------------------------------------------------------------*/
 class SIM : public CMD {
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
@@ -54,6 +76,8 @@ protected:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   CARD_LIST* _scope;
   OMSTREAM   _out;		/* places to send the results		*/
+private:
+  PROBE_LISTS* _probe_lists{nullptr};
 public:
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
 private:
@@ -66,8 +90,9 @@ private:
   virtual bool	is_step_rejected()const {return false;}
 
 protected:
-  explicit SIM(const SIM&s):CMD(s),_scope(nullptr) {untested(); incomplete();}
-  explicit SIM(): CMD(),_scope(nullptr) {}
+  explicit SIM(const SIM&s);
+  explicit SIM();
+  virtual SIM& operator=(SIM&& expired);
 public:
   ~SIM();
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
@@ -75,11 +100,15 @@ protected:
   	 void	command_base(CS&);	/* s__init.cc */
 	 void	reset_timers();	
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */ 
+public:
+  const PROBE_LISTS& probe_lists() const;
+  PROBE_LISTS& probe_lists();
+public:
+  const PROBELIST& alarmlist()const;     /* s__out.cc */
+  const PROBELIST& plotlist()const;
+  const PROBELIST& printlist()const;
+  const PROBELIST& storelist()const;
 protected:
-	 const PROBELIST& alarmlist()const;	/* s__out.cc */
-	 const PROBELIST& plotlist()const;
-	 const PROBELIST& printlist()const;
-	 const PROBELIST& storelist()const;
   virtual void	outdata(double, int);
   virtual void	head(double,double,const std::string&);
   virtual void	print_results(double);
@@ -99,8 +128,146 @@ private:
 	void	set_damp();
 	void	load_matrix();
 	void	solve_equations();
+/*--------------------------------------------------------------------------*/
+public: // SIM_DATA
+  double _time0;	/* time now */
+  double _freq;		/* AC frequency to analyze at (Hertz) */
+  double _temp_c;	/* ambient temperature, actual */
+  double _damp;		/* Newton-Raphson damping coefficient actual */
+  double _dtmin;	/* min internal step size */
+  double _genout;	/* tr dc input to circuit (generator) */
+  bool   _bypass_ok;	/* flag: ok to bypass model evaluation */
+  bool	_fulldamp; 	/* flag: big iter. jump. use full (min) damp */
+  double _last_time;	/* time at which "volts" is valid */
+  bool _freezetime;	/* flag: don't advance stored time */
+  int _iter[iCOUNT];
+  int _user_nodes;
+  int _subckt_nodes;
+  int _model_nodes;
+  int _total_nodes;
+  COMPLEX _jomega;	/* AC frequency to analyze at (radians) */
+  bool _limiting;	/* flag: node limiting */
+  double _vmax;
+  double _vmin;
+  bool _uic;		/* flag: use initial conditions (spice-like) */
+  TRI_STATE _inc_mode;	/* flag: make incremental changes (3 state) */
+  SIM_MODE _mode;	/* simulation type (AC, DC, ...) */
+  SIM_PHASE _phase;	/* phase of simulation (iter, init-dc,) */
+  int	*_nm{nullptr};		/* node map (external to internal)	*/
+  double *_i{nullptr};		/* dc-tran current (i) vector		*/
+  double *_v0{nullptr};		/* dc-tran voltage, new			*/
+  double *_vt1{nullptr};	/* dc-tran voltage, 1 time ago		*/
+				/*  used to restore after rejected step	*/
+  COMPLEX *_ac{nullptr};	/* ac right side			*/
+  COMPLEX *_noise{nullptr};	/* noise vector				*/
+  LOGIC_NODE* _nstat{nullptr};	/* digital data				*/
+  double *_vdc{nullptr};	/* saved dc voltages			*/
+  BSMATRIX<double> _aa;	/* raw matrix for DC & tran */
+  BSMATRIX<double> _lu;	/* decomposed matrix for DC & tran */
+  BSMATRIX<COMPLEX> _acx;/* raw & decomposed matrix for AC */
+  std::priority_queue<EVENT, std::deque<EVENT>, std::greater<double> > _eq; /*event queue*/
+  std::deque<CARD*> _loadq;
+  std::deque<CARD*> _acceptq;
+  std::deque<CARD*>  _evalq1; /* evaluate queues -- alternate between */
+  std::deque<CARD*>  _evalq2; /* build one while other is processed */
+  std::deque<CARD*>  _late_evalq; /* eval after everything else */
+  std::deque<CARD*>* _evalq{nullptr};   /* pointer to evalq to process */
+  std::deque<CARD*>* _evalq_uc{nullptr};/* pointer to evalq under construction */
+  WAVE *_waves{nullptr};		/* storage for waveforms "store" command*/
+  SIM_MODE _has_op;
+
+  bool is_first_expand();
+  void alloc_hold_vectors(); /* s__init.cc */
+  void alloc_vectors();
+  void unalloc_vectors();
+  void load(CARD_LIST* scope);
+  void init(CARD_LIST* scope); // arg?
+  void uninit() override;
+  void set_limit();  /* s__aux.cc */
+  void set_limit(double v);
+  void clear_limit();
+  void keep_voltages();
+  void restore_voltages();
+  void zero_voltages();
+  void map__nodes();		/* s__map.cc */
+  void order_reverse();
+  void order_forward();
+  void order_auto();
+  int init_node_count(int user, int sub, int mod) {
+    _user_nodes=user; _subckt_nodes=sub; _model_nodes=mod; return (_total_nodes=user+sub+mod);
+  }
+  int newnode_subckt() {++_subckt_nodes; return ++_total_nodes;}
+  int newnode_model()  {++_model_nodes;  return ++_total_nodes;}
+  bool is_inc_mode()	 {return _inc_mode;}
+  bool inc_mode_is_no()	 {return _inc_mode == tsNO;}
+  bool inc_mode_is_bad() {return _inc_mode == tsBAD;}
+  void set_inc_mode_bad() {_inc_mode = tsBAD;}
+  void set_inc_mode_yes() {_inc_mode = tsYES;}
+  void set_inc_mode_no()  {_inc_mode = tsNO;}
+  void mark_inc_mode_bad() {
+    switch (_inc_mode) {
+    case tsYES: _inc_mode = tsBAD; break;
+    case tsBAD: break;
+    case tsNO:  break;
+    }
+  }
+  double new_event(double Time, const CKT_BASE* Owner=NULL) {
+    assert(Time <= BIGBIG);
+    _eq.push(EVENT(Time, Owner));
+    if(_dtmin){
+    }else{
+      // getting here in d_logic_nand-dc.ckt
+      // does no harm, but cannot quantise.
+    }
+    // TODO: move to future EVENT_QUEUE. For now, quantize here, to get the effect.
+    return std::round(Time/_dtmin) * _dtmin;
+  }
+  void set_command_none() {_mode = s_NONE;}
+  void set_command_ac()	  {_mode = s_AC;}
+  void set_command_dc()	  {_mode = s_DC;}
+  void set_command_op()	  {_mode = s_OP;}
+  void set_command_tran() {_mode = s_TRAN;}
+  void set_command_fourier() {_mode = s_FOURIER;}
+  SIM_MODE sim_mode()	   {return _mode;}
+  bool command_is_ac()	   {return _mode == s_AC;}
+  bool command_is_dc()	   {return _mode == s_DC;}
+  bool command_is_op()	   {return _mode == s_OP;}
+  bool command_is_tran()    {return _mode == s_TRAN;}
+  //bool command_is_fourier() {return _mode == s_FOURIER;}
+  bool analysis_is_ac()      {return _mode == s_AC;}
+  bool analysis_is_dcop()    {return _mode == s_DC || _mode == s_OP;}
+  bool analysis_is_static()  {return _phase == p_INIT_DC || _phase == p_DC_SWEEP;}
+  bool analysis_is_restore() {return _phase == p_RESTORE;}
+  bool analysis_is_tran()    {return _mode == s_TRAN || _mode == s_FOURIER;}
+  bool analysis_is_tran_static()  {return analysis_is_tran() && _phase == p_INIT_DC;}
+  bool analysis_is_tran_restore() {return analysis_is_tran() && _phase == p_RESTORE;}
+  bool analysis_is_tran_dynamic() {return analysis_is_tran() && _phase == p_TRAN;}
+
+  void reset_iteration_counter(int i) {assert(up_order(0,i,iCOUNT-1)); _iter[i] = 0;}
+  void count_iterations(int i)	{assert(up_order(0,i,iCOUNT-1)); ++_iter[i];}
+  int iteration_tag()const      {return _iter[iTOTAL];}
+  int iteration_number()const   {return _iter[iSTEP];}
+  bool is_initial_step()	{return (_iter[_mode] <= 1  && analysis_is_static());}
+  bool is_advance_iteration()const   {return (_iter[iSTEP] == 0);}
+  bool is_advance_or_first_iteration()const {assert(_iter[iSTEP]>=0); return (_iter[iSTEP]<=1);}
+  bool is_first_iteration()const     {assert(_iter[iSTEP] > 0); return (_iter[iSTEP] == 1);}
+  bool is_second_iteration()const    {assert(_iter[iSTEP] > 0); return (_iter[iSTEP] == 2);}
+  bool is_iteration_number(int n)const    {return (_iter[iSTEP] == n);}
+  bool exceeds_iteration_limit(OPT::ITL itlnum)const {return(_iter[iSTEP] > OPT::itl[itlnum]);}
+  bool uic_now() {return _uic && analysis_is_static() && _time0==0.;}
+  SIM_MODE has_op()const {return _has_op;}
+
+  void sim_data_load();
+  void sim_data_init();
+  void sim_data_uninit();
+  void sim_data_cleanup();
+private: // stash here for now. Try plugins performance later.
+  BSMATRIX_SOLVER<double>* _aa_solver;
+  BSMATRIX_SOLVER<COMPLEX>* _acx_solver;
 };
 /*--------------------------------------------------------------------------*/
+void init_sim();
+void uninit_sim();
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:

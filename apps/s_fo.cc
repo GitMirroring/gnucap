@@ -44,7 +44,9 @@ public:
     _fstep(0.),
     _timesteps(0),
     _fdata(nullptr)
-  {}
+  {
+    set_label("fourier");
+  }
   ~FOURIER() {}
 private:
   explicit FOURIER(const FOURIER&f) : TRANSIENT(f),
@@ -53,6 +55,10 @@ private:
     _fstep(f._fstep),
     _timesteps(f._timesteps),
     _fdata(NULL) {
+    set_label("fourier");
+  }
+  SIM& operator=(SIM&& ex)override {
+    return TRANSIENT::operator=(std::move(ex));
   }
   CMD* clone()const override {return new FOURIER(*this);}
   std::string status()const override {untested();return "";}
@@ -91,16 +97,16 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
   }else{untested();
   }
   _scope = Scope;
-  _sim->set_command_fourier();
+  set_command_fourier();
   reset_timers();
   ::status.four.reset().start();
   command_base(Cmd);
   fftunallocate();
-  _sim->unalloc_vectors();
-  _sim->_aa.unallocate();
+  unalloc_vectors();
+  _aa.unallocate();
 
-  _sim->_has_op = s_FOURIER;
-  _scope = nullptr;
+  _has_op = s_FOURIER;
+  // _scope = nullptr;
 
   ::status.four.stop();
   ::status.total.stop();
@@ -269,6 +275,7 @@ void FOURIER::setup(CS& Cmd)
     /* else (no args) : no change */
   }
 
+  get_state("");
   options(Cmd);
 
   _fstart.e_val(0., _scope);
@@ -285,27 +292,28 @@ void FOURIER::setup(CS& Cmd)
   }
 
   _timesteps = to_pow_of_2(_fstop*2 / _fstep) + 1;
-  if (_cold  ||  _sim->_last_time <= 0.) {
+  if (_cold  ||  _last_time <= 0.) {
     _cont = false;
     _tstart = 0.;
   }else{
     _cont = true;
-    _tstart = _sim->_last_time;
+    _tstart = _last_time;
   }
   _tstop = _tstart + 1. / _fstep;
   _tstrobe = 1. / _fstep / (_timesteps-1);
-  _time1 = _sim->_time0 = _tstart;
+  _time1 = _time0 = _tstart;
+  trace4("fo options", _last_time, _tstart, _time0, _time1);
 
-  _sim->_freq = _fstep;
+  _freq = _fstep;
 
   _dtmax = std::min(double(_dtmax_in), _tstrobe / double(_skip_in));
   if (_dtmin_in.has_hard_value()) {untested();
-    _sim->_dtmin = _dtmin_in;
+    _dtmin = _dtmin_in;
   }else if (_dtratio_in.has_hard_value()) {untested();
-    _sim->_dtmin = _dtmax / _dtratio_in;
+    _dtmin = _dtmax / _dtratio_in;
   }else{
     // use smaller of soft values
-    _sim->_dtmin = std::min(double(_dtmin_in), _dtmax/_dtratio_in);
+    _dtmin = std::min(double(_dtmin_in), _dtmax/_dtratio_in);
   }
 }
 /*--------------------------------------------------------------------------*/

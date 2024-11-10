@@ -31,7 +31,7 @@
 class XPROBE;
 class WAVE;
 class OMSTREAM;
-struct SIM_DATA;
+class SIM;
 class PROBE_LISTS;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
@@ -39,7 +39,7 @@ private:
   mutable int	_probes;		/* number of probes set */
   std::string	_label;
 public:
-  static SIM_DATA* _sim;
+  static SIM* _sim;
   static PROBE_LISTS* _probe_lists;
 private:
   static INDIRECT<ATTRIB_LIST_p> _attribs;
