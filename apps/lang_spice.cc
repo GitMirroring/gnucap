@@ -50,7 +50,7 @@ public: // override virtual, used by callback
 
 public: // override virtual, called by commands
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*)override;
-  DEV_DOT*	parse_command(CS&, DEV_DOT*)override;
+  CARD*		parse_command(CS&, CARD*)override;
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override;
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
@@ -70,7 +70,7 @@ private: // override virtual, called by print_item
   void print_module(OMSTREAM&, const BASE_SUBCKT*)override;
   void print_instance(OMSTREAM&, const COMPONENT*)override;
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
-  void print_command(OMSTREAM&, const DEV_DOT*)override;
+  void print_command(OMSTREAM&, const CARD*)override;
 private: // local
   void print_args(OMSTREAM&, const MODEL_CARD*);
   void print_type(OMSTREAM&, const COMPONENT*);
@@ -493,10 +493,13 @@ DEV_COMMENT* LANG_SPICE_BASE::parse_comment(CS& cmd, DEV_COMMENT* x)
   return x;
 }
 /*--------------------------------------------------------------------------*/
-DEV_DOT* LANG_SPICE_BASE::parse_command(CS& cmd, DEV_DOT* x)
+CARD* LANG_SPICE_BASE::parse_command(CS& cmd, CARD* x)
 {
   assert(x);
-  x->set(cmd.fullstring());
+  if(auto dot = dynamic_cast<DEV_DOT*>(x)){
+    dot->set(cmd.fullstring());
+  }else{
+  }
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 
   cmd.reset();
@@ -514,8 +517,13 @@ DEV_DOT* LANG_SPICE_BASE::parse_command(CS& cmd, DEV_DOT* x)
   }
   CMD::cmdproc(cmd, scope);
 
-  delete x;
-  return nullptr;
+  if(dynamic_cast<DEV_DOT*>(x)){
+  //  dot->set("");
+    delete x;
+    x = nullptr;
+  }else{
+  }
+  return x;
 }
 /*--------------------------------------------------------------------------*/
 MODEL_CARD* LANG_SPICE_BASE::parse_paramset(CS& cmd, MODEL_CARD* x)
@@ -731,10 +739,17 @@ void LANG_SPICE_BASE::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
   // These are generated as a way to display calculated values.
 }
 /*--------------------------------------------------------------------------*/
-void LANG_SPICE_BASE::print_command(OMSTREAM& o, const DEV_DOT* x)
+void LANG_SPICE_BASE::print_command(OMSTREAM& o, const CARD* x)
 {itested();
   assert(x);
-  o << x->s() << '\n';
+  if(auto dot = dynamic_cast<DEV_DOT const*>(x)){ untested();
+    o << dot->s() << '\n';
+  }else if(auto cmd = dynamic_cast<CMD const*>(x)){
+    o << x->dev_type() << " label=\"" << cmd->short_label() << "\"\n";
+  }else{ untested();
+    unreachable();
+    // incomplete. maybe
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

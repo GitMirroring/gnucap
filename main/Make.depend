@@ -8,4 +8,4 @@ main.o: main.cc ../include/globals.h ../include/l_dispatcher.h \
  ../include/m_matrix_solver.h ../include/m_matrix.h \
  ../include/e_cardlist.h ../include/u_lang.h ../include/ap.h \
  ../include/patchlev.h ../include/c_comand.h ../include/e_card.h \
- ../include/declare.h
+ ../include/d_dot.h ../include/declare.h

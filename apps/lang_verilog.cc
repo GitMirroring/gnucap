@@ -72,7 +72,7 @@ public: // override virtual, used by callback
 public: // override virtual, called by commands
   void		parse_top_item(CS&, CARD_LIST*)override;
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*)override;
-  DEV_DOT*	parse_command(CS&, DEV_DOT*)override;
+  CARD*		parse_command(CS&, CARD*)override;
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override;
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
@@ -93,7 +93,7 @@ private: // override virtual, called by print_item
   void print_module(OMSTREAM&, const BASE_SUBCKT*)override;
   void print_instance(OMSTREAM&, const COMPONENT*)override;
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
-  void print_command(OMSTREAM& o, const DEV_DOT*)override;
+  void print_command(OMSTREAM& o, const CARD*)override;
 private: // local
   void print_attributes(OMSTREAM&, tag_t);
   void print_args(OMSTREAM&, const MODEL_CARD*);
@@ -400,10 +400,15 @@ DEV_COMMENT* LANG_VERILOG::parse_comment(CS& cmd, DEV_COMMENT* x)
   return x;
 }
 /*--------------------------------------------------------------------------*/
-DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
+CARD* LANG_VERILOG::parse_command(CS& cmd, CARD* x)
 {
   assert(x);
-  x->set(cmd.fullstring());
+  if(auto dot = dynamic_cast<DEV_DOT*>(x)){ untested();
+   // dot->set(cmd.fullstring());
+  }else{ untested();
+    // parse_type
+    x->set_dev_type(cmd.tail()); // TODO just type && set_param_by*
+  }
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
   cmd.reset();
   cmd.skipbl();
@@ -413,9 +418,12 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
   }
   parse_attributes(cmd, x->id_tag());
   CMD::cmdproc(cmd, scope);
-  x->purge();
-  delete x;
-  return nullptr;
+  if(dynamic_cast<DEV_DOT*>(x)){ untested();
+    delete x;
+    x = nullptr;
+  }else{
+  }
+  return x;
 }
 /*--------------------------------------------------------------------------*/
 /* "paramset" <my_name> <base_name> ";"
@@ -865,10 +873,16 @@ void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
   o << x->comment() << '\n';
 }
 /*--------------------------------------------------------------------------*/
-void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
+void LANG_VERILOG::print_command(OMSTREAM& o, const CARD* x)
 {untested();
   assert(x);
-  o << x->s() << '\n';
+  if(auto dot = dynamic_cast<DEV_DOT const*>(x)){ untested();
+    // TODO: "module" gets here.
+    // o << dot->s() << '\n';
+  }else{
+    o << x->dev_type() << " label=\"" << x->short_label() << "\"\n";
+    // print_args ..
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

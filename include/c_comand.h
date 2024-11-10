@@ -30,6 +30,10 @@
 class CS;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CMD : public CARD {
+  std::string _type;
+protected:
+  explicit CMD() : CARD() {}
+  explicit CMD(CMD const& p) : CARD(p) {untested();}
 public:
   std::string value_name()const {return "";}
   virtual void do_it(CS&, CARD_LIST*) = 0;
@@ -37,6 +41,9 @@ public:
   static  void  cmdproc(CS&, CARD_LIST*);
   static  void	command(const std::string&, CARD_LIST*);
   CARD*   clone()const override { return new DEV_DOT;} // //BUG// memory leak ?
+public:	 // not a "dev". but still a type...
+  void set_dev_type(std::string const& s)override {_type = s;}
+  std::string dev_type()const override {return _type;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
