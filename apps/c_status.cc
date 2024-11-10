@@ -38,7 +38,7 @@ public:
   void do_it(CS& cmd, CARD_LIST*)override {
     IO::mstdout << "Gnucap   System status\n";
     
-    if (!cmd.umatch("n{otime} ")) { untested();
+    if (!cmd.umatch("n{otime} ")) {
       ::status.compute_overhead();
       IO::mstdout
 	<< "command ------ last -- total\n"

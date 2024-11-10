@@ -52,7 +52,7 @@ CKT_BASE::~CKT_BASE()
   trace1("", _probes);
   assert(_probes==0);
 
-  if (has_attributes(id_tag())) {untested();
+  if (has_attributes(id_tag())) {
     unreachable();    // needs purge();
     erase_attributes(id_tag());
   }else{

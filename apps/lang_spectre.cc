@@ -180,24 +180,24 @@ DEV_COMMENT* LANG_SPECTRE::parse_comment(CS& cmd, DEV_COMMENT* x)
 CARD* LANG_SPECTRE::parse_command(CS& cmd, CARD* x)
 {
   assert(x);
-  if(auto dot = dynamic_cast<DEV_DOT*>(x)){ untested();
+  if(auto dot = dynamic_cast<DEV_DOT*>(x)){
     dot->set(cmd.fullstring());
-  }else if(auto cc = dynamic_cast<CMD*>(x)){ untested();
-    parse_type(cmd, x);
+  }else if(auto cc = dynamic_cast<CMD*>(x)){
+    parse_type(cmd, cc);
   }else{ untested();
   }
 
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
 
   cmd.reset().skipbl();
-  if ((cmd >> "model |simulator |parameters |subckt ")) { untested();
+  if ((cmd >> "model |simulator |parameters |subckt ")) {
     cmd.reset();
     CMD::cmdproc(cmd, scope);
-  }else{ untested();
+  }else{
     std::string label;
     cmd >> label;
     
-    if (label != "-") { untested();
+    if (label != "-") {
       size_t here = cmd.cursor();
       std::string command;
       cmd >> command;
@@ -206,7 +206,7 @@ CARD* LANG_SPECTRE::parse_command(CS& cmd, CARD* x)
       std::string s = cmd.tail() + " > " + file_name;
       CS augmented_cmd(CS::_STRING, s);
       CMD::cmdproc(augmented_cmd, scope);
-    }else{ untested();
+    }else{
       CMD::cmdproc(cmd, scope);
     }
   }
@@ -411,7 +411,7 @@ void LANG_SPECTRE::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPECTRE::print_command(OMSTREAM& o, const CARD* x)
-{untested();
+{
   assert(x);
   if(auto dot = dynamic_cast<DEV_DOT const*>(x)){ untested();
     o << dot->s() << '\n';

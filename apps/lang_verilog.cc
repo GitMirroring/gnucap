@@ -403,25 +403,34 @@ DEV_COMMENT* LANG_VERILOG::parse_comment(CS& cmd, DEV_COMMENT* x)
 CARD* LANG_VERILOG::parse_command(CS& cmd, CARD* x)
 {
   assert(x);
-  if(auto dot = dynamic_cast<DEV_DOT*>(x)){ untested();
-   // dot->set(cmd.fullstring());
-  }else{ untested();
-    // parse_type
-    x->set_dev_type(cmd.tail()); // TODO just type && set_param_by*
-  }
   CARD_LIST* scope = (x->owner()) ? x->owner()->subckt() : &CARD_LIST::card_list;
   cmd.reset();
-  cmd.skipbl();
+  parse_attributes(cmd, x->id_tag());
+
   if(cmd.peek() == '`'){
   }else{
     // "module" etc gets here.
   }
-  parse_attributes(cmd, x->id_tag());
-  CMD::cmdproc(cmd, scope);
-  if(dynamic_cast<DEV_DOT*>(x)){ untested();
+  if(auto dot = dynamic_cast<DEV_DOT*>(x)){ untested();
+    // dot->set(cmd.fullstring());
+  }else{ untested();
+    // parse_type
+    parse_type(cmd, x);
+    if(x->dev_type()[0]=='`'){
+      x->set_label(x->dev_type().substr(1));
+    }else{
+      x->set_label(x->dev_type());
+    }
+  }
+  if(auto c = dynamic_cast<CMD*>(x)){ untested();
+    // run command and stash.
+    CMD::cmdproc(cmd, scope, c);
+  }else{
+    // old way,
+    CMD::cmdproc(cmd, scope);
+    x->purge();
     delete x;
     x = nullptr;
-  }else{
   }
   return x;
 }
@@ -874,7 +883,7 @@ void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_command(OMSTREAM& o, const CARD* x)
-{untested();
+{
   assert(x);
   if(auto dot = dynamic_cast<DEV_DOT const*>(x)){ untested();
     // TODO: "module" gets here.
