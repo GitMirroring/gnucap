@@ -36,6 +36,7 @@ COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
    _model(p._model),
    _attach_count(0)
 {
+  attach_common(p._next, &_next);
 }
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(int c)
@@ -54,6 +55,7 @@ COMMON_COMPONENT::~COMMON_COMPONENT()
 {
   trace1("common,destruct", _attach_count);
   assert(_attach_count == 0 || _attach_count == CC_STATIC);
+  detach_common(&_next);
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
@@ -268,6 +270,44 @@ std::string COMMON_COMPONENT::param_value(int i)const
   }
 }
 /*--------------------------------------------------------------------------*/
+void COMMON_COMPONENT::precalc_first_recursive(PARAM_LIST const* p)
+{
+  if(_next){ untested();
+    COMMON_COMPONENT* c = _next->mutable_clone();
+    assert(c);
+    try { untested();
+      c->precalc_first_recursive(p);
+      attach_common(c, &_next);
+      p = c->params();
+    }catch (Exception const& e) { untested();
+      attach_common(c, &_next);
+      throw e;
+    }
+  }else{
+  }
+
+  precalc_first(p);
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_COMPONENT::precalc_last_recursive(PARAM_LIST const* p)
+{
+  if(_next){ untested();
+    COMMON_COMPONENT* c = _next->mutable_clone();
+    assert(c);
+    try { untested();
+      c->precalc_last_recursive(p);
+      attach_common(c, &_next);
+      p = c->params();
+    }catch (Exception const& e) { untested();
+      attach_common(c, &_next);
+      throw e;
+    }
+  }else{
+  }
+
+  precalc_last(p);
+}
+/*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::precalc_last(const PARAM_LIST* Scope)
 {
   if(Scope){
@@ -294,6 +334,7 @@ void COMMON_COMPONENT::ac_eval(ELEMENT*x)const
 bool COMMON_COMPONENT::operator==(const COMMON_COMPONENT& x)const
 {
   return (_modelname == x._modelname
+	  && _next == x._next
 	  && _model == x._model
 	  && _tnom_c == x._tnom_c
 	  && _dtemp == x._dtemp
@@ -503,15 +544,12 @@ void COMPONENT::set_port_to_ground(int num)
 void COMPONENT::set_dev_type(const std::string& new_type)
 {
   if (common()) {
-    if (new_type == dev_type()) {
-    }else if(!common()->is_shared()) {itested();
-      // it's us!
-      mutable_common()->set_modelname(new_type);
-    }else{
-      COMMON_COMPONENT* c = common()->clone();
+    if (new_type != dev_type()) {
+      COMMON_COMPONENT* c = mutable_common()->mutable_clone();
       assert(c);
       c->set_modelname(new_type);
       attach_common(c);
+    }else{
     }
   }else{
     CARD::set_dev_type(new_type);
@@ -559,10 +597,20 @@ void COMPONENT::precalc_first()
 {
   CARD::precalc_first();
   if (has_common()) {
+    COMMON_COMPONENT* c = mutable_common()->mutable_clone();
+    assert(c);
     try {
-      mutable_common()->precalc_first(scope()->params());
-    }catch (Exception_Precalc& e) {untested();
+      c->precalc_first_recursive(scope()->params());
+      attach_common(c);
+    }catch (Exception_Precalc& e) { untested();
       error(bWARNING, long_label() + ": " + e.message());
+      attach_common(c);
+    }catch (Exception& e) { untested();
+      if(c != common()){ untested();
+	delete c;
+      }else{ untested();
+      }
+      throw e;
     }
   }else{
   }
@@ -589,17 +637,21 @@ void COMPONENT::precalc_last()
 {
   CARD::precalc_last();
   if (has_common()) {
-    COMMON_COMPONENT* c = common()->clone();
+    COMMON_COMPONENT* c = mutable_common()->mutable_clone();
     assert(c);
     try {
-      c->precalc_last(scope()->params());
+      c->precalc_last_recursive(scope()->params());
+      attach_common(c);
     }catch (Exception_Precalc& e) {
       error(bWARNING, long_label() + ": " + e.message());
+      attach_common(c);
     }catch (Exception& e) {
-      delete c;
+      if(c != common()){
+	delete c;
+      }else{
+      }
       throw e;
     }
-    attach_common(c);
   }else{
   }
 }
@@ -731,17 +783,14 @@ int COMPONENT::set_param_by_name(std::string Name, std::string Value)
   if(int idx = set_hsparam(Name, Value)){
     trace3("COMPONENT::spbn", Name, Value, idx);
     return COMPONENT::param_count() - idx;
-  }else if (!has_common()) { itested();
-    return CARD::set_param_by_name(Name, Value);
-  }else if(!common()->is_shared()) {
-    // it's us!
-    return mutable_common()->set_param_by_name(Name, Value);
-  }else{
-    COMMON_COMPONENT* c = common()->clone();
+  }else if (has_common()) { itested();
+    COMMON_COMPONENT* c = mutable_common()->mutable_clone();
     assert(c);
     int index = c->set_param_by_name(Name, Value);
     attach_common(c);
     return index;
+  }else{
+    return CARD::set_param_by_name(Name, Value);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -751,15 +800,12 @@ void COMPONENT::set_param_by_index(int i, std::string& Value, int offset)
 
   if( I < sysparams_count ){
     hsparam().set_by_index(I, Value);
-  }else if (!has_common()) { untested();
-  }else if(!common()->is_shared()) { untested();
-    // it's us!
-    mutable_common()->set_param_by_index(i, Value, offset);
-  }else{ untested();
-    COMMON_COMPONENT* c = common()->clone();
+  }else if (has_common()) { untested();
+    COMMON_COMPONENT* c = mutable_common()->mutable_clone();
     assert(c);
     c->set_param_by_index(i, Value, offset);
     attach_common(c);
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -58,7 +58,7 @@ enum {CC_STATIC=27342}; // mid-sized arbitrary positive int
 // so it won't be deleted
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_COMPONENT : public CKT_BASE {
-  COMMON_COMPONENT* _next{nullptr};
+  mutable COMMON_COMPONENT* _next{nullptr};
 protected: // probably obsolete
   PARAMETER<double>	_tnom_c;  // specification temperature
   PARAMETER<double>	_dtemp;   // rise over enclosing temperature
@@ -88,6 +88,7 @@ public:
   void parse_modelname(CS&);
 
   virtual COMMON_COMPONENT* clone()const = 0;
+  COMMON_COMPONENT* mutable_clone() { return is_shared()?clone():this; }
 
   virtual bool use_obsolete_callback_parse()const {return false;}
   virtual bool use_obsolete_callback_print()const {return false;}
@@ -132,6 +133,11 @@ public:
   const PARAMETER<double>& value()const {return _value;}
 private:
   bool parse_param_list(CS&);
+  virtual PARAM_LIST const* params()const { return nullptr; }
+private:
+  friend class COMPONENT;
+  void precalc_first_recursive(const PARAM_LIST*);
+  void precalc_last_recursive(const PARAM_LIST*);
 };
 /*--------------------------------------------------------------------------*/
 /* note on _attach_count ...

@@ -67,7 +67,7 @@ EVAL_BM_MODEL::EVAL_BM_MODEL(const EVAL_BM_MODEL& p)
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_MODEL::operator==(const COMMON_COMPONENT& x)const
-{ untested();
+{
   const EVAL_BM_MODEL* p = dynamic_cast<const EVAL_BM_MODEL*>(&x);
   bool rv = p
     && _arglist == p->_arglist

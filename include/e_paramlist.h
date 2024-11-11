@@ -28,6 +28,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_PARAMLIST : public COMMON_COMPONENT {
+  static int	_count;
+public:
+  PARAM_LIST	_params;
 protected:
   explicit COMMON_PARAMLIST(const COMMON_PARAMLIST& p)
     :COMMON_COMPONENT(p), _params(p._params) {++_count;}
@@ -49,10 +52,8 @@ public:
 
   void		precalc_first(const PARAM_LIST*) override;
   void		precalc_last(const PARAM_LIST*) override;
-private:
-  static int	_count;
 public:
-  PARAM_LIST	_params;
+  PARAM_LIST const* params()const override { untested(); return &_params;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
