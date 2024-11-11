@@ -57,7 +57,7 @@ bool EVAL_BM_VALUE::is_trivial()const
 	    || _temp_c.has_hard_value());
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_VALUE::precalc_first(const CARD_LIST* Scope)
+void EVAL_BM_VALUE::precalc_first(const PARAM_LIST* Scope)
 {
   if (modelname() != "") {
     (_value = "") = modelname();

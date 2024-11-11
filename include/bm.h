@@ -73,7 +73,7 @@ public: // override virtual
   //COMPONENT_COMMON* clone()const;	//COMPONENT_COMMON=0
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const override;
 
-  void		precalc_last(const CARD_LIST*)override;
+  void		precalc_last(const PARAM_LIST*)override;
   void		ac_eval(ELEMENT*)const override;
   virtual bool	ac_too()const = 0;
 protected: // override virtual
@@ -96,7 +96,7 @@ private: // override virtual
   void		print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const override;
   bool		is_trivial()const override;
 
-  void		precalc_first(const CARD_LIST*)override;
+  void		precalc_first(const PARAM_LIST*)override;
   void		tr_eval(ELEMENT*)const override;
   std::string	name()const override	{itested();return "VALUE";}
   bool		ac_too()const override	{return false;}

@@ -46,10 +46,10 @@ private: // override virtual
   void  parse_common_obsolete_callback(CS&) override;
   void  print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const override;
   
-  void  	precalc_first(const CARD_LIST*) override;
+  void  	precalc_first(const PARAM_LIST*) override;
   void		expand(const COMPONENT*) override;
   COMMON_COMPONENT* deflate() override;
-  void  	precalc_last(const CARD_LIST*) override;
+  void  	precalc_last(const PARAM_LIST*) override;
 
   void  tr_eval(ELEMENT*d)const override
 	{assert(_func[d->_sim->sim_mode()]); _func[d->_sim->sim_mode()]->tr_eval(d);}
@@ -226,7 +226,7 @@ COMMON_COMPONENT* EVAL_BM_COND::deflate()
   return _func[s_NONE]->deflate();
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_COND::precalc_first(const CARD_LIST* Scope)
+void EVAL_BM_COND::precalc_first(const PARAM_LIST* Scope)
 {
   //BUG// calls the individual precalc more than once
   // wastes time and makes multiple "has no value" warnings
@@ -243,7 +243,7 @@ void EVAL_BM_COND::precalc_first(const CARD_LIST* Scope)
   }
 }
 /*--------------------------------------------------------------------------*/
-void EVAL_BM_COND::precalc_last(const CARD_LIST* Scope)
+void EVAL_BM_COND::precalc_last(const PARAM_LIST* Scope)
 {
   //BUG// calls the individual precalc more than once
   // wastes time and makes multiple "has no value" warnings
