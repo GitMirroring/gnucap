@@ -58,6 +58,7 @@ enum {CC_STATIC=27342}; // mid-sized arbitrary positive int
 // so it won't be deleted
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_COMPONENT : public CKT_BASE {
+  COMMON_COMPONENT* _next{nullptr};
 protected: // probably obsolete
   PARAMETER<double>	_tnom_c;  // specification temperature
   PARAMETER<double>	_dtemp;   // rise over enclosing temperature
