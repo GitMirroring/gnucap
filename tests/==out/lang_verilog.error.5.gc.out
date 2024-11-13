@@ -6,3 +6,4 @@ nmos2 #((*A*).w(5),(*B*) .w(5)) m4(.d(d), .g(g), .s(s),.b(b));
 // Let's just ignore it for now, and warn 
 nmos2 #(.l(NA( 100.u)),.w(5)) m3 (.d(d),.g(g),.s(s),.b(b));
 nmos2 #(.l(NA( 100.u)),(* A *) .w(5)) m4 (.d(d),.g(g),.s(s),.b(b));
+

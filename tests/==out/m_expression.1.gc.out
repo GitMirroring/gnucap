@@ -47,3 +47,4 @@ o=((QEpercent != 0))? (((QEpercent * Lambda) /  123.98E+3)):(Responsivity)
 "eval p "
 eval p 
      ^ ? missing colon (ternary)
+

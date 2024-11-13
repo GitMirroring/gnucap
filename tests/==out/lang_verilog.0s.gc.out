@@ -16,3 +16,4 @@ foo #(.fs("testvalue")) f ();
 .ends foo
 *// BUG still need {} in c_param 
 f (  )  foo  fs="testvalue"
+

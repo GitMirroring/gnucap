@@ -21,3 +21,4 @@ endmodule // crash
 
 // syntax error, no label 
 crash #() X_unnamed (.iout(x),.nC(y));
+
