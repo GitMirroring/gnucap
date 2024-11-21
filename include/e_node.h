@@ -433,7 +433,7 @@ public:
     return _m;
   }
 
-  bool	is_grounded()const { return false;}
+  //bool is_grounded()const { return false;}
 
   node_t&     map();
 

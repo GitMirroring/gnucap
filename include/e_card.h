@@ -32,7 +32,7 @@ class CARD;
 // external
 class node_t;
 class NODE;
-class NODE_P;
+class node_t;
 class CARD_LIST;
 class PARAM_LIST;
 class LANGUAGE;
@@ -134,9 +134,9 @@ public:	// label -- in CKT_BASE
   /*virtual*/ const std::string long_label()const final;
   //--------------------------------------------------------------------
 public:	// ports -- mostly defer to COMPONENT
-  virtual NODE_P const& n_(int i)const;
-  virtual NODE_P& node(int i);
-  int     connects_to(const NODE_P& node)const;
+  virtual node_t const& n_(int i)const;
+  virtual node_t& node(int i);
+  int     connects_to(const node_t& node)const;
   //--------------------------------------------------------------------
 public: // parameters
   virtual int  set_param_by_name(std::string, std::string);

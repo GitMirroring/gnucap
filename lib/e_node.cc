@@ -361,8 +361,15 @@ void NODE_P::map_subckt_node(NODE_P* m, CARD const* d)
     trace1("msn", type());
   }
 
-  assert(d || m[u].is_node());
-  m[u].req_type(type());
+  if (d) {
+    m[u].req_type(type());
+  }else if (m[u].is_node()) {
+    m[u].req_type(type());
+  }else{
+    assert(d || m[u].is_node());
+    assert(0);
+    unreachable();
+  }
 
   if(!d && is_node()){
     // assert(n_() == m[u].n_());
@@ -455,6 +462,7 @@ NODE_P& NODE_P::map()
   return *this;
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 void NODE_P::deflate(CARD* owner)
 { untested();
   if(!owner){ untested();
@@ -507,6 +515,7 @@ void NODE_P::deflate(CARD* owner)
   trace2("deflated", n_()->flat_number(), n_()->short_label());
   trace1("deflated", n_()->is_grounded());
 }
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 void GROUND_NODE::connect(NODE_P*to)

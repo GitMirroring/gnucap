@@ -175,7 +175,7 @@ protected:
   node_t*  _n;
   node_t& node(int i)override { return _n[i]; }
 public:
-  NODE_P& n_(int i)const override { return _n[i];}
+  node_t& n_(int i)const override { return _n[i];}
 private:
   node_t   _nodes[NODES_PER_BRANCH]; // nodes (0,1:out, 2,3:in)
 public:

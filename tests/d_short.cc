@@ -55,9 +55,9 @@ private: // override virtual
 
   double   tr_probe_num(const std::string&)const override;
 
-  NODE_P _n[17];
-  NODE_P const& n_(int i)const override { assert(i<17); return _n[i];}
-  NODE_P& node(int i)override { assert(i<17); return _n[i]; }
+  node_t _n[17];
+  node_t const& n_(int i)const override { assert(i<17); return _n[i];}
+  node_t& node(int i)override { assert(i<17); return _n[i]; }
   std::string port_name(int i)const override {
     return "p" + to_string(i);
   }

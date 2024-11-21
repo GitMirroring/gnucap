@@ -39,7 +39,7 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 // some pre-connect-module band aid
-LOGIC_NODE* logic(NODE_P& p)
+LOGIC_NODE* logic(node_t& p)
 {
   if(p.is_grounded()){ untested();
     unreachable();
@@ -60,7 +60,7 @@ LOGIC_NODE* logic(NODE_P& p)
   }
 }
 /*--------------------------------------------------------------------------*/
-class node_l : public node_t { // NODE_P?
+class node_l : public node_t { // node_t?
 public:
   explicit node_l(){}
   explicit node_l(node_t& p) : node_t(p){}
@@ -84,16 +84,16 @@ public:
       return logic(*this);
     }
   }
-  void set_input()  { NODE_P::set_input(); }
-  void set_output() { NODE_P::set_output(); }
-  void set_inout()  { NODE_P::set_inout(); }
+  void set_input()  { node_t::set_input(); }
+  void set_output() { node_t::set_output(); }
+  void set_inout()  { node_t::set_inout(); }
 
   void map() {
     node_t::map();
   }
 };
 /*--------------------------------------------------------------------------*/
-LOGIC_NODE const* logic(NODE_P const& p)
+LOGIC_NODE const* logic(node_t const& p)
 {
   if(p.is_grounded()){ untested();
     unreachable();
@@ -126,7 +126,7 @@ private:
   smode_t	_gatemode;
   static int	_count;
   node_l	_n[PORTS_PER_GATE];	/* PORTS_PER_GATE <= PORTSPERSUBCKT */
-  NODE_P& n_(int i)const override { return const_cast<node_l&>(_n[i]); }
+  node_t& n_(int i)const override { return const_cast<node_l&>(_n[i]); }
   node_t& node(int i)override { return _n[i]; }
 public:
   explicit	DEV_LOGIC(COMMON_COMPONENT* c=NULL);

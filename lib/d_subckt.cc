@@ -33,7 +33,7 @@ namespace{
 // components with one node are unlikely.
 const int node_capacity_floor = 2;
 /*--------------------------------------------------------------------------*/
-static void grow_nodes(int Index, NODE_P*& n, int& capacity, int capacity_floor)
+static void grow_nodes(int Index, node_t*& n, int& capacity, int capacity_floor)
 {
   if(Index < capacity) {
   }else{
@@ -42,7 +42,7 @@ static void grow_nodes(int Index, NODE_P*& n, int& capacity, int capacity_floor)
       assert(new_capacity < new_capacity * 2);
       new_capacity *= 2;
     }
-    NODE_P* new_nodes = new NODE_P[new_capacity];
+    node_t* new_nodes = new node_t[new_capacity];
     for(int i=0; i<capacity; ++i){
       new_nodes[i] = n[i]; // copy_n?
     }
@@ -59,7 +59,7 @@ private:
   friend class DEV_SUBCKT_PROTO;
   const BASE_SUBCKT* _parent;
   int _node_capacity{0};
-  NODE_P*	_n{NULL};
+  node_t*	_n{NULL};
 protected:
   explicit	DEV_MODULE(const DEV_MODULE&);
 public:
@@ -123,8 +123,8 @@ private:
 
   std::string port_name(int i)const override;
   int set_param_by_name(std::string Name, std::string Value)override;
-  NODE_P&	node(int i)override {assert(i<_node_capacity); return _n[i];}
-  NODE_P const&	n_(int i)const override {assert(i<_node_capacity); return _n[i];}
+  node_t&	node(int i)override {assert(i<_node_capacity); return _n[i];}
+  node_t const&	n_(int i)const override {assert(i<_node_capacity); return _n[i];}
 } p0(&Default_SUBCKT);
 DISPATCHER<CARD>::INSTALL d0(&device_dispatcher, "module", &p0);
 /*--------------------------------------------------------------------------*/
@@ -301,7 +301,7 @@ DEV_MODULE::DEV_MODULE(const DEV_MODULE& p)
   }
 
   if(_node_capacity){
-    _n = new NODE_P[_node_capacity];
+    _n = new node_t[_node_capacity];
   }else{
     assert(_n == NULL);
   }

@@ -32,7 +32,7 @@ class DOT_GROUND : public DEV_DOT {
 public:
   CARD_LIST* _scope{NULL}; // DEV_DOT?
 public:
- // NODE_P _np;
+ // node_t _np;
   explicit DOT_GROUND() : DEV_DOT() {
     set_label("ground");
   }
@@ -57,7 +57,7 @@ public:
       _node.set_to_ground(this);
     }
   }
-  NODE_P _node;
+  node_t _node;
  //  CARD_LIST* scope()override { unreachable(); return NULL; }
  //  CARD_LIST const* scope()const override{
  //    return _scope;
@@ -80,7 +80,7 @@ public:
     DOT_GROUND* dd = gnd.clone();
     dd->_scope = Scope;
 
-    NODE_P& np = dd->_node;
+    node_t& np = dd->_node;
     np.new_node(name, dd);
 
     if(np.is_grounded()){
