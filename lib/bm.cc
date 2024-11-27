@@ -136,7 +136,7 @@ bool EVAL_BM_ACTION_BASE::operator==(const COMMON_COMPONENT& x)const
     && _tc2 == p->_tc2
     && _ic == p->_ic
     && EVAL_BM_BASE::operator==(x);
-  if (rv) {untested();
+  if (rv) {
   }else{
   }
   return rv;
@@ -144,6 +144,7 @@ bool EVAL_BM_ACTION_BASE::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_ACTION_BASE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
 {
+  EVAL_BM_BASE::print_common_obsolete_callback(o, lang);
   print_pair(o, lang, "bandwidth",_bandwidth,_bandwidth.has_hard_value());
   print_pair(o, lang, "delay",	  _delay,    _delay.has_hard_value());
   print_pair(o, lang, "phase",	  _phase,    _phase.has_hard_value());
@@ -153,13 +154,12 @@ void EVAL_BM_ACTION_BASE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* 
   print_pair(o, lang, "tc1",	  _tc1,	     _tc1.has_hard_value());
   print_pair(o, lang, "tc2",	  _tc2,	     _tc2.has_hard_value());
   print_pair(o, lang, "ic",	  _ic,	     _ic.has_hard_value());
-  COMMON_COMPONENT::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_ACTION_BASE::precalc_last(const CARD_LIST* Scope)
 {
   assert(Scope);
-  COMMON_COMPONENT::precalc_last(Scope);
+  EVAL_BM_BASE::precalc_last(Scope);
   _bandwidth.e_val(_default_bandwidth, Scope);
   _delay.e_val(_default_delay, Scope);
   _phase.e_val(_default_phase, Scope);
@@ -190,12 +190,12 @@ bool EVAL_BM_ACTION_BASE::parse_params_obsolete_callback(CS& cmd)
     || Get(cmd, "tc1",      &_tc1)
     || Get(cmd, "tc2",      &_tc2)
     || Get(cmd, "ic",       &_ic)
-    || COMMON_COMPONENT::parse_params_obsolete_callback(cmd);
+    || EVAL_BM_BASE::parse_params_obsolete_callback(cmd);
     ;
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_ACTION_BASE::has_ext_args()const
-{ untested();
+{
   return  (_bandwidth.has_hard_value()
 	   || _delay.has_hard_value()
 	   || _phase.has_hard_value()

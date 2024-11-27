@@ -26,6 +26,31 @@
 #include "u_xprobe.h"
 #include "e_aux.h"
 #include "e_elemnt.h"
+#include "bm.h"
+/*--------------------------------------------------------------------------*/
+class COMMON_VALUE : public EVAL_BM_BASE {
+  std::string _name;
+public:
+  COMMON_VALUE(int c=CC_STATIC) : EVAL_BM_BASE(c) { }
+ // COMMON_VALUE(COMMON_COMPONENT const& c) : COMMON_COMPONENT(c) { untested(); }
+  COMMON_VALUE(COMMON_VALUE const& c) :
+    EVAL_BM_BASE(c),
+    _name(c._name) {}
+  COMMON_VALUE(COMMON_COMPONENT* next) : EVAL_BM_BASE() {
+    assert(!dynamic_cast<COMMON_VALUE*>(next));
+    // attach_next(next);
+  }
+  COMMON_VALUE* clone()const override { return new COMMON_VALUE(*this); }
+
+  std::string name()const override { return _name; }
+  void set_name(std::string const& n) { _name = n; }
+
+public: // value handling
+  bool use_obsolete_callback_print()const override	{ return false;}
+
+private: // param overrides
+  void set_param_by_index(int, std::string&, int)override { untested();unreachable();}
+}cv;
 /*--------------------------------------------------------------------------*/
 ELEMENT::ELEMENT(COMMON_COMPONENT* c)
   :COMPONENT(c),
@@ -79,86 +104,109 @@ void ELEMENT::set_value(double v, COMMON_COMPONENT* c)
   set_value(v);
 }
 /*--------------------------------------------------------------------------*/
+// create common if needed
+int ELEMENT::push_value(std::string const& Value)
+{
+  trace3("elt::push_value", value_name(), Value, has_common());
+  assert(!dynamic_cast<COMMON_VALUE const*>(common()));
+
+  PARAMETER<double> v;
+  v = Value;
+  static const CARD_LIST* empty = nullptr;
+  v.e_val(NOT_VALID, empty);
+  trace5("elt::push_value constant", Value, _value, double(v), has_common(), v.is_constant());
+
+  if(has_common() && common()->has_value()) { untested();
+    unreachable();
+  }else if(v != NOT_VALID && !has_common()) {
+    // a literal value.
+    // no need for common
+    _value = double(v);
+  }else{
+    // squeeze in common. retain parameter indexes
+    auto cc = new COMMON_VALUE();
+    cc->set_name(value_name());
+    cc->set_value(Value);
+    attach_common(cc);
+  }
+  trace3("elt::push_value", Value, _value, has_common());
+  return 0;
+}
+/*--------------------------------------------------------------------------*/
+std::string ELEMENT::value_string() const
+{
+  if(common() && common()->has_value()) {
+    return common()->param_value(ELEMENT::param_count() - 1);
+  }else{
+    return to_string(_value);
+  }
+}
+/*--------------------------------------------------------------------------*/
 int ELEMENT::set_param_by_name(std::string Name, std::string Value)
 {
   if(Name == value_name()){
-    _value = Value;
-    return ELEMENT::param_count() - 1; // BUG?
+    trace4("elt::spbn", value_name(), Name, Value, has_common());
+    try{
+      return COMPONENT::set_param_by_name(Name, Value);
+    }catch(Exception_No_Match const&) { untested();
+      return push_value(Value);
+    }
   }else{
+    trace4("elt::spbn1", value_name(), Name, Value, has_common());
     return COMPONENT::set_param_by_name(Name, Value);
   }
+  trace4("elt::spbn done", value_name(), Name, Value, has_common());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::set_param_by_index(int i, std::string& Value, int offset)
 {
-  if (has_common()) {itested();
-    COMMON_COMPONENT* c = common()->clone();
-    assert(c);
-    c->set_param_by_index(i, Value, offset);
-    attach_common(c);
+  trace2("elt::spbi", i, Value);
+  if(ELEMENT::param_count() - 1 == i) {
+    push_value(Value);
   }else{
-    switch (ELEMENT::param_count() - 1 - i) {
-    case 0:
-      _value = Value; break;
-    default:
-      COMPONENT::set_param_by_index(i, Value, offset);
-    }
+    COMPONENT::set_param_by_index(i, Value, offset);
   }
 }
 /*--------------------------------------------------------------------------*/
 bool ELEMENT::param_is_printable(int i)const
 {
-  if (has_common()) {
+  if(has_common()) {
     return COMPONENT::param_is_printable(i);
+  }else if(ELEMENT::param_count() - 1 == i){
+    return true;
   }else{
-    switch (ELEMENT::param_count() - 1 - i) {
-    case 0:
-      return value().has_hard_value();
-    default:
-      return COMPONENT::param_is_printable(i);
-    }
+    return false;
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_name(int i)const
 {
-  if (has_common()) {
+  if(has_common()) {
     return COMPONENT::param_name(i);
+  }else if(ELEMENT::param_count() - 1 == i){
+    return value_name();
   }else{
-    switch (ELEMENT::param_count() - 1 - i) {
-    case 0:  return value_name();
-    default:
-      return COMPONENT::param_name(i);
-    }
+    return "##bug";
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_name(int i, int j)const
 {
-  if (has_common()) {untested();
-    return COMPONENT::param_name(i);
+  if (j == 0) {
+    return param_name(i);
+  }else if (i >= ELEMENT::param_count()) {untested();
+    return "";
   }else{
-    if (j == 0) {
-      return param_name(i);
-    }else if (i >= ELEMENT::param_count()) {untested();
-      return "";
-    }else{
-      return COMPONENT::param_name(i,j);
-    }
+    return COMPONENT::param_name(i,j);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_value(int i)const
 {
-  if (has_common()) {
-    return COMPONENT::param_value(i);
+  if(ELEMENT::param_count() - 1 == i){
+    return value_string();
   }else{
-    switch (ELEMENT::param_count() - 1 - i) {
-    case 0:
-      return value().string();
-    default:
-      return COMPONENT::param_value(i);
-    }
+    return COMPONENT::param_value(i);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -171,7 +219,16 @@ bool ELEMENT::skip_dev_type(CS& cmd)
 void ELEMENT::precalc_last()
 {
   COMPONENT::precalc_last();
-  _value.e_val(0.,scope());
+  if(!has_common()) {
+  }else if(common()->has_value()) {
+    _value = common()->value();
+    trace4("ELEMENT::pl from common", common()->value(), long_label(), _value, common()->has_tr_eval());
+    trace1("ELEMENT::pl from common", using_tr_eval());
+  }else{
+    trace2("ELEMENT::pl no value", long_label(), _value);
+    // common, but no value. could be hsparam,
+    // stick to own _value
+  }
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_begin()
@@ -580,6 +637,7 @@ void ELEMENT::obsolete_move_parameters_from_common(const COMMON_COMPONENT* dc)
   assert(dc);
 
   _value   = dc->value();
+  trace1("obsolete move", _value);
   // _mfactor = dc->mfactor();
 }
 /*--------------------------------------------------------------------------*/

@@ -193,7 +193,7 @@ bool EVAL_BM_SEMI_BASE::operator==(const COMMON_COMPONENT& x)const
     && _length == p->_length
     && _width == p->_width
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) {untested();
+  if (rv) {
   }else{
   }
   return rv;
@@ -203,13 +203,9 @@ void EVAL_BM_SEMI_BASE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* la
 {
   assert(lang);
   o << modelname();
-  if (_value.has_hard_value()) {
-    o << " " << _value;
-  }else{
-  }
+  EVAL_BM_ACTION_BASE::print_common_obsolete_callback(o, lang);
   print_pair(o, lang, "l", _length, _length.has_hard_value());
   print_pair(o, lang, "w", _width, _width.has_hard_value());
-  EVAL_BM_ACTION_BASE::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_SEMI_BASE::expand(const COMPONENT* d)
@@ -260,7 +256,7 @@ bool EVAL_BM_SEMI_CAPACITOR::operator==(const COMMON_COMPONENT& x)const
     p = dynamic_cast<const EVAL_BM_SEMI_CAPACITOR*>(&x);
   bool rv = p
     && EVAL_BM_SEMI_BASE::operator==(x);
-  if (rv) {untested();
+  if (rv) {
   }else{
   }
   return rv;
@@ -308,7 +304,7 @@ bool EVAL_BM_SEMI_RESISTOR::operator==(const COMMON_COMPONENT& x)const
     p = dynamic_cast<const EVAL_BM_SEMI_RESISTOR*>(&x);
   bool rv = p
     && EVAL_BM_SEMI_BASE::operator==(x);
-  if (rv) {untested();
+  if (rv) {
   }else{
   }
   return rv;

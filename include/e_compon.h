@@ -58,11 +58,11 @@ enum {CC_STATIC=27342}; // mid-sized arbitrary positive int
 // so it won't be deleted
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_COMPONENT : public CKT_BASE {
-protected: // probably obsolete
+protected: // move to hsparam...
   PARAMETER<double>	_tnom_c;  // specification temperature
   PARAMETER<double>	_dtemp;   // rise over enclosing temperature
   PARAMETER<double>	_temp_c;  // actual temperature of device
-  PARAMETER<double>	_value; // not counted in param_count
+  // probably obsolete
   std::string	_modelname;
 private:
   mutable const MODEL_CARD* _model;
@@ -88,8 +88,8 @@ public:
 
   virtual COMMON_COMPONENT* clone()const = 0;
 
-  virtual bool use_obsolete_callback_parse()const {return false;}
-  virtual bool use_obsolete_callback_print()const {return false;}
+  virtual bool use_obsolete_callback_parse()const { return false;}
+  virtual bool use_obsolete_callback_print()const { return false;}
   virtual void parse_common_obsolete_callback(CS&);
   virtual void print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
   virtual bool has_parse_params_obsolete_callback()const {return false;}
@@ -102,7 +102,7 @@ public:
   virtual int  set_param_by_name(std::string, std::string);
   int Set_param_by_name(std::string, std::string); //BUG// see implementation
   virtual void set_param_by_index(int, std::string&, int);
-  virtual int param_count()const {return 3;}
+  virtual int param_count()const { return 3; }
 public:
   virtual void precalc_first(const CARD_LIST*)	{}
   virtual void expand(const COMPONENT*)		{}
@@ -114,7 +114,7 @@ public:
   virtual TIME_PAIR tr_review(COMPONENT*)const {return TIME_PAIR(NEVER,NEVER);}
   virtual void  tr_accept(COMPONENT*)const	{}
   virtual bool	has_tr_eval()const	{untested(); return false;}
-  virtual bool	has_ac_eval()const	{untested(); return false;}
+  virtual bool	has_ac_eval()const	{ return false;}
 
   virtual bool	parse_numlist(CS&);
   virtual bool	parse_params_obsolete_callback(CS&);
@@ -127,8 +127,11 @@ public:
   std::string	      modelname()const	{return _modelname;}
   const MODEL_CARD*   model()const	{assert(_model); return _model;}
   bool		      has_model()const	{return _model;}
-  void set_value(double v) {_value = v;}
-  const PARAMETER<double>& value()const {return _value;}
+
+public: // value. is this needed?
+  virtual double value()const { unreachable(); return NOT_VALID; }
+  virtual bool has_value()const { return false; }
+
 private:
   bool parse_param_list(CS&);
 };
@@ -291,7 +294,7 @@ public:	// obsolete -- do not use in new code
   bool use_obsolete_callback_parse()const override;
   bool use_obsolete_callback_print()const override;
   void print_args_obsolete_callback(OMSTREAM&, LANGUAGE*)const override;
-  virtual void obsolete_set_value(double) {}
+  virtual void obsolete_set_value(double) { }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

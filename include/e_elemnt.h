@@ -38,17 +38,22 @@ protected:
   void	   store_values()		{assert(_y[0]==_y[0]); _y1=_y[0];}
   //void   reject_values()		{ _y0 = _y1;}
 public:
-  void	set_value(const PARAMETER<double>& v)	{_value = v;}
   void	set_value(double v)			{_value = v;}
-  void	set_value(const std::string& v)		{itested(); _value = v;}
+  void	set_value(const std::string& v);
   void	set_value(double v, COMMON_COMPONENT* c);
-  const PARAMETER<double>& value()const		{return _value;}
+  double const& value()const { return _value;}
 
   bool	   skip_dev_type(CS&);
+private:
+  int      push_value(const std::string& v);
+  std::string value_string() const;
 public: // obsolete -- do not use in new code
   void     obsolete_move_parameters_from_common(const COMMON_COMPONENT*);
 private: // obsolete -- do not use in new code
-  void     obsolete_set_value(double v) final override{set_value(v);}
+  void     obsolete_set_value(double v) final override{
+    assert(!has_common() || !common()->has_value() );
+    set_value(v);
+  }
 public: // override virtual
   bool	   print_type_in_spice()const override {return false;}
   void	   precalc_last() override;
@@ -156,10 +161,11 @@ public:
   virtual double error_factor()const	{return OPT::trstepcoef[OPT::trsteporder];}
 protected:
   int param_count()const override {
-    if(has_common()) {
+    if(!has_common()) {
+      return 1 + COMPONENT::param_count();
+    }else if(common()->has_value()){
       return COMPONENT::param_count();
     }else{
-      // add /*value*/
       return 1 + COMPONENT::param_count();
     }
   }
@@ -174,7 +180,7 @@ public:
     assert(_nodes); assert(i>=0); assert(i<NODES_PER_BRANCH); return _nodes[i];
   }
 protected:
-  PARAMETER<double> _value;	// value, for simple parts
+  double   _value;	// value, for simple parts
   int      _loaditer;	// load iteration number
 protected:
   mutable node_t _nodes[NODES_PER_BRANCH]; // nodes (0,1:out, 2,3:in)

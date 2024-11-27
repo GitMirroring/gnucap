@@ -312,7 +312,7 @@ void PARAM_INSTANCE::PARAM_ANY::lookup_solve(const CARD_LIST* scope) const
       _v = b->clone();
     }else if(b){ untested();
       error(bWARNING, "parameter " + _s +  " not specified, using default\n");
-    }else{itested();
+    }else{
       error(bWARNING, "parameter " + _s +  " not specified, using default\n");
     }
   }

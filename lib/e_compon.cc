@@ -31,7 +31,6 @@ COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
    _tnom_c(p._tnom_c),
    _dtemp(p._dtemp),
    _temp_c(p._temp_c),
-   _value(p._value),
    _modelname(p._modelname),
    _model(p._model),
    _attach_count(0)
@@ -43,7 +42,6 @@ COMMON_COMPONENT::COMMON_COMPONENT(int c)
    _tnom_c(NOT_INPUT),
    _dtemp(0),
    _temp_c(NOT_INPUT),
-   _value(0),
    _modelname(),
    _model(0),
    _attach_count(c)
@@ -131,6 +129,7 @@ bool COMMON_COMPONENT::parse_param_list(CS& cmd)
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::parse_common_obsolete_callback(CS& cmd) //used
 {
+  trace2("CC::parse_common_oc", modelname(), cmd.fullstring());
   if (cmd.skip1b('(')) {
     // start with a paren
     size_t start = cmd.cursor();
@@ -264,7 +263,7 @@ std::string COMMON_COMPONENT::param_value(int i)const
   case 0:itested();  return _tnom_c.string();
   case 1:itested();  return _dtemp.string();
   case 2:itested();  return _temp_c.string();
-  default:untested(); return "";
+  default: return "";
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -274,7 +273,6 @@ void COMMON_COMPONENT::precalc_last(const CARD_LIST* Scope)
   _tnom_c.e_val(OPT::tnom_c, Scope);
   _dtemp.e_val(0., Scope);
   _temp_c.e_val(_sim->_temp_c + _dtemp, Scope);
-  _value.e_val(0, Scope);
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::tr_eval(ELEMENT*x)const
@@ -284,9 +282,14 @@ void COMMON_COMPONENT::tr_eval(ELEMENT*x)const
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::ac_eval(ELEMENT*x)const
-{untested();
-  assert(_model);
-  _model->ac_eval(x);
+{
+  if(_model){
+    _model->ac_eval(x);
+  }else{
+    // should not get here.
+    // but need to get rid of _model anyway.
+    // incomplete();
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_COMPONENT::operator==(const COMMON_COMPONENT& x)const
@@ -295,8 +298,7 @@ bool COMMON_COMPONENT::operator==(const COMMON_COMPONENT& x)const
 	  && _model == x._model
 	  && _tnom_c == x._tnom_c
 	  && _dtemp == x._dtemp
-	  && _temp_c == x._temp_c
-	  && _value == x._value);
+	  && _temp_c == x._temp_c);
 }
 /*--------------------------------------------------------------------------*/
 int COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
@@ -775,7 +777,7 @@ bool COMPONENT::param_is_printable(int i)const
     }
   }else if (has_common()) {
     return common()->param_is_printable(i);
-  }else{
+  }else{ untested();
     return CARD::param_is_printable(i);
   }
 }
@@ -796,7 +798,6 @@ std::string COMPONENT::param_name(int i)const
   default:
     if (has_common()) {
       return common()->param_name(i);
-      return to_string(i) + common()->param_name(i);
     }else{ untested();
       return CARD::param_name(i);
     }
