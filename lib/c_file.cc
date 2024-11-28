@@ -59,13 +59,14 @@ public:
       full_file_name = findfile(file_name, incl, R_OK);
     }
 
-    if(_relative){ untested();
+    if(_relative){ itested();
       cwd = OS::getcwd();
-      full_file_name = OS::basename(full_file_name);
       std::string dir = OS::dirname(full_file_name);
+      full_file_name = OS::basename(full_file_name);
       OS::chdir(dir);
     }else{
     }
+
 
     try {
       CS file(CS::_INC_FILE, full_file_name);
