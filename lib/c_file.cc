@@ -70,7 +70,7 @@ public:
     try {
       CS file(CS::_INC_FILE, full_file_name);
       for (;;) {
-	if (OPT::language) {
+	if (OPT::language) { untested();
 	  OPT::language->parse_top_item(file, Scope);
 	}else{ untested();
 	  CMD::cmdproc(file.get_line(""), Scope);
@@ -78,7 +78,7 @@ public:
       }
     }catch (Exception_File_Open& e) {itested();
       cmd.warn(bDANGER, here, e.message() + '\n');
-    }catch (Exception_End_Of_Input& e) {
+    }catch (Exception_End_Of_Input& e) { untested();
       // done
     }
     if(_relative){ untested();
