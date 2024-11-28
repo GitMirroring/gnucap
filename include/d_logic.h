@@ -1,4 +1,4 @@
-/*$Id: d_logic.h,v 26.133 2009/11/26 04:58:04 al Exp $ -*- C++ -*-
+/*                                $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  * Author: Albert Davis <aldavis@gnu.org>
  *
@@ -21,8 +21,41 @@
  *------------------------------------------------------------------
  * data structures and defaults for logic model.
  */
-//testing=script,sparse 2023.11.22
 #ifndef D_LOGIC_H
 #define D_LOGIC_H
+#include "e_compon.h"
+#include "e_logicval.h"
+/*--------------------------------------------------------------------------*/
+class INTERFACE COMMON_LOGIC : public COMMON_COMPONENT {
+  enum {PORTS_PER_GATE = 10};
+protected:
+  explicit	COMMON_LOGIC(int c=0)
+    :COMMON_COMPONENT(c) {++_count;}
+  explicit	COMMON_LOGIC(const COMMON_LOGIC& p)
+    :COMMON_COMPONENT(p) {++_count;}
+public:
+		~COMMON_LOGIC()			{--_count;}
+  bool operator==(const COMMON_COMPONENT&)const override;
+  static  int	count()				{untested();return _count;}
+  virtual LOGICVAL logic_eval(const node_t*, int)const	= 0;
+
+  void		set_param_by_index(int, std::string&, int)override;
+  bool		param_is_printable(int)const override;
+  std::string	param_name(int)const override;
+  std::string	param_name(int,int)const override;
+  std::string	param_value(int)const override;
+  int param_count()const override {return (1 + COMMON_COMPONENT::param_count());}
+  virtual std::string port_name(int i)const { untested();
+    assert(i >= 0);
+    assert(i < PORTS_PER_GATE);
+    static std::string names[PORTS_PER_GATE] = {"out",
+			"in1", "in2", "in3", "in4", "in5", "in6", "in7", "in8", "in9"};
+    return names[i];
+  }
+protected:
+  static int	_count;
+};
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:
