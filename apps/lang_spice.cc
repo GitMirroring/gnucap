@@ -533,6 +533,8 @@ MODEL_CARD* LANG_SPICE_BASE::parse_paramset(CS& cmd, MODEL_CARD* x)
 BASE_SUBCKT* LANG_SPICE_BASE::parse_module(CS& cmd, BASE_SUBCKT* x)
 {
   assert(x);
+  assert(!::status.get.is_running());
+  ::status.get.start();
 
   // header
   cmd.reset();
@@ -549,6 +551,7 @@ BASE_SUBCKT* LANG_SPICE_BASE::parse_module(CS& cmd, BASE_SUBCKT* x)
 
   // body
   parse_module_body(cmd, x, x->subckt(), name() + "-subckt>", NO_EXIT_ON_BLANK, ".ends |.eom ");
+  ::status.get.stop();
   return x;
 }
 /*--------------------------------------------------------------------------*/
