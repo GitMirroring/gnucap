@@ -221,8 +221,13 @@ void CARD::new_subckt(const CARD* Model, PARAM_LIST const* Params)
 void CARD::renew_subckt(const CARD* Model, PARAM_LIST const* Params)
 {
   if (_sim->is_first_expand()) {
+    if (subckt()) {	//BUG// should not get here?
+      incomplete();	// This is the case that loses probes.
+    }else{		// really needs new_subckt
+    }
     new_subckt(Model, Params);
-  }else{untested();
+    trace2("renew", long_label(), Model->long_label());
+  }else{untested();	//BUG// seems unreachable, but shouldn't be
     assert(subckt());
     subckt()->attach_params(Params, scope());
   }
