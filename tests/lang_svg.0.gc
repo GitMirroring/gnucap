@@ -1,0 +1,22 @@
+
+module net (a, b)
+endmodule
+module opamp741(a, b, c, d)
+endmodule
+
+module amp ( (* S0_x1=-5, S0_y1=0, S0_symbol="input" *) .a(a0), (* S0_x1=-5, S0_y1=10 *) .c(c0));
+//  ground g0;
+//  ground g1;
+
+  (* S0_x_p=0,  S0_y_p=0, S0_x_n=24, S0_y_p=7 *) resistor #(.r(1k))      r1 (.p(a1), .n(b1));
+  (* S0_x_p=24, S0_y_p=7, S0_x2=25, S0_y2=-3 *)  resistor #(.r(1k))      r2 (.p(b2), .n(c2));
+  (* S0_x1=25,  S0_y1=-3, S0_x1=25,  S0_y1=10 *) opamp741 #(.gain(100k)) u1 (c3, g1, g0, b3);
+
+  (* S0_x1=-5, S0_y1=0,  S0_x1=0,  S0_y1=0 *)  net a (a0, a1);
+  (* S0_x2=24, S0_y2=7 *)                      net b (b1, b2, b3);
+  (* S0_x1=30, S0_y1=-3, S0_x2=25, S0_y2=-3 *) net c (c0, c2, c3);
+endmodule
+
+// todo `svg amp ...
+svg
+list amp

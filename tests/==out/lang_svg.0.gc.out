@@ -1,0 +1,27 @@
+<svg viewBox="-50 -50 150 100">
+ <circle cx="-5" cy="0" r="1" fill="green"/>
+ <circle cx="-5" cy="10" r="1" fill="green"/>
+<!-- -->
+<circle cx="12" cy="3" r="2" fill="black"/>
+ <circle cx="0" cy="7" r="1" fill="red"/>
+ <circle cx="24" cy="0" r="1" fill="red"/>
+<circle cx="36" cy="2" r="2" fill="black"/>
+ <circle cx="24" cy="7" r="1" fill="red"/>
+ <circle cx="25" cy="-3" r="1" fill="red"/>
+<circle cx="24" cy="2" r="2" fill="black"/>
+ <circle cx="25" cy="10" r="1" fill="red"/>
+ <circle cx="0" cy="0" r="1" fill="red"/>
+ <circle cx="0" cy="0" r="1" fill="red"/>
+ <circle cx="0" cy="0" r="1" fill="red"/>
+<circle cx="49" cy="0" r="2" fill="black"/>
+ <circle cx="0" cy="0" r="1" fill="red"/>
+ <circle cx="0" cy="0" r="1" fill="red"/>
+<circle cx="40" cy="2" r="2" fill="black"/>
+ <circle cx="0" cy="0" r="1" fill="red"/>
+ <circle cx="24" cy="7" r="1" fill="red"/>
+ <circle cx="0" cy="0" r="1" fill="red"/>
+<circle cx="59" cy="-2" r="2" fill="black"/>
+ <circle cx="30" cy="-3" r="1" fill="red"/>
+ <circle cx="25" cy="-3" r="1" fill="red"/>
+ <circle cx="0" cy="0" r="1" fill="red"/>
+</svg>

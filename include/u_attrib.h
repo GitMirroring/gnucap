@@ -131,8 +131,8 @@ private:
 public:
   ATTRIB_LIST_p() :_p(nullptr) {}
 
-  ATTRIB_LIST_p(const ATTRIB_LIST_p& P) :_p(P._p) {untested();
-    if (_p) {untested();
+  ATTRIB_LIST_p(const ATTRIB_LIST_p& P) :_p(P._p) {
+    if (_p) {
       _p->inc_ref_count();
     }else{untested();
     }
@@ -170,6 +170,14 @@ public:
     }else{itested();
     }
     return *this;
+  }
+
+  std::string lookup(std::string const& Key)const {
+    if(_p){
+      return (*_p)[Key];
+    }else{
+      return "";
+    }
   }
 
   ATTRIB_LIST_p& add_to(const std::string& String, tag_t Owner) {
