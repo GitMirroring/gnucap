@@ -122,6 +122,7 @@ static void make_common_operator_equal(std::ofstream& out, const Device& d)
        ++p) {
     out << "    && " << (**p).code_name() << " == p->" << (**p).code_name() << '\n';
   }
+  // TODO: this is wrong. need check model equality eventually
   for(auto c : d.common().calculated()){
     out << "    && " << c->code_name() << " == p->" << c->code_name() << '\n';
   }
