@@ -22,10 +22,10 @@ res #(.rr(7)) r5(e, \0 );
 (* gnucap_r = 10, foo, gnucap_r = 5 *) r1 #() r7(g, \0 );
 
 module res2(a, b);
-(* gnucap_rr = 7 *) resistor #() r0(a, b);
+(* gnucap_r = 7 *) resistor #() r0(a, b);
 endmodule;
 
-res #() r3(h, \0 );
+res2 #() r3(h, \0 );
 
 isource #(1) i1(\0 , a);
 isource #(1) i1(\0 , b);
