@@ -1,0 +1,42 @@
+verilog
+
+(* gnucap_r = 3 *) resistor #() r1(a, \0 );
+
+r1 #() r2(b, \0 );
+
+(* gnucap_rr = 4 *) module res(a, b);
+	parameter rr = 0;
+	resistor #(.r(rr)) r0(a, b);
+endmodule;
+
+res #() r3(c, \0 );
+
+// rr is 4. override wins.
+res #(.rr(7)) r4(d, \0 );
+
+// rr still 4
+(* gnucap_rr = 5 *)
+res #(.rr(7)) r5(e, \0 );
+
+(* gnucap_r = 10, gnucap_r = 5 *) r1 #(.r(99)) r6(f, \0 );
+(* gnucap_r = 10, foo, gnucap_r = 5 *) r1 #() r7(g, \0 );
+
+module res2(a, b);
+(* gnucap_rr = 7 *) resistor #() r0(a, b);
+endmodule;
+
+res #() r3(h, \0 );
+
+isource #(1) i1(\0 , a);
+isource #(1) i1(\0 , b);
+isource #(1) i1(\0 , c);
+isource #(1) i1(\0 , d);
+isource #(1) i1(\0 , e);
+isource #(1) i1(\0 , f);
+isource #(1) i1(\0 , g);
+isource #(1) i1(\0 , h);
+
+print op v(nodes)
+op
+
+list

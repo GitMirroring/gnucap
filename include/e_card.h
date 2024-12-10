@@ -61,7 +61,7 @@ public:
   virtual CARD*	 clone_instance()const  {return clone();}
   //--------------------------------------------------------------------
 public:	// "elaborate"
-  virtual void	 precalc_first()	{}
+  virtual void	 precalc_first();
   virtual void	 expand_first()		{}
   virtual void	 expand()		{}
   virtual void	 expand_last()		{}

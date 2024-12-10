@@ -26,6 +26,7 @@
 #include "e_cardlist.h"
 #include "e_node.h"
 #include "e_card.h"
+#include "u_parameter.h" // Exception_Clash
 /*--------------------------------------------------------------------------*/
 CARD::CARD()
   :CKT_BASE(),
@@ -239,6 +240,46 @@ int CARD::set_param_by_name(std::string Name, std::string Value)
     }
   }
   throw Exception_No_Match(Name);
+}
+/*--------------------------------------------------------------------------*/
+void CARD::precalc_first()
+{
+  if(has_attributes(id_tag())) {
+    std::string s = attributes(id_tag())->string(tag_t());
+    trace2("CARD::pf", long_label(), s);
+    CS cmd(CS::_STRING, s);
+    std::string Key;
+    std::string val;
+
+    const std::string prefix("gnucap_");
+    while (cmd.more()) {
+      if (cmd >> prefix && cmd >> Key) {
+	if (cmd >> "=") {
+	  // TODO: quotes, strings, tokenise...
+	  val = cmd.get_to(",*");
+	  cmd.skip1(",");
+	}else{untested();
+	  val = "1";
+	}
+	try{
+	  set_param_by_name(Key, val);
+	}catch(Exception_Clash const&) {
+	  error(bLOG, "overriding " + Key + "=" + val + " in " + long_label() + "\n");
+	  set_param_by_name(Key, "");
+	  set_param_by_name(Key, val);
+	}
+	// keep looking in case there is another, which will supercede
+	// finds right-most match using left-right search
+      }else{
+	cmd.skiparg();
+	if (cmd >> "=") {untested();
+	  cmd.ctos();
+	}else{
+	}
+      }
+    }
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* set_dev_type: Attempt to change the type of an existing device.

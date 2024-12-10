@@ -175,6 +175,12 @@ CARD* DEV_SUBCKT_PROTO::clone_instance()const
     new_instance->_parent = this;
   }
 
+  // needed, because we don't use clone yet.
+  if(has_attributes(id_tag())) {
+    new_instance->set_attributes(new_instance->id_tag()) = attributes(id_tag());
+  }else{
+  }
+
   assert(new_instance->is_device());
   return new_instance;
 }

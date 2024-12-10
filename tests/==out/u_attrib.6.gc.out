@@ -1,0 +1,29 @@
+#           v(a)       v(b)       v(c)       v(d)       v(e)       v(f)       v(g)       v(h)      
+ 27.        3.         3.         4.         4.         4.         5.         5.         4.        
+(* gnucap_r = 3 *) resistor #(.r(3)) r1 (.p(a),.n(\0 ));
+resistor #(.r(3)) r2 (.p(b),.n(\0 ));
+(* gnucap_rr = 4 *) module res (.a(a),.b(b));
+resistor #(.r(rr)) r0 (.p(a),.n(b));
+endmodule // res
+
+res #(.rr(4)) r3 (.a(c),.b(\0 ));
+// rr is 4. override wins. 
+res #(.rr(4)) r4 (.a(d),.b(\0 ));
+// rr still 4 
+//(* gnucap_rr = 5 *) 
+res #(.rr(4)) r5 (.a(e),.b(\0 ));
+(* gnucap_r = 10, gnucap_r = 5 *) resistor #(.r(5)) r6 (.p(f),.n(\0 ));
+(* gnucap_r = 10, foo, gnucap_r = 5 *) resistor #(.r(5)) r7 (.p(g),.n(\0 ));
+module res2 (.a(a),.b(b));
+(* gnucap_rr = 7 *) resistor #() r0 (.p(a),.n(b));
+endmodule // res2
+
+res #(.rr(4)) r3 (.a(h),.b(\0 ));
+isource #(.dc(1)) i1 (.p(\0 ),.n(a));
+isource #(.dc(1)) i1 (.p(\0 ),.n(b));
+isource #(.dc(1)) i1 (.p(\0 ),.n(c));
+isource #(.dc(1)) i1 (.p(\0 ),.n(d));
+isource #(.dc(1)) i1 (.p(\0 ),.n(e));
+isource #(.dc(1)) i1 (.p(\0 ),.n(f));
+isource #(.dc(1)) i1 (.p(\0 ),.n(g));
+isource #(.dc(1)) i1 (.p(\0 ),.n(h));
