@@ -1,1 +1,1 @@
-#define PATCHLEVEL "mg_precalc 2024.12.08"
+#define PATCHLEVEL "value 2024.12.08"

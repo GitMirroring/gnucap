@@ -1,11 +1,11 @@
 \\ ground \0 
 ^ ? \\: no match
 module aaa (.\1 (\1 ),.\2 (\2 ));
-vsource #(.dc(0)) vs (.p(\1 ),.n(\2 ));
+vsource #(.dc( 0.)) vs (.p(\1 ),.n(\2 ));
 endmodule // aaa
 
 module AAA (.\1 (\1 ),.\2 (\2 ));
-vsource #(.dc(1)) vs (.p(\1 ),.n(\2 ));
+vsource #(.dc( 1.)) vs (.p(\1 ),.n(\2 ));
 endmodule // AAA
 
 module bbb (.\1 (\1 ),.\2 (\2 ));

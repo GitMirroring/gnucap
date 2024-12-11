@@ -140,7 +140,7 @@ static Base* eval_base(PARAM_INSTANCE const& p, Expression const& e)
 void Token_SYMBOL::stack_op(Expression* E)const
 {
   assert(E);
-  bool verilog_mode = E->_scope->is_verilog_math();
+  bool verilog_mode = E->_scope && E->_scope->is_verilog_math();
   // replace single token with its value
   if (!E->is_empty() && dynamic_cast<const Token_PARLIST*>(E->back())) {
     trace1("SYM stackop", name());
@@ -164,7 +164,6 @@ void Token_SYMBOL::stack_op(Expression* E)const
    //    assert(0);
    //  }else
     if (strchr("0123456789.", name()[0])) {
-      assert(E->_scope);
       // a number
       bool is_int = true;
       trace2("type", name(), name().size());
@@ -196,7 +195,7 @@ void Token_SYMBOL::stack_op(Expression* E)const
 	  CS cmd(CS::_STRING, name());
 	  String* s = new vString(cmd);
 	  E->push_back(new Token_CONSTANT(s));
-    }else{
+    }else if(E->_scope) {
       // a name
       PARAM_INSTANCE p = (*(E->_scope->params()))[name()];
       trace2("PARAM_INSTANCE name?", name(), typeid(**p).name());
@@ -239,6 +238,8 @@ void Token_SYMBOL::stack_op(Expression* E)const
 	  E->push_back(clone());
 	}
       }
+    }else{
+      E->push_back(clone());
     }
   }
 }

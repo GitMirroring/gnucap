@@ -84,9 +84,9 @@ bool EVAL_BM_POLY::operator==(const COMMON_COMPONENT& x)const
     && _abs == p->_abs
     && _c == p->_c
     && EVAL_BM_ACTION_BASE::operator==(x);
-  if (rv) { untested();
+  if (rv) {
     incomplete();
-    untested();
+  }else{
   }
   return rv;
 }
