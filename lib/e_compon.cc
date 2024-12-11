@@ -28,9 +28,6 @@
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
   :CKT_BASE(p),
-   _tnom_c(p._tnom_c),
-   _dtemp(p._dtemp),
-   _temp_c(p._temp_c),
    _value(p._value),
    _modelname(p._modelname),
    _model(p._model),
@@ -40,9 +37,6 @@ COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(int c)
   :CKT_BASE(),
-   _tnom_c(NOT_INPUT),
-   _dtemp(0),
-   _temp_c(NOT_INPUT),
    _value(0),
    _modelname(),
    _model(0),
@@ -211,32 +205,18 @@ void COMMON_COMPONENT::parse_common_obsolete_callback(CS& cmd) //used
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
-{
-  assert(lang);
-  print_pair(o, lang, "tnom", _tnom_c,  _tnom_c.has_hard_value());
-  print_pair(o, lang, "dtemp",_dtemp,   _dtemp.has_hard_value());
-  print_pair(o, lang, "temp", _temp_c,  _temp_c.has_hard_value());
+void COMMON_COMPONENT::set_param_by_index(int i, std::string& , int Offset)
+{ untested();
+  unreachable();
+  // case 0:untested();  _tnom_c = Value; break;
+  // case 1:untested();  _dtemp = Value; break;
+  // case 2:itested();  _temp_c = Value; break;
+  throw Exception_Too_Many(i, 2, Offset);
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::set_param_by_index(int i, std::string& Value, int Offset)
+bool COMMON_COMPONENT::param_is_printable(int)const
 {
-  switch (i) {
-  case 0:untested();  _tnom_c = Value; break;
-  case 1:untested();  _dtemp = Value; break;
-  case 2:itested();  _temp_c = Value; break;
-  default:untested(); assert(0); throw Exception_Too_Many(i, 2, Offset); break;
-  }
-}
-/*--------------------------------------------------------------------------*/
-bool COMMON_COMPONENT::param_is_printable(int i)const
-{
-  switch (i) {
-  case 0:  return _tnom_c.has_hard_value();
-  case 1:  return _dtemp.has_hard_value();
-  case 2:  return _temp_c.has_hard_value();
-  default: return false;
-  }
+  return false;
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_COMPONENT::param_name(int i)const
@@ -258,22 +238,14 @@ std::string COMMON_COMPONENT::param_name(int i, int j)const
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_COMPONENT::param_value(int i)const
+std::string COMMON_COMPONENT::param_value(int)const
 {
-  switch (i) {
-  case 0:itested();  return _tnom_c.string();
-  case 1:itested();  return _dtemp.string();
-  case 2:itested();  return _temp_c.string();
-  default:untested(); return "";
-  }
+  untested(); return "";
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::precalc_last(const CARD_LIST* Scope)
 {
   assert(Scope);
-  _tnom_c.e_val(OPT::tnom_c, Scope);
-  _dtemp.e_val(0., Scope);
-  _temp_c.e_val(_sim->_temp_c + _dtemp, Scope);
   _value.e_val(0, Scope);
 }
 /*--------------------------------------------------------------------------*/
@@ -293,9 +265,6 @@ bool COMMON_COMPONENT::operator==(const COMMON_COMPONENT& x)const
 {
   return (_modelname == x._modelname
 	  && _model == x._model
-	  && _tnom_c == x._tnom_c
-	  && _dtemp == x._dtemp
-	  && _temp_c == x._temp_c
 	  && _value == x._value);
 }
 /*--------------------------------------------------------------------------*/
@@ -352,13 +321,9 @@ bool COMMON_COMPONENT::parse_numlist(CS&)
   return false;
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_COMPONENT::parse_params_obsolete_callback(CS& cmd)
+bool COMMON_COMPONENT::parse_params_obsolete_callback(CS&)
 {
-  return ONE_OF
-    || Get(cmd, "tnom",   &_tnom_c)
-    || Get(cmd, "dtemp",  &_dtemp)
-    || Get(cmd, "temp",   &_temp_c)
-    ;
+  return false;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
