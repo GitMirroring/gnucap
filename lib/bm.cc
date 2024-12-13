@@ -148,7 +148,7 @@ bool EVAL_BM_ACTION_BASE::operator==(const COMMON_COMPONENT& x)const
     && _tc2 == p->_tc2
     && _ic == p->_ic
     && EVAL_BM_BASE::operator==(x);
-  if (rv) {untested();
+  if (rv) {
   }else{
   }
   return rv;
@@ -156,6 +156,7 @@ bool EVAL_BM_ACTION_BASE::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_ACTION_BASE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lang)const
 {
+  EVAL_BM_BASE::print_common_obsolete_callback(o, lang);
   print_pair(o, lang, "bandwidth",_bandwidth,_bandwidth.has_hard_value());
   print_pair(o, lang, "delay",	  _delay,    _delay.has_hard_value());
   print_pair(o, lang, "phase",	  _phase,    _phase.has_hard_value());
@@ -169,8 +170,6 @@ void EVAL_BM_ACTION_BASE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* 
   print_pair(o, lang, "tnom", _tnom_c,  _tnom_c.has_hard_value());
   print_pair(o, lang, "dtemp",_dtemp,   _dtemp.has_hard_value());
   print_pair(o, lang, "temp", _temp_c,  _temp_c.has_hard_value());
-
-  COMMON_COMPONENT::print_common_obsolete_callback(o, lang);
 }
 /*--------------------------------------------------------------------------*/
 std::string EVAL_BM_ACTION_BASE::param_value(int i) const
@@ -196,7 +195,7 @@ bool EVAL_BM_ACTION_BASE::param_is_printable(int i) const
 void EVAL_BM_ACTION_BASE::precalc_last(const CARD_LIST* Scope)
 {
   assert(Scope);
-  COMMON_COMPONENT::precalc_last(Scope);
+  EVAL_BM_BASE::precalc_last(Scope);
   _tnom_c.e_val(OPT::tnom_c, Scope);
   _dtemp.e_val(0., Scope);
   _temp_c.e_val(_sim->_temp_c + _dtemp, Scope);
@@ -234,12 +233,12 @@ bool EVAL_BM_ACTION_BASE::parse_params_obsolete_callback(CS& cmd)
     || Get(cmd, "tnom",     &_tnom_c)
     || Get(cmd, "dtemp",    &_dtemp)
     || Get(cmd, "temp",     &_temp_c)
-    || COMMON_COMPONENT::parse_params_obsolete_callback(cmd);
+    || EVAL_BM_BASE::parse_params_obsolete_callback(cmd);
     ;
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_ACTION_BASE::has_ext_args()const
-{ untested();
+{
   return  (_bandwidth.has_hard_value()
 	   || _delay.has_hard_value()
 	   || _phase.has_hard_value()

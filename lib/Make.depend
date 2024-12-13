@@ -192,7 +192,8 @@ e_card.o: e_card.cc ../include/u_time_pair.h ../include/constant.h \
  ../include/io_.h ../include/l_lib.h ../include/m_matrix_solver.h \
  ../include/m_matrix.h ../include/l_stlextra.h ../include/e_base.h \
  ../include/u_attrib.h ../include/ap.h ../include/l_indirect.h \
- ../include/e_card.h
+ ../include/e_card.h ../include/u_parameter.h ../include/m_expression.h \
+ ../include/m_base.h ../include/m_base_vams.h ../include/e_cardlist.h
 e_node.o: e_node.cc ../include/e_cardlist.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h ../include/e_card.h \
  ../include/e_base.h ../include/u_attrib.h ../include/ap.h \
@@ -258,7 +259,8 @@ e_elemnt.o: e_elemnt.cc ../include/m_divdiff.h ../include/io_trace.h \
  ../include/e_logicnode.h ../include/e_logicval.h ../include/m_cpoly.h \
  ../include/l_denoise.h ../include/e_compon.h ../include/u_time_pair.h \
  ../include/u_parameter.h ../include/m_expression.h ../include/m_base.h \
- ../include/m_base_vams.h ../include/e_cardlist.h ../include/e_card.h
+ ../include/m_base_vams.h ../include/e_cardlist.h ../include/e_card.h \
+ ../include/bm.h
 e_ccsrc.o: e_ccsrc.cc ../include/e_ccsrc.h ../include/e_elemnt.h \
  ../include/e_logicnode.h ../include/e_logicval.h ../include/md.h \
  ../include/io_trace.h ../include/io_error.h ../include/e_node.h \

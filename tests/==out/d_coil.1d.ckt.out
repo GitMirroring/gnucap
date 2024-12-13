@@ -1,7 +1,7 @@
 Mutual inductance test circuit 
 * using 'k' pseudo element 
 .subckt trans2a ( a1 a2 b1 b2 )
-k1 ( l1 l2 ) K12
+k1 ( l1 l2 )  k=K12
 l1 ( a1 a2 ) L1
 l2 ( b1 b2 ) L2
 .ends trans2a
@@ -86,7 +86,7 @@ r3b ( 12 0 ) Rload
  0.01      -0.15163    0.14979   -0.15163    0.14979   -0.15163    0.14979   
 * using 'k' pseudo element 
 .subckt trans2a ( a1 a2 b1 b2 )
-k1 ( l1 l2 ) K12
+k1 ( l1 l2 )  k=K12
 l1 ( a1 a2 ) L1
 l2 ( b1 b2 ) L2
 .ends trans2a
