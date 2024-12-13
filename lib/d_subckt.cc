@@ -67,7 +67,7 @@ private: // override virtual
 private:
   void		precalc_last()override;
   double	tr_probe_num(const std::string&)const override;
-  int param_count_dont_print()const override {return common()->COMMON_COMPONENT::param_count();}
+  //int param_count_dont_print()const override {return common()->COMMON_COMPONENT::param_count();}
 
   node_t& n_(int i)const override {
     assert(_nodes); assert(i>=0); assert(i<PORTS_PER_SUBCKT); return _nodes[i];

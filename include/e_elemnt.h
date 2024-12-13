@@ -36,8 +36,9 @@ protected:
   ~ELEMENT() {}
   
   void	   store_values()		{assert(_y[0]==_y[0]); _y1=_y[0];}
-  //void   reject_values()		{ _y0 = _y1;}
+  //void   reject_values()		{ untested(); _y0 = _y1;}
 public:
+ // void	set_value(const PARAMETER<double>& v)	{ untested();_value = v;}
   void	set_value(double v)			{_value = v;}
   void	set_value(const std::string& v);
   void	set_value(double v, COMMON_COMPONENT* c);

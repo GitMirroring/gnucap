@@ -151,6 +151,8 @@ public:	// obsolete -- do not use in new code
   virtual bool use_obsolete_callback_parse()const {return false;}
   virtual bool use_obsolete_callback_print()const {return false;}
   virtual void print_args_obsolete_callback(OMSTREAM&,LANGUAGE*)const {unreachable();}
+public: // kludge, unnecessary after param re-indexing
+  tag_t     param_id_tag(int i)const override {return id_tag() + param_count() - i;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

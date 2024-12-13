@@ -548,7 +548,7 @@ inline Base* Integer::divide(const Integer* X)  const  { untested(); assert(X); 
 inline Base* Integer::r_divide(const Integer* X)const  { assert(X); return new Float(double(X->_data) / double(_data));}
 /*--------------------------------------------------------------------------*/
 inline Integer Base::to_Integer()const {untested(); throw Exception("can't convert to integer");}
-inline Float Base::to_Float()const     { throw Exception("can't convert to float");}
+inline Float Base::to_Float()const     { untested(); throw Exception("can't convert to float");}
 inline String Base::to_String()const   { untested(); throw Exception("can't convert to string");}
 /*--------------------------------------------------------------------------*/
 inline Integer* Integer::assign(const Base*X)   const { return X? new Integer(X->to_Integer()) : nullptr; }

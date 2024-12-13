@@ -33,13 +33,12 @@
 class COMMON_COMPONENT;
 class COMPONENT;
 /*--------------------------------------------------------------------------*/
-static const int sysparams_count = 8;
-/*--------------------------------------------------------------------------*/
 // external
 class MODEL_CARD;
 class CS;
 class ELEMENT;
 class CARD_LIST;
+class HS_PARAM;
 /*--------------------------------------------------------------------------*/
 inline bool conchk(double o, double n,
 		   double a=OPT::abstol, double r=OPT::reltol)
@@ -68,9 +67,9 @@ public:
   static void attach_common(COMMON_COMPONENT* c, COMMON_COMPONENT** to);
   static void detach_common(COMMON_COMPONENT** from);
   bool is_shared()const {return _attach_count > 1;}
-  void attach_next(COMMON_COMPONENT* c) { untested(); attach_common(c, &_next); }
-  void detach_next() { untested(); detach_common(&_next); }
-  bool has_next()const { untested(); return _next; }
+  void attach_next(COMMON_COMPONENT* c) { attach_common(c, &_next); }
+  void detach_next() { detach_common(&_next); }
+  bool has_next()const { return _next; }
 private:
   COMMON_COMPONENT& operator=(const COMMON_COMPONENT&)
 			      {unreachable(); return *this;}
@@ -78,6 +77,9 @@ private:
 protected:
   explicit COMMON_COMPONENT(const COMMON_COMPONENT& p);
   explicit COMMON_COMPONENT(int c);
+  explicit COMMON_COMPONENT(COMMON_COMPONENT* c) { untested();
+    attach_next(c);
+  }
 public:
   virtual ~COMMON_COMPONENT();
 
@@ -102,10 +104,16 @@ public:
   virtual int  set_param_by_name(std::string, std::string);
   int Set_param_by_name(std::string, std::string); //BUG// see implementation
   virtual void set_param_by_index(int, std::string&, int);
-  virtual int param_count()const { return 0; }
+  virtual int param_count()const {
+    if(next_common()){
+      return next_common()->param_count();
+    }else{
+      return 0;
+    }
+  }
 public:
   virtual void precalc_first(const CARD_LIST*)	{}
-  virtual void expand(const COMPONENT*)		{}
+  virtual void expand(const COMPONENT*);
   virtual COMMON_COMPONENT* deflate()		{return this;}
   virtual void precalc_last(const CARD_LIST*);
 
@@ -113,7 +121,7 @@ public:
   virtual void	ac_eval(ELEMENT*)const;
   virtual TIME_PAIR tr_review(COMPONENT*)const {return TIME_PAIR(NEVER,NEVER);}
   virtual void  tr_accept(COMPONENT*)const	{}
-  virtual bool	has_tr_eval()const	{untested(); return false;}
+  virtual bool	has_tr_eval()const	{ return false;}
   virtual bool	has_ac_eval()const	{ return false;}
 
   virtual bool	parse_numlist(CS&);
@@ -127,13 +135,32 @@ public:
   std::string	      modelname()const	{return _modelname;}
   const MODEL_CARD*   model()const	{assert(_model); return _model;}
   bool		      has_model()const	{return _model;}
-
-public: // value. is this needed?
-  virtual double value()const { unreachable(); return NOT_VALID; }
+//  /* virtual */ void set_value(double v){_value = v;}
+  // const PARAMETER<double>& value()const {return _value;}
+  virtual double value()const {
+    if(has_next()) { untested();
+      return next_common()->value();
+    }else{
+      // unreachable();
+      return NOT_VALID;
+    }
+  }
   virtual bool has_value()const { return false; }
-
 private:
   bool parse_param_list(CS&);
+  virtual PARAM_LIST const* params()const { return nullptr; }
+public:
+  COMMON_COMPONENT const* next_common()const { return _next; }
+  COMMON_COMPONENT* next_common() { return _next; }
+public:
+  HS_PARAM const* hsparam()const{
+    return const_cast<COMMON_COMPONENT*>(this)->hsparam();
+  }
+  bool has_hsparam()const {
+    return const_cast<COMMON_COMPONENT*>(this)->hsparam();
+  }
+private:
+  virtual HS_PARAM* hsparam();
 };
 /*--------------------------------------------------------------------------*/
 /* note on _attach_count ...
@@ -151,12 +178,9 @@ private:
  * //BUG// possible portability problem.  What is deletion order?
  */
 /*--------------------------------------------------------------------------*/
-class HS_PARAM;
-/*--------------------------------------------------------------------------*/
 class INTERFACE COMPONENT : public CARD {
 private:
   COMMON_COMPONENT* _common{nullptr};
-  HS_PARAM* _hsparam{nullptr}; // possibly indirect. later.
 private:
   double _mfactor_fixed;	// composite, including subckt mfactor
   bool	 _converged;
@@ -197,12 +221,12 @@ public:	// state, aux data
 
   double mfactor()const {
     assert(_mfactor_fixed != NOT_VALID);
-#ifndef NDEBUG
+#if 0
     if (const COMPONENT* o = dynamic_cast<const COMPONENT*>(owner())) {
-      assert(_mfactor_fixed == o->mfactor() * my_mfactor());
+      assert(_mfactor_fixed == o->mfactor() * hsparam().mfactor_specified());
     }else{
       assert(!owner());
-      assert(_mfactor_fixed == my_mfactor());
+      assert(_mfactor_fixed == hsparam().mfactor_specified());
     }
 #endif
     return _mfactor_fixed;
@@ -267,10 +291,10 @@ public: // parameters
   int  set_param_by_name(std::string, std::string) override;
   void set_param_by_index(int, std::string&, int) override;
   int  param_count()const override {
-    if (has_common()) {
-      return sysparams_count + common()->param_count();
+    if(has_common()){
+      return common()->param_count();
     }else{
-      return sysparams_count + CARD::param_count();
+      return CARD::param_count();
     }
   }
   bool param_is_printable(int)const override;
@@ -282,10 +306,14 @@ public: // parameters
 			      COMMON_COMPONENT* Common, double Value,
 			      int state_count, double state[],
 			      int node_count, const node_t nodes[]);
-private: // implementation
-  int set_hsparam(std::string const&, std::string const&);
-  HS_PARAM& hsparam();
-protected: // former _mfactor
+public:
+  HS_PARAM const* hsparam()const {
+    return has_common()?common()->hsparam():nullptr;
+  }
+  bool has_hsparam()const {
+    return hsparam();
+  }
+protected:
   void set_mfactor(double);
   double my_mfactor()const;
   //--------------------------------------------------------------------

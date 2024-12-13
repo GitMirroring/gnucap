@@ -33,14 +33,27 @@ class COMMON_VALUE : public EVAL_BM_BASE {
 
   explicit COMMON_VALUE(COMMON_VALUE const& c) :
     EVAL_BM_BASE(c),
-    _name(c._name) {}
+    _name(c._name) {
+    trace1("COMMON_VALUE", this);
+  }
 public:
   explicit COMMON_VALUE(int c) : EVAL_BM_BASE(c) { }
-  // explicit COMMON_VALUE(COMMON_COMPONENT* next=nullptr) : EVAL_BM_BASE(next) { untested();
-  //   assert(!dynamic_cast<COMMON_VALUE*>(next));
-  // }
+  explicit COMMON_VALUE(COMMON_COMPONENT* next=nullptr) : EVAL_BM_BASE(next) { untested();
+    trace2("COMMON_VALUE", this, next);
+    assert(!dynamic_cast<COMMON_VALUE*>(next));
+  }
   COMMON_VALUE* clone()const override { return new COMMON_VALUE(*this); }
-  ~COMMON_VALUE() { }
+  ~COMMON_VALUE() {
+    trace1("~CV", _name);
+  }
+
+  bool operator==(COMMON_COMPONENT const& x)const override {
+    const COMMON_VALUE* p = dynamic_cast<const COMMON_VALUE*>(&x);
+    bool rv = p
+      && _name == p->_name
+      && EVAL_BM_BASE::operator==(x);
+    return rv;
+  }
 
   std::string name()const override { return _name; }
   void set_name(std::string const& n) { _name = n; }
@@ -104,7 +117,8 @@ void ELEMENT::set_value(double v, COMMON_COMPONENT* c)
   set_value(v);
 }
 /*--------------------------------------------------------------------------*/
-// create common if needed
+// tmp kludge. will provide various commons pre-attached, as in d_logic
+// create common if needed for now
 int ELEMENT::push_value(std::string const& Value)
 {
   trace3("elt::push_value", value_name(), Value, has_common());
@@ -124,7 +138,10 @@ int ELEMENT::push_value(std::string const& Value)
     _value = double(v);
   }else{
     // squeeze in common. retain parameter indexes
-    auto cc = cv.clone();
+    COMMON_VALUE* cc = cv.clone();
+    trace1("push_value", cc);
+    assert(!cc->has_next());
+    cc->attach_next(mutable_common());
     cc->set_name(value_name());
     cc->set_value(Value);
     attach_common(cc);
@@ -145,10 +162,11 @@ std::string ELEMENT::value_string() const
 int ELEMENT::set_param_by_name(std::string Name, std::string Value)
 {
   if(Name == value_name()){
-    trace4("elt::spbn", value_name(), Name, Value, has_common());
     try{
+      trace4("elt::spbn0", value_name(), Name, Value, has_common());
       return COMPONENT::set_param_by_name(Name, Value);
-    }catch(Exception_No_Match const&) { untested();
+    }catch(Exception_No_Match const&) {
+      trace4("elt::spbn2", value_name(), Name, Value, has_common());
       return push_value(Value);
     }
   }else{
@@ -160,9 +178,12 @@ int ELEMENT::set_param_by_name(std::string Name, std::string Value)
 /*--------------------------------------------------------------------------*/
 void ELEMENT::set_param_by_index(int i, std::string& Value, int offset)
 {
-  trace2("elt::spbi", i, Value);
-  if(ELEMENT::param_count() - 1 == i) {
-    push_value(Value);
+  if(ELEMENT::param_count() - 1 == i){
+    if(!common() || !common()->has_value()){
+      push_value(Value);
+    }else{
+      COMPONENT::set_param_by_index(i, Value, offset);
+    }
   }else{
     COMPONENT::set_param_by_index(i, Value, offset);
   }
@@ -174,16 +195,14 @@ bool ELEMENT::param_is_printable(int i)const
     return COMPONENT::param_is_printable(i);
   }else if(ELEMENT::param_count() - 1 == i){
     return true;
-  }else{
+  }else{ untested();
     return COMPONENT::param_is_printable(i);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_name(int i)const
 {
-  if(has_common()) {
-    return COMPONENT::param_name(i);
-  }else if(ELEMENT::param_count() - 1 == i){
+  if(ELEMENT::param_count() - 1 == i) {
     return value_name();
   }else{
     return COMPONENT::param_name(i);
@@ -196,14 +215,14 @@ std::string ELEMENT::param_name(int i, int j)const
     return param_name(i);
   }else if (i >= ELEMENT::param_count()) {untested();
     return "";
-  }else{
+  }else{ untested();
     return COMPONENT::param_name(i,j);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_value(int i)const
 {
-  if(ELEMENT::param_count() - 1 == i){
+  if(ELEMENT::param_count() - 1 == i) {
     return value_string();
   }else{
     return COMPONENT::param_value(i);

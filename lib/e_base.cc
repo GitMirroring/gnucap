@@ -27,6 +27,7 @@
 #include "u_prblst.h"
 #include "u_xprobe.h"
 #include "e_base.h"
+#include "u_hsparam.h"
 /*--------------------------------------------------------------------------*/
 static char fix_case(char c)
 {

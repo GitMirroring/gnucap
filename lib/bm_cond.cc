@@ -170,6 +170,7 @@ void EVAL_BM_COND::parse_common_obsolete_callback(CS& cmd) //used
       c = &func_zero;
     }
     assert(c);
+    trace1("OC", c);
     attach_common(c, &(_func[mode]));
     assert(_func[mode]);
     _set[mode] = true;

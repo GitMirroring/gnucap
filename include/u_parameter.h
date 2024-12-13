@@ -129,7 +129,7 @@ public:
     }
   }
   void	set_default(const T& v)		{_v = v; _s = "";}
-  void	set_fixed(const T& v)		{_v = v; _s = "#";}
+  void	set_fixed(const T& v)		{ untested();_v = v; _s = "#";}
   PARAMETER& operator=(Base const* v) override {
     value_type* x = _v.assign(v);
     assert(x);
@@ -307,7 +307,7 @@ public:
     p.base()->pclone(&_mem);
     return *this;
   }
- // PARAM_INSTANCE& operator=(Base const&b) {
+ // PARAM_INSTANCE& operator=(Base const&b) { untested();
  //   assert(base());
  //   *base() = &b;
  //   return *this;
@@ -329,20 +329,20 @@ public:
     return *this;
   }
   void set_fixed(Base const* v) {
-    if(dynamic_cast<PARAM_ANY*>(base())) {
+    if(dynamic_cast<PARAM_ANY*>(base())) { untested();
       // BUG?
-      if(dynamic_cast<Float const*>(v)){
+      if(dynamic_cast<Float const*>(v)){ untested();
 	*this = PARAMETER<Float>();
 	*base() = v;
-      }else if(dynamic_cast<Integer const*>(v)){
+      }else if(dynamic_cast<Integer const*>(v)){ untested();
 	*this = PARAMETER<Integer>();
 	*base() = v;
-      }else{
+      }else{ untested();
 	incomplete();
       }
     }else if(dynamic_cast<PARA_BASE*>(base())) {
       *base() = v;
-    }else{
+    }else{ untested();
       *base() = v;
     }
   }
@@ -384,24 +384,24 @@ public:
   operator double() const{ itested();
     // still used in Gnucsator.
     Base const* v = base()->value();
-    if(auto f = dynamic_cast<Float const*>(v)){
+    if(auto f = dynamic_cast<Float const*>(v)){ untested();
       return *f;
-    }else{
+    }else{ untested();
       return NOT_VALID;
     }
   }
   void obsolete_parse(CS& cmd) {
     base()->obsolete_parse(cmd);
   }
- //  operator PARAMETER<double> const&()const {
- //    if(auto d = dynamic_cast<PARAMETER<double> const*>(_data.base())){
+ //  operator PARAMETER<double> const&()const { untested();
+ //    if(auto d = dynamic_cast<PARAMETER<double> const*>(_data.base())){ untested();
  //      return *d;
  //    }else{ untested();
  //      throw Exception("not a double");
  //    }
  //  }
   PARA_BASE const* operator->()const {return base();}
-  PARA_BASE const* operator*()const {return base();}
+  PARA_BASE const* operator*()const { untested();return base();}
 }; // PARAM_INSTANCE
 /*--------------------------------------------------------------------------*/
 class INTERFACE PARAM_LIST {
@@ -443,7 +443,7 @@ public:
 
   iterator begin() {return _pl.begin();}
   iterator end() {return _pl.end();}
-  iterator find(std::string const& k) { return _pl.find(k); }
+  iterator find(std::string const& k) { untested(); return _pl.find(k); }
   const_iterator begin()const {itested(); return _pl.begin();}
   const_iterator end()const { return _pl.end();}
   const_iterator find(std::string const& k) const { return _pl.find(k); }
@@ -466,7 +466,7 @@ T get(Base const* t)
 
 // template <>
 // inline Float get<Float>(Base const* t)
-// {
+// { untested();
 //   auto f = prechecked_cast<Float const*>(t);
 //   assert(f);
 //   return *f;
@@ -481,7 +481,7 @@ inline double get<double>(Base const* t)
 }
 // template <>
 // inline Integer get<Integer>(Base const* t)
-// {
+// { untested();
 //   auto f = prechecked_cast<Integer const*>(t);
 //   assert(f);
 //   return *f;
@@ -511,7 +511,7 @@ inline T PARAMETER<T>::lookup_solve(const T& Def, const CARD_LIST* scope)const
 
  // T v = T(reduced.eval());
   value_type const* v = def.assign(reduced.value());
-  if(v && v->is_NA()) {
+  if(v && v->is_NA()) { untested();
     delete v;
     v = nullptr;
   }else{
@@ -648,7 +648,7 @@ inline void PARAMETER<T>::obsolete_parse(CS& cmd)
       }else{
 	_s = name;
       }
-      if (name == "NA") {
+      if (name == "NA") { untested();
         _s = "";
       }else{
       }

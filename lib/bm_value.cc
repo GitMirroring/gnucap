@@ -51,6 +51,7 @@ bool EVAL_BM_VALUE::is_trivial()const
 void EVAL_BM_VALUE::precalc_first(const CARD_LIST* Scope)
 {
   if (modelname() != "") {
+    // incomplete();?
     (_value = "") = modelname();
   }else{
   }

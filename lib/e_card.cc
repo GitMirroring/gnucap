@@ -231,6 +231,7 @@ int CARD::set_param_by_name(std::string Name, std::string Value)
   for (int i = param_count() - 1;  i >= 0;  --i) {
     for (int j = 0;  param_name(i,j) != "";  ++j) { // multiple names
       if (Umatch(Name, param_name(i,j) + ' ')) {
+	trace3("CARD::spbn match", Name, Value, i);
 	set_param_by_index(i, Value, 0/*offset*/);
 	return i; //success
       }else{

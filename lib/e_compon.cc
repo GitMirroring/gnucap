@@ -25,6 +25,7 @@
 #include "u_lang.h"
 #include "e_model.h"
 #include "e_elemnt.h"
+#include "u_hsparam.h"
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
   :CKT_BASE(p),
@@ -32,24 +33,26 @@ COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
    _model(p._model),
    _attach_count(0)
 {
+  attach_next(p._next);
 }
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(int c)
   :CKT_BASE(),
    _modelname(),
-   _model(0),
+   _model(nullptr),
    _attach_count(c)
 {
 }
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::~COMMON_COMPONENT()
 {
+  detach_next();
   trace1("common,destruct", _attach_count);
   if(_attach_count == 0){
     // not attached to anything.
   }else if(_attach_count == CC_STATIC) {
     // static, not attached to anything.
-  }else if(_attach_count > CC_STATIC) {
+  }else if(_attach_count > CC_STATIC) { untested();
     // static, still attached to another common
     // the other is static (presumably), but
     // there seems no way to influence destruction order
@@ -60,10 +63,11 @@ COMMON_COMPONENT::~COMMON_COMPONENT()
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
 {
+  trace1("attach", c);
   assert(to);
   if (c == *to) {
     // The new and old are the same object.  Do nothing.
-  }else if (!c) {itested();
+  }else if (!c) {untested();
     // There is no new common.  probably a simple element
     detach_common(to);
   }else if (!*to) {
@@ -83,6 +87,9 @@ void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
     // The new one is not used anywhere, so throw it away.
     trace1("delete", c->_attach_count);    
     delete c;
+  }else if (c->_attach_count == CC_STATIC) { untested();
+    // need to cleanup anyway.
+    c->detach_next();
   }else{untested();
     // The new and old are identical.
     // Use the old one.
@@ -92,6 +99,7 @@ void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
 {
+  trace1("detach", *from);
   assert(from);
   if (*from) {
     assert((**from)._attach_count > 0);
@@ -100,6 +108,9 @@ void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
     if ((**from)._attach_count == 0) {
       trace1("delete", (**from)._attach_count);
       delete *from;
+    }else if ((**from)._attach_count == CC_STATIC) {
+      trace1("cleanup", (**from)._attach_count);
+      (*from)->detach_next();
     }else{
       trace1("nodelete", (**from)._attach_count);
     }
@@ -214,47 +225,90 @@ void COMMON_COMPONENT::parse_common_obsolete_callback(CS& cmd) //used
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::set_param_by_index(int i, std::string& , int Offset)
+void COMMON_COMPONENT::set_param_by_index(int i, std::string& V, int Offset)
 { untested();
   unreachable();
-  // case 0:untested();  _tnom_c = Value; break;
-  // case 1:untested();  _dtemp = Value; break;
-  // case 2:itested();  _temp_c = Value; break;
-  throw Exception_Too_Many(i, 2, Offset);
+  if(has_next()) { untested();
+    COMMON_COMPONENT* m = next_common()->clone(); // shared?
+    m->set_param_by_index(i, V, Offset);
+    attach_next(m);
+  }else{ untested();
+    throw Exception_Too_Many(i, 2, Offset);
+  }
 }
 /*--------------------------------------------------------------------------*/
-bool COMMON_COMPONENT::param_is_printable(int)const
+bool COMMON_COMPONENT::param_is_printable(int i)const
 {
-  return false;
+  if(next_common()) {
+    return next_common()->param_is_printable(i);
+  }else{
+    return false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_COMPONENT::param_name(int i)const
 {
-  switch (i) {
-  case 0:  return "tnom";
-  case 1:  return "dtemp";
-  case 2:  return "temp";
-  default:untested(); return "";
-  }
-}
-/*--------------------------------------------------------------------------*/
-std::string COMMON_COMPONENT::param_name(int i, int j)const
-{itested();
-  if(j==0){itested();
-    return param_name(i);
-  }else{itested();
+  if(next_common()) {
+    return next_common()->param_name(i);
+  }else{ untested();
     return "";
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMMON_COMPONENT::param_value(int)const
+std::string COMMON_COMPONENT::param_name(int i, int j) const
+{untested();
+  if(j==0){ untested();
+    return param_name(i);
+  }else if(next_common()) { untested();
+    return next_common()->param_name(i, j);
+  }else{ untested();
+    return "";
+  }
+}
+/*--------------------------------------------------------------------------*/
+std::string COMMON_COMPONENT::param_value(int i) const
 {
-  untested(); return "";
+  if(next_common()) {
+    return next_common()->param_value(i);
+  }else{ untested();
+    return "";
+  }
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_COMPONENT::expand(const COMPONENT* comp)
+{
+  if(has_next()){
+    COMMON_COMPONENT* c = next_common()->clone();
+    assert(c);
+    try {
+      c->expand(comp);
+      attach_next(c);
+    }catch (Exception const& e) { untested();
+      attach_next(c);
+      throw e;
+    }
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::precalc_last(const CARD_LIST* Scope)
 {
-  assert(Scope);
+  if(Scope){
+  }else{ untested();
+  }
+
+  if(has_next()){
+    COMMON_COMPONENT* c = next_common()->clone();
+    assert(c);
+    try {
+      c->precalc_last(Scope);
+      attach_next(c);
+    }catch (Exception const& e) { untested();
+      attach_next(c);
+      throw e;
+    }
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::tr_eval(ELEMENT*x)const
@@ -265,7 +319,7 @@ void COMMON_COMPONENT::tr_eval(ELEMENT*x)const
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::ac_eval(ELEMENT*x)const
 {
-  if(_model){
+  if(_model){ untested();
     _model->ac_eval(x);
   }else{
     // should not get here.
@@ -277,18 +331,37 @@ void COMMON_COMPONENT::ac_eval(ELEMENT*x)const
 bool COMMON_COMPONENT::operator==(const COMMON_COMPONENT& x)const
 {
   return (_modelname == x._modelname
+	  && _next == x._next
 	  && _model == x._model);
 }
 /*--------------------------------------------------------------------------*/
 int COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
 {
-  if (has_parse_params_obsolete_callback()) {untested();
+  trace2("spbn", Name, Value);
+  if(Name[0] == '$'){
+    if(!has_next()) {
+      attach_next(new HS_PARAM());
+    }else if(next_common()->is_shared()){ untested();
+      assert(!_next->next_common()); // for now.
+      assert(0);
+      unreachable(); // really?
+      // TODO: clone and reattach?
+    }else{ untested();
+    }
+
+    // todo: figure out index.
+    COMMON_COMPONENT* c = next_common()->clone();
+    int idx = c->set_param_by_name(Name, Value);
+    attach_next(c);
+    trace1("param idx", idx + param_count());
+    return idx + param_count();;
+  }else if (has_parse_params_obsolete_callback()) {untested();
     std::string args(Name + "=" + Value);
     CS cmd(CS::_STRING, args); //obsolete_callback
     bool ok = parse_params_obsolete_callback(cmd); //BUG//callback
     if (!ok) {untested();
       throw Exception_No_Match(Name);
-    }else{itested();
+    }else{untested();
     }
     return 0;
   }else{
@@ -303,6 +376,8 @@ int COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
 	}
       }
     }
+    {
+    }
     throw Exception_No_Match(Name);
   }
 }
@@ -311,16 +386,16 @@ int COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
 // It is called during expansion only.
 
 int COMMON_COMPONENT::Set_param_by_name(std::string Name, std::string Value)
-{itested();
+{untested();
   assert(!has_parse_params_obsolete_callback());
   
   //BUG// ugly linear search
-  for (int i = COMMON_COMPONENT::param_count() - 1;  i >= 0;  --i) {itested();
-    for (int j = 0;  COMMON_COMPONENT::param_name(i,j) != "";  ++j) {itested();
-      if (Umatch(Name, COMMON_COMPONENT::param_name(i,j) + ' ')) {itested();
+  for (int i = COMMON_COMPONENT::param_count() - 1;  i >= 0;  --i) {untested();
+    for (int j = 0;  COMMON_COMPONENT::param_name(i,j) != "";  ++j) {untested();
+      if (Umatch(Name, COMMON_COMPONENT::param_name(i,j) + ' ')) {untested();
 	COMMON_COMPONENT::set_param_by_index(i, Value, 0/*offset*/);
 	return i; //success
-      }else{itested();
+      }else{untested();
 	//keep looking
       }
     }
@@ -338,37 +413,6 @@ bool COMMON_COMPONENT::parse_params_obsolete_callback(CS&)
   return false;
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-class HS_PARAM {
-  std::array<PARAMETER<double>, sysparams_count> _p;
-  explicit HS_PARAM(HS_PARAM const& p) : _p(p._p) {}
-public:
-  explicit HS_PARAM(){}
-  HS_PARAM* clone() const{ return new HS_PARAM(*this); }
-
-  void set_by_index(int i, std::string const& v){
-    _p[i] = v;
-  }
-  bool is_printable(int i)const {
-    return _p[i].has_hard_value();
-  }
-  std::string const param_value(int i) const {
-    return _p[i].string();
-  }
-  double mfactor() const{
-    return _p[0];
-  }
-  void set_mfactor(double x) {itested();
-    _p[0] = x;
-  }
-  void precalc(CARD_LIST const* scope){
-    _p[0].e_val(1., scope);
-    for(int i=1; i< sysparams_count; ++i){
-      _p[i].e_val(0, scope);
-    }
-  }
-
-};
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 COMPONENT::COMPONENT(COMMON_COMPONENT* c)
@@ -399,10 +443,6 @@ COMPONENT::COMPONENT(const COMPONENT& p)
     _sim->uninit();
   }else{untested();
   }
-  if(p._hsparam){
-    _hsparam = p._hsparam->clone();
-  }else{
-  }
   attach_common(p._common);
   assert(_common == p._common);
   if(has_attributes(p.id_tag())) {
@@ -413,12 +453,14 @@ COMPONENT::COMPONENT(const COMPONENT& p)
 /*--------------------------------------------------------------------------*/
 COMPONENT::~COMPONENT()
 {
+  if(has_common()){
+  }else{
+  }
   detach_common();
   if (_sim) {
     _sim->uninit();
   }else{
   }
-  delete _hsparam; // here: purge indirect.
 }
 /*--------------------------------------------------------------------------*/
 bool COMPONENT::node_is_grounded(int i)const 
@@ -444,6 +486,8 @@ int COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
     }else{
     }
   }
+  {
+  }
   throw Exception_No_Match(int_name);
 }
 /*--------------------------------------------------------------------------*/
@@ -468,7 +512,7 @@ void COMPONENT::set_port_to_ground(int num)
     n_(num).set_to_ground(this);
     if (num+1 > _net_nodes) {
       _net_nodes = num+1;
-    }else{untested();
+    }else{ untested();
     }
   }else{untested();
     throw Exception_Too_Many(num+1, max_nodes(), 0/*offset*/);
@@ -517,22 +561,67 @@ void COMPONENT::deflate_common()
 void COMPONENT::expand()
 {
   CARD::expand();
+  trace2("COMPONENT::expand0", long_label(), hsparam());
   if (has_common()) {
     COMMON_COMPONENT* new_common = common()->clone();
     new_common->expand(this);
     COMMON_COMPONENT* deflated_common = new_common->deflate();
     if (deflated_common != common()) {
       attach_common(deflated_common);
-      trace1("done attach", deflated_common);
     }else{untested();
     }
   }else{
+  }
+
+  if(HS_PARAM const* hsp = hsparam()){
+    _mfactor_fixed = hsp->mfactor();
+    trace3("COMPONENT::expand1", long_label(), hsp->mfactor(), _mfactor_fixed);
+  }else if (const COMPONENT* o = dynamic_cast<const COMPONENT*>(owner())) {
+    _mfactor_fixed = o->mfactor();
+    trace3("COMPONENT::expand", long_label(), o->mfactor(), _mfactor_fixed);
+  }else{
+    assert(_mfactor_fixed == 1.);
+    trace2("COMPONENT::expand", long_label(), _mfactor_fixed);
+  }
+}
+/*--------------------------------------------------------------------------*/
+static bool has_hsparam(CARD const* c)
+{
+  if(auto comp = dynamic_cast<COMPONENT const*>(c)) {
+    return comp->has_hsparam();
+  }else{
+    return false;
   }
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::precalc_first()
 {
   CARD::precalc_first();
+
+  // move to common::expand?
+  // check HS_PARAM
+  if(!::has_hsparam(owner())) {
+    // not needed or explicit (already attached)
+  }else if(dynamic_cast<HS_PARAM const*>(common())){
+    incomplete();
+    // ok. (probably ELEMENT without BM_BASE)
+  }else if(has_common()){
+    incomplete();
+    if(dynamic_cast<HS_PARAM*>(mutable_common()->next_common())){
+      // already there.
+    }else{
+      // create one.
+      HS_PARAM* hspl = new HS_PARAM();
+      hspl->attach_next(mutable_common()->next_common());
+      mutable_common()->attach_next(hspl);
+    }
+  }else{
+    // device without common, but with hs params
+    incomplete();
+    attach_common(new HS_PARAM());
+  }
+
+
   if (has_common()) {
     try {
       mutable_common()->precalc_first(scope());
@@ -542,21 +631,30 @@ void COMPONENT::precalc_first()
   }else{
   }
 
-  //BUG//  _mfactor must be in precalc_first
-
-//  _mfactor.e_val(1, scope());
-  if(_hsparam){
-    _hsparam->precalc(scope());
+  // needed?
+  if(HS_PARAM const* hsp = hsparam()){
+    _mfactor_fixed = hsp->mfactor();
   }else{
+    _mfactor_fixed = 1.;
   }
-  trace1(long_label().c_str(), double(my_mfactor()));
-  if (const COMPONENT* o = dynamic_cast<const COMPONENT*>(owner())) {
-    _mfactor_fixed = o->mfactor() * my_mfactor();
-  }else{
-    assert(!owner());
-    _mfactor_fixed =  my_mfactor();
-  } 
-  trace1(long_label().c_str(), _mfactor_fixed);
+
+#if 0
+  //BUG//  _mfactor must be in precalc_first
+  HS_PARAM const* ch;
+  if(HS_PARAM* h = hsparam()) { untested();
+    h->precalc(owner());
+    ch = h;
+  }else if(const COMPONENT* o = dynamic_cast<const COMPONENT*>(owner())){ untested();
+    ch = o->hsparam();
+  }else{ untested();
+    static HS_PARAM s;
+    ch = &s;
+  }
+  assert(ch);
+  _mfactor_fixed = ch->mfactor();
+
+  trace3("COMPONENT::precalc_first", long_label(), _mfactor_fixed, ch->method());
+#endif
 }
 /*--------------------------------------------------------------------------*/
 // .. bypassed in mg_out_dev.
@@ -571,11 +669,15 @@ void COMPONENT::precalc_last()
     }catch (Exception_Precalc& e) {
       error(bWARNING, long_label() + ": " + e.message());
     }catch (Exception& e) {
-      delete c;
+      if(c != common()){
+	delete c;
+      }else{ untested();
+      }
       throw e;
     }
     attach_common(c);
   }else{
+    assert(_mfactor_fixed == 1.);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -603,7 +705,7 @@ void COMPONENT::tr_iwant_matrix()
     assert(matrix_nodes() == 0);
     if (subckt()) {
       subckt()->tr_iwant_matrix();
-    }else{itested();
+    }else{ untested();
     }
   }else{
   }
@@ -615,7 +717,7 @@ void COMPONENT::ac_iwant_matrix()
     assert(matrix_nodes() == 0);
     if (subckt()) {
       subckt()->ac_iwant_matrix();
-    }else{itested();
+    }else{ untested();
     }
   }else{
   }
@@ -649,106 +751,64 @@ void COMPONENT::set_slave()
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-HS_PARAM& COMPONENT::hsparam()
-{
-  if(!_hsparam){
-    _hsparam = new HS_PARAM();
-  }else{
-  }
-  return(*_hsparam);
-}
-/*--------------------------------------------------------------------------*/
+#if 0
 void COMPONENT::set_mfactor(double x)
-{itested();
-  hsparam().set_mfactor(x);
-}
-/*--------------------------------------------------------------------------*/
-int COMPONENT::set_hsparam(std::string const& Name, std::string const& Value)
-{
-  int which = -1;
-  if( Name == "$mfactor" ){
-    which = 0;
-  }else if(  Name == "$xposition") {
-    which = 1;
-  }else if(  Name == "$yposition") {
-    which = 2;
-  }else if(  Name == "$zposition") {
-    which = 3;
-  }else if(  Name == "$hflip") {
-    which = 4;
-  }else if(  Name == "$vflip") {
-    which = 5;
-  }else if(  Name == "$bflip") {
-    which = 6;
-  }else if(  Name == "$angle") {
-    which = 7;
-  }else{
-  }
-
-  if(which == -1){
-  }else{
-    hsparam().set_by_index(which, Value);
-  }
-  return which+1;
-}
-/*--------------------------------------------------------------------------*/
-double COMPONENT::my_mfactor() const
-{
-  if(_hsparam){
-    return _hsparam->mfactor();
-  }else{
-    return 1.;
+{untested();
+  if(has_hsparam() || x!=1.){ untested();
+    hsparam().set_mfactor(x);
+  }else{ untested();
+    // avoid hsparam allocation.
+    assert(my_mfactor()==1.);
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 int COMPONENT::set_param_by_name(std::string Name, std::string Value)
 {
-  if(int idx = set_hsparam(Name, Value)){
-    trace3("COMPONENT::spbn", Name, Value, idx);
-    return COMPONENT::param_count() - idx;
-  }else if (!has_common()) { itested();
-    return CARD::set_param_by_name(Name, Value);
-  }else if(!common()->is_shared()) {
-    // it's us!
+  trace2("COMPONENT::spbn", Name, Value);
+  if(Name[0] != '$'){
+  }else if(!has_common()) {
+    attach_common(new HS_PARAM());
     return mutable_common()->set_param_by_name(Name, Value);
   }else{
-    COMMON_COMPONENT* c = common()->clone();
+    if(dynamic_cast<HS_PARAM const*>(common())){ untested();
+    }else{
+      incomplete();
+    }
+  }
+
+  if (has_common()) {
+    COMMON_COMPONENT* c = mutable_common()->clone();
     assert(c);
     int index = c->set_param_by_name(Name, Value);
     attach_common(c);
     return index;
+  }else{
+    throw Exception_No_Match(Name);
   }
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_param_by_index(int i, std::string& Value, int offset)
 {
-  int I = COMPONENT::param_count() - 1 - i;
-
-  if( I < sysparams_count ){
-    hsparam().set_by_index(I, Value);
-  }else if (!has_common()) { untested();
-  }else if(!common()->is_shared()) { untested();
-    // it's us!
-    mutable_common()->set_param_by_index(i, Value, offset);
-  }else{ untested();
-    COMMON_COMPONENT* c = common()->clone();
+  if (has_common()) { untested();
+    COMMON_COMPONENT* c = mutable_common()->clone();
     assert(c);
+    try{ untested();
     c->set_param_by_index(i, Value, offset);
+    }catch(Exception_Too_Many const&){ untested();
+      incomplete();
+    }
     attach_common(c);
+  }else if(i<0){
+    throw Exception_Too_Many(-i+1, param_count(), 0);
+  }else{ untested();
+    throw Exception_Too_Many(i, param_count(), 0);
   }
 }
 /*--------------------------------------------------------------------------*/
 bool COMPONENT::param_is_printable(int i)const
 {
-  int I = COMPONENT::param_count() - 1 - i;
-
-  if( I < sysparams_count ){
-    if(_hsparam){
-      return _hsparam->is_printable(I);
-    }else{
-      return false;
-    }
-  }else if (has_common()) {
+  if(has_common()) {
     return common()->param_is_printable(i);
   }else{ untested();
     return CARD::param_is_printable(i);
@@ -757,57 +817,29 @@ bool COMPONENT::param_is_printable(int i)const
 /*--------------------------------------------------------------------------*/
 std::string COMPONENT::param_name(int i)const
 {
-  assert(sysparams_count == 8);
-  switch (COMPONENT::param_count() - 1 - i) {
-  case 0: return "$mfactor";
-  case 1:itested(); return "$xposition";
-  case 2:itested(); return "$yposition";
-  case 3:itested(); return "$zposition";
-  case 4:itested(); return "$angle";
-  case 5:itested(); return "$hflip";
-  case 6:itested(); return "$vflip";
-  case 7:itested(); return "$sflip"; // 's' for "stack"
-  // case 7:untested(); return "$nflip"; // 'n' for "normal"
-  default:
-    if (has_common()) {
-      return common()->param_name(i);
-    }else{ untested();
-      return CARD::param_name(i);
-    }
+  if(has_common()) {
+    return common()->param_name(i);
+  }else{ untested();
+    return CARD::param_name(i);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string COMPONENT::param_name(int i, int j)const
-{itested();
-  trace3("COMPONENT::param_name", long_label(), i, j);
-  int I = COMPONENT::param_count() - 1 - i;
-  if(I < sysparams_count && j) {itested();
-    return "";
-  }else if(I < sysparams_count) { untested();
+{untested();
+  if (j == 0) { untested();
     return param_name(i);
-  }else if (has_common()) {untested();
-    return common()->param_name(i,j);
-  }else{ untested();
-    if (j == 0) { untested();
-      return param_name(i);
-    }else if (i >= CARD::param_count()) {
-      return "";
-    }else{untested();
-      return CARD::param_name(i,j);
-    }
+  }else if(has_common()){ untested();
+    return common()->param_name(i, j);
+  }else if (i >= CARD::param_count()) { untested();
+    return "";
+  }else{untested();
+    return CARD::param_name(i,j);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string COMPONENT::param_value(int i)const
 {
-  int I = COMPONENT::param_count() - 1 - i;
-  if(I>=0 && I < sysparams_count) {
-    if(_hsparam){
-      return _hsparam->param_value(I);
-    }else{ untested();
-      return "";
-    }
-  }else if (has_common()) {
+  if(has_common()){
     return common()->param_value(i);
   }else{ untested();
     return CARD::param_value(i);
@@ -917,7 +949,7 @@ void COMPONENT::q_eval()
   if(!is_q_for_eval()) {
     mark_q_for_eval();
     _sim->_evalq_uc->push_back(this);
-  }else{itested();
+  }else{untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -951,7 +983,7 @@ bool COMPONENT::use_obsolete_callback_parse()const
 {
   if (has_common()) {
     return common()->use_obsolete_callback_parse();
-  }else{untested();
+  }else{ untested();
     return false;
   }
 }
@@ -998,7 +1030,7 @@ double COMPONENT::volts_limited(const node_t & n1, const node_t & n2)
       error(bTRACE, "range limit damp\n");
     }else{
     }
-    if (OPT::picky <= bTRACE) {itested();
+    if (OPT::picky <= bTRACE) { untested();
       error(bNOERROR,"node limiting (n1,n2,dif) "
 	    "was (%g %g %g) now (%g %g %g)\n",
 	    n1.v0(), n2.v0(), n1.v0() - n2.v0(), v1, v2, v1-v2);
@@ -1008,6 +1040,15 @@ double COMPONENT::volts_limited(const node_t & n1, const node_t & n2)
   }
 
   return dn_diff(v1,v2);
+}
+/*--------------------------------------------------------------------------*/
+HS_PARAM* COMMON_COMPONENT::hsparam()
+{
+  if(next_common()) {
+    return next_common()->hsparam();
+  }else{
+    return nullptr;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

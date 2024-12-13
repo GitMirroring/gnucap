@@ -88,8 +88,10 @@ void EVAL_BM_ACTION_BASE::tr_final_adjust(FPOLY1* y, bool f_is_value)const
     y->f0 = 0.;
   }else{
   }
+  trace3("AB::fa", y->f0, y->f1, temp_adjust());
   *y *= temp_adjust();
   y->f0 += _ooffset;
+  trace3("AB::fa1", y->f0, y->f1, _ooffset);
 }
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_ACTION_BASE::tr_finish_tdv(ELEMENT* d, double val)const
@@ -173,17 +175,17 @@ void EVAL_BM_ACTION_BASE::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* 
 }
 /*--------------------------------------------------------------------------*/
 std::string EVAL_BM_ACTION_BASE::param_value(int i) const
-{
+{ untested();
   switch (i) {
-  case 0:itested();  return _tnom_c.string();
-  case 1:itested();  return _dtemp.string();
-  case 2:itested();  return _temp_c.string();
+  case 0:untested();  return _tnom_c.string();
+  case 1:untested();  return _dtemp.string();
+  case 2:untested();  return _temp_c.string();
   default:untested(); return "";
   }
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_ACTION_BASE::param_is_printable(int i) const
-{
+{ untested();
   switch (i) {
   case 0:  return _tnom_c.has_hard_value();
   case 1:  return _dtemp.has_hard_value();
@@ -194,10 +196,10 @@ bool EVAL_BM_ACTION_BASE::param_is_printable(int i) const
 /*--------------------------------------------------------------------------*/
 void EVAL_BM_ACTION_BASE::precalc_last(const CARD_LIST* Scope)
 {
-  assert(Scope);
+  // assert(Scope);
   EVAL_BM_BASE::precalc_last(Scope);
   _tnom_c.e_val(OPT::tnom_c, Scope);
-  _dtemp.e_val(0., Scope);
+  _dtemp.e_val(_default_dtemp, Scope);
   _temp_c.e_val(_sim->_temp_c + _dtemp, Scope);
 
   _bandwidth.e_val(_default_bandwidth, Scope);

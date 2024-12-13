@@ -35,11 +35,11 @@ protected:
 protected:
   explicit	EVAL_BM_BASE(int c=0) 
     :COMMON_COMPONENT(c) {}
+  explicit	EVAL_BM_BASE(COMMON_COMPONENT* next)
+    :COMMON_COMPONENT(next) { untested();}
 public:
   explicit	EVAL_BM_BASE(const EVAL_BM_BASE& p)
-    :COMMON_COMPONENT(p), _value(p._value) {
-      trace2("EVAL_BM_BASE::EVAL_BM_BASE", _value, _value.string());
-    }
+    :COMMON_COMPONENT(p), _value(p._value) { }
 		~EVAL_BM_BASE() {}
 protected: // override virtual
   virtual COMMON_COMPONENT* clone()const override {return new EVAL_BM_BASE(*this); }
@@ -58,7 +58,7 @@ protected: // override virtual
   bool has_tr_eval()const override	{ return false;}
   bool has_ac_eval()const override	{ return true;}
 #ifndef NDEBUG
-  void tr_eval(ELEMENT*)const override {unreachable();}
+  void tr_eval(ELEMENT*)const override { untested();unreachable();}
 #endif
 
   int param_count()const override { return COMMON_COMPONENT::param_count() + 1; }
@@ -72,7 +72,7 @@ protected: // override virtual
     }
   }
   std::string param_name(int i)const override {
-    if(i == COMMON_COMPONENT::param_count()) {
+    if(i == COMMON_COMPONENT::param_count()) { untested();
       return name();
     }else{
       return COMMON_COMPONENT::param_name(i);
