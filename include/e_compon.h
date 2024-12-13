@@ -59,9 +59,6 @@ enum {CC_STATIC=27342}; // mid-sized arbitrary positive int
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_COMPONENT : public CKT_BASE {
 protected: // probably obsolete
-  PARAMETER<double>	_tnom_c;  // specification temperature
-  PARAMETER<double>	_dtemp;   // rise over enclosing temperature
-  PARAMETER<double>	_temp_c;  // actual temperature of device
   PARAMETER<double>	_value; // not counted in param_count
   std::string	_modelname;
 private:
@@ -91,7 +88,7 @@ public:
   virtual bool use_obsolete_callback_parse()const {return false;}
   virtual bool use_obsolete_callback_print()const {return false;}
   virtual void parse_common_obsolete_callback(CS&);
-  virtual void print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const;
+  virtual void print_common_obsolete_callback(OMSTREAM&, LANGUAGE*)const {}
   virtual bool has_parse_params_obsolete_callback()const {return false;}
   virtual bool is_trivial()const {return false;}
 
