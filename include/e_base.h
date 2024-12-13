@@ -54,7 +54,7 @@ protected: // create and destroy
 public: // tags and attributes (meta-data)
   tag_t			id_tag()const		{return tag_t(this)<<16;}
   tag_t		   port_id_tag(int i)const	{return id_tag()-(i+1);}
-  virtual /*kludge*/ tag_t param_id_tag(int i)const      {return id_tag()+(i+1);}
+  tag_t           param_id_tag(int i)const      {return id_tag()+(i+1);}
 protected:
   const ATTRIB_LIST_p& attributes(tag_t x)const {return _attribs.at(x);}
   ATTRIB_LIST_p&   set_attributes(tag_t x)	{return _attribs[x];}

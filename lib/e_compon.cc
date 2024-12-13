@@ -353,8 +353,8 @@ int COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
     COMMON_COMPONENT* c = next_common()->clone();
     int idx = c->set_param_by_name(Name, Value);
     attach_next(c);
-    trace1("param idx", idx + param_count());
-    return idx + param_count();;
+    trace2("param idx", Name, idx);
+    return idx;
   }else if (has_parse_params_obsolete_callback()) {untested();
     std::string args(Name + "=" + Value);
     CS cmd(CS::_STRING, args); //obsolete_callback
@@ -769,7 +769,8 @@ int COMPONENT::set_param_by_name(std::string Name, std::string Value)
   if(Name[0] != '$'){
   }else if(!has_common()) {
     attach_common(new HS_PARAM());
-    return mutable_common()->set_param_by_name(Name, Value);
+    int index = mutable_common()->set_param_by_name(Name, Value);
+    return param_count() - index - 1;
   }else{
     if(dynamic_cast<HS_PARAM const*>(common())){ untested();
     }else{
@@ -782,7 +783,7 @@ int COMPONENT::set_param_by_name(std::string Name, std::string Value)
     assert(c);
     int index = c->set_param_by_name(Name, Value);
     attach_common(c);
-    return index;
+    return param_count() - index - 1;
   }else{
     throw Exception_No_Match(Name);
   }
@@ -793,23 +794,25 @@ void COMPONENT::set_param_by_index(int i, std::string& Value, int offset)
   if (has_common()) { untested();
     COMMON_COMPONENT* c = mutable_common()->clone();
     assert(c);
+    int I = param_count() - 1 - i;
     try{ untested();
-    c->set_param_by_index(i, Value, offset);
+      c->set_param_by_index(I, Value, offset);
     }catch(Exception_Too_Many const&){ untested();
       incomplete();
     }
     attach_common(c);
   }else if(i<0){
     throw Exception_Too_Many(-i+1, param_count(), 0);
-  }else{ untested();
-    throw Exception_Too_Many(i, param_count(), 0);
+  }else{
+    throw Exception_Too_Many(i+1, param_count(), 0);
   }
 }
 /*--------------------------------------------------------------------------*/
 bool COMPONENT::param_is_printable(int i)const
 {
   if(has_common()) {
-    return common()->param_is_printable(i);
+    int I = param_count() - 1 - i;
+    return common()->param_is_printable(I);
   }else{ untested();
     return CARD::param_is_printable(i);
   }
@@ -818,7 +821,8 @@ bool COMPONENT::param_is_printable(int i)const
 std::string COMPONENT::param_name(int i)const
 {
   if(has_common()) {
-    return common()->param_name(i);
+    int I = param_count() - 1 - i;
+    return common()->param_name(I);
   }else{ untested();
     return CARD::param_name(i);
   }
@@ -829,7 +833,8 @@ std::string COMPONENT::param_name(int i, int j)const
   if (j == 0) { untested();
     return param_name(i);
   }else if(has_common()){ untested();
-    return common()->param_name(i, j);
+    int I = param_count() - 1 - i;
+    return common()->param_name(I, j);
   }else if (i >= CARD::param_count()) { untested();
     return "";
   }else{untested();
@@ -840,7 +845,8 @@ std::string COMPONENT::param_name(int i, int j)const
 std::string COMPONENT::param_value(int i)const
 {
   if(has_common()){
-    return common()->param_value(i);
+    int I = param_count() - 1 - i;
+    return common()->param_value(I);
   }else{ untested();
     return CARD::param_value(i);
   }

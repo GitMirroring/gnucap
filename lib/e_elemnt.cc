@@ -178,7 +178,7 @@ int ELEMENT::set_param_by_name(std::string Name, std::string Value)
 /*--------------------------------------------------------------------------*/
 void ELEMENT::set_param_by_index(int i, std::string& Value, int offset)
 {
-  if(ELEMENT::param_count() - 1 == i){
+  if(i == 0) {
     if(!common() || !common()->has_value()){
       push_value(Value);
     }else{
@@ -193,38 +193,48 @@ bool ELEMENT::param_is_printable(int i)const
 {
   if(has_common()) {
     return COMPONENT::param_is_printable(i);
-  }else if(ELEMENT::param_count() - 1 == i){
+  }else if(i == 0) {
     return true;
   }else{ untested();
-    return COMPONENT::param_is_printable(i);
+    unreachable();
+    return COMPONENT::param_is_printable(i-1);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_name(int i)const
 {
-  if(ELEMENT::param_count() - 1 == i) {
+  if(has_common()) {
+    return COMPONENT::param_name(i);
+  }else if(i == 0){
     return value_name();
   }else{
-    return COMPONENT::param_name(i);
+    unreachable();
+    return COMPONENT::param_name(i-1);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_name(int i, int j)const
 {
-  if (j == 0) {
+  if(has_common()) {
+    return COMPONENT::param_name(i, j);
+  }else if (j == 0) {
     return param_name(i);
   }else if (i >= ELEMENT::param_count()) {untested();
     return "";
   }else{ untested();
-    return COMPONENT::param_name(i,j);
+    unreachable();
+    return COMPONENT::param_name(i-1,j);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_value(int i)const
 {
-  if(ELEMENT::param_count() - 1 == i) {
+  if(has_common() && common()->has_value() ) {
+    return COMPONENT::param_value(i);
+  }else if(i == 0) {
     return value_string();
   }else{
+    unreachable();
     return COMPONENT::param_value(i);
   }
 }

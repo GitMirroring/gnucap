@@ -778,12 +778,12 @@ void LANG_SPICE_BASE::print_args(OMSTREAM& o, const COMPONENT* x)
   if (x->use_obsolete_callback_print()) {
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
-    for (int ii = x->param_count() - 1;  ii >= x->param_count_dont_print();  --ii) {
+    for (int ii = 0; ii < x->param_count(); ++ii) {
       if (x->param_is_printable(ii)) {
-	if ((ii != x->param_count() - 1) || (x->param_name(ii) != x->value_name())) {
+	if (x->param_name(ii) == x->value_name()) {
 	  // skip name if plain value
-	  o << " " << x->param_name(ii) << "=";
 	}else{
+	  o << " " << x->param_name(ii) << "=";
 	}
 	o << x->param_value(ii);
       }else{
