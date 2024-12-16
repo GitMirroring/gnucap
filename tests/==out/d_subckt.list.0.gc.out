@@ -1,0 +1,7 @@
+.subckt S ( a b c )
+.ends S
+X1 ( aa bb cc )  S 
+module S (.a(a),.b(b),.c(c));
+endmodule // S
+
+S #() X1 (.(aa),.(bb),.(cc));

@@ -1,0 +1,11 @@
+
+spice
+
+.subckt S a b c
+.ends
+
+X1 aa bb cc S
+
+.list
+.verilog
+list
