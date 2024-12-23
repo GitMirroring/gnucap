@@ -54,7 +54,7 @@ public:
     if (OS::access_ok(file_name, R_OK)) {
       // prefer local, relative or absolute.
       full_file_name = file_name;
-    }else{ untested();
+    }else{
       std::string incl = OS::getenv("GNUCAP_INCLUDEPATH");
       full_file_name = findfile(file_name, incl, R_OK);
     }

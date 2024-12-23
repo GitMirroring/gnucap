@@ -264,7 +264,7 @@ private:
   }
 
 private: // implementation
-  void fbsub(T* v) const override{itested();
+  void fbsub(T* v) const override{untested();
     return _lu.fbsub(v, v, v);
   }
   void fbsub(T* x, const T* b, T* c = nullptr) const override {
@@ -607,7 +607,16 @@ T BSSMATRIX<T>::subdot(T* lj, int i, T* ui, int j, int dd, T const& in) const
       assert(!std::isnan(*ui));
       assert(!std::isnan(*lj));
 
+      assert(!std::isnan(dot));
+      if(*ui && *lj){
       dot -= *ui * *lj;
+      }else{
+      }
+
+      if(std::isnan(dot)){
+	trace2("cbserr",  *ui, *lj);
+      }else{
+      }
       --uu;
       --ui;
       --ll;
@@ -1284,7 +1293,7 @@ void BSSMATRIX<T>::fbsub(T* x, const T* b, T* c) const
       T const* lj = rowptr(ii);
       int jj = 1;
       if(idx(lj)){
-	jj+=idx(lj--);
+	jj += idx(lj--);
       }else{
       }
       assert(jj);
@@ -1321,6 +1330,10 @@ void BSSMATRIX<T>::fbsub(T* x, const T* b, T* c) const
   }
 
   notstd::copy_n(c, size()+1, x);
+  for (int kk = 0; kk <= size(); ++kk){
+    trace1("chk", c[kk]);
+    // assert(!std::isnan(c[kk]));
+  }
 
   for (int jj = size(); jj > 1; --jj) {		/* back substitution    */
     T const* ui = colptr(jj);
@@ -1336,9 +1349,18 @@ void BSSMATRIX<T>::fbsub(T* x, const T* b, T* c) const
       }else{itested();
       }
       assert(!std::isnan(*ui));
-      x[ii] -= *ui * x[jj];
-      if(*ui)
-      trace5("bs", ii, jj, x[ii], *ui, x[jj]);
+      // assert(!std::isnan(x[ii]));
+      if(*ui) {
+	trace6("bs", ii, jj, x[ii], *ui, x[jj], size());
+	x[ii] -= *ui * x[jj];
+      }else{
+      }
+      if(std::isnan(x[ii])){
+	// x[ii] = 0;
+      }else{
+      }
+
+      assert((!std::isnan(x[ii])) || std::isinf(x[ii]) || std::isnan(c[ii]));
       ++ii;
       ++ui;
       skip(ui, ii);

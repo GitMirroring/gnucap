@@ -42,11 +42,11 @@ CCFLAGS = \
 
 .SUFFIXES:
 .SUFFIXES: .so .o .cc
-.cc.o:; $(CXX) $(CXXFLAGS) ${MAKE_CPPFLAGS} $(CPPFLAGS) $(CCFLAGS) -c $<
-.cc.so:; $(MAKE_LIB) $<
+.cc.o:; $(CXX) $(CXXFLAGS) ${MAKE_CPPFLAGS} $(CPPFLAGS) $(CCFLAGS) -c $< # Conf.Dbg1
+.cc.so:; $(MAKE_LIB) $< # Conf.Dbg2
 #------------------------------------------------------------------------
 MAKE_EXE = $(CXX) $(CCFLAGS) $(CXXFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -o $@ 
-MAKE_LIB = $(CXX) $(CCFLAGS) $(CXXFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@ 
+MAKE_LIB = $(CXX) $(CCFLAGS) ${CPPFLAGS} $(CXXFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@ 
 #------------------------------------------------------------
 # warnings turned off, because they warn of nothing wrong
 # 4.3

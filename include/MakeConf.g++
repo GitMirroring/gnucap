@@ -34,8 +34,8 @@ CCFLAGS = \
 
 .SUFFIXES:
 .SUFFIXES: .so .o .cc
-.cc.o:; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CCFLAGS) -c $<
-.cc.so:; $(MAKE_LIB) $<
+.cc.o:; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CCFLAGS) -c $< #Confg++
+.cc.so:; $(MAKE_LIB) $< # Confg++
 #------------------------------------------------------------------------
 MAKE_EXE = $(CXX) $(CCFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -o $@ 
 MAKE_LIB = $(CXX) $(CCFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@ 
