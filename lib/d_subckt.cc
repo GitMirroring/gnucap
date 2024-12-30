@@ -76,7 +76,7 @@ private:
 public:
   static int	count()			{untested();return _count;}
 protected:
-  const COMPONENT* _parent;
+  const BASE_SUBCKT* _parent;
 private:
   mutable node_t _nodes[PORTS_PER_SUBCKT];
   static int	_count;
@@ -92,7 +92,7 @@ public:
 public: // override virtual
   char		id_letter()const override	{untested();return '\0';}
   CARD*		clone_instance()const override;
-  bool		print_type_in_spice()const override {unreachable(); return false;}
+  bool		print_type_in_spice()const override { untested();unreachable(); return false;}
   std::string   value_name()const override	{untested();incomplete(); return "";}
   std::string   dev_type()const override	{itested(); return "";}
   int		max_nodes()const override	{return PORTS_PER_SUBCKT;}
@@ -136,13 +136,11 @@ DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "X|subckt|module", &pp);
 DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO(const DEV_SUBCKT_PROTO& p)
   :DEV_SUBCKT(p)
 {
-  new_subckt();
 }
 /*--------------------------------------------------------------------------*/
 DEV_SUBCKT_PROTO::DEV_SUBCKT_PROTO(COMMON_COMPONENT* c)
   :DEV_SUBCKT(c)
 {
-  new_subckt();
 }
 /*--------------------------------------------------------------------------*/
 int DEV_SUBCKT_PROTO::set_port_by_name(std::string& name, std::string& value)
@@ -165,7 +163,7 @@ CARD* DEV_SUBCKT_PROTO::clone_instance()const
   }
   new_instance->_net_nodes = 0;
 #endif
-  assert(!new_instance->subckt());
+  assert(!new_instance->subckt() || !new_instance->subckt()->size());
 
   if (this == &pp){
     // cloning from static, empty model
@@ -194,7 +192,6 @@ DEV_SUBCKT::DEV_SUBCKT(const DEV_SUBCKT& p)
   for (int ii = 0;  ii < max_nodes();  ++ii) {
     _nodes[ii] = p._nodes[ii];
   }
-  assert(!subckt());
   ++_count;
 }
 /*--------------------------------------------------------------------------*/
@@ -206,7 +203,7 @@ std::string DEV_SUBCKT::port_name(int i)const
     }else{ 
       return "";
     }
-  }else if(_parent){untested(); untested();
+  }else if(_parent){untested();
     // reachable?
     return "";
   }else{
@@ -236,7 +233,7 @@ void DEV_SUBCKT::expand()
   }
   
   assert(_parent);
-  assert(_parent->subckt());
+  // assert(_parent->subckt());
   assert(_parent->subckt()->nodes());
   trace2("",  _parent->net_nodes(),  _parent->subckt()->nodes()->how_many());
   assert(_parent->net_nodes() <= _parent->subckt()->nodes()->how_many());
@@ -254,7 +251,7 @@ void DEV_SUBCKT::precalc_first()
 {
   BASE_SUBCKT::precalc_first();
 
-  if (subckt()) {
+  if (subckt()->size()) {
     auto c = prechecked_cast<COMMON_PARAMLIST const*>(common());
     assert(c);
     subckt()->attach_params(&(c->_params), scope());

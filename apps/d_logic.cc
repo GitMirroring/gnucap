@@ -35,6 +35,7 @@
 namespace {
 /*--------------------------------------------------------------------------*/
 class DEV_LOGIC : public ELEMENT {
+  CARD_LIST* _subckt{nullptr};
 public:
   enum {OUTNODE=0,BEGIN_IN=1}; //node labels
   enum {PORTS_PER_GATE = 10};
@@ -113,6 +114,29 @@ private:
   bool	   tr_eval_digital();
   bool	   want_analog()const;
   bool	   want_digital()const;
+
+private: // from BASE_SUBCKT
+  CARD_LIST* subckt()override { return _subckt;}
+  CARD_LIST const* subckt()const { return _subckt;}
+  void new_subckt() { untested();
+    assert(!_subckt);
+    _subckt = new CARD_LIST;
+  }
+  void new_subckt(const CARD* Model, PARAM_LIST const* Params) {
+    delete _subckt;
+    _subckt = nullptr;
+    _subckt = new CARD_LIST(Model, this, scope(), Params);
+    _subckt->set_owner(this);
+  }
+  void renew_subckt(const CARD* Model, PARAM_LIST const* Params) {
+    if (_sim->is_first_expand()) {
+      new_subckt(Model, Params);
+    }else{untested();
+      assert(subckt());
+      subckt()->attach_params(Params, scope());
+    }
+  }
+/*--------------------------------------------------------------------------*/
 };
 /*--------------------------------------------------------------------------*/
 class LOGIC_AND : public COMMON_LOGIC {
@@ -278,13 +302,13 @@ void DEV_LOGIC::expand()
   try {
     const CARD* model = find_looking_out(subckt_name);
     
-    if(!dynamic_cast<const BASE_SUBCKT*>(model)) {untested();
+    if(auto mm = dynamic_cast<const BASE_SUBCKT*>(model)) {
+      _gatemode = OPT::mode;    
+      renew_subckt(mm, nullptr/*&(c->_params)*/);    
+      subckt()->expand();
+    }else{
       error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)),
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
-    }else{
-      _gatemode = OPT::mode;    
-      renew_subckt(model, nullptr/*&(c->_params)*/);    
-      subckt()->expand();
     }
   }catch (Exception_Cant_Find&) {
     error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)), 

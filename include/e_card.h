@@ -44,7 +44,6 @@ class INTERFACE CARD : public CKT_BASE {
     CARD_LIST* _scope{nullptr};
   };
 private:
-  CARD_LIST*	_subckt;
   owner_tag_t 	_owner_tag;
   mutable short _probes;	// number of probes set
   bool		_constant;	// eval stays the same every iteration
@@ -122,12 +121,9 @@ public: // owner, scope
   const CARD*	owner()const	   {return _owners.at(_owner_tag)._owner;}
   void		set_owner(CARD* o);
   //--------------------------------------------------------------------
-public: // subckt
-  CARD_LIST*	     subckt()		{return _subckt;}
-  const CARD_LIST*   subckt()const	{return _subckt;}
-  void	  new_subckt();
-  void	  new_subckt(const CARD* model, PARAM_LIST const* p);
-  void	  renew_subckt(const CARD* model, PARAM_LIST const* p);
+public: // subckt -- BASE_SUBCKT & DEV_LOGIC
+  virtual CARD_LIST*	     subckt()		{return nullptr;}
+  bool has_subckt()const {return const_cast<CARD*>(this)->subckt();}
   //--------------------------------------------------------------------
 public:	// type
   virtual std::string dev_type()const	{unreachable(); return "";}

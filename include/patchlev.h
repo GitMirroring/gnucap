@@ -1,1 +1,1 @@
-#define PATCHLEVEL "node-5 2024.12.21"
+#define PATCHLEVEL "subckt 2024.12.30"

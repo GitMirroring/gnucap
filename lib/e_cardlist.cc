@@ -27,6 +27,7 @@
 #include "e_node.h"
 #include "u_nodemap.h"
 #include "e_model.h"
+#include "e_subckt.h"
 /*--------------------------------------------------------------------------*/
 #define trace_func_comp() trace0((__func__ + (":" + (**ci).long_label())).c_str())
 /*--------------------------------------------------------------------------*/
@@ -37,12 +38,21 @@ CARD_LIST::CARD_LIST()
 {
 }
 /*--------------------------------------------------------------------------*/
-CARD_LIST::CARD_LIST(const CARD* model, CARD* owner,
-		     const CARD_LIST* scope, PARAM_LIST const* p)
-  :_parent(nullptr),
-   _nm(new NODE_MAP),
-   _params(nullptr)
+void CARD_LIST::build(const CARD* Model, CARD* owner,
+                      const CARD_LIST* scope, PARAM_LIST const* p)
 {
+  assert(!size());
+  if(_parent){
+    _parent = nullptr;
+  }else{
+    delete _params;
+  }
+  _params = nullptr;
+  delete _nm;
+  _nm = nullptr;
+  _nm = new NODE_MAP;
+
+  BASE_SUBCKT const* model = prechecked_cast<BASE_SUBCKT const*>(Model);
   assert(model);
   assert(model->subckt());
   assert(owner);
@@ -62,6 +72,7 @@ CARD_LIST::~CARD_LIST()
   delete _nm;
   if (!_parent) {
     delete _params;
+    _params = nullptr;
   }else{
   }
 }
@@ -516,8 +527,9 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
 }
 /*--------------------------------------------------------------------------*/
 // set up the map of external to expanded node numbers
-void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
+void CARD_LIST::map_subckt_nodes(const CARD* Model, const CARD* owner)
 {
+  BASE_SUBCKT const* model = prechecked_cast<BASE_SUBCKT const*>(Model);
   assert(model);
   assert(model->subckt());
   assert(model->subckt()->nodes());

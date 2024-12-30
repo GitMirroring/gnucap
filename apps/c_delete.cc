@@ -28,7 +28,7 @@
 // usually before anything else.
 
 #include "globals.h"
-#include "e_cardlist.h"
+#include "e_subckt.h"
 #include "c_comand.h"
 /*--------------------------------------------------------------------------*/
 namespace {
@@ -65,9 +65,10 @@ private:
       }else if ((**i).is_device()) {
 	// found a match, but it isn't a container (subckt)
 	return false;
-      }else{
+      }else if(auto b = dynamic_cast<BASE_SUBCKT*>(*i)) {
 	// found the container, look inside
-	return delete_one_name(dev_name, (**i).subckt());
+	return delete_one_name(dev_name, b->subckt());
+      }else{
       }
       unreachable();
     }else{

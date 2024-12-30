@@ -27,11 +27,17 @@
 #include "e_compon.h"
 /*--------------------------------------------------------------------------*/
 class BASE_SUBCKT : public COMPONENT {
+  CARD_LIST	_subckt;
 protected:
   explicit BASE_SUBCKT(COMMON_COMPONENT* c=nullptr)
-    :COMPONENT(c) {}
+    :COMPONENT(c) {
+    assert(!_subckt.size());
+  }
   explicit BASE_SUBCKT(const BASE_SUBCKT& p)
-    :COMPONENT(p) {}
+    :COMPONENT(p) {
+      // BUG: copy subckt?
+      assert(!_subckt.size());
+    }
 public:
   ~BASE_SUBCKT() {}
 protected: // override virtual
@@ -42,7 +48,9 @@ protected: // override virtual
   //int	  num_nodes()const		//COMPONENT/null
   //int	  min_nodes()const		//COMPONENT/null
   int     matrix_nodes()const override	{return 0;}
+public:
   int     net_nodes()const override	{return _net_nodes;}
+protected:
   //CARD* clone()const			//CARD/null
   //void  precalc_first()	{assert(subckt()); subckt()->precalc();}
   //void  expand()			//COMPONENT
@@ -69,7 +77,35 @@ protected: // override virtual
   void	  ac_load()override	{assert(subckt()); subckt()->ac_load();}
   void	  ac_final()override	{assert(subckt()); subckt()->ac_final();}
   double  noise_num(std::string const& n)const override {itested(); assert(subckt()); return subckt()->noise_num(n);}
+public:
+  CARD_LIST*   subckt()override		{return &_subckt;}
+  const CARD_LIST*   subckt()const	{return &_subckt;}
+  void    new_subckt() {untested();} // obsolete. called from modelgen models
+  void	  new_subckt(const CARD* model, PARAM_LIST const* p);
+  void	  renew_subckt(const CARD* model, PARAM_LIST const* p);
 };
+/*--------------------------------------------------------------------------*/
+inline void BASE_SUBCKT::new_subckt(const CARD* Model, PARAM_LIST const* Params)
+{
+  _subckt.erase_all();
+  try {
+    _subckt.build(Model, this, scope(), Params);
+  }catch(Exception const& e){
+    _subckt.erase_all();
+    throw e;
+  }
+  _subckt.set_owner(this);
+}
+/*--------------------------------------------------------------------------*/
+inline void BASE_SUBCKT::renew_subckt(const CARD* Model, PARAM_LIST const* Params)
+{
+  if (_sim->is_first_expand()) {
+    new_subckt(Model, Params);
+  }else{untested();
+    assert(subckt());
+    subckt()->attach_params(Params, scope());
+  }
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

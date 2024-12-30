@@ -36,7 +36,7 @@ void CCSRC_BASE::expand_last()
 
   if (!_input) {untested();
     throw Exception(long_label() + ": " + _input_label + " cannot be used as current probe");
-  }else if (_input->subckt()) {untested();
+  }else if (_input->has_subckt()) {untested();
     throw Exception(long_label() + ": " + _input_label
 		    + " has a subckt, cannot be used as current probe");
   }else if (_input->has_inode()) {untested();

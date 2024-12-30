@@ -34,7 +34,6 @@ XPROBE CARD::ac_probe_ext(const std::string&)const {return XPROBE(NOT_VALID, mtN
 /*--------------------------------------------------------------------------*/
 CARD::CARD()
   :CKT_BASE(),
-   _subckt(0),
    _owner_tag(0),
    _probes(0),
    _constant(false)
@@ -43,7 +42,6 @@ CARD::CARD()
 /*--------------------------------------------------------------------------*/
 CARD::CARD(const std::string& S)
   :CKT_BASE(S),
-   _subckt(0),
    _owner_tag(0),
    _probes(0),
    _constant(false)
@@ -52,7 +50,6 @@ CARD::CARD(const std::string& S)
 /*--------------------------------------------------------------------------*/
 CARD::CARD(const CARD& p)
   :CKT_BASE(p),
-   _subckt(0), //BUG// isn't this supposed to copy????
    _owner_tag(0),
    _probes(0),
    _constant(p._constant)
@@ -67,9 +64,6 @@ CARD::~CARD()
   }else{
   }
   assert(_probes==0);
-
-  // purge();
-  delete _subckt;
 }
 /*--------------------------------------------------------------------------*/
 void CARD::purge()
@@ -145,11 +139,6 @@ CARD_LIST* CARD::scope()
 /*--------------------------------------------------------------------------*/
 const CARD_LIST* CARD::scope()const
 {
-  if (owner()) {
-    assert(_owners.at(_owner_tag)._scope == owner()->subckt());
-  }else{
-    assert(_owners.at(_owner_tag)._scope == &(CARD_LIST::card_list));
-  }
   return _owners.at(_owner_tag)._scope;
 }
 /*--------------------------------------------------------------------------*/
@@ -238,30 +227,6 @@ const CARD* CARD::find_looking_out(const std::string& name)const
 TIME_PAIR CARD::tr_review()
 {
   return TIME_PAIR(NEVER,NEVER);
-}
-/*--------------------------------------------------------------------------*/
-void CARD::new_subckt()
-{
-  assert(!_subckt);
-  _subckt = new CARD_LIST;
-}
-/*--------------------------------------------------------------------------*/
-void CARD::new_subckt(const CARD* Model, PARAM_LIST const* Params)
-{
-  delete _subckt;
-  _subckt = nullptr;
-  _subckt = new CARD_LIST(Model, this, scope(), Params);
-  _subckt->set_owner(this);
-}
-/*--------------------------------------------------------------------------*/
-void CARD::renew_subckt(const CARD* Model, PARAM_LIST const* Params)
-{
-  if (_sim->is_first_expand()) {
-    new_subckt(Model, Params);
-  }else{untested();
-    assert(subckt());
-    subckt()->attach_params(Params, scope());
-  }
 }
 /*--------------------------------------------------------------------------*/
 node_t& CARD::n_(int)const
