@@ -1,0 +1,22 @@
+1foo
+  ^ ? trailing characters
+
+#           r(r1)     
+1foo
+  ^ ? trailing characters
+
+ 27.        2.Meg     
+1meg
+ ^ ? bogus modifier
+
+1foo
+  ^ ? trailing characters
+
+#           r(r1)     
+1meg
+ ^ ? bogus modifier
+
+1foo
+  ^ ? trailing characters
+
+ 27.        2.Meg     

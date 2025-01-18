@@ -313,7 +313,12 @@ double CS::ctof()
     power *= 1e6;
   }else if (skip1("m")) {
     assert(OPT::units == uSI);
-    power *= 1e-3;
+    if(skip1("e") && skip1("g")) {
+      warn(bLOG, cursor()-3, "bogus modifier\n");
+      power *= 1e6;
+    }else{
+      power *= 1e-3;
+    }
   }else if (skip1("uU")) {		// other letters
     power *= 1e-6;
   }else if (skip1("nN")) {
@@ -334,6 +339,11 @@ double CS::ctof()
     power *= 1e12;
   }else if (skip1("%")) {untested();
     power *= 1e-2;
+  }else{
+  }
+
+  if (is_alpha()) {
+    warn(bDEBUG, "trailing characters\n");
   }else{
   }
   while (is_alpha()) {			// skip letters

@@ -1,0 +1,9 @@
+verilog
+
+resistor #(.r(1meg + 1e6 + 1foo)) r1(a, b);
+
+print op r(r1)
+options debug
+op
+options log
+op
