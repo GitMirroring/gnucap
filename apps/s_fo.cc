@@ -43,16 +43,17 @@ public:
     _fstop(0.),
     _fstep(0.),
     _timesteps(0),
-    _fdata(NULL)
+    _fdata(nullptr)
   {}
   ~FOURIER() {}
 private:
   explicit FOURIER(const FOURIER&): TRANSIENT() {unreachable(); incomplete();}
   std::string status()const override {untested();return "";}
-  void	setup(CS&)override;	/* s_fo_set.cc */
+  void	setup(CS&)override;
   void	fftallocate();
   void	fftunallocate();
-  void	foout();	/* s_fo_out.cc */
+  void	final()override;
+  //void finish()override	{untested();}
   void	fohead(const PROBE&);
   void	foprint(COMPLEX*);
   void	store_results(double)override; // override virtual
@@ -89,31 +90,25 @@ void FOURIER::do_it(CS& Cmd, CARD_LIST* Scope)
     _sim->_aa.reallocate();
     _sim->_aa.dezero(OPT::gmin);
     _sim->_aa.set_min_pivot(OPT::pivtol);    
-    _sim->_lu.reallocate();
-    _sim->_lu.dezero(OPT::gmin);
-    _sim->_lu.set_min_pivot(OPT::pivtol);
     fftallocate();
     ::status.set_up.stop();
 
     switch (ENV::run_mode) {
     case rPRE_MAIN:	unreachable();		break;
-    case rBATCH:	untested();
-      // fall through
-    case rINTERACTIVE:  itested();
-      // fall through
-    case rSCRIPT:	sweep(); foout();	break;
-    case rPRESET:	untested(); /*nothing*/ break;
+    case rBATCH:	untested();sweep(); final(); break;
+    case rINTERACTIVE:  itested();sweep(); final(); break;
+    case rSCRIPT:	sweep(); final(); break;
+    case rPRESET:	untested();/*nothing*/	break;
     }
   }catch (Exception& e) {untested();
     error(bDANGER, e.message() + '\n');
   }
   fftunallocate();
   _sim->unalloc_vectors();
-  _sim->_lu.unallocate();
   _sim->_aa.unallocate();
 
   _sim->_has_op = s_FOURIER;
-  _scope = NULL;
+  _scope = nullptr;
 
   ::status.four.stop();
   ::status.total.stop();
@@ -141,8 +136,10 @@ void FOURIER::store_results(double X)
 /*--------------------------------------------------------------------------*/
 /* foout:  print out the results of the transform
  */
-void FOURIER::foout()
+void FOURIER::final()
 {
+  TRANSIENT::final();
+
   plclose();
   plclear();
   int ii = 0;
@@ -315,8 +312,9 @@ void FOURIER::setup(CS& Cmd)
   }else if (_dtratio_in.has_hard_value()) {untested();
     _sim->_dtmin = _dtmax / _dtratio_in;
   }else{
-    // use smaller of soft values
-    _sim->_dtmin = std::min(double(_dtmin_in), _dtmax/_dtratio_in);
+    // use larger of soft values
+    // relax (increase) dtmin for very large dtmax
+    _sim->_dtmin = std::max(double(_dtmin_in), _dtmax/_dtratio_in);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -340,7 +338,7 @@ void FOURIER::fftunallocate()
       delete [] _fdata[ii];
     }
     delete [] _fdata;
-    _fdata = NULL;
+    _fdata = nullptr;
   }else{untested();
   }
 }
@@ -359,7 +357,7 @@ static int to_pow_of_2(double Z)
 }   
 /*--------------------------------------------------------------------------*/
 static FOURIER p3;
-DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "fourier", &p3);
+DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "fourier|`fourier", &p3);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

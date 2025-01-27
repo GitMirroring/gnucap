@@ -30,7 +30,6 @@
 ELEMENT::ELEMENT(COMMON_COMPONENT* c)
   :COMPONENT(c),
    _value(0),
-   _loaditer(0),
    _m0(),
    _m1(),
    _loss0(0.),
@@ -39,7 +38,6 @@ ELEMENT::ELEMENT(COMMON_COMPONENT* c)
    _ev(0.),
    _dt(0.)
 {
-  _n = _nodes;
   assert(_y[0].x == 0. && _y[0].f0 == 0. && _y[0].f1 == 0.);
   assert(_y1 == _y[0]);
 
@@ -49,7 +47,6 @@ ELEMENT::ELEMENT(COMMON_COMPONENT* c)
 ELEMENT::ELEMENT(const ELEMENT& p)
   :COMPONENT(p),
    _value(p._value),
-   _loaditer(0),
    _m0(),
    _m1(),
    _loss0(p._loss0),
@@ -59,21 +56,11 @@ ELEMENT::ELEMENT(const ELEMENT& p)
    _dt(0.)
 {
   trace0(long_label().c_str());
-  _n = _nodes;
-  trace1("ELEMENT::ELEMENT", p.long_label());
-  trace1("ELEMENT::ELEMENT", long_label());
-  if (p._n == p._nodes) {
-    for (int ii = 0;  ii < NODES_PER_BRANCH;  ++ii) {
-      _n[ii] = p._n[ii];
-      trace2("ELEMENT::ELEMENT node", ii, p.n_(ii).user_number());
-      trace2("ELEMENT::ELEMENT node", ii, p._n[ii].user_number());
-      assert(_n[ii].user_number() == p._n[ii].user_number());
-    }
-  }else{
-    trace1("ELEMENT::ELEMENT??", p.long_label());
-    assert(p._nodes);
-    // the constructor for a derived class will take care of it
+
+  for (int ii = 0;  ii < NODES_PER_BRANCH;  ++ii) {
+    _nodes[ii] = p._nodes[ii];
   }
+
   assert(_y[0].x == 0. && _y[0].f0 == 0. && _y[0].f1 == 0.);
   assert(_y1 == _y[0]);
 
@@ -92,12 +79,11 @@ void ELEMENT::set_value(double v, COMMON_COMPONENT* c)
 /*--------------------------------------------------------------------------*/
 int ELEMENT::set_param_by_name(std::string Name, std::string Value)
 {
-  trace3("ELEMENT::spbn", Name, value_name(), Value);
   if(Name == value_name()){
     _value = Value;
-    return ELEMENT::param_count() - 1; // BUG?
+    return 0;
   }else{
-    return COMPONENT::set_param_by_name(Name, Value);
+    return COMPONENT::set_param_by_name(Name, Value) + 1;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -109,11 +95,11 @@ void ELEMENT::set_param_by_index(int i, std::string& Value, int offset)
     c->set_param_by_index(i, Value, offset);
     attach_common(c);
   }else{
-    switch (ELEMENT::param_count() - 1 - i) {
+    switch (i) {
     case 0:
       _value = Value; break;
     default:
-      COMPONENT::set_param_by_index(i, Value, offset);
+      COMPONENT::set_param_by_index(i-1, Value, offset+1);
     }
   }
 }
@@ -123,11 +109,11 @@ bool ELEMENT::param_is_printable(int i)const
   if (has_common()) {
     return COMPONENT::param_is_printable(i);
   }else{
-    switch (ELEMENT::param_count() - 1 - i) {
+    switch (i) {
     case 0:
       return value().has_hard_value();
     default:
-      return COMPONENT::param_is_printable(i);
+      return COMPONENT::param_is_printable(i-1);
     }
   }
 }
@@ -137,25 +123,25 @@ std::string ELEMENT::param_name(int i)const
   if (has_common()) {
     return COMPONENT::param_name(i);
   }else{
-    switch (ELEMENT::param_count() - 1 - i) {
+    switch (i) {
     case 0:  return value_name();
     default:
-      return COMPONENT::param_name(i);
+      return COMPONENT::param_name(i-1);
     }
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_name(int i, int j)const
-{ untested();
+{
   if (has_common()) {untested();
     return COMPONENT::param_name(i);
-  }else{ untested();
-    if (j == 0) { untested();
+  }else{
+    if (j == 0) {
       return param_name(i);
-    }else if (i >= ELEMENT::param_count()) {untested();
+    }else if (i < 1) {
       return "";
-    }else{ untested();
-      return COMPONENT::param_name(i,j);
+    }else{
+      return COMPONENT::param_name(i-1,j);
     }
   }
 }
@@ -165,11 +151,11 @@ std::string ELEMENT::param_value(int i)const
   if (has_common()) {
     return COMPONENT::param_value(i);
   }else{
-    switch (ELEMENT::param_count() - 1 - i) {
+    switch (i) {
     case 0:
       return value().string();
     default:
-      return COMPONENT::param_value(i);
+      return COMPONENT::param_value(i-1);
     }
   }
 }
@@ -183,9 +169,7 @@ bool ELEMENT::skip_dev_type(CS& cmd)
 void ELEMENT::precalc_last()
 {
   COMPONENT::precalc_last();
-  trace3("ELEMENT::precalc_last", long_label(), _value, _value.string());
   _value.e_val(0.,scope());
-  trace3("ELEMENT::precalc_last", long_label(), _value, _value.string());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_begin()
@@ -262,7 +246,7 @@ void ELEMENT::tr_advance()
   assert(_time[0] < _sim->_time0); // moving forward
   
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
-    assert(_time[i] < _time[i-1] || _time[i] == 0.);
+    assert(_time[i] <= _time[i-1]);
     _time[i] = _time[i-1];
     _y[i] = _y[i-1];
   }
@@ -277,7 +261,7 @@ void ELEMENT::tr_regress()
   assert(_time[1] <= _sim->_time0); // but not too far backwards
 
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
-    assert(_time[i] < _time[i-1] || _time[i] == 0.);
+    assert(_time[i] <= _time[i-1]);
   }
   _time[0] = _sim->_time0;
 
@@ -301,17 +285,13 @@ void ELEMENT::tr_iwant_matrix_passive()
   assert(matrix_nodes() == 2);
   assert(is_device());
   //assert(!subckt()); ok for subckt to exist for logic
-  trace3("ELEMENT::tr_iwant_matrix_passive", long_label(), _n[OUT1].short_label(), _n[OUT2].short_label());
- // trace3("ELEMENT::tr_iwant_matrix_passive", long_label(), _n[OUT1].flat_number(), _n[OUT1].user_number());
- // trace3("ELEMENT::tr_iwant_matrix_passive", long_label(), _n[OUT2].flat_number(), _n[OUT2].user_number());
-  trace3("ELEMENT::tr_iwant_matrix_passive", long_label(), _n[OUT1].m_(), _n[OUT2].m_());
+  trace2(long_label().c_str(), n_(OUT1).m_(), n_(OUT2).m_());
 
-  assert(_n[OUT1].m_() != INVALID_NODE);
-  assert(_n[OUT2].m_() != INVALID_NODE);
+  assert(n_(OUT1).m_() != INVALID_NODE);
+  assert(n_(OUT2).m_() != INVALID_NODE);
   //BUG// assert can fail as a result of some parse errors
 
-  _sim->_aa.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_lu.iwant(_n[OUT1].m_(),_n[OUT2].m_());
+  _sim->_aa.iwant(n_(OUT1).m_(),n_(OUT2).m_());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_iwant_matrix_active()
@@ -320,25 +300,18 @@ void ELEMENT::tr_iwant_matrix_active()
   assert(is_device());
   assert(!subckt());
 
-  assert(_n[OUT1].m_() != INVALID_NODE);
-  assert(_n[OUT2].m_() != INVALID_NODE);
-  assert(_n[IN1].m_() != INVALID_NODE);
-  assert(_n[IN2].m_() != INVALID_NODE);
+  assert(n_(OUT1).m_() != INVALID_NODE);
+  assert(n_(OUT2).m_() != INVALID_NODE);
+  assert(n_(IN1).m_() != INVALID_NODE);
+  assert(n_(IN2).m_() != INVALID_NODE);
   //BUG// assert can fail as a result of some parse errors
 
-  //_sim->_aa.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_aa.iwant(_n[OUT1].m_(),_n[IN1].m_());
-  _sim->_aa.iwant(_n[OUT1].m_(),_n[IN2].m_());
-  _sim->_aa.iwant(_n[OUT2].m_(),_n[IN1].m_());
-  _sim->_aa.iwant(_n[OUT2].m_(),_n[IN2].m_());
-  //_sim->_aa.iwant(_n[IN1].m_(),_n[IN2].m_());
-
-  //_sim->_lu.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_lu.iwant(_n[OUT1].m_(),_n[IN1].m_());
-  _sim->_lu.iwant(_n[OUT1].m_(),_n[IN2].m_());
-  _sim->_lu.iwant(_n[OUT2].m_(),_n[IN1].m_());
-  _sim->_lu.iwant(_n[OUT2].m_(),_n[IN2].m_());
-  //_sim->_lu.iwant(_n[IN1].m_(),_n[IN2].m_());
+  //_sim->_aa.iwant(n_(OUT1).m_(),n_(OUT2).m_());
+  _sim->_aa.iwant(n_(OUT1).m_(),n_(IN1).m_());
+  _sim->_aa.iwant(n_(OUT1).m_(),n_(IN2).m_());
+  _sim->_aa.iwant(n_(OUT2).m_(),n_(IN1).m_());
+  _sim->_aa.iwant(n_(OUT2).m_(),n_(IN2).m_());
+  //_sim->_aa.iwant(n_(IN1).m_(),n_(IN2).m_());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_iwant_matrix_extended()
@@ -348,10 +321,9 @@ void ELEMENT::tr_iwant_matrix_extended()
   assert(ext_nodes() + int_nodes() == matrix_nodes());
 
   for (int ii = 0;  ii < matrix_nodes();  ++ii) {
-    if (_n[ii].m_() >= 0) {
+    if (n_(ii).m_() >= 0) {
       for (int jj = 0;  jj < ii ;  ++jj) {
-	_sim->_aa.iwant(_n[ii].m_(),_n[jj].m_());
-	_sim->_lu.iwant(_n[ii].m_(),_n[jj].m_());
+	_sim->_aa.iwant(n_(ii).m_(),n_(jj).m_());
       }
     }else{itested();
       // node 1 is grounded or invalid
@@ -361,18 +333,18 @@ void ELEMENT::tr_iwant_matrix_extended()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::ac_iwant_matrix_passive()
 {
-  trace2(long_label().c_str(), _n[OUT1].m_(), _n[OUT2].m_());
-  _sim->_acx.iwant(_n[OUT1].m_(),_n[OUT2].m_());
+  trace2(long_label().c_str(), n_(OUT1).m_(), n_(OUT2).m_());
+  _sim->_acx.iwant(n_(OUT1).m_(),n_(OUT2).m_());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::ac_iwant_matrix_active()
 {
-  //_sim->_acx.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_acx.iwant(_n[OUT1].m_(),_n[IN1].m_());
-  _sim->_acx.iwant(_n[OUT1].m_(),_n[IN2].m_());
-  _sim->_acx.iwant(_n[OUT2].m_(),_n[IN1].m_());
-  _sim->_acx.iwant(_n[OUT2].m_(),_n[IN2].m_());
-  //_sim->_acx.iwant(_n[IN1].m_(),_n[IN2].m_());
+  //_sim->_acx.iwant(n_(OUT1).m_(),n_(OUT2).m_());
+  _sim->_acx.iwant(n_(OUT1).m_(),n_(IN1).m_());
+  _sim->_acx.iwant(n_(OUT1).m_(),n_(IN2).m_());
+  _sim->_acx.iwant(n_(OUT2).m_(),n_(IN1).m_());
+  _sim->_acx.iwant(n_(OUT2).m_(),n_(IN2).m_());
+  //_sim->_acx.iwant(n_(IN1).m_(),n_(IN2).m_());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::ac_iwant_matrix_extended()
@@ -382,9 +354,9 @@ void ELEMENT::ac_iwant_matrix_extended()
   assert(ext_nodes() + int_nodes() == matrix_nodes());
 
   for (int ii = 0;  ii < matrix_nodes();  ++ii) {
-    if (_n[ii].m_() >= 0) {
+    if (n_(ii).m_() >= 0) {
       for (int jj = 0;  jj < ii ;  ++jj) {
-	_sim->_acx.iwant(_n[ii].m_(),_n[jj].m_());
+	_sim->_acx.iwant(n_(ii).m_(),n_(jj).m_());
       }
     }else{itested();
       // node 1 is grounded or invalid
@@ -456,9 +428,9 @@ double ELEMENT::tr_probe_num(const std::string& x)const
   }else if (Umatch(x, "r ")) {
     return (_m0.c1!=0.) ? 1/_m0.c1 : MAXDBL;
   }else if (Umatch(x, "z ")) {
-    return port_impedance(_n[OUT1], _n[OUT2], _sim->_lu, mfactor()*(_m0.c1+_loss0));
+    return port_impedance(n_(OUT1), n_(OUT2), _sim->_aa, mfactor()*(_m0.c1+_loss0));
   }else if (Umatch(x, "zraw ")) {
-    return port_impedance(_n[OUT1], _n[OUT2], _sim->_lu, 0.);
+    return port_impedance(n_(OUT1), n_(OUT2), _sim->_aa, 0.);
   }else{
     return COMPONENT::tr_probe_num(x);
   }
@@ -495,9 +467,9 @@ XPROBE ELEMENT::ac_probe_ext(const std::string& x)const
       return XPROBE(1. / admittance);
     }
   }else if (Umatch(x, "z ")) {			/* port impedance */
-    return XPROBE(port_impedance(_n[OUT1], _n[OUT2], _sim->_acx, mfactor()*admittance));
+    return XPROBE(port_impedance(n_(OUT1), n_(OUT2), _sim->_acx, mfactor()*admittance));
   }else if (Umatch(x, "zraw ")) {		/* port impedance, raw */
-    return XPROBE(port_impedance(_n[OUT1], _n[OUT2], _sim->_acx, COMPLEX(0.)));
+    return XPROBE(port_impedance(n_(OUT1), n_(OUT2), _sim->_acx, COMPLEX(0.)));
   }else{ 					/* bad parameter */
     return COMPONENT::ac_probe_ext(x);
   }
@@ -518,9 +490,12 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
     }else{
       error_deriv = order()+1;
     }
-    while (_time[error_deriv-1] <= 0.) {
-      // not enough info to use that derivative, use a lower order derivative
-      --error_deriv;
+    for (int i=error_deriv; i>0; --i) {
+      if (_time[i-1] <= _time[i]) {
+	// not enough info to use that derivative, use a lower order derivative
+	error_deriv = i-1;
+      }else{
+      }
     }
     assert(error_deriv > 0);
     assert(error_deriv < OPT::_keep_time_steps);
@@ -604,28 +579,6 @@ void ELEMENT::obsolete_move_parameters_from_common(const COMMON_COMPONENT* dc)
 
   _value   = dc->value();
   // _mfactor = dc->mfactor();
-}
-/*--------------------------------------------------------------------------*/
-void ELEMENT::map_nodes()
-{
-  trace2("ELEMENT::map node", long_label(),  ext_nodes()+int_nodes());
-  assert(is_device());
-  assert(0 <= min_nodes());
-  //assert(min_nodes() <= net_nodes());
-  assert(net_nodes() <= max_nodes());
-  //assert(ext_nodes() + int_nodes() == matrix_nodes());
-
-  for (int ii = 0; ii < ext_nodes()+int_nodes(); ++ii) {
-    trace2("map node", long_label(), ii);
-    _n[ii].map();
-    trace3("mapped node", long_label(), _n[ii].short_label(), _n[ii]->matrix_number());
-  }
-
-  if (subckt()) {
-    unreachable();
-  //  subckt()->map_nodes();
-  }else{
-  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

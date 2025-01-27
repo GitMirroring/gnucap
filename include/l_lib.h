@@ -30,6 +30,7 @@ INTERFACE bool		wmatch(const std::string& s1,const std::string& s2);
 INTERFACE std::string	to_string(unsigned);
 INTERFACE std::string	to_string(int);
 INTERFACE std::string	to_string(double);
+inline std::string	to_string(std::string const& s) { return s;}
 INTERFACE char*		ftos(double,int,int,int);
 /*--------------------------------------------------------------------------*/
 //ftos stuff
@@ -46,7 +47,7 @@ namespace OS {
     ::system(s.c_str());
   }
 
-  inline void chdir(const std::string& s) {itested();
+  inline void chdir(const std::string& s) {
     ::chdir(s.c_str());
   }
 
@@ -58,14 +59,30 @@ namespace OS {
     return (::access(file.c_str(), mode) == 0/*file_ok*/);
   }
 
-  inline std::string getcwd() {itested();
+  inline std::string getcwd() {
     char buf[BUFLEN+1];
     char* cwd = ::getcwd(buf,BUFLEN);
-    if (cwd) {itested();
+    if (cwd) {
       return cwd;
     }else{untested();
       return "";
     }
+  }
+
+  inline std::string dirname(std::string const& fn) {
+    char* buf = strdup(fn.c_str());
+    char* dir = ::dirname(buf);
+    std::string ret(dir);
+    free(buf);
+    return ret;
+  }
+
+  inline std::string basename(std::string const& fn) {
+    char* buf = strdup(fn.c_str());
+    char* base = ::basename(buf);
+    std::string ret(base);
+    free(buf);
+    return ret;
   }
 
   inline std::string getenv(const std::string& s) {

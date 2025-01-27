@@ -77,6 +77,7 @@ depend ${srcdir}/Make.depend: # $(SRCS) ${GENERATED_SRCS} $(HDRS)
 	: > ${srcdir}/Make.depend
 	if [ -n "$(RAW_SRCS)" ]; then \
 		( cd ${srcdir}; $(CXX) -MM $(CXXFLAGS) -I../include ${CPPFLAGS} \
+		-isystem${CURDIR}/../conf \
 		${MAKE_CPPFLAGS} ${RAW_SRCS} -DDEPEND ) \
 		>> ${srcdir}/Make.depend; \
 	fi
@@ -88,7 +89,9 @@ depend ${srcdir}/Make.depend: # $(SRCS) ${GENERATED_SRCS} $(HDRS)
 		${MAKE_CPPFLAGS} $$i -DDEPEND \
 		>> ${srcdir}/Make.depend; \
 	done
-	
+	if [ -n "${EXTRA_DEPEND}" ]; then \
+		echo ${EXTRA_DEPEND} >> ${srcdir}/Make.depend; \
+	fi
 #-----------------------------------------------------------------------------
 date:
 	date "+#define PATCHLEVEL \"`git branch | awk '/\*/ { print $$2; }'` %Y.%m.%d\"" \
@@ -105,11 +108,16 @@ md5sums: MD5SUMS
 MD5SUMS: $(DIST_FILES)
 	md5sum $(DIST_FILES) | grep -v MD5SUMS >MD5SUMS
 #-----------------------------------------------------------------------------
+MOSTLYCLEANFILES = $(OBJS) $(GENERATED)
+CLEANFILES = $(MOSTLYCLEANFILES) $(TARGET_EXE) $(EXTRA_CLEANFILES)
+DISTCLEANFILES = $(CLEANFILES) config.log Makefile
+MAINTAINERCLEANFILES = $(DISTCLEANFILES)
+#-----------------------------------------------------------------------------
 mostlyclean:
 	rm -rf $(MOSTLYCLEANFILES)
 	rm -f */*.o */*.obj */*.h */*.cc
 clean:
-	rm -rf $(CLEANFILES)
+	rm -rf $(CLEANFILES) $(EXTRA_CLEANFILES)
 	rm -f */*.o */*.obj */*.h */*.cc
 distclean:
 	rm -rf $(DISTCLEANFILES)

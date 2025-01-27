@@ -70,13 +70,13 @@ Token* Token_BINOP::op(const Token* T1, const Token* T2)const
   }else{ untested();
     // op (name()) not one of those listed
     unreachable();
-    return NULL;
+    return nullptr;
   }
   if (b) {
-    return new Token_CONSTANT(b->val_string(), b);
+    return new Token_CONSTANT(b);
   }else{
     // can get here if either T1 or T2 has no data
-    return new Token_CONSTANT("false", NULL);
+    return new Token_CONSTANT(nullptr);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -96,103 +96,129 @@ Token* Token_UNARY::op(const Token* T1)const
   }else{ untested();
     // op (name()) not one of those listed
     unreachable();
-    return NULL;
+    return nullptr;
   }
   if (b) {
-    return new Token_CONSTANT(b->val_string(), b);
   }else{untested();
     // can get here if T1 has no data
-    return new Token_CONSTANT("false", NULL);
   }
+  return new Token_CONSTANT(b);
 }
 /*--------------------------------------------------------------------------*/
-static std::string call_function(FUNCTION const* F, Expression const* E)
+static Base* eval_base(PARAM_INSTANCE const& p, Expression const& e)
 {
-  assert(!E->is_empty());
-  Expression::const_iterator input = E->end();
-  --input;
-  assert(dynamic_cast<const Token_PARLIST*>(*input));
-  --input;
-
-  std::string arg;
-  std::string comma = "";
-  bool all_float = true;
-  while (!dynamic_cast<const Token_STOP*>(*input)) {
-    Float const* f = dynamic_cast<Float const*>((*input)->data());
-    all_float = f;
-    if(!all_float){
-      trace1("not float", (*input)->name());
-      break;
-    }else{
-      assert(dynamic_cast<Token_CONSTANT const*>(*input));
+  assert(e._scope);
+  if(!p->value()){
+    // parameter without type?
+    Base const* v = e.value();
+    if(v){
+      return v->assign(v);
+    }else{itested();
     }
 
-    arg = (*input)->name() + comma + arg;
-    comma = ", ";
-    assert(input != E->begin());
-    --input;
+  }else{
+    Base const* v = e.value();
+
+    if(v){
+      trace1("eval_base", typeid(*v).name());
+      assert(p.operator->());
+      assert(p->value());
+      return p->value()->assign(v);
+    }else{
+    }
+//       p = *v;
+//     }else{ untested();
+//       incomplete();
+//       // p = v;
+//     }
+//     return p.value();
   }
 
-  if(all_float){
-    // function call as usual
-    CS cmd(CS::_STRING, arg);
-    return F->eval(cmd, E->_scope);
-  }else{
-    return "";
-  }
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 void Token_SYMBOL::stack_op(Expression* E)const
 {
   assert(E);
+  bool verilog_mode = E->_scope->is_verilog_math();
   // replace single token with its value
   if (!E->is_empty() && dynamic_cast<const Token_PARLIST*>(E->back())) {
     trace1("SYM stackop", name());
     // has parameters (table or function)
     if (FUNCTION* f = function_dispatcher[name()]) {
-      std::string result = call_function(f, E);
-      trace2("callf", result, name());
-      if(result==""){
+      try{
+	f->stack_op(E);
+      }catch (Exception const& e) {
+	// didnt work. put back function token
 	E->push_back(clone());
-      }else{
-	while (!dynamic_cast<const Token_STOP*>(E->back())) {
-	  delete(E->back());
-	  E->pop_back();
-	  assert(!E->is_empty());
-	}
-	delete(E->back());
-	E->pop_back();
-	const Float* v = new Float(result);
-	E->push_back(new Token_CONSTANT(result, v));
       }
     }else{
       throw Exception_No_Match(name()); //BUG// memory leak
       unreachable();
       E->push_back(clone());
     }
-
   }else{
     // has no parameters (scalar)
+   //  if (name()[0] == '"') { untested();
+   //    incomplete();
+   //    assert(0);
+   //  }else
     if (strchr("0123456789.", name()[0])) {
+      assert(E->_scope);
       // a number
-      Float* n = new Float(name());
-      trace1("found number", name());
-      E->push_back(new Token_CONSTANT(name(), n));
+      bool is_int = true;
+      trace2("type", name(), name().size());
+      std::string sn = name();
+      for(std::string::const_iterator c = sn.begin();
+	  is_int && c != sn.end(); ++c){
+	trace3("type", name(), *c, isdigit(*c));
+	is_int = isdigit(*c);
+      }
+
+      Base* n;
+      if(is_int) {
+	if(verilog_mode) {
+	  n = new vInteger(name());
+	}else{
+	  n = new Integer(name());
+	}
+	trace1("found Integer", name());
+      }else{
+	if(verilog_mode) {
+	  n = new vReal(name());
+	}else{
+	  n = new Float(name());
+	}
+	trace2("found Float", name(), typeid(*n).name());
+      }
+      E->push_back(new Token_CONSTANT(n));
+    }else if(name()[0] == '"') { untested();
+	  CS cmd(CS::_STRING, name());
+	  String* s = new vString(cmd);
+	  E->push_back(new Token_CONSTANT(s));
     }else{
       // a name
-      PARAMETER<double> p = (*(E->_scope->params()))[name()];
+      PARAM_INSTANCE p = (*(E->_scope->params()))[name()];
+      trace2("PARAM_INSTANCE name?", name(), typeid(**p).name());
+      assert(name().size());
       if (p.has_hard_value()) {
+	trace1("hard value", name());
+	assert((*(E->_scope->params()))[name()].has_hard_value());
 	CS cmd(CS::_STRING, p.string());
 	Expression pp(cmd);
 	Expression e(pp, E->_scope);
-	double v = e.eval();
 
-	if(v!=NOT_INPUT){
-	  // it's a float constant.
-	  Float* n = new Float(v);
-	  E->push_back(new Token_CONSTANT(n->val_string(), n));
+	trace1("eval_base", name());
+	Base* n = eval_base(p, e);
+	if(n){
+	  trace2("/eval_base", name(), typeid(*n).name());
 	}else{
-	  // not a float. keep expression
+	}
+
+	if(n){
+	  E->push_back(new Token_CONSTANT(n));
+	}else{
+	  // keep expression
 	  for (Expression::const_iterator i = e.begin(); i != e.end(); ++i) {
 	    E->push_back(*i);
 	  }
@@ -201,10 +227,17 @@ void Token_SYMBOL::stack_op(Expression* E)const
 	    e.pop_back();
 	  }
 	}
+
       }else{
-	// no value - push name (and accept incomplete solution later)
-	String* s = new String(name());
-	E->push_back(new Token_CONSTANT(name(), s));
+	trace1("no value", name());
+	// no value - keep name (and accept incomplete solution later)
+	if(name()[0] == '"') { untested();
+	  CS cmd(CS::_STRING, name());
+	  String* s = new vString(cmd);
+	  E->push_back(new Token_CONSTANT(s));
+	}else{
+	  E->push_back(clone());
+	}
       }
     }
   }
@@ -213,10 +246,10 @@ void Token_SYMBOL::stack_op(Expression* E)const
 Token_TERNARY::~Token_TERNARY()
 {
   delete _true;
-  _true = NULL;
+  _true = nullptr;
 
   delete _false;
-  _false = NULL;
+  _false = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 void Token_TERNARY::stack_op(Expression* E)const
@@ -225,15 +258,17 @@ void Token_TERNARY::stack_op(Expression* E)const
   Token const* t = E->back();
   auto constant = dynamic_cast<Token_CONSTANT const*>(t);
 
-  bool is_float = false;
+  bool is_num = false;
   if(constant){
-    is_float = dynamic_cast<Float const*>(constant->data());
+    is_num = dynamic_cast<Float const*>(constant->data())
+           ||dynamic_cast<Integer const*>(constant->data());
+    // bool?
   }else{
   }
 
   assert(true_part());
   assert(false_part());
-  if (is_float) {
+  if (is_num) {
     assert(constant->data());
     bool select = constant->data()->to_bool();
     delete t;
@@ -253,7 +288,7 @@ void Token_TERNARY::stack_op(Expression* E)const
   }else{
     Expression* te = new Expression(*true_part(), E->_scope);
     Expression* fe = new Expression(*false_part(), E->_scope);
-    E->push_back(new Token_TERNARY(name(), te, fe));
+    E->push_back(new Token_TERNARY(te, fe));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -265,9 +300,32 @@ void Token_BINOP::stack_op(Expression* E)const
   E->pop_back();
   Token* t2 = E->back();
   E->pop_back();
-  if (dynamic_cast<Token_CONSTANT*>(t1)) {
+  if (dynamic_cast<Token_SYMBOL*>(t1)) {
+    if (dynamic_cast<Token_CONSTANT*>(t2)) {
+      if (!strchr("+*", name()[0])) {
+	trace3("order unchanged.", t2->name(), name(), t1->name());
+	E->push_back(t2);
+	E->push_back(t1);
+      }else if (dynamic_cast<String const*>(t2->data())) {
+	trace3("string order unchanged.", t2->name(), name(), t1->name());
+	E->push_back(t2);
+	E->push_back(t1);
+      }else{
+	trace3("order changed0", t2->name(), name(), t1->name());
+	// change order to enable later optimization
+	E->push_back(t1);
+	E->push_back(t2);
+      }
+    }else{
+      // two symbols.
+      E->push_back(t2);
+      E->push_back(t1);
+    }
+    E->push_back(clone()); //op
+  }else if (dynamic_cast<Token_CONSTANT*>(t1)) {
     if (dynamic_cast<Token_CONSTANT*>(t2)) {
       // have # # + .. becomes result (the usual)
+      trace3("op+", t2->name(), name(), t1->name());
       Token* t = op(t2, t1);
       assert(t);
       if (t->data()) {
@@ -277,17 +335,52 @@ void Token_BINOP::stack_op(Expression* E)const
 	delete t1;
       }else{
 	// fail - one arg is unknown, push back args
-	if (strchr("+*", name()[0]) && !dynamic_cast<const Float*>(t1->data())) {
+	if (!strchr("+*", name()[0])) {
+	  trace2("order unchanged0", typeid(*t1).name(), typeid(*t2).name());
+	  trace3("order unchanged0", t2->name(), name(), t1->name());
+	  E->push_back(t2);
+	  E->push_back(t1);
+	}else if (dynamic_cast<const Integer*>(t1->data())) {
+	  trace3("order unchanged1", t2->name(), name(), t1->name());
+	  E->push_back(t2);
+	  E->push_back(t1);
+	}else if (dynamic_cast<const Float*>(t1->data())) { untested();
+	  trace3("order unchanged2", t2->name(), name(), t1->name());
+	  E->push_back(t2);
+	  E->push_back(t1);
+	}else if (dynamic_cast<String const*>(t1->data())) {
+	  trace3("string, order unchanged1", t2->name(), name(), t1->name());
+	  E->push_back(t2);
+	  E->push_back(t1);
+	}else if (dynamic_cast<String const*>(t2->data())) { untested();
+	  trace3("string, order unchanged2", t2->name(), name(), t1->name());
+	  E->push_back(t2);
+	  E->push_back(t1);
+	}else{ untested();
+	  trace3("order changed", t2->name(), name(), t1->name());
 	  // change order to enable later optimization
 	  E->push_back(t1);
 	  E->push_back(t2);
-	}else{
-	  E->push_back(t2);
-	  E->push_back(t1);
 	}
 	E->push_back(clone()); //op
 	delete t;
       }
+    }else if (dynamic_cast<Token_SYMBOL*>(t2)) {
+      if (!E->is_empty() && dynamic_cast<const Token_PARLIST*>(E->back())) {
+	trace3("order unchanged3b", t2->name(), name(), t1->name());
+	E->push_back(t2);
+	E->push_back(t1);
+//      }else if (strchr("+*", name()[0])) {itested();
+//	trace3("order changed2", t2->name(), name(), t1->name());
+//	// change order to enable later optimization
+//	E->push_back(t1);
+//	E->push_back(t2);
+      }else{
+	trace3("order unchanged3", t2->name(), name(), t1->name());
+	E->push_back(t2);
+	E->push_back(t1);
+      }
+      E->push_back(clone()); //op
     }else if (((*t2) == (*this)) && strchr("+*", name()[0])
 	      && dynamic_cast<Token_CONSTANT*>(E->back())) {
       // have # + # + .. becomes result + (previous unknown, try to optimize)
@@ -301,7 +394,7 @@ void Token_BINOP::stack_op(Expression* E)const
 	E->push_back(t2);
 	delete t3;
 	delete t1;
-      }else{
+      }else{ untested();
 	// fail - push all
 	E->push_back(t3);
 	E->push_back(t2);
@@ -370,15 +463,17 @@ void Token_CONSTANT::stack_op(Expression* E)const
 {
   // unreachable(); no. restoring arg expression??
   trace2("stackop constant", name(), dynamic_cast<Float const*>(data()));
+  trace2("stackop constant", name(), dynamic_cast<vString const*>(data()));
+  trace2("stackop constant", name(), dynamic_cast<String const*>(data()));
 
-  assert(E);
-  if(auto f = dynamic_cast<Float const*>(data())){itested();
-    E->push_back(new Token_CONSTANT(name(), new Float(*f)));
-  }else if(auto s = dynamic_cast<String const*>(data())){
-    E->push_back(new Token_CONSTANT(name(), new String(*s)));
+  if(data()){
+    Base* cl = data()->clone();
+    trace4("stackop constant", name(), dynamic_cast<vString const*>(cl), cl->val_string(), cl->is_NA());
+    assert(cl->val_string() == data()->val_string());
+    assert(cl);
+    assert(E);
+    E->push_back(new Token_CONSTANT(cl));
   }else{ untested();
-    assert(false);
-    unreachable();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -388,7 +483,7 @@ void Expression::reduce_copy(const Expression& Proto)
   // The Proto._list is the expression in RPN.
   // Attempt to build a reduced _list here, hopefully with only one item.
   for (const_iterator i = Proto.begin(); i != Proto.end(); ++i) {
-    trace2("reducecopy", (**i).name(), (**i).data() );
+    trace3("reducecopy", (**i).name(), (**i).name().size(), (**i).data() );
     trace1("reducecopy", dynamic_cast<const Token_CONSTANT*>(*i));
     trace1("reducecopy", dynamic_cast<const Token_SYMBOL*>(*i));
     (**i).stack_op(this);

@@ -62,11 +62,11 @@ void load_or_unload(CS& cmd, CARD_LIST const* Scope, int flags)
     list();
   }else{
     std::string full_file_name;
-    if (short_file_name[0]=='/' || short_file_name[0]=='.'){itested();
-      if (OS::access_ok(short_file_name, R_OK)) {itested();
+    if (short_file_name[0]=='/' || short_file_name[0]=='.'){
+      if (OS::access_ok(short_file_name, R_OK)) {
 	// found it, local or root
 	full_file_name = short_file_name;
-      }else{untested();
+      }else{itested();
 	cmd.reset(here);
 	throw Exception_CS(std::string("plugin not found in ") + short_file_name[0], cmd);
       }
@@ -136,7 +136,7 @@ public:
       "With no arg, it lists plugins already loaded\n\n";
   }
 } p1;
-DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "attach|load", &p1);
+DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "attach|load|`attach|`load", &p1);
 /*--------------------------------------------------------------------------*/
 void tach_dir(CS& cmd, std::string const& dirname, DIRECTORY const& dir,
               CARD_LIST const* Scope, int flags, size_t here)
@@ -173,11 +173,11 @@ void attach_file(CS& cmd, std::string const& file_name,
   // a name to look for
   // check if already loaded
   assert(flags);
-  if (void* handle = attach_list[file_name]) { untested();
-    if (Scope->is_empty()) { untested();
+  if (void* handle = attach_list[file_name]) {itested();
+    if (Scope->is_empty()) {itested();
       cmd.warn(bDANGER, here, "\"" + file_name + "\": already loaded, replacing");
       dlclose(handle);
-      attach_list[file_name] = NULL;
+      attach_list[file_name] = nullptr;
     }else{untested();
       cmd.reset(here);
       throw Exception_CS("already loaded, cannot replace when there is a circuit", cmd);
@@ -190,7 +190,7 @@ void attach_file(CS& cmd, std::string const& file_name,
   if (!flags) { untested();
   }else if (void* handle = dlopen(file_name.c_str(), flags)) {
     attach_list[file_name] = handle;
-  }else{untested();
+  }else{
     throw Exception_CS(dlerror(), cmd);
   }
 }
@@ -202,7 +202,7 @@ void detach_file(CS& cmd, std::string const& file_name,
     void* handle = attach_list[file_name];
     if (handle) {itested();
       dlclose(handle);
-      attach_list[file_name] = NULL;
+      attach_list[file_name] = nullptr;
     }else{untested();
       cmd.reset(here);
       throw Exception_CS("plugin not attached", cmd);
@@ -237,7 +237,7 @@ public:
       "With no arg, it lists plugins already loaded\n\n";
   }
 } p2;
-DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "detach|unload", &p2);
+DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "detach|`detach|unload|`unload", &p2);
 /*--------------------------------------------------------------------------*/
 class CMD_DETACH_ALL : public CMD {
 public:
@@ -252,8 +252,8 @@ public:
 	void* handle = ii->second;
 	if (handle) {
 	  dlclose(handle);
-	  ii->second = NULL;
-	}else{itested();
+	  ii->second = nullptr;
+	}else{
 	  // name still in list, but has been detached already
 	}
       }
@@ -262,7 +262,7 @@ public:
     }
   }
 } p3;
-DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "detach_all", &p3);
+DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "detach_all|`detach_all", &p3);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

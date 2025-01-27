@@ -108,7 +108,7 @@ void TRANSIENT::setup(CS& Cmd)
 	_tstart = 0.;
 	_tstop  = oldrange;
 	/* _tstrobe unchanged */
-      }else{itested();			     /* 1 arg: _tstrobe */
+      }else{			     /* 1 arg: _tstrobe */
 	assert(arg1 <= _sim->_last_time);
 	assert(arg1 > 0.);
 	double oldrange = _tstop - _tstart;
@@ -165,9 +165,17 @@ void TRANSIENT::setup(CS& Cmd)
     _sim->_dtmin = _dtmin_in;
   }else if (_dtratio_in.has_hard_value()) {untested();
     _sim->_dtmin = _dtmax / _dtratio_in;
+  }else if(double(_dtmin_in) >= _dtmax/_dtratio_in) {
+    _sim->_dtmin = double(_dtmin_in);
+    // ok
   }else{
     // use larger of soft values
-    _sim->_dtmin = std::max(double(_dtmin_in), _dtmax/_dtratio_in);
+    double newdtmin = _dtmax/_dtratio_in;
+    if(_dtmin_in != newdtmin && _sim->_dtmin) {
+      error(bDEBUG, "adjusting dtmin to " + to_string(newdtmin) + ". requested: " + to_string(_dtmin_in) + "\n");
+    }else{
+    }
+    _sim->_dtmin = newdtmin;
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -59,7 +59,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class SWITCH_BASE : public ELEMENT {
 protected:
-  explicit	SWITCH_BASE(COMMON_COMPONENT* c=NULL);
+  explicit	SWITCH_BASE(COMMON_COMPONENT* c=nullptr);
   explicit	SWITCH_BASE(const SWITCH_BASE& p);
 protected: // override virtual
   std::string value_name()const override	{return "";}
@@ -101,7 +101,7 @@ class DEV_VSWITCH : public SWITCH_BASE {
 private:
   explicit  DEV_VSWITCH(const DEV_VSWITCH& p) :SWITCH_BASE(p) {}
 public:
-  explicit  DEV_VSWITCH(COMMON_COMPONENT* c=NULL) :SWITCH_BASE(c) {}
+  explicit  DEV_VSWITCH(COMMON_COMPONENT* c=nullptr) :SWITCH_BASE(c) {}
 private: // override virtual
   int	    max_nodes()const override	{return 4;}
   int	    min_nodes()const override	{return 4;}
@@ -122,33 +122,31 @@ private:
   explicit  DEV_CSWITCH(const DEV_CSWITCH& p) 
     :SWITCH_BASE(p), _input_label(p._input_label) {}
 public:
-  explicit  DEV_CSWITCH(COMMON_COMPONENT* c=NULL) :SWITCH_BASE(c), _input_label() {}
+  explicit  DEV_CSWITCH(COMMON_COMPONENT* c=nullptr) :SWITCH_BASE(c), _input_label() {}
 private: // override virtual
   int	    max_nodes()const override	{return 3;}
   int	    ext_nodes()const override	{return 2;}
   int	    min_nodes()const override	{return 3;}
   int	    net_nodes()const override	{return 2;}
   int	    num_current_ports()const override {return 1;}
-  const std::string current_port_value(int)const override {return _input_label;};
   CARD*	    clone()const override	{return new DEV_CSWITCH(*this);}
   void	    expand()override;
   char	    id_letter()const override	{return 'W';}
-  int	   set_port_by_name(std::string& Name, std::string& Value)override
-		{untested(); return SWITCH_BASE::set_port_by_name(Name,Value);}
   void	   set_port_by_index(int, std::string&)override;
   bool	   node_is_connected(int)const override;
 
-  std::string port_name(int i)const override {itested();
+  std::string port_name(int i)const override {
     assert(i >= 0);
-    assert(i < 2);
-    static std::string names[] = {"p", "n"};
+    assert(i < 3);
+    static std::string names[] = {"p", "n", "in"};
     return names[i];
   }
-  std::string current_port_name(int i)const override { untested();
-    assert(i >= 0);
-    assert(i < 1);
-    static std::string names[] = {"in"};
-    return names[i];
+  const std::string port_value(int i)const override {
+    if (i == 2) {
+      return _input_label;
+    }else{
+      return SWITCH_BASE::port_value(i);
+    }
   }
 private:
   std::string	 _input_label;
@@ -199,17 +197,17 @@ bool COMMON_SWITCH::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 bool COMMON_SWITCH::param_is_printable(int i)const
 {
-  switch (COMMON_SWITCH::param_count() - 1 - i) {
+  switch (i) {
   case 0:  return (_ic == _ON || _ic == _OFF);
-  default: return COMMON_COMPONENT::param_is_printable(i);
+  default: return COMMON_COMPONENT::param_is_printable(i-1);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_SWITCH::param_name(int i)const
 { untested();
-  switch (COMMON_SWITCH::param_count() - 1 - i) {
+  switch (i) {
   case 0:  return "ic";
-  default: return COMMON_COMPONENT::param_name(i);
+  default: return COMMON_COMPONENT::param_name(i-1);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -217,18 +215,18 @@ std::string COMMON_SWITCH::param_name(int i, int j)const
 {itested();
   if (j == 0) {itested();
     return param_name(i);
-  }else if (i >= COMMON_COMPONENT::param_count()) {itested();
+  }else if (i < 1) {untested();
     return "";
   }else{itested();
-    return COMMON_COMPONENT::param_name(i, j);
+    return COMMON_COMPONENT::param_name(i-1, j);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_SWITCH::param_value(int i)const
 {itested();
-  switch (COMMON_SWITCH::param_count() - 1 - i) {
+  switch (i) {
   case 0:  return (_ic == _ON) ? "1" : "0";
-  default: return COMMON_COMPONENT::param_value(i);
+  default: return COMMON_COMPONENT::param_value(i-1);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -299,27 +297,27 @@ std::string MODEL_SWITCH::dev_type()const
 /*--------------------------------------------------------------------------*/
 void MODEL_SWITCH::set_param_by_index(int i, std::string& value, int offset)
 {
-  switch (MODEL_SWITCH::param_count() - 1 - i) {
+  switch (i) {
   case 0: vt = value; break;
   case 1: vh = value; break;
   case 2: von = value; break;
   case 3: voff = value; break;
   case 4: ron = value; break;
   case 5: roff = value; break;
-  default: MODEL_CARD::set_param_by_index(i, value, offset); break;
+  default: MODEL_CARD::set_param_by_index(i-6, value, offset+6); break;
   }
 }
 /*--------------------------------------------------------------------------*/
 bool MODEL_SWITCH::param_is_printable(int i)const
 {
-  switch (MODEL_SWITCH::param_count() - 1 - i) {
+  switch (i) {
   case 0: 
   case 1: 
   case 2: 
   case 3: 
   case 4: 
   case 5: return true;
-  default: return MODEL_CARD::param_is_printable(i);
+  default: return MODEL_CARD::param_is_printable(i-6);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -327,24 +325,24 @@ std::string MODEL_SWITCH::param_name(int i)const
 {
   switch (type) {
   case VOLTAGE:
-    switch (MODEL_SWITCH::param_count() - 1 - i) {
+    switch (i) {
     case 0: return "vt";
     case 1: return "vh";
     case 2: return "von";
     case 3: return "voff";
     case 4: return "ron";
     case 5: return "roff";
-    default: return MODEL_CARD::param_name(i);
+    default: return MODEL_CARD::param_name(i-6);
     }
   case CURRENT:
-    switch (MODEL_SWITCH::param_count() - 1 - i) {
+    switch (i) {
     case 0: return "it";
     case 1: return "ih";
     case 2: return "ion";
     case 3: return "ioff";
     case 4: return "ron";
     case 5: return "roff";
-    default: return MODEL_CARD::param_name(i);
+    default: return MODEL_CARD::param_name(i-6);
     }
   }
   unreachable();
@@ -355,30 +353,31 @@ std::string MODEL_SWITCH::param_name(int i, int j)const
 {
   if (j == 0) {
     return param_name(i);
-  }else if (i >= MODEL_CARD::param_count()) {
+  }else if (i < 6) {
     return "";
   }else{ untested();
-    return MODEL_CARD::param_name(i, j);
+    assert(0);
+    return MODEL_CARD::param_name(i-6, j);
   }
 }
 /*--------------------------------------------------------------------------*/
 std::string MODEL_SWITCH::param_value(int i)const
 {
-  switch (MODEL_SWITCH::param_count() - 1 - i) {
+  switch (i) {
   case 0: return vt.string();
   case 1: return vh.string();
   case 2: return von.string();
   case 3: return voff.string();
   case 4: return ron.string();
   case 5: return roff.string();
-  default: return MODEL_CARD::param_value(i);
+  default: return MODEL_CARD::param_value(i-6);
   }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 SWITCH_BASE::SWITCH_BASE(COMMON_COMPONENT* c)
   :ELEMENT(c),
-   _input(NULL)
+   _input(nullptr)
 {
   std::fill_n(_in, int(OPT::_keep_time_steps), 0.);
   std::fill_n(_state, int(OPT::_keep_time_steps), _UNKNOWN);
@@ -386,7 +385,7 @@ SWITCH_BASE::SWITCH_BASE(COMMON_COMPONENT* c)
 /*--------------------------------------------------------------------------*/
 SWITCH_BASE::SWITCH_BASE(const SWITCH_BASE& p)
   :ELEMENT(p),
-   _input(NULL)
+   _input(nullptr)
 {
   notstd::copy_n(p._in, int(OPT::_keep_time_steps), _in);
   notstd::copy_n(p._state, int(OPT::_keep_time_steps), _state);  
@@ -418,9 +417,6 @@ void SWITCH_BASE::precalc_last()
     const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
     assert(m);
     _y1.f1 = _y[0].f1 = (c->_ic == _ON) ? m->ron : m->roff;	// override, unknown is off
-    
-    assert(!is_constant()); // depends on input
-    // converged?????
     
     _m0.c1 = 1./_y[0].f1;
     _m0.c0 = 0.;
@@ -520,7 +516,7 @@ bool SWITCH_BASE::do_tr()
   if (_sim->analysis_is_static()) {
     _y[0].x = (_input)			/* _y[0].x is controlling value */
       ? CARD::probe(_input,"I")		/* current controlled */
-      : _n[IN1].v0() - _n[IN2].v0();	/* voltage controlled */
+      : n_(IN1).v0() - n_(IN2).v0();	/* voltage controlled */
     
     state_t new_state;
     if (_y[0].x > m->von) {
@@ -573,7 +569,7 @@ TIME_PAIR SWITCH_BASE::tr_review()
   
   _in[0] = (_input)
     ? CARD::probe(_input,"I")
-    : _n[IN1].v0() - _n[IN2].v0();
+    : n_(IN1).v0() - n_(IN2).v0();
 
   double old_dt = _time[0] - _time[1];
   double old_dv = _in[0] - _in[1];
@@ -590,6 +586,12 @@ TIME_PAIR SWITCH_BASE::tr_review()
     assert(_time_by._event == NEVER);
   }
   // _time_by_event is the predicted switch time
+
+  trace3("switch", _sim->_time0, _time_by._event, _time_by._error_estimate);
+  //assert(_time_by._event >  _sim->_time0);
+  assert(_time_by._error_estimate > _sim->_time0);
+  //assert(_time_by._event >  _sim->_time0 + _sim->_dtmin);
+  assert(_time_by._error_estimate > _sim->_time0 + _sim->_dtmin);
 
   return _time_by;
 }

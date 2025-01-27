@@ -40,9 +40,9 @@ public:
   UNITS units()const override {return uSI;}
 
 public: // override virtual, used by callback
-  std::string arg_front()const override {unreachable();return " ";}
-  std::string arg_mid()const override {unreachable();return "=";}
-  std::string arg_back()const override {unreachable();return "";}
+  std::string arg_front()const override { untested();unreachable();return " ";}
+  std::string arg_mid()const override { untested();unreachable();return "=";}
+  std::string arg_back()const override { untested();unreachable();return "";}
 
 public: // override virtual, called by commands
   void		parse_top_item(CS&, CARD_LIST*)override;
@@ -86,7 +86,7 @@ static void parse_args(CS& cmd, CARD* x)
     std::string value = cmd.ctos("", "(", ")");
     try{
       x->set_param_by_name(name, value);
-    }catch (Exception_No_Match&) { untested();
+    }catch (Exception_No_Match&) {untested();
       cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
     }
   }
@@ -128,7 +128,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  ++index;
 	}
       }catch (Exception_Too_Many& e) {
-	cmd.warn(bDANGER, here, e.message() + " (ignored)");
+	cmd.warn(bDANGER, here, e.message());
       }
     }
     cmd >> ')';
@@ -161,13 +161,9 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
     }
   }
   if (index < x->min_nodes()) {
-    cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, floating");
-    for (int Index = index;  Index < x->min_nodes();  ++Index) {
-      // can't leave unconnected, as requested.
-      // we don't necessarily have ground (create one?)
-      // "floating" seems more reasonable anyway.
-      std::string unique_name = "_" + x->short_label() + "_float_" + to_string(Index);
-      x->set_port_by_index(Index, unique_name);
+    cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, grounding");
+    for (int iii = index;  iii < x->min_nodes();  ++iii) {
+      x->set_port_to_ground(iii);
     }
   }else{
   }
@@ -209,7 +205,7 @@ DEV_DOT* LANG_SPECTRE::parse_command(CS& cmd, DEV_DOT* x)
     }
   }
   delete x;
-  return NULL;
+  return nullptr;
 }
 /*--------------------------------------------------------------------------*/
 MODEL_CARD* LANG_SPECTRE::parse_paramset(CS& cmd, MODEL_CARD* x)
@@ -309,7 +305,7 @@ std::string LANG_SPECTRE::find_type_in_string(CS& cmd)
 void LANG_SPECTRE::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
   cmd.get_line("gnucap-spectre>");
-  new__instance(cmd, NULL, Scope);
+  new__instance(cmd, nullptr, Scope);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -320,7 +316,7 @@ void LANG_SPECTRE::print_args(OMSTREAM& o, const CARD* x)
   if (x->use_obsolete_callback_print()) {
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
-    for (int ii = x->param_count() - 1;  ii >= 0;  --ii) {
+    for (int ii = 0; ii < x->param_count(); ++ii) {
       if (x->param_is_printable(ii)) {
 	std::string arg = " " + x->param_name(ii) + "=" + x->param_value(ii);
 	o << arg;
@@ -350,10 +346,6 @@ static void print_ports(OMSTREAM& o, const COMPONENT* x)
   std::string sep = "";
   for (int ii = 0;  x->port_exists(ii);  ++ii) {
     o << sep << x->port_value(ii);
-    sep = " ";
-  }
-  for (int ii = 0;  x->current_port_exists(ii);  ++ii) {untested();
-    o << sep << x->current_port_value(ii);
     sep = " ";
   }
   o << ")";
@@ -405,7 +397,7 @@ void LANG_SPECTRE::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPECTRE::print_command(OMSTREAM& o, const DEV_DOT* x)
-{
+{untested();
   assert(x);
   o << x->s() << '\n';
 }
@@ -420,12 +412,13 @@ class CMD_MODEL : public CMD {
     cmd >> base_name;
 
     //const MODEL_CARD* p = model_dispatcher[base_name];
-    const CARD* p = lang_spectre.find_proto(base_name, NULL);
+    const CARD* p = lang_spectre.find_proto(base_name, nullptr);
     if (p) {
       CARD* cl = p->clone();
       MODEL_CARD* new_card = dynamic_cast<MODEL_CARD*>(cl);
       if (new_card) {
-	assert(!new_card->owner());
+	//assert(!new_card->owner());
+	new_card->set_owner(nullptr);
 	lang_spectre.parse_paramset(cmd, new_card);
 	Scope->push_back(new_card);
       }else{untested();
@@ -443,7 +436,8 @@ class CMD_SUBCKT : public CMD {
   void do_it(CS& cmd, CARD_LIST* Scope)override {
     BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("subckt"));
     assert(new_module);
-    assert(!new_module->owner());
+    //assert(!new_module->owner());
+    new_module->set_owner(nullptr);
     assert(new_module->subckt());
     assert(new_module->subckt()->is_empty());
     assert(!new_module->is_device());
@@ -466,7 +460,7 @@ public:
     command("options lang=spectre", Scope);
   }
 } p8;
-DISPATCHER<CMD>::INSTALL d8(&command_dispatcher, "spectre", &p8);
+DISPATCHER<CMD>::INSTALL d8(&command_dispatcher, "spectre|`spectre", &p8);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

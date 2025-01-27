@@ -55,11 +55,9 @@ METHOD STORAGE::method_select[meNUM_METHODS][meNUM_METHODS] = { //
 void STORAGE::precalc_last()
 {
   ELEMENT::precalc_last();
-
   set_converged();
-  assert(!is_constant()); /* because of integration */
- 
   _method_a = method_select[OPT::method][_method_u];
+
   //assert(_loss0 == 0.);
   //assert(_loss1 == 0.);
   /* m0 and acg are frequency/time dependent and cannot be set here.
@@ -136,7 +134,7 @@ FPOLY1 differentiate(const FPOLY1* q, const FPOLY1* i, double* time, METHOD meth
     return i[0];
   }else{
     assert(CKT_BASE::_sim->analysis_is_tran_dynamic());
-    if (time[1] == 0) {
+    if (time[1] == time[2]) {
       method = mEULER;	// Bogus current in previous step.  Force Euler.
     }else{
     }
@@ -184,9 +182,11 @@ double STORAGE::tr_c_to_g(double c, double g)const
   }else{
     assert(_sim->analysis_is_tran_dynamic());
     METHOD method;
-    if (_time[1] == 0) {
+    if (_time[1] == _time[2]) {
+      assert(_time[1] == 0);
       method = mEULER; // Bogus current in previous step.  Force Euler.
     }else{
+      assert(_time[1] != 0);
       method = _method_a;
     }
     g = c / _dt;

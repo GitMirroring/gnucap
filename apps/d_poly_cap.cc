@@ -43,6 +43,7 @@ protected:
   int	   _n_ports;
   double   _load_time;
   const double** _inputs;
+  node_t*  _nN;
 protected:
   explicit DEV_CPOLY_CAP(const DEV_CPOLY_CAP& p);
 public:
@@ -71,6 +72,9 @@ protected: // override virtual
   COMPLEX  ac_involts()const override	{itested(); return NOT_VALID;}
   COMPLEX  ac_amps()const override	{itested(); return NOT_VALID;}
 
+  node_t& n_(int i)const override {
+    assert(_nN); assert(i>=0); assert(i<net_nodes()); return _nN[i];
+  }
   std::string port_name(int)const override {untested();
     incomplete();
     unreachable();
@@ -102,13 +106,14 @@ private: // override virtual
 /*--------------------------------------------------------------------------*/
 DEV_CPOLY_CAP::DEV_CPOLY_CAP(const DEV_CPOLY_CAP& p)
   :STORAGE(p),
-   _vy0(NULL),
-   _vy1(NULL),
-   _vi0(NULL),
-   _vi1(NULL),
+   _vy0(nullptr),
+   _vy1(nullptr),
+   _vi0(nullptr),
+   _vi1(nullptr),
    _n_ports(p._n_ports),
    _load_time(NOT_VALID),
-   _inputs(NULL)
+   _inputs(nullptr),
+   _nN(_nodes)
 {
   // not really a copy .. only valid to copy a default
   // too lazy to do it right, and that's all that is being used
@@ -124,13 +129,14 @@ DEV_CPOLY_CAP::DEV_CPOLY_CAP(const DEV_CPOLY_CAP& p)
 /*--------------------------------------------------------------------------*/
 DEV_CPOLY_CAP::DEV_CPOLY_CAP()
   :STORAGE(),
-   _vy0(NULL),
-   _vy1(NULL),
-   _vi0(NULL),
-   _vi1(NULL),
+   _vy0(nullptr),
+   _vy1(nullptr),
+   _vi0(nullptr),
+   _vi1(nullptr),
    _n_ports(0),
    _load_time(NOT_VALID),
-   _inputs(NULL)
+   _inputs(nullptr),
+   _nN(_nodes)
 {
 }
 /*--------------------------------------------------------------------------*/
@@ -140,8 +146,9 @@ DEV_CPOLY_CAP::~DEV_CPOLY_CAP()
   delete [] _vi0;
   delete [] _vi1;
   if (net_nodes() > NODES_PER_BRANCH) {
-    delete [] _n;
+    delete [] _nN;
   }else{
+    assert(_nN == _nodes);
     // it is part of a base class
   }
 }
@@ -188,7 +195,7 @@ bool DEV_FPOLY_CAP::do_tr()
   }else{
     for (int i=1; i<=_n_ports; ++i) {
       _vi0[i] = tr_c_to_g(_vy0[i], _vi0[i]);
-      _vi0[0] -= volts_limited(_n[2*i-2],_n[2*i-1]) * _vi0[i];
+      _vi0[0] -= volts_limited(n_(2*i-2),n_(2*i-1)) * _vi0[i];
       assert(_vi0[i] == _vi0[i]);
       assert(_vi0[0] == _vi0[0]);
     }
@@ -210,7 +217,7 @@ void DEV_CPOLY_CAP::tr_load()
   _vi1[0] = _vi0[0];
   _vi1[1] = _vi0[1];
   for (int i=2; i<=_n_ports; ++i) {
-    tr_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], &(_vi0[i]), &(_vi1[i]));
+    tr_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), &(_vi0[i]), &(_vi1[i]));
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -226,7 +233,7 @@ double DEV_CPOLY_CAP::tr_amps()const
 {untested();
   double amps = _m0.c0;
   for (int i=1; i<=_n_ports; ++i) {untested();
-    amps += dn_diff(_n[2*i-2].v0(),_n[2*i-1].v0()) * _vi0[i];
+    amps += dn_diff(n_(2*i-2).v0(),n_(2*i-1).v0()) * _vi0[i];
   }
   return amps;
 }
@@ -236,7 +243,7 @@ void DEV_CPOLY_CAP::ac_load()
   _acg = _vy0[1] * _sim->_jomega;
   ac_load_passive();
   for (int i=2; i<=_n_ports; ++i) {
-    ac_load_extended(_n[OUT1], _n[OUT2], _n[2*i-2], _n[2*i-1], _vy0[i] * _sim->_jomega);
+    ac_load_extended(n_(OUT1), n_(OUT2), n_(2*i-2), n_(2*i-1), _vy0[i] * _sim->_jomega);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -268,8 +275,9 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
 
     if (net_nodes() > NODES_PER_BRANCH) {
       // allocate a bigger node list
-      _n = new node_t[net_nodes()];
+      _nN = new node_t[net_nodes()];
     }else{
+      assert(_nN == _nodes);
       // use the default node list, already set
     }      
   }else{itested();
@@ -288,7 +296,7 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
   std::fill_n(_vy1, n_states, 0.);
   std::fill_n(_vi0, n_states, 0.);
   std::fill_n(_vi1, n_states, 0.);
-  notstd::copy_n(nodes, net_nodes(), _n);
+  std::copy_n(nodes, net_nodes(), &n_(0));
   assert(net_nodes() == _n_ports * 2);
 }
 /*--------------------------------------------------------------------------*/

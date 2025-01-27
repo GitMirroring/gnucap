@@ -32,6 +32,7 @@ CCFLAGS = \
 -DHAVE_LIBREADLINE \
 -std=c++11 -DUNIX  -g -O0 $(INCLUDE) -DTRACE_UNTESTED \
 -Wall -Wextra \
+-Wsuggest-override \
 -Wswitch-enum -Wundef -Wpointer-arith -Woverloaded-virtual \
 -Wcast-qual -Wcast-align -Wpacked -Wshadow -Wconversion \
 -Winit-self -Wmissing-include-dirs -Winvalid-pch \
@@ -44,8 +45,8 @@ CCFLAGS = \
 .cc.o:; $(CXX) $(CXXFLAGS) ${MAKE_CPPFLAGS} $(CPPFLAGS) $(CCFLAGS) -c $<
 .cc.so:; $(MAKE_LIB) $<
 #------------------------------------------------------------------------
-MAKE_EXE = $(CXX) $(CCFLAGS) ${MAKE_CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -o $@ 
-MAKE_LIB = $(CXX) $(CCFLAGS) ${MAKE_CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@ 
+MAKE_EXE = $(CXX) $(CCFLAGS) $(CXXFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -o $@ 
+MAKE_LIB = $(CXX) $(CCFLAGS) $(CXXFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@ 
 #------------------------------------------------------------
 # warnings turned off, because they warn of nothing wrong
 # 4.3

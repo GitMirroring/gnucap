@@ -113,15 +113,15 @@ CS& Expression::array(CS& File)
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void Expression::leaf(CS& File)
 {
-    trace1("leaf?", File.tail());
+  trace1("leaf?", File.tail().substr(0,20));
   size_t here = File.cursor();
   if (File.peek() == '"') {
-    Quoted_String* s = new Quoted_String(File);
-    if (File.stuck(&here)) { untested();
+    vString* s = new vString(File);
+    if (File.stuck(&here)) {
       delete s;
       throw Exception_CS("what's this?", File);
     }else{
-      push_back(new Token_CONSTANT("\"" + s->val_string() + "\"", s));
+      push_back(new Token_CONSTANT(s));
     }
   }else if (File.peek() == '<') {
     std::string s = File.ctos("", "<", ">");
@@ -133,7 +133,7 @@ void Expression::leaf(CS& File)
       arglist(File);
       push_back(new Token_SYMBOL(name));
     }else{itested();
-      trace1("leafstuck", File.tail());
+      trace1("leafstuck", File.tail().substr(0,20));
       throw Exception_CS("what's this?", File);
     }
   }
@@ -141,7 +141,7 @@ void Expression::leaf(CS& File)
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void Expression::factor(CS& File)
 {
-  Token* t = NULL;
+  Token* t = nullptr;
   if (File >> "-|+|!") {
     std::string name(File.last_match());
     t = new Token_UNARY(name);
@@ -160,14 +160,14 @@ void Expression::factor(CS& File)
     push_back(t);
   }else{
   }
-  trace1("factor1", File.tail());
+  trace1("factor1", File.tail().substr(0,20));
 }
 /*--------------------------------------------------------------------------*/
 void Expression::ternary(CS& File)
 {
   std::string name(File.last_match());
-  Expression* true_part = NULL;
-  Expression* false_part = NULL;
+  Expression* true_part = nullptr;
+  Expression* false_part = nullptr;
 
   true_part = new Expression(File);
 
@@ -181,7 +181,8 @@ void Expression::ternary(CS& File)
 
  // andarg(File);
 
-  push_back(new Token_TERNARY(name, true_part, false_part));
+  assert(name == "?");
+  push_back(new Token_TERNARY(true_part, false_part));
 }
 /*--------------------------------------------------------------------------*/
 void Expression::termtail(CS& File)
@@ -197,9 +198,9 @@ void Expression::termtail(CS& File)
 /*--------------------------------------------------------------------------*/
 void Expression::term(CS& File)
 {
-  trace1("term0", File.tail());
+  trace1("term0", File.tail().substr(0,20));
   factor(File);
-  trace1("term1", File.tail());
+  trace1("term1", File.tail().substr(0,20));
   termtail(File);
 }
 /*--------------------------------------------------------------------------*/

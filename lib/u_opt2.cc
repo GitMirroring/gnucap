@@ -28,18 +28,33 @@
 #include "l_compar.h"
 #include "e_cardlist.h"
 /*--------------------------------------------------------------------------*/
-void OPT::command(CS& cmd)
+void OPT::command(CS& cmd, CARD_LIST* Scope)
 {
-  bool changed = set_values(cmd);
+  bool changed = set_values(cmd, Scope);
   if (!changed || opts) {
     print(IO::mstdout);
   }
 }
 /*--------------------------------------------------------------------------*/
+static bool Get(CS& cmd, std::string const& key, method_t* method)
+{
+  return (cmd >> (key + " {=}")) && (ONE_OF
+   || Set(cmd, "euler", 	method, meEULER)
+   || Set(cmd, "eulero{nly}",	method, meEULERONLY)
+   || Set(cmd, "trap{ezoidal}",	method, meTRAP)
+   || Set(cmd, "trapo{nly}",	method, meTRAPONLY)
+   || Set(cmd, "gear{2}", 	method, meGEAR2)
+   || Set(cmd, "gear2o{nly}",	method, meGEAR2ONLY)
+   || Set(cmd, "t{rap}g{ear}",	method, meTRAPGEAR)
+   || Set(cmd, "t{rap}e{uler}",	method, meTRAPEULER)
+   || cmd.warn(bWARNING, "illegal method"));
+}
+/*--------------------------------------------------------------------------*/
 /* set:  set options from a string
  */
-bool OPT::set_values(CS& cmd)
+bool OPT::set_values(CS& cmd, CARD_LIST* Scope)
 {
+  assert(Scope);
   bool big_change = false;
   bool changed = false;
   size_t here = cmd.cursor();
@@ -68,17 +83,7 @@ bool OPT::set_values(CS& cmd)
       || Get(cmd, "limpts",	&limpts)
       || Get(cmd, "lvlcod",	&lvlcod)
       || Get(cmd, "lvltim",	&lvltim)
-      || (cmd.umatch("method {=}") &&
-	  (ONE_OF
-	   || Set(cmd, "euler", 	&method, meEULER)
-	   || Set(cmd, "eulero{nly}",	&method, meEULERONLY)
-	   || Set(cmd, "trap{ezoidal}",	&method, meTRAP)
-	   || Set(cmd, "trapo{nly}",	&method, meTRAPONLY)
-	   || Set(cmd, "gear{2}", 	&method, meGEAR2)
-	   || Set(cmd, "gear2o{nly}",	&method, meGEAR2ONLY)
-	   || Set(cmd, "t{rap}g{ear}",	&method, meTRAPGEAR)
-	   || Set(cmd, "t{rap}e{uler}",	&method, meTRAPEULER)
-	   || cmd.warn(bWARNING, "illegal method")))
+      || Get(cmd, "method",     &method)
       || Get(cmd, "maxord",	   &maxord)
       || Get(cmd, "defl",	   &defl,	mPOSITIVE)
       || Get(cmd, "defw",	   &defw,	mPOSITIVE)
@@ -160,7 +165,8 @@ bool OPT::set_values(CS& cmd)
       || Get(cmd, "edit",	   &edit)
       || Get(cmd, "recur{sion}",   &recursion)
       || (Get(cmd, "lang{uage}",   &language)
-	  && ((case_insensitive = ((language) ? (language->case_insensitive()) : false)),
+	  && ( Scope->set_verilog_math( language && language->is_verilog() ),
+	      (case_insensitive = ((language) ? (language->case_insensitive()) : false)),
 	      (units = ((language) ? (language->units()) : uSI)), true))
       || Get(cmd, "insensitive",   &case_insensitive)
       || (cmd.umatch("units {=}") &&
@@ -328,10 +334,10 @@ namespace {
       }else{itested();
       }
       static OPT o;
-      o.command(cmd);
+      o.command(cmd, Scope);
     }
   } p5;
-  DISPATCHER<CMD>::INSTALL d5(&command_dispatcher, "options|set|width", &p5);
+  DISPATCHER<CMD>::INSTALL d5(&command_dispatcher, "options|set|width|`options|`set", &p5);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

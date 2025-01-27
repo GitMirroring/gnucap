@@ -34,16 +34,15 @@ public:
     switch (ENV::run_mode) {
     case rPRE_MAIN: unreachable(); break;
     case rPRESET:   untested(); break;  //BUG// this should close the file
-    case rINTERACTIVE:untested();
+    case rINTERACTIVE:itested();
       itested();
       command("quit", Scope);
       break;
-    case rSCRIPT:untested();
+    case rSCRIPT:
       if (OPT::acct) {untested();
 	command("status", Scope);
-      }else{untested();
+      }else{
       }
-      untested();
       throw Exception("end");
       break;
     case rBATCH:
@@ -56,7 +55,7 @@ public:
     }
   }
 } p0;
-DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "end", &p0);
+DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "end|`end", &p0);
 /*--------------------------------------------------------------------------*/
 class CMD_PAUSE : public CMD {
 public:
@@ -71,7 +70,7 @@ public:
     }
   }
 } p1;
-DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "pause", &p1);
+DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "pause|`pause", &p1);
 /*--------------------------------------------------------------------------*/
 class CMD_QUIT : public CMD {
 public:
@@ -85,7 +84,7 @@ public:
     }
   }
 } p2;
-DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "quit|exit", &p2);
+DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "quit|exit|`quit|`exit", &p2);
 /*--------------------------------------------------------------------------*/
 class CMD_TEMP : public CMD {
 public:
@@ -100,7 +99,7 @@ public:
     }
   }
 } p3;
-DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "temperature|temp", &p3);
+DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "temperature|temp|`temperature|`temp", &p3);
 /*--------------------------------------------------------------------------*/
 class CMD_TITLE : public CMD {
 public:
@@ -112,7 +111,7 @@ public:
     }
   }
 } p4;
-DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "title", &p4);
+DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "title|`title", &p4);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

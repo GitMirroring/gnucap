@@ -53,7 +53,17 @@ COMMON_COMPONENT::COMMON_COMPONENT(int c)
 COMMON_COMPONENT::~COMMON_COMPONENT()
 {
   trace1("common,destruct", _attach_count);
-  assert(_attach_count == 0 || _attach_count == CC_STATIC);
+  if(_attach_count == 0){
+    // not attached to anything.
+  }else if(_attach_count == CC_STATIC) {
+    // static, not attached to anything.
+  }else if(_attach_count > CC_STATIC) {
+    // static, still attached to another common
+    // the other is static (presumably), but
+    // there seems no way to influence destruction order
+  }else{
+    assert(0 && "common still in use");
+  }
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
@@ -101,7 +111,7 @@ void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
     }else{
       trace1("nodelete", (**from)._attach_count);
     }
-    *from = NULL;
+    *from = nullptr;
   }else{
   }
 }
@@ -312,7 +322,7 @@ int COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
     return 0;
   }else{
     //BUG// ugly linear search
-    for (int i = param_count() - 1;  i >= 0;  --i) {
+    for (int i = 0;  i < param_count();  ++i) {
       for (int j = 0;  param_name(i,j) != "";  ++j) {
 	if (Umatch(Name, param_name(i,j) + ' ')) {
 	  set_param_by_index(i, Value, 0/*offset*/);
@@ -322,7 +332,6 @@ int COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
 	}
       }
     }
-    itested();
     throw Exception_No_Match(Name);
   }
 }
@@ -335,7 +344,7 @@ int COMMON_COMPONENT::Set_param_by_name(std::string Name, std::string Value)
   assert(!has_parse_params_obsolete_callback());
   
   //BUG// ugly linear search
-  for (int i = COMMON_COMPONENT::param_count() - 1;  i >= 0;  --i) {itested();
+  for (int i = 0;  i < COMMON_COMPONENT::param_count();  ++i) {itested();
     for (int j = 0;  COMMON_COMPONENT::param_name(i,j) != "";  ++j) {itested();
       if (Umatch(Name, COMMON_COMPONENT::param_name(i,j) + ' ')) {itested();
 	COMMON_COMPONENT::set_param_by_index(i, Value, 0/*offset*/);
@@ -397,10 +406,6 @@ public:
 /*--------------------------------------------------------------------------*/
 COMPONENT::COMPONENT(COMMON_COMPONENT* c)
   :CARD(),
-   _common(0),
-   _mfactor_fixed(NOT_VALID),
-   _converged(false),
-   _q_for_eval(-1),
    _time_by()
 {
   if (_sim) {
@@ -413,11 +418,10 @@ COMPONENT::COMPONENT(COMMON_COMPONENT* c)
 /*--------------------------------------------------------------------------*/
 COMPONENT::COMPONENT(const COMPONENT& p)
   :CARD(p),
-   _common(0),
-   _mfactor_fixed(p._mfactor_fixed),
    _converged(p._converged),
-   _q_for_eval(-1),
-   _time_by(p._time_by)
+   _mfactor_fixed(p._mfactor_fixed),
+   _time_by(p._time_by),
+   _net_nodes(p._net_nodes)
 {
   if (_sim) {
     _sim->uninit();
@@ -429,6 +433,10 @@ COMPONENT::COMPONENT(const COMPONENT& p)
   }
   attach_common(p._common);
   assert(_common == p._common);
+  if(has_attributes(p.id_tag())) {
+    set_attributes(id_tag()) = attributes(p.id_tag());
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 COMPONENT::~COMPONENT()
@@ -464,26 +472,19 @@ int COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
     }else{
     }
   }
-  itested();
   throw Exception_No_Match(int_name);
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_port_by_index(int num, std::string& ext_name)
 {
-  trace2("spbi", num, ext_name);
   if (num < max_nodes()) {
-    node(num).new_node(ext_name, this);
-
-
-    assert(node(num)->short_label() == ext_name);
-    // assert(node(num).short_label() == ext_name);
-    trace2("spbi", num, node(num).user_number());
+    n_(num).new_node(ext_name, this);  // Really look-up node, make new if needed.
 
     if (num+1 > _net_nodes) {
-      // make the list bigger
-      _net_nodes = num+1;
+      // Update _net_nodes for net_nodes().  Not really a count.
+      _net_nodes = short(num+1);
     }else{
-      // it's already big enough, probably assigning out of order
+      // probably assigning out of order.
     }
   }else{
     throw Exception_Too_Many(num+1, max_nodes(), 0/*offset*/);
@@ -493,9 +494,9 @@ void COMPONENT::set_port_by_index(int num, std::string& ext_name)
 void COMPONENT::set_port_to_ground(int num)
 {
   if (num < max_nodes()) {
-    node(num).set_to_ground(this);
+    n_(num).set_to_ground(this);
     if (num+1 > _net_nodes) {
-      _net_nodes = num+1;
+      _net_nodes = short(num+1);
     }else{untested();
     }
   }else{untested();
@@ -560,16 +561,6 @@ void COMPONENT::expand()
 /*--------------------------------------------------------------------------*/
 void COMPONENT::precalc_first()
 {
-  for(int i = 0; i < min_nodes(); ++i){
-    if(!node_is_connected(i)) {
-      trace2("not connected", long_label(), i);
-
-
-      unreachable(); //WIP
-      throw Exception(long_label() + ": invalid nodes");
-    }else{
-    }
-  }
   CARD::precalc_first();
   if (has_common()) {
     try {
@@ -589,10 +580,10 @@ void COMPONENT::precalc_first()
   }
   trace1(long_label().c_str(), double(my_mfactor()));
   if (const COMPONENT* o = dynamic_cast<const COMPONENT*>(owner())) {
-    _mfactor_fixed = o->mfactor() * my_mfactor();
+    _mfactor_fixed = float(o->mfactor() * my_mfactor());
   }else{
     assert(!owner());
-    _mfactor_fixed =  my_mfactor();
+    _mfactor_fixed = float(my_mfactor());
   } 
   trace1(long_label().c_str(), _mfactor_fixed);
 }
@@ -608,6 +599,9 @@ void COMPONENT::precalc_last()
       c->precalc_last(scope());
     }catch (Exception_Precalc& e) {
       error(bWARNING, long_label() + ": " + e.message());
+    }catch (Exception& e) {
+      delete c;
+      throw e;
     }
     attach_common(c);
   }else{
@@ -623,9 +617,7 @@ void COMPONENT::map_nodes()
   //assert(ext_nodes() + int_nodes() == matrix_nodes());
 
   for (int ii = 0; ii < ext_nodes()+int_nodes(); ++ii) {
-    // incomplete(); probably not. nothing to do if n[ii] is a NODE_P
-    //_n[ii].map();
-    // node(ii).map();
+    n_(ii).map();
   }
 
   if (subckt()) {
@@ -671,11 +663,7 @@ void COMPONENT::set_parameters(const std::string& Label, CARD *Owner,
   attach_common(Common);
 
   assert(node_count <= net_nodes());
-  //notstd::copy_n(nodes, net_nodes(), _n);
-  for(int i=0; i<node_count; ++i){
-    trace3("set_parameters", long_label(), i, Nodes[i].is_link());
-    node(i) = Nodes[i];
-  }
+  std::copy_n(Nodes, node_count, &n_(0));
 }
 /*--------------------------------------------------------------------------*/
 /* set_slave: force evaluation whenever the owner is evaluated.
@@ -746,24 +734,24 @@ int COMPONENT::set_param_by_name(std::string Name, std::string Value)
 {
   if(int idx = set_hsparam(Name, Value)){
     trace3("COMPONENT::spbn", Name, Value, idx);
-    return COMPONENT::param_count() - idx;
+    return idx-1;
   }else if (!has_common()) { itested();
-    return CARD::set_param_by_name(Name, Value);
+    return CARD::set_param_by_name(Name, Value) + sysparams_count;
   }else if(!common()->is_shared()) {
     // it's us!
-    return mutable_common()->set_param_by_name(Name, Value);
-  }else{itested();
+    return mutable_common()->set_param_by_name(Name, Value) + sysparams_count;
+  }else{
     COMMON_COMPONENT* c = common()->clone();
     assert(c);
     int index = c->set_param_by_name(Name, Value);
     attach_common(c);
-    return index;
+    return index + sysparams_count;
   }
 }
 /*--------------------------------------------------------------------------*/
-void COMPONENT::set_param_by_index(int i, std::string& Value, int offset)
+void COMPONENT::set_param_by_index(int I, std::string& Value, int offset)
 {
-  int I = COMPONENT::param_count() - 1 - i;
+  int i = I - sysparams_count;
 
   if( I < sysparams_count ){
     hsparam().set_by_index(I, Value);
@@ -779,9 +767,9 @@ void COMPONENT::set_param_by_index(int i, std::string& Value, int offset)
   }
 }
 /*--------------------------------------------------------------------------*/
-bool COMPONENT::param_is_printable(int i)const
+bool COMPONENT::param_is_printable(int I)const
 {
-  int I = COMPONENT::param_count() - 1 - i;
+  int i = I - sysparams_count;
 
   if( I < sysparams_count ){
     if(_hsparam){
@@ -796,10 +784,12 @@ bool COMPONENT::param_is_printable(int i)const
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMPONENT::param_name(int i)const
+std::string COMPONENT::param_name(int I)const
 {
+  int i = I - sysparams_count;
+
   assert(sysparams_count == 8);
-  switch (COMPONENT::param_count() - 1 - i) {
+  switch (I) {
   case 0: return "$mfactor";
   case 1:itested(); return "$xposition";
   case 2:itested(); return "$yposition";
@@ -819,10 +809,10 @@ std::string COMPONENT::param_name(int i)const
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMPONENT::param_name(int i, int j)const
+std::string COMPONENT::param_name(int I, int j)const
 {itested();
-  trace3("COMPONENT::param_name", long_label(), i, j);
-  int I = COMPONENT::param_count() - 1 - i;
+  int i = I - sysparams_count;
+
   if(I < sysparams_count && j) {itested();
     return "";
   }else if(I < sysparams_count) { untested();
@@ -840,9 +830,10 @@ std::string COMPONENT::param_name(int i, int j)const
   }
 }
 /*--------------------------------------------------------------------------*/
-std::string COMPONENT::param_value(int i)const
+std::string COMPONENT::param_value(int I)const
 {
-  int I = COMPONENT::param_count() - 1 - i;
+  int i = I - sysparams_count;
+
   if(I>=0 && I < sysparams_count) {
     if(_hsparam){
       return _hsparam->param_value(I);
@@ -863,19 +854,12 @@ const std::string COMPONENT::port_value(int i)const
   return n_(i).short_label();
 }
 /*--------------------------------------------------------------------------*/
-const std::string COMPONENT::current_port_value(int)const 
-{untested();
-  unreachable();
-  static std::string s;
-  return s;
-}
-/*--------------------------------------------------------------------------*/
 double COMPONENT::tr_probe_num(const std::string& x)const
 {
   CS cmd(CS::_STRING, x);
   if (cmd.umatch("v")) {
     int nn = cmd.ctoi();
-    return (nn > 0 && nn <= net_nodes()) ? n_(nn-1)->v0() : NOT_VALID;
+    return (nn > 0 && nn <= net_nodes()) ? n_(nn-1).v0() : NOT_VALID;
   }else if (Umatch(x, "error{time} |next{time} ")) {
     return (_time_by._error_estimate < BIGBIG) ? _time_by._error_estimate : 0;
   }else if (Umatch(x, "timef{uture} ")) {
@@ -894,9 +878,9 @@ const MODEL_CARD* COMPONENT::find_model(const std::string& modelname)const
   if (modelname == "") {
     throw Exception(long_label() + ": missing args -- need model name");
     unreachable();
-    return NULL;
+    return nullptr;
   }else{
-    const CARD* c = NULL;
+    const CARD* c = nullptr;
     {
       int bin_count = 0;
       for (const CARD* Scope = this; Scope && !c; Scope = Scope->owner()) {
@@ -913,7 +897,7 @@ const MODEL_CARD* COMPONENT::find_model(const std::string& modelname)const
 	      c = Scope->find_in_my_scope(extended_name);
 	    }catch (Exception_Cant_Find& e2) {
 	      // that's all .. looked at all of them
-	      c = NULL;
+	      c = nullptr;
 	      break;
 	    }
 	    const MODEL_CARD* m = dynamic_cast<const MODEL_CARD*>(c);

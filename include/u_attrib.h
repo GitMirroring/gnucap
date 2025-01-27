@@ -51,8 +51,8 @@ public:
     if (_up) {
       if (_up->dec_ref_count()==0) {
 	delete _up;
-	_up = NULL;
-      }else{untested();
+	_up = nullptr;
+      }else{
       }
     }else{
     }
@@ -80,11 +80,13 @@ public:
   const std::string string(tag_t Owner)const {
     if (Owner == _owner || !Owner) {
       if (_up) {
-	return _up->string(Owner) + ", " + _s;
+	std::string upstring = _up->string(Owner);
+	std::string sep = upstring.size()?", ":"";
+	return upstring + sep + _s;
       }else{
 	return _s;
       }
-    }else{untested();
+    }else{
       return "";
     }
   }
@@ -104,11 +106,11 @@ public:
 	found = true;
 	// keep looking in case there is another, which will supercede
 	// finds right-most match using left-right search
-      }else{untested();
+      }else{itested();
 	cmd.skiparg();
-	if (cmd >> "=") {untested();
+	if (cmd >> "=") {itested();
 	  cmd.ctos();
-	}else{untested();
+	}else{itested();
 	}
       }
     }
@@ -117,7 +119,7 @@ public:
       return val;
     }else if (_up) {untested();
       return (*_up)[Key];
-    }else{untested();
+    }else{
       return "0";
     }
   }
@@ -127,7 +129,7 @@ class INTERFACE ATTRIB_LIST_p {
 private:
   ATTRIB_LIST* _p;
 public:
-  ATTRIB_LIST_p() :_p(NULL) {}
+  ATTRIB_LIST_p() :_p(nullptr) {}
 
   ATTRIB_LIST_p(const ATTRIB_LIST_p& P) :_p(P._p) {untested();
     if (_p) {untested();
@@ -140,7 +142,7 @@ public:
     if (_p) {
       if (_p->dec_ref_count()==0) {
 	delete _p;
-	_p = NULL;
+	_p = nullptr;
       }else{
       }
     }else{
@@ -156,7 +158,7 @@ public:
     if (_p) {untested();
       if (_p->dec_ref_count()==0) {untested();
 	delete _p;
-	_p = NULL;
+	_p = nullptr;
       }else{untested();
       }
     }else{
@@ -174,7 +176,7 @@ public:
     if (String != "") {
       if (_p) {
 	if (_p->owner() == Owner) {
-	}else{untested();
+	}else{
 	}
 	_p->dec_ref_count();
       }else{

@@ -28,10 +28,11 @@
 /*--------------------------------------------------------------------------*/
 class BASE_SUBCKT : public COMPONENT {
 protected:
-  explicit BASE_SUBCKT(COMMON_COMPONENT* c=NULL)
+  explicit BASE_SUBCKT(COMMON_COMPONENT* c=nullptr)
     :COMPONENT(c) {}
   explicit BASE_SUBCKT(const BASE_SUBCKT& p)
     :COMPONENT(p) {}
+public:
   ~BASE_SUBCKT() {}
 protected: // override virtual
   //char  id_letter()const		//CARD/null
@@ -43,16 +44,12 @@ protected: // override virtual
   int     matrix_nodes()const override	{return 0;}
   int     net_nodes()const override	{return _net_nodes;}
   //CARD* clone()const			//CARD/null
-  //void  precalc_first()	{assert(subckt()); subckt()->precalc();}
+  void  precalc_first()override { COMPONENT::precalc_first();
+    if(subckt()){ subckt()->precalc_first();} else { } }
   //void  expand()			//COMPONENT
-  void  expand_first()override;
-  void  setup_nodes();
-  void  expand_ports_first();
-  void  expand_ports();
-  void  expand_nodes();
-  void  expand_model_nodes();
-  //void  precalc_last()	{assert(subckt()); subckt()->precalc();}
-  void	  map_nodes()override;
+  void  precalc_last()override { COMPONENT::precalc_last();
+    if(subckt()){ subckt()->precalc_last();} else { untested(); } }
+  //void  map_nodes();
   void	  tr_begin()override	{assert(subckt()); subckt()->tr_begin();}
   void	  tr_restore()override	{assert(subckt()); subckt()->tr_restore();}
   void	  dc_advance()override	{assert(subckt()); subckt()->dc_advance();}
@@ -67,24 +64,13 @@ protected: // override virtual
   TIME_PAIR tr_review()override	{assert(subckt()); return _time_by = subckt()->tr_review();}
   void	  tr_accept()override	{assert(subckt()); subckt()->tr_accept();}
   void	  tr_unload()override	{assert(subckt()); subckt()->tr_unload();}
+  void	  dc_final()override	{assert(subckt()); subckt()->dc_final();}
+  void	  tr_final()override	{assert(subckt()); subckt()->tr_final();}
   void	  ac_begin()override	{assert(subckt()); subckt()->ac_begin();}
   void	  do_ac()override	{assert(subckt()); subckt()->do_ac();}
   void	  ac_load()override	{assert(subckt()); subckt()->ac_load();}
+  void	  ac_final()override	{assert(subckt()); subckt()->ac_final();}
   double  noise_num(std::string const& n)const override {itested(); assert(subckt()); return subckt()->noise_num(n);}
-
-public:
-  NODE* new_logic_node(NODE const* proto)override {
-    NODE* l = CARD::new_logic_node(proto);
-    _sim->newnode_module(); // bump module node counter.
-    return l;
-   // assert(prechecked_cast<LOGIC_NODE*>(l));
-   // return prechecked_cast<LOGIC_NODE*>(l);
-  }
-  NODE* new_matrix_node(NODE const* proto)override {
-    NODE* l = CARD::new_matrix_node(proto);
-    CKT_BASE::_sim->newnode_module(); // bump module node counter.
-    return l;
-  }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

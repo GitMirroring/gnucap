@@ -109,7 +109,7 @@ private: // override virtual
   char	   id_letter()const override	{return 'K';}
   bool	   print_type_in_spice()const override {return false;}
   std::string value_name()const override {return "k";}
-  std::string dev_type()const override	{untested(); return "mutual_inductor";}
+  std::string dev_type()const override	{return "mutual_inductor";}
   int	   max_nodes()const override	{return 2;}
   int	   min_nodes()const override	{return 2;}
   int	   matrix_nodes()const override	{return 2;}
@@ -139,10 +139,6 @@ private: // override virtual
   void	   ac_load()override;
   COMPLEX  ac_amps()const override	{untested(); return _loss0 * ac_outvolts();}
 
-  int	   set_port_by_name(std::string& Name, std::string& Value)override
-		{untested(); return COMPONENT::set_port_by_name(Name,Value);}
-  void	   set_port_by_index(int Index, std::string& Value)override
-		{set_current_port_by_index(Index, Value);}
   bool	   node_is_connected(int i)const override {
     switch (i) {
     case 0:  return _output_label != "";
@@ -150,24 +146,20 @@ private: // override virtual
     default: unreachable(); return false;
     }
   }
-
-  std::string port_name(int)const override {untested();
-    return "";
-  }
-  std::string current_port_name(int i)const override {untested();
+  std::string port_name(int i)const override {
     assert(i >= 0);
     assert(i < 2);
     static std::string names[] = {"l1", "l2"};
     return names[i];
   }
-  const std::string current_port_value(int i)const override {
+  const std::string port_value(int i)const override {
     switch (i) {
-    case 0:  return _output_label;
-    case 1:  return _input_label;
-    default: unreachable(); return COMPONENT::current_port_value(i);
+    case 0: return _output_label;
+    case 1: return _input_label;
+    default: unreachable(); return COMPONENT::port_value(i);
     }
   }
-  void set_current_port_by_index(int i, const std::string& s) override {
+  void set_port_by_index(int i, std::string& s) override {
     switch (i) {
     case 0:  _output_label = s;	break;
     case 1:  _input_label = s;	break;
@@ -232,9 +224,9 @@ void DEV_INDUCTANCE::expand()
   STORAGE::expand();
   if (_sim->is_first_expand()) {
     if (!_c_model) {
-      _n[IN1].set_to_ground(this);
+      //n_(IN1).set_to_ground(this);
     }else{
-      _n[IN1].new_model_node(long_label() + ".i", this);
+      n_(IN1).new_model_node(long_label() + ".i", this);
     }
   }else{untested();
   }
@@ -261,8 +253,8 @@ void DEV_MUTUAL_L::expand_last()
 {
   STORAGE::expand(); // skip DEV_INDUCTANCE
   if (_sim->is_first_expand()) {
-    _n[OUT2] = _input->n_(IN1);
-    _n[OUT1] = _output->n_(IN1);
+    n_(OUT2) = _input->n_(IN1);
+    n_(OUT1) = _output->n_(IN1);
   }else{untested();
   }
 }
@@ -295,15 +287,12 @@ void DEV_INDUCTANCE::tr_iwant_matrix()
   }else{
     assert(matrix_nodes() == 3);
     
-    assert(_n[OUT1].m_() != INVALID_NODE);
-    assert(_n[OUT2].m_() != INVALID_NODE);
-    assert(_n[IN1].m_() != INVALID_NODE);
+    assert(n_(OUT1).m_() != INVALID_NODE);
+    assert(n_(OUT2).m_() != INVALID_NODE);
+    assert(n_(IN1).m_() != INVALID_NODE);
     
-    _sim->_aa.iwant(_n[OUT1].m_(),_n[IN1].m_());
-    _sim->_aa.iwant(_n[OUT2].m_(),_n[IN1].m_());
-    
-    _sim->_lu.iwant(_n[OUT1].m_(),_n[IN1].m_());
-    _sim->_lu.iwant(_n[OUT2].m_(),_n[IN1].m_());
+    _sim->_aa.iwant(n_(OUT1).m_(),n_(IN1).m_());
+    _sim->_aa.iwant(n_(OUT2).m_(),n_(IN1).m_());
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -393,7 +382,7 @@ bool DEV_MUTUAL_L::do_tr_last()
   double l2 = _input->_y[0].f1;
   _lm = value() * sqrt(l1 * l2);
 
-  _y[0].x = _n[OUT1].v0() - _n[OUT2].v0(); // really current
+  _y[0].x = n_(OUT1).v0() - n_(OUT2).v0(); // really current
   _y[0].f1 = -_lm;
   _y[0].f0 = _y[0].x * _y[0].f1;	   // flux = I * L
   trace3("", _y[0].x, _y[0].f0, _y[0].f1);
@@ -405,7 +394,7 @@ bool DEV_MUTUAL_L::do_tr_last()
   _m0.c0 = -_loss0 * _loss0 * _i[0].c0();
   trace3("", _m0.x, _m0.c0, _m0.c1);
 
-  _yf[0].x = _n[OUT1].v0();
+  _yf[0].x = n_(OUT1).v0();
   _yf[0].f1 = -_lm;
   _yf[0].f0 = _yf[0].x * _yf[0].f1;
   trace3("", _yf[0].x, _yf[0].f0, _yf[0].f1);
@@ -415,7 +404,7 @@ bool DEV_MUTUAL_L::do_tr_last()
   trace3("", _if[0].x, _if[0].f0, _if[0].f1);
   _mf0_c0 = -_loss0 * _loss0 * _if[0].c0();
   
-  _yr[0].x = _n[OUT2].v0();
+  _yr[0].x = n_(OUT2).v0();
   _yr[0].f1 = -_lm;
   _yr[0].f0 = _yr[0].x * _yr[0].f1;
   trace3("", _yr[0].x, _yr[0].f0, _yr[0].f1);
@@ -435,8 +424,8 @@ void DEV_INDUCTANCE::tr_load()
     tr_load_passive();
   }else{
     tr_load_inode();
-    tr_load_diagonal_point(_n[IN1], &_m0.c1, &_m1.c1);
-    tr_load_source_point(_n[IN1], &_m0.c0, &_m1.c0);
+    tr_load_diagonal_point(n_(IN1), &_m0.c1, &_m1.c1);
+    tr_load_source_point(n_(IN1), &_m0.c0, &_m1.c0);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -444,8 +433,8 @@ void DEV_MUTUAL_L::tr_load()
 {
   tr_load_couple();
   tr_load_source();
-  tr_load_source_point(_n[OUT2], &_mr0_c0, &_mr1_c0);
-  tr_load_source_point(_n[OUT1], &_mf0_c0, &_mf1_c0);
+  tr_load_source_point(n_(OUT2), &_mr0_c0, &_mr1_c0);
+  tr_load_source_point(n_(OUT1), &_mf0_c0, &_mf1_c0);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_INDUCTANCE::tr_unload()
@@ -465,7 +454,7 @@ double DEV_INDUCTANCE::tr_input()const
   if (!_c_model) {
     return _m0.c0 + _m0.c1 * tr_involts();
   }else{
-    return _n[IN1].v0();
+    return n_(IN1).v0();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -474,7 +463,7 @@ double DEV_INDUCTANCE::tr_input_limited()const
   if (!_c_model) {
     return _m0.c0 + _m0.c1 * tr_involts_limited();
   }else{
-    return _n[IN1].v0();
+    return n_(IN1).v0();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -483,7 +472,7 @@ double DEV_INDUCTANCE::tr_amps()const
   if (!_c_model) {
     return fixzero((_m0.c1 * tr_involts() + _m0.c0), _m0.c0);
   }else{
-    return _loss0 * _n[IN1].v0();
+    return _loss0 * n_(IN1).v0();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -494,12 +483,12 @@ void DEV_INDUCTANCE::ac_iwant_matrix()
   }else{
     assert(matrix_nodes() == 3);
     
-    assert(_n[OUT1].m_() != INVALID_NODE);
-    assert(_n[OUT2].m_() != INVALID_NODE);
-    assert(_n[IN1].m_() != INVALID_NODE);
+    assert(n_(OUT1).m_() != INVALID_NODE);
+    assert(n_(OUT2).m_() != INVALID_NODE);
+    assert(n_(IN1).m_() != INVALID_NODE);
     
-    _sim->_acx.iwant(_n[OUT1].m_(),_n[IN1].m_());
-    _sim->_acx.iwant(_n[OUT2].m_(),_n[IN1].m_());
+    _sim->_acx.iwant(n_(OUT1).m_(),n_(IN1).m_());
+    _sim->_acx.iwant(n_(OUT2).m_(),n_(IN1).m_());
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -536,7 +525,7 @@ void DEV_INDUCTANCE::ac_load()
     ac_load_passive();
   }else{
     ac_load_inode();
-    ac_load_diagonal_point(_n[IN1], _acg);
+    ac_load_diagonal_point(n_(IN1), _acg);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -550,7 +539,7 @@ COMPLEX DEV_INDUCTANCE::ac_amps()const
   if (!_c_model) {
     return (ac_involts() * _acg);
   }else{
-    return  _loss0 * _n[IN1].vac();
+    return  _loss0 * n_(IN1).vac();
   }
 }
 /*--------------------------------------------------------------------------*/

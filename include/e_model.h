@@ -52,7 +52,7 @@ public:
 
 public: // override virtuals
   char	id_letter()const override	{untested();return '\0';}
-  CARD*	clone_instance()const override	{return (_component_proto) ? _component_proto->clone() : NULL;}
+  CARD*	clone_instance()const override	{return (_component_proto) ? _component_proto->clone() : nullptr;}
   void	precalc_first()override;
   void	set_param_by_index(int, std::string&, int)override;
   bool  param_is_printable(int)const override;
@@ -68,7 +68,7 @@ public:
   virtual SDP_CARD* new_sdp(COMMON_COMPONENT*)const {unreachable();return 0;};
   virtual bool parse_params_obsolete_callback(CS&) {unreachable(); return false;}
   virtual bool is_valid(const COMPONENT*)const {return true;}
-  const CARD* component_proto()const {untested(); return _component_proto;}
+  const CARD* component_proto()const {itested(); return _component_proto;}
 protected:
   const CARD* _component_proto;
 public:

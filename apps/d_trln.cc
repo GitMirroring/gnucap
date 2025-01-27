@@ -78,7 +78,7 @@ private:
   explicit	DEV_TRANSLINE(const DEV_TRANSLINE& p)
     :ELEMENT(p), _forward(), _reflect(), _if0(0), _ir0(0), _if1(0), _ir1(0) {}
 public:
-  explicit	DEV_TRANSLINE(COMMON_COMPONENT* c=NULL);
+  explicit	DEV_TRANSLINE(COMMON_COMPONENT* c=nullptr);
 private: // override virtual
   char		id_letter()const override	{return 'T';}
   std::string   value_name()const override	{return "#";}
@@ -107,7 +107,7 @@ private: // override virtual
   void		ac_load()override;
   COMPLEX	ac_involts()const override;
 
-  std::string port_name(int i)const override {itested();
+  std::string port_name(int i)const override {
     assert(i >= 0);
     assert(i < 4);
     static std::string names[] = {"t1", "b1", "t2", "b2"};
@@ -125,18 +125,18 @@ inline bool DEV_TRANSLINE::tr_needs_eval()const
 /*--------------------------------------------------------------------------*/
 inline double DEV_TRANSLINE::tr_involts()const
 {
-  return dn_diff(_n[IN1].v0(), _n[IN2].v0());
+  return dn_diff(n_(IN1).v0(), n_(IN2).v0());
 }
 /*--------------------------------------------------------------------------*/
 inline double DEV_TRANSLINE::tr_involts_limited()const
 { untested();
   unreachable();
-  return volts_limited(_n[IN1],_n[IN2]);
+  return volts_limited(n_(IN1),n_(IN2));
 }
 /*--------------------------------------------------------------------------*/
 inline COMPLEX DEV_TRANSLINE::ac_involts()const
 {untested();
-  return _n[IN1]->vac() - _n[IN2]->vac();
+  return n_(IN1)->vac() - n_(IN2)->vac();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -217,7 +217,7 @@ bool COMMON_TRANSLINE::operator==(const COMMON_COMPONENT& x)const
 /*--------------------------------------------------------------------------*/
 void COMMON_TRANSLINE::set_param_by_index(int I, std::string& Value, int Offset)
 {
-  switch (COMMON_TRANSLINE::param_count() - 1 - I) {
+  switch (I) {
   case 0:  len = Value; break;
   case 1:  R = Value; break;
   case 2:  L = Value; break;
@@ -227,14 +227,14 @@ void COMMON_TRANSLINE::set_param_by_index(int I, std::string& Value, int Offset)
   case 6:  td = Value; break;
   case 7:  f = Value; break;
   case 8:  nl = Value; break;
-  default: COMMON_COMPONENT::set_param_by_index(I, Value, Offset); break;
+  default: COMMON_COMPONENT::set_param_by_index(I-9, Value, Offset+9); break;
   }
   //BUG// does not print IC
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_TRANSLINE::param_is_printable(int I)const
 {
-  switch (COMMON_TRANSLINE::param_count() - 1 - I) {
+  switch (I) {
   case 0:  return len.has_hard_value();
   case 1:  return R.has_hard_value();
   case 2:  return L.has_hard_value();
@@ -244,7 +244,7 @@ bool COMMON_TRANSLINE::param_is_printable(int I)const
   case 6:  return td.has_hard_value();
   case 7:  return f.has_hard_value();
   case 8:  return nl.has_hard_value();
-  default: return COMMON_COMPONENT::param_is_printable(I);
+  default: return COMMON_COMPONENT::param_is_printable(I-9);
   }
   //BUG// does not print IC
 #if 0
@@ -260,7 +260,7 @@ bool COMMON_TRANSLINE::param_is_printable(int I)const
 /*--------------------------------------------------------------------------*/
 std::string COMMON_TRANSLINE::param_name(int I)const
 {
-  switch (COMMON_TRANSLINE::param_count() - 1 - I) {
+  switch (I) {
   case 0:  return "len";
   case 1:  return "r";
   case 2:  return "l";
@@ -270,7 +270,7 @@ std::string COMMON_TRANSLINE::param_name(int I)const
   case 6:  return "td";
   case 7:  return "f";
   case 8:  return "nl";
-  default: return COMMON_COMPONENT::param_name(I);
+  default: return COMMON_COMPONENT::param_name(I-9);
   }
   //BUG// does not print IC
 }
@@ -280,21 +280,21 @@ std::string COMMON_TRANSLINE::param_name(int I, int j)const
   if (j == 0) {
     return param_name(I);
   }else if (I >= COMMON_COMPONENT::param_count()) {
-    switch (COMMON_TRANSLINE::param_count() - 1 - I) {
+    switch (I) {
     case 5:  return (j==1) ? "z" : (j==2) ? "zo" : "";
     case 6:  return (j==1) ? "d" : (j==2) ? "delay" : "";
     case 7:  return (j==1) ? "freq" : "";
     default: return "";
     }
   }else{itested();
-    return COMMON_COMPONENT::param_name(I, j);
+    return COMMON_COMPONENT::param_name(I-9, j);
   }
   //BUG// does not print IC
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_TRANSLINE::param_value(int I)const
 {
-  switch (COMMON_TRANSLINE::param_count() - 1 - I) {
+  switch (I) {
   case 0:  return len.string();
   case 1:  return R.string();
   case 2:  return L.string();
@@ -304,7 +304,7 @@ std::string COMMON_TRANSLINE::param_value(int I)const
   case 6:  return td.string();
   case 7:  return f.string();
   case 8:  return nl.string();
-  default: return COMMON_COMPONENT::param_value(I);
+  default: return COMMON_COMPONENT::param_value(I-9);
   }
   //BUG// does not print IC
 }
@@ -380,15 +380,12 @@ void DEV_TRANSLINE::precalc_last()
   _forward.set_delay(c->real_td);
   _reflect.set_delay(c->real_td);
   set_converged();
-  assert(!is_constant());
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_iwant_matrix()
 {
-  _sim->_aa.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_aa.iwant(_n[IN1].m_(), _n[IN2].m_());
-  _sim->_lu.iwant(_n[OUT1].m_(),_n[OUT2].m_());
-  _sim->_lu.iwant(_n[IN1].m_(), _n[IN2].m_());
+  _sim->_aa.iwant(n_(OUT1).m_(),n_(OUT2).m_());
+  _sim->_aa.iwant(n_(IN1).m_(), n_(IN2).m_());
 }
 /*--------------------------------------------------------------------------*/
 /* first setup, initial dc, empty the lines
@@ -458,8 +455,8 @@ void DEV_TRANSLINE::tr_load()
   if (!_sim->is_inc_mode()) {
     const COMMON_TRANSLINE* c = prechecked_cast<const COMMON_TRANSLINE*>(common());
     assert(c);
-    _sim->_aa.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), mfactor()/c->real_z0);
-    _sim->_aa.load_symmetric(_n[IN1].m_(),  _n[IN2].m_(),  mfactor()/c->real_z0);
+    _sim->_aa.load_symmetric(n_(OUT1).m_(), n_(OUT2).m_(), mfactor()/c->real_z0);
+    _sim->_aa.load_symmetric(n_(IN1).m_(),  n_(IN2).m_(),  mfactor()/c->real_z0);
     lvf = _if0;
     lvr = _ir0;
   }else{
@@ -467,23 +464,23 @@ void DEV_TRANSLINE::tr_load()
     lvr = dn_diff(_ir0, _ir1);
   }
   if (lvf != 0.) {
-    if (_n[OUT1].m_() != 0) {
-      _n[OUT1].i() += mfactor() * lvf;
+    if (n_(OUT1).m_() != 0) {
+      n_(OUT1).i() += mfactor() * lvf;
     }else{untested();
     }
-    if (_n[OUT2].m_() != 0) {untested();
-      _n[OUT2].i() -= mfactor() * lvf;
+    if (n_(OUT2).m_() != 0) {untested();
+      n_(OUT2).i() -= mfactor() * lvf;
     }else{
     }
   }else{
   }
   if (lvr != 0.) {
-    if (_n[IN1].m_() != 0) {
-      _n[IN1].i() += mfactor() * lvr;
+    if (n_(IN1).m_() != 0) {
+      n_(IN1).i() += mfactor() * lvr;
     }else{untested();
     }
-    if (_n[IN2].m_() != 0) {untested();
-      _n[IN2].i() -= mfactor() * lvr;
+    if (n_(IN2).m_() != 0) {untested();
+      n_(IN2).i() -= mfactor() * lvr;
     }else{
     }
   }else{
@@ -536,11 +533,11 @@ void DEV_TRANSLINE::do_ac()
 void DEV_TRANSLINE::ac_load()
 {
   //BUG// explicit mfactor
-  _sim->_acx.load_symmetric(_n[OUT1].m_(), _n[OUT2].m_(), mfactor()*_y11);
-  _sim->_acx.load_symmetric(_n[IN1].m_(),  _n[IN2].m_(),  mfactor()*_y11);
-  _sim->_acx.load_asymmetric(_n[OUT1].m_(),_n[OUT2].m_(), _n[IN2].m_(),  _n[IN1].m_(),
+  _sim->_acx.load_symmetric(n_(OUT1).m_(), n_(OUT2).m_(), mfactor()*_y11);
+  _sim->_acx.load_symmetric(n_(IN1).m_(),  n_(IN2).m_(),  mfactor()*_y11);
+  _sim->_acx.load_asymmetric(n_(OUT1).m_(),n_(OUT2).m_(), n_(IN2).m_(),  n_(IN1).m_(),
 			     mfactor()*_y12);
-  _sim->_acx.load_asymmetric(_n[IN1].m_(), _n[IN2].m_(), _n[OUT2].m_(), _n[OUT1].m_(),
+  _sim->_acx.load_asymmetric(n_(IN1).m_(), n_(IN2).m_(), n_(OUT2).m_(), n_(OUT1).m_(),
 			     mfactor()*_y12);
 }
 /*--------------------------------------------------------------------------*/

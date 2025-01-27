@@ -72,8 +72,6 @@ static DISPATCHER<COMMON_COMPONENT>::INSTALL d1(&bm_dispatcher,
 namespace {
 /*--------------------------------------------------------------------------*/
 class DCOP : public SIM {
-public:
-  void	finish()override;
 protected:
   void	fix_args(int);
   void	options(CS&, int);
@@ -83,6 +81,9 @@ private:
   void	sweep_recursive(int);
   void	first(int);
   bool	next(int);
+  void	final()override		{_scope->dc_final();}
+  void	finish()override;
+
   explicit DCOP(const DCOP&): SIM() {unreachable(); incomplete();}
 protected:
   void set_sweepval(int i, double d){
@@ -124,7 +125,7 @@ protected:
   COMMON_COMPONENT* _ctrl[DCNEST]; /* take control */
   std::string _param_name[DCNEST];
   double _param[DCNEST];        // sweep this value:
-  PARAMETER<double> _param_zap[DCNEST]; // keep a backup
+  PARAM_INSTANCE _param_zap[DCNEST]; // keep a backup
   CARDSTASH _stash[DCNEST];	/* store std values of elements being swept */
   bool _loop[DCNEST];		/* flag: do it again backwards */
   bool _reverse_in[DCNEST];	/* flag: sweep backwards, input */
@@ -168,7 +169,7 @@ void DC::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->_phase = p_INIT_DC;
   ::status.dc.reset().start();
   command_base(Cmd);
-  _scope = NULL;
+  _scope = nullptr;
   ::status.dc.stop();
 }
 /*--------------------------------------------------------------------------*/
@@ -184,7 +185,7 @@ void OP::do_it(CS& Cmd, CARD_LIST* Scope)
   _sim->_phase = p_INIT_DC;
   ::status.op.reset().start();
   command_base(Cmd);
-  _scope = NULL;
+  _scope = nullptr;
   ::status.op.stop();
 }
 /*--------------------------------------------------------------------------*/
@@ -202,8 +203,8 @@ DCOP::DCOP()
     _step[ii]=0.;
     _linswp[ii]=true;
     _sweepval[ii]=&_sim->_genout;
-    _zap[ii] = NULL;
-    _ctrl[ii] = NULL;
+    _zap[ii] = nullptr;
+    _ctrl[ii] = nullptr;
     _stepmode[ii] = ONE_PT;
     _param[ii] = NOT_VALID;
   }
@@ -222,14 +223,15 @@ void DCOP::finish(void)
       _stash[ii].restore();
       _zap[ii]->precalc_first();
       _zap[ii]->precalc_last();
-      _zap[ii] = NULL;
-      _ctrl[ii] = NULL;
+      _zap[ii] = nullptr;
+      _ctrl[ii] = nullptr;
     }else if (n != "") {
       PARAM_LIST* pl = _scope->params();
       assert(pl);
       std::string previous_value = _param_zap[ii].string();
       CS cmd(CS::_STRING, n + "=" + previous_value);
       pl->set(n, previous_value);
+    }else{
     }
     assert(!_ctrl[ii]);
   }
@@ -244,7 +246,7 @@ void OP::setup(CS& Cmd)
   _out.reset(); //BUG// don't know why this is needed */
   bool ploton = IO::plotset  &&  plotlist().size() > 0;
 
-  _zap[0] = NULL;
+  _zap[0] = nullptr;
   _sweepval[0] = &(_sim->_temp_c);
   _have_param = true; // temp requires precalc
 
@@ -296,13 +298,13 @@ void DC::setup(CS& Cmd)
 	  throw Exception("dc/op: can't sweep " + (**ci).long_label() + '\n');
 	}
       }else if (Cmd.is_float()) {		// sweep the generator
-	_zap[_n_sweeps] = NULL;
+	_zap[_n_sweeps] = nullptr;
       }else if (Cmd.is_alpha()) {
 	std::string pname;
 
 	size_t here = Cmd.cursor();
         Cmd >> pname;
-	PARAMETER<double> zap = _scope->params()->deep_lookup(pname);
+	PARAM_INSTANCE zap = _scope->params()->deep_lookup(pname);
 	if(zap.has_hard_value()){
 	  _param_zap[_n_sweeps] = zap;
 	  _param_name[_n_sweeps] = pname;
@@ -454,7 +456,11 @@ void DCOP::sweep()
     _sim->clear_limit();
     _scope->tr_begin();
   }
-  sweep_recursive(_n_sweeps);
+  try {
+    sweep_recursive(_n_sweeps);
+  }catch (Exception& e) {untested();
+    error(bDANGER, e.message() + '\n');
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DCOP::precalc()
@@ -609,8 +615,8 @@ bool DCOP::next(int Nest)
 /*--------------------------------------------------------------------------*/
 static DC p2;
 static OP p4;
-static DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "dc", &p2);
-static DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "op", &p4);
+static DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "dc|`dc", &p2);
+static DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "op|`op", &p4);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

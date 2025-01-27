@@ -58,6 +58,7 @@ enum {CC_STATIC=27342}; // mid-sized arbitrary positive int
 // so it won't be deleted
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_COMPONENT : public CKT_BASE {
+  mutable COMMON_COMPONENT* _next{nullptr};
 protected: // probably obsolete
   PARAMETER<double>	_tnom_c;  // specification temperature
   PARAMETER<double>	_dtemp;   // rise over enclosing temperature
@@ -71,6 +72,9 @@ public:
   static void attach_common(COMMON_COMPONENT* c, COMMON_COMPONENT** to);
   static void detach_common(COMMON_COMPONENT** from);
   bool is_shared()const {return _attach_count > 1;}
+  void attach_next(COMMON_COMPONENT* c) { untested(); attach_common(c, &_next); }
+  void detach_next() { untested(); detach_common(&_next); }
+  bool has_next()const { untested(); return _next; }
 private:
   COMMON_COMPONENT& operator=(const COMMON_COMPONENT&)
 			      {unreachable(); return *this;}
@@ -152,17 +156,19 @@ class HS_PARAM;
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMPONENT : public CARD {
 private:
-  COMMON_COMPONENT* _common{NULL};
-  HS_PARAM* _hsparam{NULL}; // possibly indirect. later.
+  // meets short,int,bool (7 bytes, needs 1)
+  bool	    _converged{false};
 private:
-  double _mfactor_fixed;	// composite, including subckt mfactor
-  bool	 _converged;
-  int	 _q_for_eval;
+  COMMON_COMPONENT* _common{nullptr};
+  HS_PARAM* _hsparam{nullptr};		// possibly indirect. later.
+  float	    _mfactor_fixed{1.0};	// composite, including subckt mfactor
+  int	    _q_for_eval{-1};
 public:
   TIME_PAIR _time_by;
+  short     _net_nodes{0};	// actual number of "nodes" in the netlist
   //--------------------------------------------------------------------
 protected: // create and destroy.
-  explicit   COMPONENT(COMMON_COMPONENT* c=NULL);
+  explicit   COMPONENT(COMMON_COMPONENT* c=nullptr);
   explicit   COMPONENT(const COMPONENT& p);
 	     ~COMPONENT();
   //--------------------------------------------------------------------
@@ -193,13 +199,12 @@ public:	// state, aux data
   void	set_not_converged()		{_converged = false;}
 
   double mfactor()const {
-    assert(_mfactor_fixed != NOT_VALID);
 #ifndef NDEBUG
     if (const COMPONENT* o = dynamic_cast<const COMPONENT*>(owner())) {
-      assert(_mfactor_fixed == o->mfactor() * my_mfactor());
+      assert(_mfactor_fixed == float(o->mfactor() * my_mfactor()));
     }else{
       assert(!owner());
-      assert(_mfactor_fixed == my_mfactor());
+      assert(_mfactor_fixed == float(my_mfactor()));
     }
 #endif
     return _mfactor_fixed;
@@ -229,24 +234,19 @@ public:	// type
   void  set_dev_type(const std::string& new_type) override;
   //--------------------------------------------------------------------
 public:	// ports
+  node_t& n_(int i)const override = 0;
   virtual std::string port_name(int)const = 0;
   virtual int  set_port_by_name(std::string& name, std::string& value);
   virtual void set_port_by_index(int index, std::string& value);
-  bool port_exists(int i)const {return i < net_nodes();}
-  const std::string port_value(int i)const;
+  bool port_exists(int i)const		{return i < (net_nodes()+num_current_ports());}
+  virtual const std::string port_value(int i)const;
   void	set_port_to_ground(int index);
-
-  virtual std::string current_port_name(int)const {return "";}
-  virtual const std::string current_port_value(int)const;
-  virtual void set_current_port_by_index(int, const std::string&) {unreachable();}    
-  bool current_port_exists(int i)const	{return i < num_current_ports();}
 
   virtual int	max_nodes()const	{unreachable(); return 0;}
   virtual int	min_nodes()const	{unreachable(); return 0;}
   virtual int	num_current_ports()const {return 0;}
   virtual int	tail_size()const	{return 0;}
 
-  int	net_nodes()const override	{itested();return 0;} //override
   virtual int	ext_nodes()const	{return max_nodes();}
   virtual int	int_nodes()const	{return 0;}
   virtual int	matrix_nodes()const	{return 0;}

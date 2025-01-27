@@ -49,12 +49,13 @@ public:
   ~AC() {}
 private:
   explicit AC(const AC&):SIM() {unreachable(); incomplete();}
+  void	setup(CS&)override;
   void	sweep()override;
   void	first();
   bool	next();
   void	solve();
-  void	clear();
-  void	setup(CS&)override;
+  void	final()override		{_scope->ac_final();}
+  void	finish()override	{}
 private:
   PARAMETER<double> _start;	// sweep start frequency
   PARAMETER<double> _stop;	// sweep stop frequency
@@ -89,18 +90,19 @@ void AC::do_it(CS& Cmd, CARD_LIST* Scope)
 
     switch (ENV::run_mode) {
     case rPRE_MAIN:	unreachable();	break;
-    case rBATCH:
-    case rINTERACTIVE:
-    case rSCRIPT:	sweep();	break;
+    case rBATCH:	sweep(); final(); break;
+    case rINTERACTIVE:	itested();sweep(); final(); break;
+    case rSCRIPT:	sweep(); final(); break;
     case rPRESET:	/*nothing*/	break;
     }
   }catch (Exception& e) {untested();
     error(bDANGER, e.message() + '\n');
   }
+  finish();
   _sim->_acx.unallocate();
   _sim->unalloc_vectors();
 
-  _scope = NULL;
+  _scope = nullptr;
   
   ::status.ac.stop();
   ::status.total.stop();
@@ -232,11 +234,15 @@ void AC::setup(CS& Cmd)
 void AC::solve()
 {
   _sim->_acx.zero();
-  std::fill_n(_sim->_ac, _sim->total_nodes()+1, 0.);
+  std::fill_n(_sim->_ac, _sim->_total_nodes+1, 0.);
 
   ::status.load.start();
   _sim->count_iterations(iTOTAL);
   _scope->do_ac();
+  while (!_sim->_late_evalq.empty()) { //BUG// encapsulation violation
+    _sim->_late_evalq.front()->do_ac_last();
+    _sim->_late_evalq.pop_front();
+  }
   _scope->ac_load();
   ::status.load.stop();
 
@@ -254,12 +260,16 @@ void AC::sweep()
   head(_start, _stop, "Freq");
   first();
   _scope->ac_begin();
-  do {
-    _sim->_jomega = COMPLEX(0., _sim->_freq * M_TWO_PI);
-    solve();
-    outdata(_sim->_freq, ofPRINT | ofSTORE);
-    _sim->_has_op = s_AC;
-  } while (next());
+  try {
+    do {
+      _sim->_jomega = COMPLEX(0., _sim->_freq * M_TWO_PI);
+      solve();
+      outdata(_sim->_freq, ofPRINT | ofSTORE);
+      _sim->_has_op = s_AC;
+    } while (next());
+  }catch (Exception& e) {untested();
+    error(bDANGER, e.message() + '\n');
+  }
 }
 /*--------------------------------------------------------------------------*/
 void AC::first()
@@ -288,7 +298,7 @@ bool AC::next()
 }
 /*--------------------------------------------------------------------------*/
 static AC p1;
-static DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "ac", &p1);
+static DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "ac|`ac", &p1);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

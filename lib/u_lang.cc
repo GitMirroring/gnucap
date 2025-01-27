@@ -31,7 +31,7 @@
 LANGUAGE::~LANGUAGE()
 {
   if (OPT::language == this) {
-    OPT::language = NULL;
+    OPT::language = nullptr;
   }else{
   }
 }
@@ -44,7 +44,7 @@ void LANGUAGE::parse_top_item(CS& cmd, CARD_LIST* Scope)
 /*--------------------------------------------------------------------------*/
 const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
 {
-  const CARD* p = NULL;
+  const CARD* p = nullptr;
   if (Scope) {
     try {
       p = Scope->find_looking_out(Name);
@@ -77,7 +77,7 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
     else if (Umatch(Name, "gen{erator} "))  {		 s = "generator";}
     else if (Umatch(Name, "inc{lude} "))    {untested(); s = "include";}
     else if (Umatch(Name, "l{ist} "))       {untested(); s = "list";}
-    else if (Umatch(Name, "m{odify} "))     {untested(); s = "modify";}
+    else if (Umatch(Name, "m{odify} "))     { s = "modify";}
     else if (Umatch(Name, "opt{ions} "))    {            s = "options";}
     else if (Umatch(Name, "par{ameter} "))  {untested(); s = "param";}
     else if (Umatch(Name, "pr{int} "))      {untested(); s = "print";}
@@ -94,20 +94,20 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
     if ((command_dispatcher[s])) {
       return new DEV_DOT; //BUG// we will look it up twice, //BUG// memory leak
     }else{
-      return NULL;
+      return nullptr;
     }
   }
 }
 /*--------------------------------------------------------------------------*/
-void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* owner, CARD_LIST* Scope)
+void LANGUAGE::new__instance(CS& cmd, BASE_SUBCKT* Owner, CARD_LIST* Scope)
 {
   if (cmd.is_end()) {itested();
     // nothing
   }else{
     std::string type = find_type_in_string(cmd);
-    if (const CARD* proto = find_proto(type, owner)) {
+    if (const CARD* proto = find_proto(type, Owner)) {
       if (CARD* new_instance = proto->clone_instance()) {
-	new_instance->set_owner(owner);
+	new_instance->set_owner(Owner);
 	CARD* x = parse_item(cmd, new_instance);
 	if (x) {
 	  assert(Scope);
@@ -144,7 +144,7 @@ CARD* LANGUAGE::parse_item(CS& cmd, CARD* c)
   }else{untested();
     incomplete();
     unreachable();
-    return NULL;
+    return nullptr;
   }
 }
 /*--------------------------------------------------------------------------*/
