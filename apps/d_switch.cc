@@ -86,7 +86,7 @@ protected: // override virtual
   double   tr_involts()const override	{itested(); return tr_outvolts();}
   double   tr_involts_limited()const override {unreachable(); return tr_outvolts_limited();}
   void	   ac_iwant_matrix()override	{ac_iwant_matrix_passive();}
-  void	   ac_begin()override		{_ev = _y[0].f1; _acg = _m0.c1;}
+  void	   ac_begin()override		{ELEMENT::ac_begin(); _ev = _y[0].f1; _acg = _m0.c1;}
   void	   do_ac()override;
   void	   ac_load()override		{ac_load_passive();}
   COMPLEX  ac_involts()const override	{untested(); return ac_outvolts();}
@@ -391,6 +391,16 @@ SWITCH_BASE::SWITCH_BASE(const SWITCH_BASE& p)
   notstd::copy_n(p._state, int(OPT::_keep_time_steps), _state);  
 }
 /*--------------------------------------------------------------------------*/
+#define check_consistency() {						\
+    trace5("",__LINE__,_m0.c1,1./_y[0].f1, ((_m0.c1)-(1./_y[0].f1)), ((_m0.c1)/(1./_y[0].f1))); \
+    assert(_y[0].f0 == LINEAR);						\
+    assert(_y[0].f1 == ((_state[0] == _ON) ? m->ron : m->roff));	\
+    assert(conchk(_m0.c1, 1./_y[0].f1));				\
+    assert(_m0.c0 == 0.);						\
+    assert(_loss0 == 0.);						\
+    assert(_loss1 == 0.);						\
+  }
+/*--------------------------------------------------------------------------*/
 void SWITCH_BASE::expand()
 {
   ELEMENT::expand();
@@ -410,19 +420,24 @@ void SWITCH_BASE::expand()
 void SWITCH_BASE::precalc_last()
 {
   ELEMENT::precalc_last();
-    
+
+  const COMMON_SWITCH* c = prechecked_cast<const COMMON_SWITCH*>(common());
+  assert(c);
+  const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
+  assert(m);
+
   if (_sim->has_op() == s_NONE) {
-    const COMMON_SWITCH* c = prechecked_cast<const COMMON_SWITCH*>(common());
-    assert(c);
-    const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
-    assert(m);
+    // first time here.
+    //check_consistency(); // it's not
+    _y1.f0 = _y[0].f0 = LINEAR;
     _y1.f1 = _y[0].f1 = (c->_ic == _ON) ? m->ron : m->roff;	// override, unknown is off
-    
     _m0.c1 = 1./_y[0].f1;
     _m0.c0 = 0.;
     _m1 = _m0;
     _state[1] = _state[0] = c->_ic;
+    check_consistency();
   }else{
+    check_consistency();
   }
 
   assert(_loss0 == 0.);
@@ -438,15 +453,15 @@ void SWITCH_BASE::tr_begin()
   const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
   assert(m);
 
-  assert(_loss0 == 0.);
-  assert(_loss1 == 0.);
-  assert(_y[0].f0 == LINEAR);
+  //check_consistency(); // it's not
+  _y1.f0 = _y[0].f0 = LINEAR;
   _y1.f1 = _y[0].f1 = ((c->_ic == _ON) ? m->ron : m->roff);  /* unknown is off */
   _m0.c1 = 1./_y[0].f1;
-  assert(_m0.c0 == 0.);
+  _m0.c0 = 0.;
   _m1 = _m0;
   _state[1] = _state[0] = c->_ic;
   set_converged();
+  check_consistency();
 }
 /*--------------------------------------------------------------------------*/
 void SWITCH_BASE::dc_advance()
@@ -479,14 +494,10 @@ void SWITCH_BASE::tr_advance()
     _y[0].f1 = (_state[0] == _ON) ? m->ron : m->roff;	/* unknown is off */
     _m0.c1 = 1./_y[0].f1;
     q_eval();
+    check_consistency();
   }else{
+    check_consistency();
   }
-  
-  assert(_y[0].f1 == ((_state[0] == _ON) ? m->ron : m->roff));
-  assert(_y[0].f0 == LINEAR);
-  trace4("", _m0.c1, 1./_y[0].f1, ((_m0.c1) - (1./_y[0].f1)), ((_m0.c1) / (1./_y[0].f1)));
-  assert(conchk(_m0.c1, 1./_y[0].f1));
-  assert(_m0.c0 == 0.);
   set_converged();
 }
 /*--------------------------------------------------------------------------*/
@@ -498,12 +509,8 @@ void SWITCH_BASE::tr_regress()
   assert(c);
   const MODEL_SWITCH* m = prechecked_cast<const MODEL_SWITCH*>(c->model());
   assert(m);
-
-  assert(_y[0].f1 == ((_state[0] == _ON) ? m->ron : m->roff));
-  assert(_y[0].f0 == LINEAR);
-  assert(_m0.c1 == 1./_y[0].f1);
-  assert(_m0.c0 == 0.);
   set_converged();
+  check_consistency();
 }
 /*--------------------------------------------------------------------------*/
 bool SWITCH_BASE::do_tr()
@@ -528,6 +535,7 @@ bool SWITCH_BASE::do_tr()
     }
     
     if (new_state != _state[0]) {
+      check_consistency();
       _y[0].f1 = (new_state == _ON) ? m->ron : m->roff;	/* unknown is off */
       _state[0] = new_state;
       _m0.c1 = 1./_y[0].f1;
@@ -535,11 +543,14 @@ bool SWITCH_BASE::do_tr()
       q_load();
       store_values();
       set_not_converged();
+      check_consistency();
     }else{
+      check_consistency();
       trace3("no change", new_state, _y[0].f1, _m0.c1);
       set_converged();
     }
   }else{
+    check_consistency();
     // Above isn't necessary because it was done in tr_advance,
     // and doesn't iterate.
     // I believe it is not necessary on restart, because it is stored.
@@ -550,11 +561,8 @@ bool SWITCH_BASE::do_tr()
       // gets here only on "nobypass"
     }
     assert(converged());
+    check_consistency();
   }
-  assert(_y[0].f1 == ((_state[0] == _ON) ? m->ron : m->roff));
-  assert(_y[0].f0 == LINEAR);
-  //assert(_m0.c1 == 1./_y[0].f1);
-  assert(_m0.c0 == 0.);
   return converged();
 }
 /*--------------------------------------------------------------------------*/
