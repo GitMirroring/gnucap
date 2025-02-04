@@ -25,10 +25,9 @@
 #ifndef U_ATTRIB_H
 #define U_ATTRIB_H
 #include "ap.h"
+#include "md.h"
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-typedef intptr_t tag_t;
-
 class INTERFACE ATTRIB_LIST {
 private:
   std::string _s;	// comma separated, key=value

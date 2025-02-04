@@ -202,6 +202,10 @@ public:
 #include "io_trace.h"
 #include "io_error.h"
 /*--------------------------------------------------------------------------*/
+// tagging. probably arch dependent...
+typedef intptr_t tag_t; // possibly need/want uint64_t on 32 bit
+inline tag_t base_tag(void const* x) {return tag_t(x)<<2*sizeof(tag_t);}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:

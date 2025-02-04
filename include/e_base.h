@@ -26,6 +26,7 @@
 #define E_BASE_H
 #include "u_attrib.h"
 #include "l_indirect.h"
+#include "md.h"
 /*--------------------------------------------------------------------------*/
 // external
 class WAVE;
@@ -50,7 +51,7 @@ protected: // create and destroy
   virtual void	      purge() {}
   //--------------------------------------------------------------------
 public: // tags and attributes (meta-data)
-  tag_t			id_tag()const		{return tag_t(this)<<sizeof(tag_t);}
+  tag_t			id_tag()const		{return base_tag(this);}
   tag_t		   port_id_tag(int i)const	{return id_tag()-(i+1);}
   tag_t		  param_id_tag(int i)const	{return id_tag()+(i+1);}
 protected:
