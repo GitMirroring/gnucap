@@ -36,7 +36,6 @@ class PARAM_LIST;
 class NODE_MAP;
 class LANGUAGE;
 struct TIME_PAIR;
-class NODE_P;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CARD_LIST {
 public: // base types

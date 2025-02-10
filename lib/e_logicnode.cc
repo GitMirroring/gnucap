@@ -25,8 +25,8 @@
 #include "e_logicmod.h"
 #include "e_logicnode.h"
 /*--------------------------------------------------------------------------*/
-LOGIC_NODE::LOGIC_NODE(NODE const* proto)
-  :NODE(proto),
+LOGIC_NODE::LOGIC_NODE()
+  :NODE(),
    _family(0),
    _d_iter(-1), // initially d_iter is older than a_iter
    _a_iter(0),

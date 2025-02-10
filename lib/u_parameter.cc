@@ -244,13 +244,12 @@ void PARAM_LIST::set(std::string Name, const PARAM_INSTANCE& Value)
   }else{
   }
   try{
-    _pl[Name] = Value;
+    _pl[Name].set_fixed(&v);
   }catch(Exception_Clash const&){ untested();
-    (_pl[Name] = "") = Value;
+    (_pl[Name] = "").set_fixed(&v);
     error(bTRACE, Name + " already set. replacing\n");
   }
 }
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 bool Get(CS& cmd, const std::string& key, PARAMETER<bool>* val)
 {

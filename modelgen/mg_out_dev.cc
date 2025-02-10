@@ -163,7 +163,7 @@ void make_dev_copy_constructor(std::ofstream& out, const Device& d)
     "  }\n"
 #if 0
     "  for (; ii < max_nodes()+int_nodes(); ++ii) {\n"
-    "    // cf. NODE_P::clone in NODE_MAP::clone.\n"
+    "    // cf. node_t::clone in NODE_MAP::clone.\n"
     "    // prepare internal connections\n"
     "    if(_n[ii].n_()){untested();\n"
     "      assert(_n[ii].user_number() == ii);\n"
@@ -239,7 +239,7 @@ static void make_dev_expand_one_element(std::ofstream& out, const Element& e)
   
   if (!(e.reverse().empty())) {
     out << "      if (" << e.reverse() << ") {\n";
-    out << "        NODE_P nodes[] = {";
+    out << "        node_t nodes[] = {";
     
     Port_List::const_iterator p = e.ports().begin();
     if (p != e.ports().end()) {
@@ -271,7 +271,7 @@ static void make_dev_expand_one_element(std::ofstream& out, const Element& e)
     out << "      {\n";
   }
   
-  out << "        NODE_P nodes[] = {";
+  out << "        node_t nodes[] = {";
   
   Port_List::const_iterator p = e.ports().begin();
   if (p != e.ports().end()) {

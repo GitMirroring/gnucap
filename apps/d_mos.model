@@ -509,7 +509,7 @@ bool DEV_BUILT_IN_MOS::do_tr()
       Vbs = polarity * volts_limited(n_(n_b),n_(n_is));
     }
     vgs = fet_limit_vgs(Vgs, vgs, von);
-    if (_n[n_d].is_short_to(_n[n_g])) {
+    if (n_(n_d).n_() == n_(n_g).n_()) {
       vds = Vds + (vgs - Vgs);
     }else{
       // Spice hacks Vds here, but my tests show that it often makes

@@ -90,7 +90,7 @@ const std::string CARD::long_label()const
  * returns: how many times this part connects to it.
  * does not traverse subcircuits
  */
-int CARD::connects_to(const NODE_P&)const
+int CARD::connects_to(const node_t&)const
 {untested();
   int count = 0;
   if (is_device()) {untested();
@@ -363,18 +363,18 @@ double CARD::ac_probe_num(const std::string& what)const
   }					/* don't have all parts */
 }
 /*--------------------------------------------------------------------------*/
-NODE_P const& CARD::n_(int i) const
+node_t const& CARD::n_(int i) const
 {
   incomplete(); // missing override
   assert(0);
   return const_cast<CARD*>(this)->node(i);
 }
 /*--------------------------------------------------------------------------*/
-NODE_P& CARD::node(int)
+node_t& CARD::node(int)
 {
   unreachable(); // need to override.
   assert(0);
-  static NODE_P n;
+  static node_t n;
   return n;
 }
 /*--------------------------------------------------------------------------*/

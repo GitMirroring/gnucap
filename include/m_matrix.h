@@ -113,14 +113,6 @@
 /*--------------------------------------------------------------------------*/
 #include "l_stlextra.h"
 /*--------------------------------------------------------------------------*/
-namespace{
-struct BSMATRIX_WARN {
-  virtual void operator()(int mm)const {
-    error(bWARNING, "open circuit: internal node %u\n", mm);
-  }
-}default_warn;
-}
-/*--------------------------------------------------------------------------*/
 template <class T>
 class BSMATRIX_SOLVER;
 template <class T>
@@ -810,85 +802,6 @@ void BSMATRIX_SOLVER<T>::load_asymmetric(int r1,int r2,int c1,int c2,T value)
     }else{
     }
   }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-template <class T>
-void BSMATRIX<T>::lu_decomp(const BSMATRIX<T>& aa, bool do_partial,
-    BSMATRIX_WARN const* warn)
-{
-  int prop = 0;   /* change propagation indicator */
-  assert(_lownode);
-  assert(aa._lownode);
-  assert(aa.size() == size());
-  for (int mm = 1;   mm <= size();   ++mm) {
-    assert(aa.lownode(mm) == _lownode[mm]);
-    int bn = _lownode[mm];
-    if (!do_partial  ||  aa.is_changed(mm)  ||  bn <= prop) {
-      aa.set_changed(mm, false);
-      prop = mm;
-      if (bn < mm) {
-	prop = mm;
-	u(bn,mm) = aa.u(bn,mm) / d(bn,bn);
-	for (int ii = bn+1;  ii<mm;  ii++) {
-	  /* u(ii,mm) = (aa.u(ii,mm) - dot(ii,mm,ii)) / d(ii,ii); */
-	  subtract_dot_product(ii,mm,ii,aa.u(ii,mm)) /= d(ii,ii);
-	}
-	l(mm,bn) = aa.l(mm,bn);
-	for (int jj = bn+1;  jj<mm;  jj++) {
-	  /* l(mm,jj) = aa.l(mm,jj) - dot(mm,jj,jj); */
-	  subtract_dot_product(mm,jj,jj,aa.l(mm,jj));
-	}
-	{ /* jj == mm */
-	  /* d(mm,mm) = aa.d(mm,mm) - dot(mm,mm,mm); then test */
-	  if (subtract_dot_product(mm,mm,mm,aa.d(mm,mm)) == 0.) {
-	    (*warn)(mm);
-	    d(mm,mm) = _min_pivot;
-	  }else{
-	  }
-	}
-      }else{    /* bn == mm */
-	d(mm,mm) = aa.d(mm,mm);
-	if (d(mm,mm)==0.) { untested();
-	  d(mm,mm) = _min_pivot;
-	}else{
-	}
-      }
-    }else{
-    }
-  }
-}
-/*--------------------------------------------------------------------------*/
-template <class T>
-void BSMATRIX<T>::lu_decomp(BSMATRIX_WARN const* warn)
-{
-  assert(_lownode);
-  for (int mm = 1;   mm <= size();   ++mm) {
-    int bn = _lownode[mm];
-    if (bn < mm) {
-      u(bn,mm) /= d(bn,bn);
-      for (int ii =bn+1;  ii<mm;  ii++) {
-	/* (m(ii,mm) -= dot(ii,mm,ii)) /= d(ii,ii); */
-	subtract_dot_product(ii,mm,ii) /= d(ii,ii);
-      }
-      for (int jj = bn+1;  jj<mm;  jj++) {
-	/* m(mm,jj) -= dot(mm,jj,jj); */
-	subtract_dot_product(mm,jj,jj);
-      }
-      { /* jj == mm */
-	/* m(mm,mm) -= dot(mm,mm,mm); then test */
-	if (subtract_dot_product(mm,mm,mm) == 0.) {itested();
-	  (*warn)(mm);
-	  d(mm,mm) = _min_pivot;
-	}else{
-	}
-      }
-    }else{    /* bn == mm */
-      if (d(mm,mm)==0.) {
-	d(mm,mm) = _min_pivot;
-      }else{
-      }
-    }
   }
 }
 /*--------------------------------------------------------------------------*/

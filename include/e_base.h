@@ -35,7 +35,6 @@ class PROBE_LISTS;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CKT_BASE {
 private:
-  mutable int	_probes;		/* number of probes set */
   std::string	_label;
 public:
   static SIM_DATA* _sim;
@@ -44,9 +43,9 @@ private:
   static INDIRECT<ATTRIB_LIST_p> _attribs;
   //--------------------------------------------------------------------
 protected: // create and destroy
-  explicit CKT_BASE()			  :_probes(0), _label() {}
-  explicit CKT_BASE(const std::string& s) :_probes(0), _label(s) {}
-  explicit CKT_BASE(const CKT_BASE& p)	  :_probes(0), _label(p._label) {}
+  explicit CKT_BASE()			  :_label() {}
+  explicit CKT_BASE(const std::string& s) :_label(s) {}
+  explicit CKT_BASE(const CKT_BASE& p)	  :_label(p._label) {}
   virtual  ~CKT_BASE();
   virtual void	      purge() {}
   //--------------------------------------------------------------------
@@ -71,7 +70,7 @@ public: // user stuff
 public: // label
   bool operator!=(const std::string& n)const;
   virtual const std::string long_label()const;
-  virtual const std::string&  short_label()const {return _label;}
+  const std::string&  short_label()const {return _label;}
   void	set_label(const std::string& s) {_label = s;}
 };
 /*--------------------------------------------------------------------------*/

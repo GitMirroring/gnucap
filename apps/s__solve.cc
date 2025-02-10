@@ -158,12 +158,12 @@ void SIM::advance_time(void)
   static double last_iter_time;
   if (_sim->_time0 > 0) {
     if (_sim->_time0 > last_iter_time) {	/* moving forward */
-      notstd::copy_n(_sim->_v0, _sim->total_nodes()+1, _sim->_vt1);
+      notstd::copy_n(_sim->_v0, _sim->_total_nodes+1, _sim->_vt1);
       _scope->tr_advance();
     }else{				/* moving backward */
       /* don't save voltages.  They're wrong! */
       /* instead, restore a clean start for iteration */
-      notstd::copy_n(_sim->_vt1, _sim->total_nodes()+1, _sim->_v0);
+      notstd::copy_n(_sim->_vt1, _sim->_total_nodes+1, _sim->_v0);
       _scope->tr_regress();
     }
   }else{
@@ -271,27 +271,8 @@ void SIM::load_matrix()
   ::status.load.stop();
 }
 /*--------------------------------------------------------------------------*/
-namespace{
-struct mywarn : BSMATRIX_WARN {
-  MATRIX_NODE const** _nodes{NULL};
-  explicit mywarn(MATRIX_NODE const** p) : _nodes(p) { }
-  void operator()(int mm)const override {
-    // assert(_nodes);
-    if(mm >= CKT_BASE::_sim->matrix_nodes()){
-      error(bWARNING, "open circuit: internal node %u\n", mm);
-    }else if(CKT_BASE::_sim->_mstat[mm]){ untested();
-      // todo _nm?
-      error(bWARNING, "open circuit: " + CKT_BASE::_sim->_mstat[mm]->long_label() + "\n");
-    }else{ untested();
-      error(bWARNING, "open circuit: unknown node %u\n", mm);
-    }
-  }
-};
-}
-/*--------------------------------------------------------------------------*/
 void SIM::solve_equations()
 {
-  mywarn w(_sim->_mstat.data());
   ::status.lud.start();
   _sim->_aa.lu_decomp(bool(OPT::lubypass && _sim->is_inc_mode()));
   ::status.lud.stop();

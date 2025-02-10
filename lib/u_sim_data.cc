@@ -351,7 +351,7 @@ void SIM_DATA::deflate_nodes( CARD_LIST* scope )
       trace2("post deflate check", (*ci)->long_label(), (**ci).net_nodes());
       for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
 	// for each connection node in card
-	NODE_P& np = (**ci).node(ii);
+	node_t& np = (**ci).node(ii);
 	if(np.is_node()){
 	}else{
 	  untested();
@@ -389,13 +389,13 @@ void SIM_DATA::map_subckt_nodes( CARD_LIST* scope )
     if ((**ci).is_device()) {
       for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
 	// for each connection node in card
-	NODE_P& np = (**ci).node(ii);
+	node_t& np = (**ci).node(ii);
 	trace3("dbg topconn", (*ci)->long_label(), np.user_number(), np.short_label());
       }
 
       for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
 	// for each connection node in card
-	NODE_P& np = (**ci).node(ii);
+	node_t& np = (**ci).node(ii);
 	trace1("topconnect un", np.user_number());
 	if(np.is_link()){
 	}else if( dynamic_cast<USER_NODE const*>(np.n_())){

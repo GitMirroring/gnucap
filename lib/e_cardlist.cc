@@ -603,11 +603,11 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
     // for each card in card_list
     if ((**ci).is_device()) {
       for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
-	NODE_P& np = (**ci).node(ii);
+	node_t& np = (**ci).node(ii);
 	trace3("dbg map", (*ci)->long_label(), np.user_number(), np.short_label());
       }
       for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
-	NODE_P& np = (**ci).node(ii);
+	node_t& np = (**ci).node(ii);
 	// for each connection node in card
 	trace2("connect map", (*ci)->long_label(), ii);
 	// trace1("connect map", (**ci).node(ii).user_number());

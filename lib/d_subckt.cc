@@ -1,4 +1,4 @@
-/*                              -*- C++ -*-
+/*$Id: d_subckt.cc   $ -*- C++ -*-
  * Copyright (C) 2001 Albert Davis
  *               2022, 2023, 2025 Felix Salfelder
  *
@@ -40,8 +40,9 @@
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
-// components with one node are unlikely.
-const int node_capacity_floor = 2;
+COMMON_PARAMLIST Default_SUBCKT(CC_STATIC);
+#define PORTS_PER_SUBCKT 100
+//BUG// fixed limit on number of ports
 /*--------------------------------------------------------------------------*/
 static void grow_nodes(int Index, node_t*& n, int& capacity, int capacity_floor)
 {
@@ -119,8 +120,8 @@ private:
   }
   std::string port_name(int i)const override;
   int set_param_by_name(std::string Name, std::string Value)override;
-  NODE_P&	node(int i)override {assert(i<_node_capacity); return _n[i];}
-  NODE_P const&	n_(int i)const override {assert(i<_node_capacity); return _n[i];}
+  node_t&	node(int i)override {assert(i<_node_capacity); return _n[i];}
+  node_t const&	n_(int i)const override {assert(i<_node_capacity); return _n[i];}
 } p1(&Default_SUBCKT);
 int DEV_SUBCKT::_count = -1;
 /*--------------------------------------------------------------------------*/
@@ -191,7 +192,7 @@ public: // override virtual
   CARD*		clone()const override		{return new DEV_SUBCKT_PROTO(*this);}
   bool		is_device()const override	{return false;}
   bool		makes_own_scope()const override	{return true;}
-  CARD_LIST*	   scope()override		{return subckt();}
+  CARD_LIST*	   scope()override		{untested();return subckt();}
   const CARD_LIST* scope()const override	{return subckt();}
 private: // no-ops for prototype
   void precalc_first()override {}
@@ -401,7 +402,7 @@ DEV_SUBCKT::DEV_SUBCKT(const DEV_SUBCKT& p)
   }
 
   if(_node_capacity){
-    _n = new NODE_P[_node_capacity];
+    _n = new node_t[_node_capacity];
   }else{
     assert(_n == NULL);
   }
@@ -480,7 +481,6 @@ std::string DEV_SUBCKT::port_name(int i)const
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT::expand()
 {
-  trace2("DEV_MODULE::expand", long_label(), _node_capacity);
   BASE_SUBCKT::expand();
   trace3("DEV_SUBCKT::expand", long_label(), max_nodes(), is_device());
 
@@ -510,6 +510,13 @@ void DEV_SUBCKT::expand()
     }
   }else{ untested();
   }
+  
+  assert(_parent);
+  assert(_parent->subckt());
+  assert(_parent->subckt()->nodes());
+  trace2("",  _parent->net_nodes(),  _parent->subckt()->nodes()->how_many());
+  assert(_parent->net_nodes() <= _parent->subckt()->nodes()->how_many());
+  assert(_parent->subckt()->params());
 
   trace1("DEV_SUBCKT::expand1", max_nodes());
 
@@ -529,45 +536,9 @@ void DEV_SUBCKT::expand()
       trace3("DEV_MODULE::expand param", p.first, p.second, p.second.string());
     }
 
-    int k = 0;
-    for(; k < net_nodes(); ++k) {
-      if(_n[k].is_link()){
-      }else{
-      }
-    }
-
-    trace3("MODULE::expand renew", long_label(), net_nodes(), _node_capacity);
-
-    // matrix numbers used to be allocated here.
-    renew_subckt(_parent, &(c->_params));
-    trace0("MODULE::expand done renew");
-
-    for(int i=0; i < net_nodes(); ++i) {
-      if(_n[i].is_link()){
-      }else{
-      }
-    }
-
-    expand_ports_first();
-    subckt()->expand();
-
-#if 1 // move to CARD_LIST::expand?
-    for(CARD_LIST::iterator i=subckt()->begin(); i!=subckt()->end(); ++i) {
-      CARD* d = (*i)->deflate();
-
-      if(d == (*i)){
-      }else{ untested();
-	assert(d->owner() == this);
-	delete *i;
-	*i = d;
-      }
-    }
-#endif
-
-    assert(subckt()->nodes()->how_many() == _parent->subckt()->nodes()->how_many());
-    expand_nodes();
-  }
-} // expand.
+  renew_subckt(_parent, &(c->_params));
+  subckt()->expand();
+}
 /*--------------------------------------------------------------------------*/
 void DEV_SUBCKT::precalc_first()
 {
@@ -575,7 +546,6 @@ void DEV_SUBCKT::precalc_first()
 
   if(subckt()) {
   }else{
-    new_subckt();
   }
 
   if(_parent) {
@@ -610,6 +580,22 @@ void DEV_SUBCKT::precalc_last()
 /*--------------------------------------------------------------------------*/
 double DEV_MODULE::tr_probe_num(const std::string& x)const
 {
+=======
+}
+/*--------------------------------------------------------------------------*/
+void DEV_SUBCKT::precalc_last()
+{
+  BASE_SUBCKT::precalc_last();
+
+  COMMON_PARAMLIST* c = prechecked_cast<COMMON_PARAMLIST*>(mutable_common());
+  assert(c);
+  subckt()->attach_params(&(c->_params), scope());
+  subckt()->precalc_last();
+}
+/*--------------------------------------------------------------------------*/
+double DEV_SUBCKT::tr_probe_num(const std::string& x)const
+{untested();
+>>>>>>> 0239b0521 (NODE_P-12:; Try to merge in from obsolete_parse-1.)
   if (Umatch(x, "p ")) {untested();
     double power = 0.;
     assert(subckt());
@@ -634,7 +620,7 @@ double DEV_MODULE::tr_probe_num(const std::string& x)const
       power += CARD::probe(*ci,"PS");
     }      
     return power;
-  }else{
+  }else{untested();
     return COMPONENT::tr_probe_num(x);
   }
   /*NOTREACHED*/

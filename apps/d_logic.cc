@@ -34,12 +34,12 @@
 #include "u_nodemap.h"
 #include "u_node.h"
 /*--------------------------------------------------------------------------*/
-const int MODEL_LOGIC::_type_number = 12345;
+//const int MODEL_LOGIC::_type_number = 12345;
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
 // some pre-connect-module band aid
-LOGIC_NODE* logic(NODE_P& p)
+LOGIC_NODE* logic(node_t& p)
 {
   if(p.is_grounded()){ untested();
     unreachable();
@@ -60,7 +60,7 @@ LOGIC_NODE* logic(NODE_P& p)
   }
 }
 /*--------------------------------------------------------------------------*/
-class node_l : public node_t { // NODE_P?
+class node_l : public node_t { // node_t?
 public:
   explicit node_l(){}
   explicit node_l(node_t& p) : node_t(p){}
@@ -84,16 +84,16 @@ public:
       return logic(*this);
     }
   }
-  void set_input()  { NODE_P::set_input(); }
-  void set_output() { NODE_P::set_output(); }
-  void set_inout()  { NODE_P::set_inout(); }
+  void set_input()  { node_t::set_input(); }
+  void set_output() { node_t::set_output(); }
+  void set_inout()  { node_t::set_inout(); }
 
   void map() {
     node_t::map();
   }
 };
 /*--------------------------------------------------------------------------*/
-LOGIC_NODE const* logic(NODE_P const& p)
+LOGIC_NODE const* logic(node_t const& p)
 {
   if(p.is_grounded()){ untested();
     unreachable();
@@ -137,8 +137,8 @@ private: // override virtuals
   std::string dev_type()const override{assert(has_common()); return common()->name();}
   void set_port_by_index(int num, std::string& ext_name) {
     COMPONENT::set_port_by_index(num, ext_name);
-    _n[num].set_type(MODEL_LOGIC::_type_number);
-    assert(_n[num].type() == MODEL_LOGIC::_type_number);
+    _n[num].set_type(12345);
+    assert(_n[num].type() == 12345);
     // later.
     // if(num){
     //   _n[num].set_output();
@@ -154,15 +154,10 @@ private: // override virtuals
   CARD*	   clone()const override {return new DEV_LOGIC(*this);}
   void	   precalc_first()override {ELEMENT::precalc_first(); if (subckt()) {subckt()->precalc_first();}}
   void	   expand()override;
-<<<<<<< HEAD
-  void	   precalc_last() override;
-  //void   map_nodes();
-=======
   void	   expand_ports();
   void	   expand_nodes();
-  void	   precalc_last() override{ELEMENT::precalc_last(); if (subckt()) {subckt()->precalc_last();}}
+  void	   precalc_last() override;
   void   map_nodes()override;
->>>>>>> 5663faefd (node rework WIP)
 
   void	   tr_iwant_matrix()override;
   void	   tr_begin()override;
@@ -213,31 +208,6 @@ private:
   bool	   want_digital()const;
 };
 /*--------------------------------------------------------------------------*/
-<<<<<<< HEAD
-=======
-class INTERFACE COMMON_LOGIC : public COMMON_COMPONENT {
-protected:
-  explicit	COMMON_LOGIC(int c=0)
-    :COMMON_COMPONENT(c) {++_count;}
-  explicit	COMMON_LOGIC(const COMMON_LOGIC& p)
-    :COMMON_COMPONENT(p) {++_count;}
-public:
-		~COMMON_LOGIC()			{--_count;}
-  bool operator==(const COMMON_COMPONENT&)const override;
-  static  int	count()				{untested();return _count;}
-  virtual LOGICVAL logic_eval(const node_l*, int)const	= 0;
-
-  void		set_param_by_index(int, std::string&, int)override;
-  bool		param_is_printable(int)const override;
-  std::string	param_name(int)const override;
-  std::string	param_name(int,int)const override;
-  std::string	param_value(int)const override;
-  int param_count()const override {return (1 + COMMON_COMPONENT::param_count());}
-protected:
-  static int	_count;
-};
-/*--------------------------------------------------------------------------*/
->>>>>>> 5663faefd (node rework WIP)
 class LOGIC_AND : public COMMON_LOGIC {
 private:
   explicit LOGIC_AND(const LOGIC_AND& p) :COMMON_LOGIC(p){++_count;}
@@ -379,11 +349,7 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
 {
   assert(max_nodes() == PORTS_PER_GATE);
   for (int ii = 0;  ii < max_nodes();  ++ii) {
-<<<<<<< HEAD
     _nodes[ii] = p._nodes[ii];
-=======
-    _n[ii] = p._n[ii];
->>>>>>> 5663faefd (node rework WIP)
   }
   ++_count;
 }
@@ -419,12 +385,8 @@ void DEV_LOGIC::expand()
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
     }else{
       _gatemode = OPT::mode;    
-<<<<<<< HEAD
       renew_subckt(model, nullptr/*&(c->_params)*/);    
-=======
-      renew_subckt(model, NULL/*&(c->_params)*/);    
       expand_ports();
->>>>>>> 5663faefd (node rework WIP)
       subckt()->expand();
       expand_nodes();
     }
@@ -535,19 +497,11 @@ void DEV_LOGIC::tr_begin()
   ELEMENT::tr_begin();
   if (!subckt()) {
     _gatemode = moDIGITAL;
-<<<<<<< HEAD
     n_(OUTNODE)->set_mode(_gatemode);
     _oldgatemode = _gatemode;
   }else{
     _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
     n_(OUTNODE)->set_mode(_gatemode);
-=======
-    logic(_n[OUTNODE])->set_mode(_gatemode);
-    _oldgatemode = _gatemode;
-  }else{
-    _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
-    logic(_n[OUTNODE])->set_mode(_gatemode);
->>>>>>> 5663faefd (node rework WIP)
     _oldgatemode = _gatemode;
     subckt()->tr_begin();
   }

@@ -69,7 +69,7 @@ public: // override virtual
 #endif
   TIME_PAIR tr_review() override;
 
-  void   map_nodes()override;
+  //void   map_nodes();
   void	   tr_iwant_matrix() override = 0;
   void	   ac_iwant_matrix() override = 0;
   double   tr_probe_num(const std::string&)const override;

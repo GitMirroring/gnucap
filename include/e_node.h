@@ -153,7 +153,7 @@ public:
     n.set_none();
   };
   explicit NODE_P(NODE_P const& n, int)
-    : NODE_P_BITS(n){ incomplete(); } // needed?
+    : NODE_P_BITS(n){ } // needed?
   ~NODE_P();
 
   NODE_P& operator=(NODE_P const& n) {
@@ -434,7 +434,6 @@ public:
     return _m;
   }
 
-  
   const std::string  short_label()const {return ((n_()) ? (n_()->short_label()) : "?????");}
   void	set_to_ground(CARD* Owner)	{new_node("0", Owner);}
   void	new_node(const std::string&, const CARD*);

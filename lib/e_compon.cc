@@ -71,7 +71,7 @@ void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
   assert(to);
   if (c == *to) {
     // The new and old are the same object.  Do nothing.
-  }else if (!c) {
+  }else if (!c) {itested();
     // There is no new common.  probably a simple element
     detach_common(to);
   }else if (!*to) {
@@ -230,7 +230,7 @@ void COMMON_COMPONENT::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lan
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::set_param_by_index(int i, std::string& Value, int Offset)
-{ untested();
+{
   switch (i) {
   case 0:untested();  _tnom_c = Value; break;
   case 1:untested();  _dtemp = Value; break;
@@ -269,7 +269,7 @@ std::string COMMON_COMPONENT::param_name(int i, int j)const
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_COMPONENT::param_value(int i)const
-{ untested();
+{
   switch (i) {
   case 0:itested();  return _tnom_c.string();
   case 1:itested();  return _dtemp.string();
@@ -465,7 +465,6 @@ bool COMPONENT::node_is_connected(int i)const
 /*--------------------------------------------------------------------------*/
 int COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
 {
-  trace3("spbn", int_name, ext_name, net_nodes());
   for (int i=0; i<max_nodes(); ++i) {
     if (int_name == port_name(i)) {
       set_port_by_index(i, ext_name);
@@ -473,19 +472,13 @@ int COMPONENT::set_port_by_name(std::string& int_name, std::string& ext_name)
     }else{
     }
   }
-  {
-    throw Exception_No_Match(int_name);
-  }
+  throw Exception_No_Match(int_name);
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::set_port_by_index(int num, std::string& ext_name)
 {
-  trace2("spbi", num, ext_name);
   if (num < max_nodes()) {
-    n_(num).new_node(ext_name, this);
-    assert(n_(num)->short_label() == ext_name);
-    // assert(node(num).short_label() == ext_name);
-    trace2("spbi", num, n_(num).user_number());
+    n_(num).new_node(ext_name, this);  // Really look-up node, make new if needed.
 
     if (num+1 > _net_nodes) {
       // Update _net_nodes for net_nodes().  Not really a count.
@@ -493,8 +486,6 @@ void COMPONENT::set_port_by_index(int num, std::string& ext_name)
     }else{
       // probably assigning out of order.
     }
-    trace1("spbi", n_(num).short_label());
-    trace1("spbi", n_(num).short_label());
   }else{
     throw Exception_Too_Many(num+1, max_nodes(), 0/*offset*/);
   }
@@ -570,14 +561,6 @@ void COMPONENT::expand()
 /*--------------------------------------------------------------------------*/
 void COMPONENT::precalc_first()
 {
-  for(int i = 0; i < min_nodes(); ++i){
-    if(!node_is_connected(i)) {
-      trace2("not connected", long_label(), i);
-      unreachable(); //WIP
-      throw Exception(long_label() + ": invalid nodes");
-    }else{
-    }
-  }
   CARD::precalc_first();
   if (has_common()) {
     try {
@@ -630,7 +613,6 @@ void COMPONENT::map_nodes()
   assert(is_device());
   assert(0 <= min_nodes());
   //assert(min_nodes() <= net_nodes());
-  trace3("COMPONENT::map_nodes", long_label(), net_nodes(), max_nodes());
   assert(net_nodes() <= max_nodes());
   //assert(ext_nodes() + int_nodes() == matrix_nodes());
 
@@ -675,7 +657,7 @@ void COMPONENT::ac_iwant_matrix()
 void COMPONENT::set_parameters(const std::string& Label, CARD *Owner,
 			       COMMON_COMPONENT *Common, double Value,
 			       int , double [],
-			       int node_count, const NODE_P Nodes[])
+			       int node_count, const node_t Nodes[])
 {
   set_label(Label);
   set_owner(Owner);
@@ -721,15 +703,15 @@ int COMPONENT::set_hsparam(std::string const& Name, std::string const& Value)
     which = 1;
   }else if(  Name == "$yposition") {
     which = 2;
-  }else if(  Name == "$zposition") { untested();
+  }else if(  Name == "$zposition") {
     which = 3;
-  }else if(  Name == "$hflip") { untested();
+  }else if(  Name == "$hflip") {
     which = 4;
-  }else if(  Name == "$vflip") { untested();
+  }else if(  Name == "$vflip") {
     which = 5;
-  }else if(  Name == "$bflip") { untested();
+  }else if(  Name == "$bflip") {
     which = 6;
-  }else if(  Name == "$angle") { untested();
+  }else if(  Name == "$angle") {
     which = 7;
   }else{
   }
@@ -799,7 +781,7 @@ bool COMPONENT::param_is_printable(int I)const
     }
   }else if (has_common()) {
     return common()->param_is_printable(i);
-  }else{ untested();
+  }else{
     return CARD::param_is_printable(i);
   }
 }
@@ -842,7 +824,7 @@ std::string COMPONENT::param_name(int I, int j)const
   }else{ untested();
     if (j == 0) { untested();
       return param_name(i);
-    }else if (i >= CARD::param_count()) { untested();
+    }else if (i >= CARD::param_count()) {
       return "";
     }else{untested();
       return CARD::param_name(i,j);
@@ -997,7 +979,7 @@ bool COMPONENT::use_obsolete_callback_parse()const
 {
   if (has_common()) {
     return common()->use_obsolete_callback_parse();
-  }else{
+  }else{untested();
     return false;
   }
 }
@@ -1044,7 +1026,7 @@ double COMPONENT::volts_limited(const node_t & n1, const node_t & n2)
       error(bTRACE, "range limit damp\n");
     }else{
     }
-    if (OPT::picky <= bTRACE) {
+    if (OPT::picky <= bTRACE) {itested();
       error(bNOERROR,"node limiting (n1,n2,dif) "
 	    "was (%g %g %g) now (%g %g %g)\n",
 	    n1.v0(), n2.v0(), n1.v0() - n2.v0(), v1, v2, v1-v2);

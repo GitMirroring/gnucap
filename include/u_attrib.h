@@ -186,7 +186,7 @@ public:
     if (String != "") {
       if (_p) {
 	if (_p->owner() == Owner) {
-	}else{untested();
+	}else{
 	}
 	_p->dec_ref_count();
       }else{

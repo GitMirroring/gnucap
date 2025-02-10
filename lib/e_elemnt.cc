@@ -94,7 +94,6 @@ void ELEMENT::set_value(double v, COMMON_COMPONENT* c)
 /*--------------------------------------------------------------------------*/
 int ELEMENT::set_param_by_name(std::string Name, std::string Value)
 {
-  trace3("ELEMENT::spbn", Name, value_name(), Value);
   if(Name == value_name()){
     _value = Value;
     return 0;
@@ -148,11 +147,11 @@ std::string ELEMENT::param_name(int i)const
 }
 /*--------------------------------------------------------------------------*/
 std::string ELEMENT::param_name(int i, int j)const
-{ untested();
+{
   if (has_common()) {untested();
     return COMPONENT::param_name(i);
-  }else{ untested();
-    if (j == 0) { untested();
+  }else{
+    if (j == 0) {
       return param_name(i);
     }else if (i < 1) {
       return "";
@@ -185,9 +184,7 @@ bool ELEMENT::skip_dev_type(CS& cmd)
 void ELEMENT::precalc_last()
 {
   COMPONENT::precalc_last();
-  trace3("ELEMENT::precalc_last", long_label(), _value, _value.string());
   _value.e_val(0.,scope());
-  trace3("ELEMENT::precalc_last", long_label(), _value, _value.string());
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_begin()
@@ -597,28 +594,6 @@ void ELEMENT::obsolete_move_parameters_from_common(const COMMON_COMPONENT* dc)
 
   _value   = dc->value();
   // _mfactor = dc->mfactor();
-}
-/*--------------------------------------------------------------------------*/
-void ELEMENT::map_nodes()
-{
-  trace2("ELEMENT::map node", long_label(),  ext_nodes()+int_nodes());
-  assert(is_device());
-  assert(0 <= min_nodes());
-  //assert(min_nodes() <= net_nodes());
-  assert(net_nodes() <= max_nodes());
-  //assert(ext_nodes() + int_nodes() == matrix_nodes());
-
-  for (int ii = 0; ii < ext_nodes()+int_nodes(); ++ii) {
-    trace2("map node", long_label(), ii);
-    _n[ii].map();
-    trace3("mapped node", long_label(), _n[ii].short_label(), _n[ii]->matrix_number());
-  }
-
-  if (subckt()) {
-    unreachable();
-  //  subckt()->map_nodes();
-  }else{
-  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -30,8 +30,8 @@
 class CARD;
 /*--------------------------------------------------------------------------*/
 // external
-class NODE;
-class NODE_P;
+class XPROBE;
+class node_t;
 class CARD_LIST;
 class PARAM_LIST;
 class LANGUAGE;
@@ -52,8 +52,6 @@ private:
   //--------------------------------------------------------------------
   static INDIRECT<owner_tag_t,CARD*> _owner_index;
   static INDIRECT<owner_scope_t,owner_tag_t> _owners;
-public:
-  int		_net_nodes;	// actual number of "nodes" in the netlist
   //--------------------------------------------------------------------
 public:   				// traversal functions
   CARD* find_in_my_scope(const std::string& name);
@@ -130,11 +128,6 @@ public: // subckt
   void	  new_subckt();
   void	  new_subckt(const CARD* model, PARAM_LIST const* p);
   void	  renew_subckt(const CARD* model, PARAM_LIST const* p);
-  //void     new_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
-  //void     renew_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
-public: // from SIM_DATA.
-  virtual NODE* new_matrix_node(NODE const* proto);
-  virtual NODE* new_logic_node(NODE const* proto);
   //--------------------------------------------------------------------
 public:	// type
   virtual std::string dev_type()const	{unreachable(); return "";}
