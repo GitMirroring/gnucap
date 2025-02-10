@@ -38,10 +38,10 @@ public:
       itested();
       command("quit", Scope);
       break;
-    case rSCRIPT:
+    case rSCRIPT:untested();
       if (OPT::acct) {untested();
 	command("status", Scope);
-      }else{
+      }else{untested();
       }
       throw Exception("end");
       break;
