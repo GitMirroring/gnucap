@@ -50,11 +50,13 @@ protected:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
   // explicit NODE(const std::string& s);
 public:
-  ~NODE();
+  ~NODE() {}
 
   CARD* clone()const override	{untested(); return new NODE(*this);}
 
 public: // label
+  std::string const& short_label()const final override;
+  std::string const  long_label()const final override;
   void set_user_number(int i) {_user_number = i;}
   void set_owner(CARD const* c) {
     assert(!_owner || _owner == c || !c);
