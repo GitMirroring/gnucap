@@ -52,6 +52,8 @@ private:
   //--------------------------------------------------------------------
   static INDIRECT<owner_tag_t,CARD*> _owner_index;
   static INDIRECT<owner_scope_t,owner_tag_t> _owners;
+public:
+  int		_net_nodes;	// actual number of "nodes" in the netlist
   //--------------------------------------------------------------------
 public:   				// traversal functions
   CARD* find_in_my_scope(const std::string& name);
@@ -76,7 +78,7 @@ public:	// "elaborate"
   virtual void	 expand_last()		{}
   virtual void	 precalc_last()		{}
   virtual void	 map_nodes()		{}
-  virtual CARD*  deflate()		{ return this;}
+  virtual CARD*  deflate()		{itested(); return this;}
   //--------------------------------------------------------------------
 public:	// dc-tran
   virtual void	 tr_iwant_matrix()	{}
@@ -139,9 +141,9 @@ public:	// type
   virtual void set_dev_type(const std::string&);
   //--------------------------------------------------------------------
 public:	// label -- in CKT_BASE
-  /*virtual*/ std::string long_label()const final;
-  std::string const& short_label()const final override {return _label;}
-  void	set_label(const std::string& s)final {_label=s;}
+  // non-virtual void set_label(const std::string& s) //BASE
+  // non-virtual const std::string& short_label()const //BASE
+  /*virtual*/ const std::string long_label()const final;
   //--------------------------------------------------------------------
 public:	// ports -- mostly defer to COMPONENT
   virtual node_t& n_(int i)const;
