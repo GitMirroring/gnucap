@@ -27,7 +27,7 @@ Vcc (V_cc 0) vsource  DC  20.
  27.        20.        592.44p    11.849     16.        19.556     7.6625    
 #Freq       v(V_cc)    v(in)      v(amp_in)  v(out)    
  1.K        11.493p    0.2        0.099997   0.0015029 
-#           v(V_cc)    v(in)      v(out)     iter(0)    vc(X1.q1)  vce(X1.q1)
- 27.        20.        557.89p    5.579      14.        19.131     7.8851    
+#           v(V_cc)    v(in)      v(out)     iter(0)   
+ 27.        20.        557.89p    5.579      14.       
 #Freq       v(V_cc)    v(in)      v(amp_in)  v(out)    
  1.K        11.159p    0.2        0.099997   0.00117   

@@ -89,6 +89,10 @@ public:
       }
     }
     IO::mstdout
+      << "nodes: user=" << _sim->_user_nodes
+      << ", subckt=" << _sim->_subckt_nodes
+      << ", model=" << _sim->_model_nodes
+      << ", total=" << _sim->_total_nodes
       << "nodes: user=" << _sim->user_nodes()
       << ", module=" << _sim->module_nodes()
       << ", model=" << _sim->model_nodes()

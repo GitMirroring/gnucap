@@ -234,7 +234,7 @@ void AC::setup(CS& Cmd)
 void AC::solve()
 {
   _sim->_acx.zero();
-  std::fill_n(_sim->_ac, _sim->total_nodes()+1, 0.);
+  std::fill_n(_sim->_ac, _sim->_total_nodes+1, 0.);
 
   ::status.load.start();
   _sim->count_iterations(iTOTAL);

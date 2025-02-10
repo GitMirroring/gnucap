@@ -79,20 +79,6 @@ protected: // override virtual
   void	  ac_load()override	{assert(subckt()); subckt()->ac_load();}
   void	  ac_final()override	{assert(subckt()); subckt()->ac_final();}
   double  noise_num(std::string const& n)const override {itested(); assert(subckt()); return subckt()->noise_num(n);}
-
-public:
-  NODE* new_logic_node(NODE const* proto)override {
-    NODE* l = CARD::new_logic_node(proto);
-    _sim->newnode_module(); // bump module node counter.
-    return l;
-   // assert(prechecked_cast<LOGIC_NODE*>(l));
-   // return prechecked_cast<LOGIC_NODE*>(l);
-  }
-  NODE* new_matrix_node(NODE const* proto)override {
-    NODE* l = CARD::new_matrix_node(proto);
-    CKT_BASE::_sim->newnode_module(); // bump module node counter.
-    return l;
-  }
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

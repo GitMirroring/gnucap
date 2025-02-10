@@ -65,7 +65,7 @@ public:
   PROBELIST plot[sCOUNT];  // list of plot probes
   PROBELIST print[sCOUNT]; // list of print probes
   PROBELIST store[sCOUNT]; // list of probes to store for postproc
-  void purge(CKT_BASE*);
+  void purge(CARD*);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

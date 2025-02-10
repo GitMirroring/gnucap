@@ -39,7 +39,7 @@ static const bool alias_m_mfactor = true; // treat m as mfactor when rejected.
 static const bool want_ground_zero = true; // "ground 0;"
 /*--------------------------------------------------------------------------*/
 class DOT_GLOBAL : public DEV_DOT {
-  NODE_P _node;
+  node_t _node;
 public:
   explicit DOT_GLOBAL() : DEV_DOT() {
     // set_type(".global");
@@ -50,11 +50,11 @@ public:
   int net_nodes()const override {return _net_nodes;}
   // int max_nodes()const override {return 1;}
   // int min_nodes()const override {return 1;}
-  NODE_P const& n_(int i)const override { untested();
+  node_t const& n_(int i)const override { untested();
     assert(i==0);
     return _node;
   }
-  NODE_P& node(int i){ untested();
+  node_t& node(int i){ untested();
     assert(i==0);
     return _node;
   }

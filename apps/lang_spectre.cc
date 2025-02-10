@@ -86,7 +86,7 @@ static void parse_args(CS& cmd, CARD* x)
     std::string value = cmd.ctos("", "(", ")");
     try{
       x->set_param_by_name(name, value);
-    }catch (Exception_No_Match&) { untested();
+    }catch (Exception_No_Match&) {untested();
       cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
     }
   }
@@ -128,7 +128,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  ++index;
 	}
       }catch (Exception_Too_Many& e) {
-	cmd.warn(bDANGER, here, e.message() + " (ignored)");
+	cmd.warn(bDANGER, here, e.message());
       }
     }
     cmd >> ')';
@@ -161,13 +161,9 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
     }
   }
   if (index < x->min_nodes()) {
-    cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, floating");
-    for (int Index = index;  Index < x->min_nodes();  ++Index) {
-      // can't leave unconnected, as requested.
-      // we don't necessarily have ground (create one?)
-      // "floating" seems more reasonable anyway.
-      std::string unique_name = "_" + x->short_label() + "_float_" + to_string(Index);
-      x->set_port_by_index(Index, unique_name);
+    cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, grounding");
+    for (int iii = index;  iii < x->min_nodes();  ++iii) {
+      x->set_port_to_ground(iii);
     }
   }else{
   }
@@ -401,7 +397,7 @@ void LANG_SPECTRE::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPECTRE::print_command(OMSTREAM& o, const DEV_DOT* x)
-{
+{untested();
   assert(x);
   o << x->s() << '\n';
 }

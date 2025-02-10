@@ -24,7 +24,7 @@
 //testing=script 2009.06.21
 #include "u_sim_data.h"
 #include "u_status.h"
-#include "e_base.h"
+#include "e_card.h"
 #include "u_probe.h"
 /*--------------------------------------------------------------------------*/
 PROBE::PROBE(const std::string& what,const CARD *brh)
