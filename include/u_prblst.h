@@ -43,6 +43,8 @@ public:
   typedef _container::const_iterator const_iterator;
   void	   listing(const std::string&)const;
   void     clear();
+  void     store();
+  void     restore(CARD_LIST const*);
 
   void	   remove_list(CS&);
   void     remove_one(CARD*);
@@ -66,6 +68,8 @@ public:
   PROBELIST print[sCOUNT]; // list of print probes
   PROBELIST store[sCOUNT]; // list of probes to store for postproc
   void purge(CARD*);
+  void store_();
+  void restore(CARD_LIST const*);
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

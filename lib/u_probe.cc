@@ -26,6 +26,29 @@
 #include "u_status.h"
 #include "e_card.h"
 #include "u_probe.h"
+#include "e_cardlist.h"
+#include "u_nodemap.h"
+#include "e_node.h"
+#include "ap.h"
+#include "u_xprobe.h"
+/*--------------------------------------------------------------------------*/
+class PROBE0 : public CKT_BASE {
+  mutable int _probes{0};
+public:
+  PROBE0(){ set_label("0"); }
+public:// doesnt work
+//   double tr_probe_num(std::string const&x)const override { untested();
+//     return probe_num(x);
+//   }
+//   XPROBE ac_probe_ext(std::string const&x)const override { untested();
+//     return XPROBE(probe_num(x));
+//   }
+  double probe_num(std::string const&)const;
+private:
+  void  inc_probes()const override {++_probes;}
+  void  dec_probes()const override {assert(_probes>0); --_probes;}
+}probe0;
+CKT_BASE* prb0 = &probe0;
 /*--------------------------------------------------------------------------*/
 PROBE::PROBE(const std::string& what,const CARD *brh)
   :CKT_BASE(),
@@ -78,11 +101,109 @@ PROBE& PROBE::operator=(const PROBE& p)
 void PROBE::detach()
 {
   if (_brh) {
+    _what = _what+"("+_brh->long_label()+")";
     _brh->dec_probes();
   }else{
+    _what = "";
   }
-  _what = "";
   _brh = nullptr;
+}
+/*--------------------------------------------------------------------------*/
+// same. but keep label
+void PROBE::store()
+{
+  if(_brh){
+    trace2("store probe", label(), _brh->short_label());
+    detach();
+    trace1("stored probe", _what);
+  //  _what = s;
+  }else{
+    incomplete();
+    // hmm node probe?
+  }
+  assert(!_brh);
+}
+/*--------------------------------------------------------------------------*/
+static CKT_BASE const* find_device(CARD_LIST const* scope, std::string const& what)
+{
+  std::string::size_type dotplace = what.find_first_of(".");
+  if (dotplace != std::string::npos) {
+    std::string dev = what.substr(dotplace+1, std::string::npos);
+    std::string container = what.substr(0, dotplace);
+    for (CARD_LIST::const_iterator
+	i = scope->begin();  i != scope->end();  ++i) {
+      CARD* card = *i;
+      if (card->is_device()
+	  && card->subckt()
+	  && card->short_label() == container) {
+
+	return find_device(card->subckt(), dev);
+      }else{
+      }
+    }
+  }else{
+    for (NODE_MAP::const_iterator 
+	i = scope->nodes()->begin();
+	i != scope->nodes()->end();
+	++i) {
+      if (i->first != "0") {
+	NODE* node = i->second;
+	assert (node);
+	if (node->short_label() == what) {
+	  return node;
+	}else{
+	}
+      }else{
+      }
+    }
+    {// components
+      for (CARD_LIST::const_iterator
+	  i = scope->begin();  i != scope->end();  ++i) {
+	CARD* card = *i;
+	if (card->short_label() == what){
+	  return card;
+	}else{
+	}
+      }
+    }
+  }
+  return NULL;
+}
+/*--------------------------------------------------------------------------*/
+void PROBE::restore(CARD_LIST const* scope)
+{
+  std::string s = _what;
+  trace2("restore probe", _what, _brh);
+  
+  if(_brh){
+  }else{
+    CS cmd(CS::_STRING, s);
+    std::string parameter(cmd.ctos(TOKENTERM));
+    int paren = cmd.skip1b('(');
+    std::string device(cmd.ctos(TOKENTERM));
+    paren -= cmd.skip1b(')');
+    assert(paren==0);
+
+    if(device=="0"){
+      _brh = &probe0;
+      _what = parameter;
+    }else{
+      _brh = (*scope->nodes())[device];
+      _what = parameter;
+    }
+    if(_brh){
+      _brh->inc_probes();
+    }else{
+      trace2("restore probe", parameter, device);
+      if (CKT_BASE const* cc = find_device(scope, device)) {
+	_what = parameter;
+	_brh = cc;
+	_brh->inc_probes();
+      }else{
+	error(bTRACE, "device is gone %s %s %s\n", s.c_str(), parameter.c_str(), device.c_str());
+      }
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* label: returns a string corresponding to a possible probe point
@@ -101,14 +222,17 @@ const std::string PROBE::label(void)const
 double PROBE::value(void)const
 {
   // _brh is either a node or a "branch", which is really any device
-  if (_brh) {
+  if (_brh == &probe0) {
+    // avoid ac_probes, as they mess with what.
+    return probe0.probe_num(_what);
+  }else if (_brh) {
     return _brh->probe_num(_what);
   }else{
-    return probe_node();
+    return NOT_VALID;
   }
 }
 /*--------------------------------------------------------------------------*/
-double PROBE::probe_node(void)const
+double PROBE0::probe_num(std::string const& _what) const
 {
   if (Umatch(_what, "iter ")) {
     assert(iPRINTSTEP - sCOUNT == 0);

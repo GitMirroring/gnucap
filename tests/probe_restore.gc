@@ -1,0 +1,10 @@
+verilog
+
+vsource #(.dc(1)) v1(1 0)
+
+print op ev(v1)
+op
+
+delete v1
+vsource #(.dc(2)) v1(1 0)
+op
