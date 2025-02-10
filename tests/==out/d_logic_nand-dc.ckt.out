@@ -1,6 +1,6 @@
 * nor-test 
-U2: can't find subckt: CMOSnor2, forcing digital
 U1: can't find subckt: CMOSnor2, forcing digital
+U2: can't find subckt: CMOSnor2, forcing digital
 #           V(V2)      V(V3)      V(U1)      V(U2)      logic(U2)  logic(U1) 
  0.         0.         10.        5.         0.         0.         3.        
  2.         2.         10.        5.         0.         0.         3.        
@@ -11,5 +11,5 @@ U1: can't find subckt: CMOSnor2, forcing digital
 Gnucap   System status
 iterations: op=0, dc=19, tran=0, fourier=0, total=19
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=5, subckt=0, model=0, total=5
+nodes: user=5, module=0, model=0, logic=4, matrix=5, total=5
 dctran density=20.0%, ac density=20.0%

@@ -84,7 +84,7 @@ public:
   void set_parameters(const std::string& Label, CARD* Parent,
 		      COMMON_COMPONENT* Common, double Value,
 		      int state_count, double state[],
-		      int node_count, const node_t nodes[])override;
+		      int node_count, const NODE_P nodes[])override;
   //		      const double* inputs[]=0);
 protected:
   bool do_tr_con_chk_and_q();
@@ -252,9 +252,10 @@ void DEV_CPOLY_CAP::ac_load()
 void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
 				   COMMON_COMPONENT *Common, double Value,
 				   int n_states, double states[],
-				   int n_nodes, const node_t nodes[])
+				   int n_nodes, const NODE_P nodes[])
   //				   const double* inputs[])
 {
+  // later. ELEMENT::set_parameters(Label, Owner, Common, Value, n_states, states, n_nodes, nodes);
   bool first_time = (net_nodes() == 0);
 
   set_label(Label);

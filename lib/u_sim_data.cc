@@ -27,6 +27,7 @@
 #include "u_nodemap.h"
 #include "e_cardlist.h"
 #include "u_prblst.h"
+#include "e_card.h" // BUG // map_subckt_nodes
 #include "u_status.h"
 /*--------------------------------------------------------------------------*/
 SIM_DATA::SIM_DATA()
@@ -40,10 +41,6 @@ SIM_DATA::SIM_DATA()
    _fulldamp(false),
    _last_time(0.),
    _freezetime(false),
-   _user_nodes(0),
-   _subckt_nodes(0),
-   _model_nodes(0),
-   _total_nodes(0),
    _jomega(0.,0.),
    _limiting(true),
    _vmax(0.),
@@ -58,7 +55,7 @@ SIM_DATA::SIM_DATA()
    _vt1(nullptr),
    _ac(nullptr),
    _noise(nullptr),
-   _nstat(nullptr),
+  // _mstat(nullptr),
    _vdc(nullptr),
    _aa(),
    _lu(_aa), // alias.
@@ -118,11 +115,14 @@ SIM_DATA::~SIM_DATA()
     _noise = nullptr;
   }else{
   }
+<<<<<<< HEAD
   if (_nstat) {unreachable();
     delete [] _nstat;
     _nstat = nullptr;
   }else{
   }
+=======
+>>>>>>> 5663faefd (node rework WIP)
   if (_vdc) {unreachable();
     delete [] _vdc;
     _vdc = nullptr;
@@ -155,7 +155,7 @@ SIM_DATA::~SIM_DATA()
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::set_limit()
 {
-  for (int ii = 1;  ii <= _total_nodes;  ++ii) {
+  for (int ii = 1;  ii <= matrix_nodes();  ++ii) {
     set_limit(_v0[ii]);
   }
 }
@@ -181,7 +181,7 @@ void SIM_DATA::clear_limit()
 void SIM_DATA::keep_voltages()
 {
   if (!_freezetime) {
-    for (int ii = 1;  ii <= _total_nodes;  ++ii) {
+    for (int ii = 1;  ii <= matrix_nodes();  ++ii) {
       _vdc[ii] = _v0[ii];
     }
     _last_time = (_time0 > 0.) ? _time0 : 0.;
@@ -192,14 +192,14 @@ void SIM_DATA::keep_voltages()
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::restore_voltages()
 {
-  for (int ii = 1;  ii <= _total_nodes;  ++ii) {
+  for (int ii = 1;  ii <= matrix_nodes();  ++ii) {
     _vt1[ii] = _v0[ii] = _vdc[ii];
   }
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::zero_voltages()
 {
-  for (int ii = 1;  ii <= _total_nodes;  ++ii) {
+  for (int ii = 1;  ii <= matrix_nodes();  ++ii) {
     _vt1[ii] = _v0[ii] = _vdc[ii] = _i[ii] = 0.;
   }
 }
@@ -211,7 +211,7 @@ void SIM_DATA::zero_voltages()
  */
 void SIM_DATA::map__nodes()
 {
-  _nm = new int[_total_nodes+1];
+  _nm = new int[matrix_nodes()+1];
   ::status.order.reset().start();
   switch (OPT::order) {
   default:       unreachable();
@@ -229,9 +229,9 @@ void SIM_DATA::map__nodes()
  */
 void SIM_DATA::order_reverse()
 {
-  _nm[0] = 0;
-  for (int node = 1;  node <= _total_nodes;  ++node) {
-    _nm[node] = _total_nodes - node + 1;
+  for (int node = 0;  node < matrix_nodes();  ++node) {
+    _nm[node] = matrix_nodes() - node;
+    trace2("_nm", node, _nm[node]);
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -240,21 +240,16 @@ void SIM_DATA::order_reverse()
  */
 void SIM_DATA::order_forward()
 {
-  _nm[0] = 0;
-  for (int node = 1;  node <= _total_nodes;  ++node) {
-    _nm[node] = node;
+  for (int node = 0;  node < matrix_nodes();  ++node) {
+    _nm[node] = node + 1;
   }
 }
 /*--------------------------------------------------------------------------*/
 /* order_auto: full automatic ordering
- * reverse, for now
  */
 void SIM_DATA::order_auto()
 {
-  _nm[0] = 0;
-  for (int node = 1;  node <= _total_nodes;  ++node) {
-    _nm[node] = _total_nodes - node + 1;
-  }
+  order_forward();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -269,15 +264,39 @@ void SIM_DATA::init(CARD_LIST* scope)
   }
   if (is_first_expand()) {
     uninit();
-    init_node_count(scope->nodes()->how_many(), 0, 0);
-    scope->expand();
-    map__nodes();
+    init_node_count(0, 0, 0);
+    trace1("SIM_DATA::init top level?", scope->nodes()->how_many());
+
+    map_subckt_nodes(scope); // not in develop
+                             // propagate node types down here?
+
+    try{
+      scope->expand();
+      deflate_nodes(scope);
+    }catch(...){
+      // need to deflate anyway
+      deflate_nodes(scope);
+      throw;
+    }
+
+    map__nodes(); // build _nm
+    if(matrix_nodes() == int(_mstat.size())) {
+    }else{
+      trace2("wrong matrix count", matrix_nodes(), _mstat.size());
+      incomplete();
+    }
+	
+    // call "map" on all port nodes. recursively
+    // i.e. _n[ii].map();
     scope->map_nodes();
+
     alloc_hold_vectors();
     _aa.reinit(_total_nodes);
     _acx.reinit(_total_nodes);
     scope->tr_iwant_matrix();
     scope->ac_iwant_matrix();
+
+
     _last_time = 0;
   }else{
     scope->precalc_first();
@@ -296,18 +315,10 @@ void SIM_DATA::alloc_hold_vectors()
 {
   assert(is_first_expand());
 
-  assert(!_nstat);
-  _nstat = new LOGIC_NODE[_total_nodes+1];
-  for (int ii=0;  ii <= _total_nodes;  ++ii) {
-    _nstat[_nm[ii]].set_owner(nullptr);
-    _nstat[_nm[ii]].set_user_number(ii);
-  }
-
   assert(!_vdc);
-  _vdc = new double[_total_nodes+1];
-  std::fill_n(_vdc, _total_nodes+1, 0);
+  _vdc = new double[matrix_nodes()+1];
+  std::fill_n(_vdc, matrix_nodes()+1, 0);
 
-  assert(_nstat);
   assert(_vdc);
 }
 /*--------------------------------------------------------------------------*/
@@ -315,6 +326,97 @@ void SIM_DATA::restore_probes()
 {
   assert(CKT_BASE::_probe_lists);
   CKT_BASE::_probe_lists->restore(&CARD_LIST::card_list);
+}
+/*--------------------------------------------------------------------------*/
+void SIM_DATA::deflate_nodes( CARD_LIST* scope )
+{
+#if 1
+    int num_nodes = int(scope->nodes()->length());
+    assert( num_nodes <= int(scope->nodes()->how_many()));
+    for(int i=0; i<num_nodes; ++i) {
+      trace1("consistency", i);
+     // assert(scope->nodes()->operator[](i).is_node());
+    }
+    for(auto p : *scope->nodes()){
+      trace2("consistency", p.first, p.second->user_number());
+    }
+#endif
+
+  scope->deflate_nodes(nullptr);
+
+#if 0
+  // check
+  for (CARD_LIST::iterator ci = scope->begin(); ci != scope->end(); ++ci) {
+    if ((**ci).is_device()) {
+      trace2("post deflate check", (*ci)->long_label(), (**ci).net_nodes());
+      for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
+	// for each connection node in card
+	NODE_P& np = (**ci).node(ii);
+	if(np.is_node()){
+	}else{
+	  untested();
+	  assert(np.operator->());
+	}
+      }
+    }else{
+    }
+  }
+#endif
+}
+/*--------------------------------------------------------------------------*/
+// same purpose as CARD_LIST::map_subckt_nodes, but there is no owner.
+// also need to keep track of connections, so they can be restored.
+void SIM_DATA::map_subckt_nodes( CARD_LIST* scope )
+{
+  assert(scope);
+  int num_nodes = scope->nodes()->how_many();
+  trace1("SIM_DATA::map_subckt_nodes", num_nodes);
+
+  scope->nodes()->build_map();
+  NODE_P* map = scope->nodes()->map();
+
+  for(int i=0; i<num_nodes; ++i) {
+   // assert(map[i].is_link());
+   // assert(map[i].next()->is_node());
+   // assert(dynamic_cast<USER_NODE const*>(map[i].next()->n_()));
+    trace1("SIM_DATA::map_subckt_nodes", map[i].short_label());
+    trace1("SIM_DATA::map_subckt_nodes", map[i].is_grounded());
+  }
+
+  for (CARD_LIST::iterator ci = scope->begin(); ci != scope->end(); ++ci) {
+    // trace3("SIM_DATA::map_subckt_nodes2", num_nodes, (*ci)->long_label(), (*ci)->net_nodes());
+
+    if ((**ci).is_device()) {
+      for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
+	// for each connection node in card
+	NODE_P& np = (**ci).node(ii);
+	trace3("dbg topconn", (*ci)->long_label(), np.user_number(), np.short_label());
+      }
+
+      for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
+	// for each connection node in card
+	NODE_P& np = (**ci).node(ii);
+	trace1("topconnect un", np.user_number());
+	if(np.is_link()){
+	}else if( dynamic_cast<USER_NODE const*>(np.n_())){
+	}else if(dynamic_cast<MATRIX_NODE const*>(np.n_())){
+	}else{
+	  incomplete();
+	}
+
+	trace2("np map", ii, np.user_number());
+	try{
+	  np.map_subckt_node(map, nullptr);
+	}catch(...){
+	  throw;
+	}
+	// assert(np.is_link());
+ 	// assert(np.next()->is_node()); // top level
+      }
+    }else{
+      // assert(dynamic_cast<MODEL_CARD*>(*ci));
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_vectors:
@@ -331,20 +433,21 @@ void SIM_DATA::alloc_vectors()
   assert(!_v0);
   assert(!_vt1);
 
-  _ac = new COMPLEX[_total_nodes+1];
-  _noise = new COMPLEX[_total_nodes+1];
-  _i   = new double[_total_nodes+1];
-  _v0  = new double[_total_nodes+1];
-  _vt1 = new double[_total_nodes+1];
-  std::fill_n(_ac, _total_nodes+1, 0);
-  std::fill_n(_noise, _total_nodes+1, 0);
-  std::fill_n(_i,  _total_nodes+1, 0);
-  std::fill_n(_v0, _total_nodes+1, 0);
-  std::fill_n(_vt1,_total_nodes+1, 0);
+  _ac = new COMPLEX[matrix_nodes()+1];
+  _noise = new COMPLEX[matrix_nodes()+1];
+  _i   = new double[matrix_nodes()+1];
+  _v0  = new double[matrix_nodes()+1];
+  _vt1 = new double[matrix_nodes()+1];
+  std::fill_n(_ac, matrix_nodes()+1, 0);
+  std::fill_n(_noise, matrix_nodes()+1, 0);
+  std::fill_n(_i,  matrix_nodes()+1, 0);
+  std::fill_n(_v0, matrix_nodes()+1, 0);
+  std::fill_n(_vt1,matrix_nodes()+1, 0);
 }
 /*--------------------------------------------------------------------------*/
 void SIM_DATA::unalloc_vectors()
 {
+  trace0("unalloc");
   _evalq1.clear();
   _evalq2.clear();
   delete [] _i;
@@ -372,17 +475,33 @@ void SIM_DATA::uninit()
     _aa.reinit(0);
     delete [] _vdc;
     _vdc = nullptr;
-    delete [] _nstat;
-    _nstat = nullptr;
     delete [] _nm;
     _nm = nullptr;
+    _mstat.resize(0);
   }else{
     assert(_acx.size() == 0);
     assert(_aa.size() == 0);
-    assert(!_nstat);
     assert(!_nm);
   }
   _has_op = s_NONE;
+}
+/*--------------------------------------------------------------------------*/
+NODE* SIM_DATA::newnode_matrix(CARD* owner)
+{
+  int flat_number = newnode_matrix();
+  trace1("newnode_matrix", flat_number);
+  MATRIX_NODE* n = new MATRIX_NODE(owner, flat_number);
+  _mstat.push_back(n);
+  return n;
+}
+/*--------------------------------------------------------------------------*/
+NODE* SIM_DATA::newnode_matrix(NODE const* proto)
+{
+  int flat_number = newnode_matrix();
+  trace1("newnode_matrix1", flat_number);
+  MATRIX_NODE* n = new MATRIX_NODE(proto, flat_number);
+  _mstat.push_back(n);
+  return n;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

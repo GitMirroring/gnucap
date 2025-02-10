@@ -1,0 +1,22 @@
+
+verilog
+
+module test(1 2)
+resistor #(1) r1(1,3);
+resistor #(1) r2(3,2);
+endmodule
+
+vsource #(.dc(1)) v(1, gnd);
+test #() dut(1, gnd);
+ground gnd
+
+print op v(nodes) v(dut.3)
+op
+print op v(nodes) v(dut.1)
+op
+print op v(nodes) v(dut.2)
+op
+print op v(nodes) v(dut.*)
+op
+
+status notime

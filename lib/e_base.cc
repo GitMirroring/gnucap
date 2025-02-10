@@ -24,6 +24,8 @@
 //testing=script 2014.07.04
 #include "u_sim_data.h"
 #include "m_wave.h"
+#include "u_xprobe.h"
+#include "e_base.h"
 #include "u_prblst.h"
 /*--------------------------------------------------------------------------*/
 SIM_DATA* CKT_BASE::_sim = nullptr; 
@@ -39,7 +41,7 @@ CKT_BASE::~CKT_BASE()
   assert(!has_attributes(id_tag()));
 }
 /*--------------------------------------------------------------------------*/
-const std::string CKT_BASE::long_label()const
+std::string CKT_BASE::long_label()const
 {
   //incomplete();
   std::string buffer(short_label());
@@ -92,9 +94,9 @@ bool CKT_BASE::help(CS& Cmd, OMSTREAM& Out)const
 bool CKT_BASE::operator!=(const std::string& n)const
 {
   if(OPT::case_insensitive){
-    return strcasecmp(_label.c_str(),n.c_str())!=0;
+    return strcasecmp(short_label().c_str(),n.c_str())!=0;
   }else{
-    return strcmp(_label.c_str(),n.c_str())!=0;
+    return n != short_label();
   }
 }
 /*--------------------------------------------------------------------------*/

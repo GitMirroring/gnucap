@@ -31,7 +31,13 @@ r1 ( 1 2 )  1.K
 c2 ( 2 0 ) t1 l= 1.u w= 2.u
 .model t1 c ( cj=5 cjsw=NA( 0.) narrow=NA( 0.) defw=NA( 1.u) tc1=NA( 0.) tc2=NA( 0.) tnom=NA( 27.))
 Gnucap   System status
+<<<<<<< HEAD
 iterations: op=4, dc=0, tran=49, fourier=0, total=77
 transient timesteps: accepted=13, rejected=0, total=13
 nodes: user=2, subckt=0, model=0, total=2
+=======
+iterations: op=4, dc=0, tran=53, fourier=0, total=82
+transient timesteps: accepted=14, rejected=0, total=14
+nodes: user=2, module=0, model=0, logic=0, matrix=2, total=2
+>>>>>>> 5663faefd (node rework WIP)
 dctran density=100.0%, ac density=100.0%

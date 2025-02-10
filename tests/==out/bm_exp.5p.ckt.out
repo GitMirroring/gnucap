@@ -81,8 +81,14 @@ x1 ( 1 0 )  esource  p=ppp
 *x2 (2 0) esource p=20n 
 "*>.status notime "
 Gnucap   System status
+<<<<<<< HEAD
 iterations: op=0, dc=0, tran=59, fourier=0, total=233
 transient timesteps: accepted=59, rejected=0, total=59
 nodes: user=1, subckt=0, model=0, total=1
+=======
+iterations: op=0, dc=0, tran=56, fourier=0, total=229
+transient timesteps: accepted=58, rejected=0, total=58
+nodes: user=1, module=0, model=0, logic=0, matrix=1, total=1
+>>>>>>> 5663faefd (node rework WIP)
 dctran density=100.0%, ac density=100.0%
 ".end "

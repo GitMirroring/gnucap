@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 module rr (a, b, c, ref);
 	resistor #(.r($temperature())) r(b, ref);
 endmodule
@@ -6,3 +7,21 @@ endmodule
 simulator lang=verilog
 
 list
+=======
+verilog
+option list
+
+ground 0
+
+module open (n0 n1 n2 n3 n4);
+resistor #(1) r1(n0, n2);
+resistor #(1) r2(n3, n4);
+endmodule
+
+vsource #(.dc(1)) v1(1, 0);
+open X1 (1 2);
+
+print op i(v1)
+op
+end
+>>>>>>> 5663faefd (node rework WIP)

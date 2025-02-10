@@ -28,6 +28,7 @@
 /*--------------------------------------------------------------------------*/
 // defined here
 class CARD_LIST;
+class NODE;
 /*--------------------------------------------------------------------------*/
 // external
 class CARD;
@@ -35,6 +36,7 @@ class PARAM_LIST;
 class NODE_MAP;
 class LANGUAGE;
 struct TIME_PAIR;
+class NODE_P;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CARD_LIST {
 public: // base types
@@ -45,7 +47,9 @@ private: // internal types
   typedef list::reverse_iterator reverse_iterator;
 private: // data members
   const CARD_LIST* _parent;
-  mutable NODE_MAP* _nm;
+  //int _node_capacity{0};
+  friend class NODE_MAP;
+  mutable NODE_MAP* _nm; // mutable?
   mutable PARAM_LIST* _params;
   list _cl;
   bool _verilog_math{false};
@@ -105,6 +109,12 @@ public:
   const_iterator find_(const std::string& short_name)const
 					{return find_again(short_name, begin());}
 
+private: // expand
+  // return reverse iterator
+  reverse_iterator rbegin()			{return _cl.rbegin();}
+  reverse_iterator rend()			{return _cl.rend();}
+
+public:
   // add to it
   CARD_LIST& push_front(CARD* c)	{_cl.push_front(c); return *this;}
   CARD_LIST& push_back(CARD* c)		{_cl.push_back(c);  return *this;}
@@ -145,7 +155,12 @@ public:
   CARD_LIST& ac_final();
   double noise_num(std::string const&)const;
 
-  NODE_MAP*   nodes()const {assert(_nm); return _nm;}
+  NODE_MAP*         nodes()const {assert(_nm); return _nm;} // (sic!)
+  NODE_MAP*	    nodes()      {assert(_nm); return _nm;}
+  NODE* n_(int i); //  {assert(i<_node_capacity); return _nodes[i];};
+  NODE* new_node(std::string const&, CARD const* owner);
+  // NODE const* node_by_name(std::string const&) const;
+
   PARAM_LIST* params();
   PARAM_LIST* params()const;
 
@@ -153,6 +168,7 @@ public:
   void attach_params(PARAM_LIST const* p, const CARD_LIST* scope);
   void shallow_copy(const CARD_LIST*);
   void map_subckt_nodes(const CARD* model, const CARD* owner);
+  void deflate_nodes(CARD* owner);
 
   explicit CARD_LIST();
   explicit CARD_LIST(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST const* p);

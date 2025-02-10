@@ -1,0 +1,12 @@
+
+load ./d_short.so
+
+verilog
+
+short s1(2,1);
+short s1(1,2);
+
+list
+op
+status notime
+end

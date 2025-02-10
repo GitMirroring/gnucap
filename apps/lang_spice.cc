@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-//testing=script 2015.01.27
+#include "u_node.h"
 #include "u_nodemap.h"
 #include "globals.h"
 #include "u_status.h"
@@ -36,6 +36,36 @@ namespace {
 /*--------------------------------------------------------------------------*/
 static const bool add_mfactor = true; // allow $mfactor
 static const bool alias_m_mfactor = true; // treat m as mfactor when rejected.
+static const bool want_ground_zero = true; // "ground 0;"
+/*--------------------------------------------------------------------------*/
+class DOT_GLOBAL : public DEV_DOT {
+  NODE_P _node;
+public:
+  explicit DOT_GLOBAL() : DEV_DOT() {
+    // set_type(".global");
+  }
+  explicit DOT_GLOBAL(DOT_GLOBAL const& p) : DEV_DOT(p) { }
+  ~DOT_GLOBAL(){ }
+  DOT_GLOBAL* clone()const override {return new DOT_GLOBAL(*this);}
+  int net_nodes()const override {return _net_nodes;}
+  // int max_nodes()const override {return 1;}
+  // int min_nodes()const override {return 1;}
+  NODE_P const& n_(int i)const override { untested();
+    assert(i==0);
+    return _node;
+  }
+  NODE_P& node(int i){ untested();
+    assert(i==0);
+    return _node;
+  }
+  void set_port_by_index(int i, std::string const n) { untested();
+    assert(i==0);
+    _node.new_node(n, this);
+    _net_nodes = 1;
+  }
+}dot_global;
+/*--------------------------------------------------------------------------*/
+void set_globals(CARD_LIST* from, CARD* to);
 /*--------------------------------------------------------------------------*/
 class LANG_SPICE_BASE : public LANGUAGE {
 public:
@@ -77,7 +107,18 @@ private: // local
   void print_args(OMSTREAM&, const COMPONENT*);
   void print_label(OMSTREAM&, const COMPONENT*);
   void print_ports(OMSTREAM&, const COMPONENT*);
-};
+
+public:
+  void set_ground(CARD_LIST* Scope) {
+    if(want_ground_zero) {
+      CMD::command("spiceground 0", Scope);
+
+      // // with this it shouldn't be necessary to declare ground in each sckt
+      // CMD::command("global 0", Scope);
+    }else{ untested();
+    }
+  }
+}; // LANG_SPICE_BASE
 /*--------------------------------------------------------------------------*/
 class LANG_SPICE : public LANG_SPICE_BASE {
 public:
@@ -238,7 +279,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	break; // done.  have closing paren.
       }else if (index >= num_nodes) {
 	break; // done.  have maxnodes.
-      }else if (!cmd.more()) {untested();
+      }else if (!cmd.more()) {
 	break; // done.  premature end of line.
       }else if (OPT::keys_between_nodes &&
 		(cmd.umatch("poly ")
@@ -257,18 +298,24 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
 	if (cmd.stuck(&here)) {untested();
 	  // didn't move, probably a terminator.
 	  throw Exception("bad node name");
+	}else if(all_new && want_ground_zero && node_name == "0") {
 	}else{
 	  // legal node name, store it.
+	  trace3("lang_spice", x->long_label(), index, node_name);
 	  x->set_port_by_index(index, node_name);
 	}
 	//----------------------
-	if (!(x->node_is_connected(index))) {untested();
+	if(all_new && want_ground_zero && node_name == "0") {
+	  cmd.warn(bDANGER, here1, "ground not allowed here, skipped");
+	}else if (!(x->node_is_connected(index))) {untested();
 	  break; // illegal node name, might be proper exit.
 	}else{
 	  if (all_new) {
-	    if (x->node_is_grounded(index)) {
-	      cmd.warn(bDANGER, here1, "node 0 not allowed here");
-	    }else if (x->subckt() && x->subckt()->nodes()->how_many() != index+1) {
+	    trace3("all new", start, index, x->subckt()->nodes()->how_many());
+	   // if (x->node_is_grounded(index))  // doesn't work
+	    if (node_name == "0" && want_ground_zero) {
+	      cmd.warn(bDANGER, here1, "ground not allowed here, skipped");
+	    }else if (x->subckt() && x->subckt()->nodes()->how_many() != 1+index) {
 	      cmd.warn(bDANGER, here1, "duplicate port name, skipping");
 	    }else{
 	      ++index;
@@ -294,7 +341,8 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
   
   // ground unused input nodes
   for (int iii = index;  iii < minnodes;  ++iii) {untested();
-    x->set_port_to_ground(iii);
+    // it's an error, no need to ground
+    // x->set_port_to_ground(iii);
   }
   //assert(x->_net_nodes >= index);
 }
@@ -311,7 +359,7 @@ void LANG_SPICE_BASE::parse_element_using_obsolete_callback(CS& cmd, COMPONENT* 
     int num_nodes = count_ports(cmd, stop_nodes, 0,  0,   0);
     //				     max	 min tail already_got
     cmd.reset(here);
-    parse_ports(cmd, x, 0,  0,		num_nodes, false);
+    parse_ports(cmd, x, 0,  0,         num_nodes, false);
     //			min already_got
   }
   //assert(x->_net_nodes == x->net_nodes()); //fails
@@ -538,6 +586,8 @@ MODEL_CARD* LANG_SPICE_BASE::parse_paramset(CS& cmd, MODEL_CARD* x)
 BASE_SUBCKT* LANG_SPICE_BASE::parse_module(CS& cmd, BASE_SUBCKT* x)
 {
   assert(x);
+  // lang_spice.set_ground(x->subckt());
+  // assert(x->subckt()->nodes()->how_many()==1);
 
   // header
   cmd.reset();
@@ -548,18 +598,32 @@ BASE_SUBCKT* LANG_SPICE_BASE::parse_module(CS& cmd, BASE_SUBCKT* x)
     int num_nodes = count_ports(cmd, x->max_nodes(), x->min_nodes(), 
 				0/*no unnamed par*/, 0/*start*/);
     cmd.reset(here);
-    parse_ports(cmd, x, x->min_nodes(), 0/*start*/, num_nodes, true/*all new*/);
+    parse_ports(cmd, x, x->min_nodes(), 0, num_nodes+0, true/*all new*/);
   }
   x->subckt()->params()->parse(cmd);
 
+  // set_globals(&CARD_LIST::card_list, x);
+  // CMD::command("spiceground 0", x->subckt()); // TODO: use global 0 instead.
   // body
   parse_module_body(cmd, x, x->subckt(), name() + "-subckt>", NO_EXIT_ON_BLANK, ".ends |.eom ");
   return x;
-}
+} // parse_module
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::parse_module_body(CS& cmd, BASE_SUBCKT* x, CARD_LIST* Scope,
 		const std::string& prompt, EOB exit_on_blank, const std::string& exit_key)
 {
+  if (x && want_ground_zero) {
+    assert(x);
+    assert(x->scope()==x->subckt());
+    assert(x->scope()==Scope);
+    NODE* gnd = Scope->nodes()->new_node("0", x);
+    auto u = prechecked_cast<USER_NODE*>(gnd);
+    assert(u);
+    u->set_ground();
+    assert(u->is_grounded());
+  }else{
+  }
+
   try {
     for (;;) {
       cmd.get_line(prompt);
@@ -567,6 +631,8 @@ void LANG_SPICE_BASE::parse_module_body(CS& cmd, BASE_SUBCKT* x, CARD_LIST* Scop
       if ((exit_on_blank==EXIT_ON_BLANK && cmd.is_end()) 
 	  || cmd.umatch(exit_key)) {
 	break;
+      }else if(cmd.umatch(".global")){ untested();
+	cmd.warn(bDANGER, "not allowed here");
       }else{
 	skip_pre_stuff(cmd);
 	new__instance(cmd, x, Scope);
@@ -737,9 +803,12 @@ void LANG_SPICE_BASE::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_SPICE_BASE::print_command(OMSTREAM& o, const DEV_DOT* x)
-{itested();
+{
   assert(x);
-  o << x->s() << '\n';
+  if(x->s().size()) {
+    o << "." << x->s() << '\n';
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -872,6 +941,7 @@ class CMD_SUBCKT : public CMD {
     assert(new_module->subckt()->is_empty());
     assert(!new_module->is_device());
     lang_spice.parse_module(cmd, new_module);
+    set_globals(Scope, new_module); // here?
     Scope->push_back(new_module);
   }
 } p2;
@@ -906,6 +976,9 @@ static void getmerge(CS& cmd, Skip_Header skip_header, CARD_LIST* Scope)
   }else{
   }
   cmd.check(bWARNING, "need section, echo, list, or quiet");
+
+  lang_spice.set_ground(Scope);
+
 
   CS file(CS::_INC_FILE, file_name);
 
@@ -1042,6 +1115,7 @@ class CMD_SPICE : public CMD {
 public:
   void do_it(CS&, CARD_LIST* Scope)override {
     command("options lang=spice", Scope);
+    lang_spice.set_ground(Scope);
   }
 } p8;
 DISPATCHER<CMD>::INSTALL d8(&command_dispatcher, "spice|`spice", &p8);
@@ -1062,8 +1136,8 @@ public:
     }else{untested();
     }
   }
-} p88;
-DISPATCHER<CMD>::INSTALL d88(&command_dispatcher, ".endc", &p88);
+} p10;
+DISPATCHER<CMD>::INSTALL d10(&command_dispatcher, ".endc", &p10);
 /*--------------------------------------------------------------------------*/
 class CMD_CONTROL : public CMD {
 public:
@@ -1073,9 +1147,66 @@ public:
     }else{untested();
     }
   }
-} p99;
-DISPATCHER<CMD>::INSTALL d99(&command_dispatcher, ".control", &p99);
+} p11;
+DISPATCHER<CMD>::INSTALL d11(&command_dispatcher, ".control", &p11);
 /*--------------------------------------------------------------------------*/
+class CMD_GLOBAL : public CMD {
+public:
+  void do_it(CS& cmd, CARD_LIST* Scope)override {untested();
+    if(Scope == &CARD_LIST::card_list){ untested();
+
+      std::string name;
+      cmd >> name;
+      DOT_GLOBAL* G = dot_global.clone();
+      G->set(cmd.fullstring());
+      // G->set_owner(NULL);
+      G->set_port_by_index(G->_net_nodes, name);
+      trace1("toplevel global", name);
+      Scope->push_front(G);
+
+    }else{ untested();
+      cmd.check(bDANGER, "only allowed at top level");
+    }
+  }
+} p12;
+DISPATCHER<CMD>::INSTALL d12(&command_dispatcher, "global|.global", &p12);
+/*--------------------------------------------------------------------------*/
+void set_globals(CARD_LIST* Scope, CARD* Proto)
+{
+  assert(Scope);
+  assert(Proto);
+
+  for(CARD* c : *Scope){
+    if(auto g = dynamic_cast<DOT_GLOBAL*>(c)) { untested();
+      for(int i = 0; i < g->net_nodes(); ++i) { untested();
+	assert(i==0); // for now.
+	std::string label = g->n_(i).short_label();
+	trace1("set_globals", label);
+
+	{ untested();
+	  DOT_GLOBAL* G = dot_global.clone();
+	  assert(Proto->subckt());
+	  Proto->subckt()->push_back(G);
+	  G->set_owner(Proto);
+
+	  assert(g->n_(i).n_());
+	  // Proto->subckt()->set_node(g->node(i).n_());
+	  NODE* p = Proto->subckt()->new_node(label, G);
+	  assert(p);
+	  USER_NODE* u = prechecked_cast<USER_NODE*>(p);
+	  assert(u);
+	  incomplete();
+	  // u->connect_(&g->node(i));
+
+	  G->set_port_by_index(G->_net_nodes, label);
+	  // G->set("inherited global " + label); // debug
+	}
+
+      }
+    }else{
+    }
+  }
+}
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

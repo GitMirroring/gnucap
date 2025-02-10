@@ -1,5 +1,6 @@
 
 simulator lang=spice
+.ground 0
 
 .model zz npn bf=150
 

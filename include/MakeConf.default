@@ -9,7 +9,7 @@ MAKE_CXXFLAGS = -fPIC \
 .cc.so:; $(MAKE_LIB) $<
 #------------------------------------------------------------------------
 MAKE_EXE = $(CXX) $(MAKE_CXXFLAGS) $(CXXFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -o $@ # Make2.default
-MAKE_LIB = $(CXX) $(MAKE_CXXFLAGS) $(CXXFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@ # Make2.default
+MAKE_LIB = $(CXX) $(MAKE_CXXFLAGS) ${MAKE_CPPFLAGS} ${CPPFLAGS} $(OBJS) $(LIBS) $(LDFLAGS) -shared -o $@  # Make2.default
 all: $(TARGET_EXE) $(TARGET)
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------

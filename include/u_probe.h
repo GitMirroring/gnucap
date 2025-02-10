@@ -30,6 +30,7 @@
 class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class INTERFACE PROBE : public CKT_BASE {
+  std::string _label; // reallt?
 private:
   std::string	_what;
   const CKT_BASE* _brh;
@@ -46,7 +47,12 @@ public:
   void restore(CARD_LIST const* scope);
   PROBE&    operator=(const PROBE& p);
 
+public:	// label -- in CKT_BASE
+  /*virtual*/ std::string long_label()const final{return _label;}
+  std::string const& short_label()const final override {return _label;}
+  void	set_label(const std::string& s)final {_label=s;}
   const std::string label()const;
+
   double	  value()const;
   CKT_BASE const* object()const	 {return _brh;}
   double	  lo()const	 {return _lo;}

@@ -249,8 +249,8 @@ static void make_device(std::ofstream& out, const Device& d)
       << class_name << "(*this);}\n"
     "  void      precalc_first()override {COMPONENT::precalc_first(); if(subckt()) subckt()->precalc_first();}\n"
     "  void      expand()override;\n"
-    "  //void    precalc_last()override;//BASE_SUBCKT\n"
-    "  //void    map_nodes();         //BASE_SUBCKT\n"
+    "  void      precalc_last()override;\n"
+    "  void      map_nodes()override;\n"
     "  //void    tr_begin();          //BASE_SUBCKT\n"
     "  //void    tr_restore();        //BASE_SUBCKT\n";
   if (d.tr_eval().is_empty()) {
@@ -280,6 +280,9 @@ static void make_device(std::ofstream& out, const Device& d)
     "  //void    do_ac();             //BASE_SUBCKT\n"
     "  //void    ac_load();           //BASE_SUBCKT\n"
     "  //XPROBE  ac_probe_ext(CS&)const;//CKT_BASE/nothing\n"
+    "public:\n"
+    "  CARD_LIST* scope()override;\n"
+    "  CARD_LIST const* scope()const override;\n"
     "public:\n"
     "  static int  count() {return _count;}\n"
     "public: // may be used by models\n";

@@ -31,8 +31,88 @@
 #include "u_xprobe.h"
 #include "e_logic.h"
 #include "e_elemnt.h"
+#include "u_nodemap.h"
+#include "u_node.h"
+/*--------------------------------------------------------------------------*/
+const int MODEL_LOGIC::_type_number = 12345;
 /*--------------------------------------------------------------------------*/
 namespace {
+/*--------------------------------------------------------------------------*/
+// some pre-connect-module band aid
+LOGIC_NODE* logic(NODE_P& p)
+{
+  if(p.is_grounded()){ untested();
+    unreachable();
+    // TODO: connect module needed here
+    incomplete();
+    return NULL;
+  }else if(auto l = prechecked_cast<LOGIC_NODE*>(p.n_())){
+    return l;
+  }else if(auto u = prechecked_cast<USER_NODE*>(p.n_())){
+    incomplete();
+    // unreachable();
+    // deal with top level case
+    assert( dynamic_cast<LOGIC_NODE*>(&u->data()));
+    return dynamic_cast<LOGIC_NODE*>(&u->data());
+  }else{
+    unreachable();
+    return NULL;
+  }
+}
+/*--------------------------------------------------------------------------*/
+class node_l : public node_t { // NODE_P?
+public:
+  explicit node_l(){}
+  explicit node_l(node_t& p) : node_t(p){}
+public:
+  //LOGIC_NODE&	    operator*()const	{untested();return data();}
+  const LOGIC_NODE* operator->()const	{
+    if(is_grounded()){ untested();
+      // TODO: connect module needed here
+      incomplete();
+      return NULL;
+    }else{
+      return logic(*const_cast<node_l*>(this));
+    }
+  }
+  LOGIC_NODE*	    operator->()	{
+    if(is_grounded()){ untested();
+      // TODO: connect module needed here
+      incomplete();
+      return NULL;
+    }else{
+      return logic(*this);
+    }
+  }
+  void set_input()  { NODE_P::set_input(); }
+  void set_output() { NODE_P::set_output(); }
+  void set_inout()  { NODE_P::set_inout(); }
+
+  void map() {
+    node_t::map();
+  }
+};
+/*--------------------------------------------------------------------------*/
+LOGIC_NODE const* logic(NODE_P const& p)
+{
+  if(p.is_grounded()){ untested();
+    unreachable();
+    // TODO: connect module needed here
+    incomplete();
+    return NULL;
+  }else if(auto u = dynamic_cast<USER_NODE const*>(p.n_())){
+    incomplete();
+    // unreachable();
+    // deal with top level case
+    auto L = prechecked_cast<LOGIC_NODE const*>(&u->data());
+    assert(L);
+    return L;
+  }else{
+    auto l = prechecked_cast<LOGIC_NODE const*>(p.n_());
+    assert(l);
+    return l;
+  }
+}
 /*--------------------------------------------------------------------------*/
 class DEV_LOGIC : public ELEMENT {
 public:
@@ -55,6 +135,17 @@ private: // override virtuals
   std::string value_name()const override{return "";}
   bool	      print_type_in_spice()const override{return true;}
   std::string dev_type()const override{assert(has_common()); return common()->name();}
+  void set_port_by_index(int num, std::string& ext_name) {
+    COMPONENT::set_port_by_index(num, ext_name);
+    _n[num].set_type(MODEL_LOGIC::_type_number);
+    assert(_n[num].type() == MODEL_LOGIC::_type_number);
+    // later.
+    // if(num){
+    //   _n[num].set_output();
+    // }else{
+    //   _n[num].set_input();
+    // }
+  }
   int	   tail_size()const override {return 2;}
   int	   max_nodes()const override {return PORTS_PER_GATE;}
   int	   min_nodes()const override {return BEGIN_IN+1;}
@@ -63,8 +154,15 @@ private: // override virtuals
   CARD*	   clone()const override {return new DEV_LOGIC(*this);}
   void	   precalc_first()override {ELEMENT::precalc_first(); if (subckt()) {subckt()->precalc_first();}}
   void	   expand()override;
+<<<<<<< HEAD
   void	   precalc_last() override;
   //void   map_nodes();
+=======
+  void	   expand_ports();
+  void	   expand_nodes();
+  void	   precalc_last() override{ELEMENT::precalc_last(); if (subckt()) {subckt()->precalc_last();}}
+  void   map_nodes()override;
+>>>>>>> 5663faefd (node rework WIP)
 
   void	   tr_iwant_matrix()override;
   void	   tr_begin()override;
@@ -115,16 +213,41 @@ private:
   bool	   want_digital()const;
 };
 /*--------------------------------------------------------------------------*/
+<<<<<<< HEAD
+=======
+class INTERFACE COMMON_LOGIC : public COMMON_COMPONENT {
+protected:
+  explicit	COMMON_LOGIC(int c=0)
+    :COMMON_COMPONENT(c) {++_count;}
+  explicit	COMMON_LOGIC(const COMMON_LOGIC& p)
+    :COMMON_COMPONENT(p) {++_count;}
+public:
+		~COMMON_LOGIC()			{--_count;}
+  bool operator==(const COMMON_COMPONENT&)const override;
+  static  int	count()				{untested();return _count;}
+  virtual LOGICVAL logic_eval(const node_l*, int)const	= 0;
+
+  void		set_param_by_index(int, std::string&, int)override;
+  bool		param_is_printable(int)const override;
+  std::string	param_name(int)const override;
+  std::string	param_name(int,int)const override;
+  std::string	param_value(int)const override;
+  int param_count()const override {return (1 + COMMON_COMPONENT::param_count());}
+protected:
+  static int	_count;
+};
+/*--------------------------------------------------------------------------*/
+>>>>>>> 5663faefd (node rework WIP)
 class LOGIC_AND : public COMMON_LOGIC {
 private:
   explicit LOGIC_AND(const LOGIC_AND& p) :COMMON_LOGIC(p){++_count;}
   COMMON_COMPONENT* clone()const override{return new LOGIC_AND(*this);}
 public:
   explicit LOGIC_AND(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n,  int incount)const override {
-    LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {
-      out &= n[ii]->lv();
+  LOGICVAL logic_eval(const node_l* n,  int incount)const override {itested();
+    LOGICVAL out(logic(n[0])->lv());
+    for (int ii=1; ii<incount; ++ii) {itested();
+      out &= logic(n[ii])->lv();
     }
     return out;
   }
@@ -137,10 +260,10 @@ private:
   COMMON_COMPONENT* clone()const override {return new LOGIC_NAND(*this);}
 public:
   explicit LOGIC_NAND(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override {
-    LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {
-      out &= n[ii]->lv();
+  LOGICVAL logic_eval(const node_l* n, int incount)const override {itested();
+    LOGICVAL out(logic(n[0])->lv());
+    for (int ii=1; ii<incount; ++ii) {itested();
+      out &= logic(n[ii])->lv();
     }
     return ~out;
   }
@@ -153,8 +276,8 @@ private:
   COMMON_COMPONENT* clone()const override {itested(); return new LOGIC_OR(*this);}
 public:
   explicit LOGIC_OR(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override{untested();
-    LOGICVAL out(n[0]->lv());
+  LOGICVAL logic_eval(const node_l* n, int incount)const override{untested();
+    LOGICVAL out(logic(n[0])->lv());
     for (int ii=1; ii<incount; ++ii) {untested();
       out |= n[ii]->lv();
     }
@@ -169,8 +292,8 @@ private:
   COMMON_COMPONENT* clone()const override {return new LOGIC_NOR(*this);}
 public:
   explicit LOGIC_NOR(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override {
-    LOGICVAL out(n[0]->lv());
+  LOGICVAL logic_eval(const node_l* n, int incount)const override {
+    LOGICVAL out(logic(n[0])->lv());
     for (int ii=1; ii<incount; ++ii) {
       out |= n[ii]->lv();
     }
@@ -185,8 +308,8 @@ private:
   COMMON_COMPONENT* clone()const override {itested(); return new LOGIC_XOR(*this);}
 public:
   explicit LOGIC_XOR(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override {untested();
-    LOGICVAL out(n[0]->lv());
+  LOGICVAL logic_eval(const node_l* n, int incount)const override {untested();
+    LOGICVAL out(logic(n[0])->lv());
     for (int ii=1; ii<incount; ++ii) {untested();
       out ^= n[ii]->lv();
     }
@@ -201,8 +324,8 @@ private:
   COMMON_COMPONENT* clone()const override {itested(); return new LOGIC_XNOR(*this);}
 public:
   explicit LOGIC_XNOR(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override {untested();
-    LOGICVAL out(n[0]->lv());
+  LOGICVAL logic_eval(const node_l* n, int incount)const override {untested();
+    LOGICVAL out(logic(n[0])->lv());
     for (int ii=1; ii<incount; ++ii) {untested();
       out ^= n[ii]->lv();
     }
@@ -217,8 +340,8 @@ private:
   COMMON_COMPONENT* clone()const override {return new LOGIC_INV(*this);}
 public:
   explicit LOGIC_INV(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int)const override {
-    return ~n[0]->lv();
+  LOGICVAL logic_eval(const node_l* n, int)const override {
+    return ~logic(n[0])->lv();
   }
   std::string name()const override	  {return "inv";}
 };
@@ -229,7 +352,7 @@ private:
   COMMON_COMPONENT* clone()const override {untested(); return new LOGIC_NONE(*this);}
 public:
   explicit LOGIC_NONE(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t*, int)const override {untested();
+  LOGICVAL logic_eval(const node_l*, int)const override {untested();
     return lvUNKNOWN;
   }
   std::string name()const override	  {untested();return "error";}
@@ -256,7 +379,11 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
 {
   assert(max_nodes() == PORTS_PER_GATE);
   for (int ii = 0;  ii < max_nodes();  ++ii) {
+<<<<<<< HEAD
     _nodes[ii] = p._nodes[ii];
+=======
+    _n[ii] = p._n[ii];
+>>>>>>> 5663faefd (node rework WIP)
   }
   ++_count;
 }
@@ -292,12 +419,105 @@ void DEV_LOGIC::expand()
 	    long_label() + ": " + subckt_name + " is not a subckt, forcing digital\n");
     }else{
       _gatemode = OPT::mode;    
+<<<<<<< HEAD
       renew_subckt(model, nullptr/*&(c->_params)*/);    
+=======
+      renew_subckt(model, NULL/*&(c->_params)*/);    
+      expand_ports();
+>>>>>>> 5663faefd (node rework WIP)
       subckt()->expand();
+      expand_nodes();
     }
   }catch (Exception_Cant_Find&) {
     error(((!_sim->is_first_expand()) ? (bDEBUG) : (bWARNING)), 
 	  long_label() + ": can't find subckt: " + subckt_name + ", forcing digital\n");
+  }
+}
+/*--------------------------------------------------------------------------*/
+// todo: sync with SCKT_BASE
+void DEV_LOGIC::expand_ports()
+{
+# if 1
+  int num_nodes = subckt()->nodes()->how_many();
+  CARD_LIST* s = subckt();
+  NODE_P* map = s->nodes()->map();
+  trace3("BASE_SUBCKT::setup early connect", long_label(), num_nodes, net_nodes());
+  for(int i=0; i < net_nodes(); ++i) {
+    trace4("DEV_LOGIC::expand_ports", i, long_label(), node(i).type(), map[i].type());
+    trace4("DEV_LOGIC::expand_ports", i, long_label(), node(i).is_node(), map[i].is_node());
+    if(i >= num_nodes) {
+    }else if(node(i).type() == s->nodes()->nodes()[i].type()) {
+      // TODO: allocate split nodes,
+      //       place connect modules as needed
+      // node(i).merge(&s->nodes()->nodes()[i]); // pass to caller.
+      unreachable();
+    }else if(!map[i].type()){
+      // unreachable();
+      // node(i).merge(&s->nodes()->nodes()[i]); // pass to caller.
+#if 1
+     //  node(i) = map[i]; // .set_next(&node(i)); // pass to caller.
+     map[i] = node(i); // .set_next(&node(i)); // pass to caller.
+#else
+      map[i].set_next(&node(i)); // pass to caller.
+#endif
+    }else{
+      trace4("BASE_SUBCKT::setup", i, long_label(), node(i).type(),
+	  s->nodes()->nodes()[i].type());
+      unreachable(); incomplete();
+      // happens in modelgen models... presumably already connected.
+    }
+  }
+#endif
+}
+/*--------------------------------------------------------------------------*/
+void DEV_LOGIC::expand_nodes()
+{
+  int num_nodes = subckt()->nodes()->how_many();
+  int len = int(subckt()->nodes()->length());
+//  expand_ports();
+
+  trace1("BASE_SUBCKT::expand_nodes internal", num_nodes);
+
+  // matrix numbers allocated here, need reverse order
+  trace3("alloc internal node", long_label(), num_nodes, net_nodes());
+
+  for(int i=len; i>net_nodes(); ) {
+    --i;
+    trace3("alloc internal node", long_label(), i, net_nodes());
+    NODE_P& pi = subckt()->nodes()->nodes()[i];
+    if(pi.is_link()){
+      // todo: somehow avoid label copy
+      // std::string label = _parent->subckt()->nodes()->node(i)->short_label();
+      USER_NODE cn(subckt()->nodes()->proto(i));
+
+      pi.set_node(cn.deflate(&pi, this));
+      pi.set_own();
+      trace3("alloc sckt node", long_label(), pi.short_label(), pi.user_number());
+      assert(pi.n_());
+    }else if(pi.n_()){
+      trace3("alloc sckt node done?", long_label(), pi.short_label(), pi.user_number());
+      incomplete();
+    }else{
+      unreachable();
+    }
+  }
+} // expand_nodes
+/*--------------------------------------------------------------------------*/
+void DEV_LOGIC::map_nodes()
+{
+  trace2("DEV_LOGIC::map_nodes", ext_nodes(), int_nodes());
+  for (int ii = 0; ii < ext_nodes()+int_nodes(); ++ii) {
+    if(_n[ii].is_connected()){
+      // assert(dynamic_cast<LOGIC_NODE const*>(_n[ii].n_()));
+      _n[ii].map();
+    }else{
+      // ext_nodes too big??
+    }
+  }
+
+  if (subckt()) {
+    subckt()->map_nodes();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -315,11 +535,19 @@ void DEV_LOGIC::tr_begin()
   ELEMENT::tr_begin();
   if (!subckt()) {
     _gatemode = moDIGITAL;
+<<<<<<< HEAD
     n_(OUTNODE)->set_mode(_gatemode);
     _oldgatemode = _gatemode;
   }else{
     _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
     n_(OUTNODE)->set_mode(_gatemode);
+=======
+    logic(_n[OUTNODE])->set_mode(_gatemode);
+    _oldgatemode = _gatemode;
+  }else{
+    _gatemode = (OPT::mode==moMIXED) ? moANALOG : OPT::mode;
+    logic(_n[OUTNODE])->set_mode(_gatemode);
+>>>>>>> 5663faefd (node rework WIP)
     _oldgatemode = _gatemode;
     subckt()->tr_begin();
   }

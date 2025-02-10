@@ -33,6 +33,7 @@ class DEV_DOT;
 class CARD_LIST;
 /*--------------------------------------------------------------------------*/
 class INTERFACE LANGUAGE : public CKT_BASE {
+  std::string _label;
 public:
   const CARD* find_proto(const std::string&, const CARD*);
 public:
@@ -49,6 +50,10 @@ public: // used by obsolete_callback
   virtual std::string arg_front()const = 0;
   virtual std::string arg_mid()const = 0;
   virtual std::string arg_back()const = 0;
+
+public: // labels
+  std::string const& short_label()const final override {return _label;}
+  void	set_label(const std::string& s)final {_label=s;}
 
   // in
 public: // real public interface

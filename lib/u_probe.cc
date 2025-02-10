@@ -35,7 +35,13 @@
 class PROBE0 : public CKT_BASE {
   mutable int _probes{0};
 public:
-  PROBE0(){ set_label("0"); }
+  PROBE0(){ }
+private: // label
+  void set_label(const std::string&)override {unreachable();}
+  std::string const& short_label()const override {
+    static std::string z("0");
+    return z;
+  }
 public:// doesnt work
 //   double tr_probe_num(std::string const&x)const override { untested();
 //     return probe_num(x);
@@ -142,21 +148,10 @@ static CKT_BASE const* find_device(CARD_LIST const* scope, std::string const& wh
       }
     }
   }else{
-    for (NODE_MAP::const_iterator 
-	i = scope->nodes()->begin();
-	i != scope->nodes()->end();
-	++i) {
-      if (i->first != "0") {
-	NODE* node = i->second;
-	assert (node);
-	if (node->short_label() == what) {
-	  return node;
-	}else{
-	}
-      }else{
-      }
-    }
-    {// components
+    NODE_P const& node = scope->nodes()->operator[](what);
+    if(node.n_()){
+      return node.n_();
+    }else{ // components
       for (CARD_LIST::const_iterator
 	  i = scope->begin();  i != scope->end();  ++i) {
 	CARD* card = *i;
@@ -188,7 +183,7 @@ void PROBE::restore(CARD_LIST const* scope)
       _brh = &probe0;
       _what = parameter;
     }else{
-      _brh = (*scope->nodes())[device];
+      _brh = (*scope->nodes())[device].n_();
       _what = parameter;
     }
     if(_brh){

@@ -26,7 +26,13 @@ rspice ( 4 0 )  1.G
 G1 ( 5 0 3 0 )  1.
 Rg ( 5 0 )  1.
 Gnucap   System status
+<<<<<<< HEAD
 iterations: op=3, dc=0, tran=107, fourier=0, total=148
 transient timesteps: accepted=32, rejected=4, total=36
 nodes: user=5, subckt=0, model=0, total=5
+=======
+iterations: op=3, dc=0, tran=104, fourier=0, total=144
+transient timesteps: accepted=31, rejected=4, total=35
+nodes: user=5, module=0, model=0, logic=0, matrix=5, total=5
+>>>>>>> 5663faefd (node rework WIP)
 dctran density=52.0%, ac density=52.0%

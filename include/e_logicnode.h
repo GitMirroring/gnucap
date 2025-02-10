@@ -31,6 +31,9 @@ class MODEL_LOGIC;
 #define	qBAD	 (0)
 #define qGOOD	 (OPT::transits)
 /*--------------------------------------------------------------------------*/
+// legacy hybrid used at top level used in DEV_LOGIC.
+// ... and at top level
+// still is-a MATRIX_NODE, as we don't have connect modules.
 class INTERFACE LOGIC_NODE : public NODE {
 private:
   const MODEL_LOGIC *_family;	/* logic family */
@@ -45,8 +48,14 @@ private:
   int	      _quality;		/* quality of digital mode */
   std::string _failure_mode;
 
-  // so it is not pure virtual
-  //const	      std::string long_label()const;
+  int _user_number{-1}; // needed to keep track of top level nodes in between runs
+public: // BUG
+  MATRIX_NODE* _matrix_node{NULL};
+public: // misc
+  // int user_number()const {return _user_number;}
+  // void set_user_number(int u) {
+  //   _user_number = u;
+  // }
 public: // virtuals
   double	tr_probe_num(const std::string&)const override;
   //XPROBE	ac_probe_ext(const std::string&)const;
@@ -117,11 +126,18 @@ public: // action, used by logic
   double      to_analog(const MODEL_LOGIC*f);
   void	      to_logic(const MODEL_LOGIC*f);
 
+public:
+  int matrix_number()const override {
+    assert(_matrix_node);
+    return _matrix_node->matrix_number();
+  }
 private: // inhibited
-  explicit LOGIC_NODE(const LOGIC_NODE&):NODE(){incomplete();unreachable();}
+  // explicit LOGIC_NODE(const LOGIC_NODE&):MATRIX_NODE(){incomplete();unreachable();}
 public: // general use
-  explicit LOGIC_NODE();
+  // explicit LOGIC_NODE();
 	   ~LOGIC_NODE() {}
+public:
+  explicit LOGIC_NODE(NODE const* s);
 
 public: // used by matrix
   LOGIC_NODE&	set_a_iter()	{_a_iter = _sim->iteration_tag(); return *this;}

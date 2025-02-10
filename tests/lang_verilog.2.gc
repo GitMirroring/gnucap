@@ -1,5 +1,6 @@
 
 simulator lang=verilog
+ground 0
 
 // ground \0
 

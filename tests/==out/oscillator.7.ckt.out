@@ -1011,9 +1011,15 @@
  99.9       3.7786     3.2748     4.        
  100.       4.0864     2.8815     4.        
 Gnucap   System status
+<<<<<<< HEAD
 iterations: op=0, dc=0, tran=4024, fourier=0, total=5034
 transient timesteps: accepted=1003, rejected=7, total=1010
 nodes: user=2, subckt=0, model=0, total=2
+=======
+iterations: op=0, dc=0, tran=4028, fourier=0, total=5040
+transient timesteps: accepted=1005, rejected=7, total=1012
+nodes: user=2, module=0, model=0, logic=0, matrix=2, total=2
+>>>>>>> 5663faefd (node rework WIP)
 dctran density=50.0%, ac density=50.0%
 #Time       v(1)       v(2)       iter(0)   
  0.         0.         0.         0.        
@@ -2027,7 +2033,13 @@ dctran density=50.0%, ac density=50.0%
  99.9       3.7786     3.2748     4.        
  100.       4.0864     2.8815     4.        
 Gnucap   System status
+<<<<<<< HEAD
 iterations: op=0, dc=0, tran=4024, fourier=0, total=10068
 transient timesteps: accepted=2006, rejected=14, total=2020
 nodes: user=2, subckt=0, model=0, total=2
+=======
+iterations: op=0, dc=0, tran=4028, fourier=0, total=10080
+transient timesteps: accepted=2010, rejected=14, total=2024
+nodes: user=2, module=0, model=0, logic=0, matrix=2, total=2
+>>>>>>> 5663faefd (node rework WIP)
 dctran density=50.0%, ac density=50.0%
