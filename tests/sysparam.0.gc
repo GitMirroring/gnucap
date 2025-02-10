@@ -1,0 +1,5 @@
+verilog
+
+resistor #(.r(1), .$xposition(0), .$yposition(1)) r1(1,2);
+
+list

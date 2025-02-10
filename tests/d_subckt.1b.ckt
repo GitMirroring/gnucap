@@ -1,0 +1,23 @@
+'
+V1   2  0  1.
+X1   2  1  3 zzz
+X2   2  4  5 zzz
+.subckt zzz  1 2 4
+XR1   1  2  rrr
+XR2   2  0  rrr
+XR3   2  3  rrr
+XR4   3  0  rrr
+Xr5 3 4 rrr
+Xr6 4 0 rrr
+.ends zzz
+.subckt rrr  1 2
+R1   1  2  1.
+.ends zzz
+.width out=160
+.print op v(nodes)
+.op
+.print op + v(xr1.x1) v(xr?.x1) v(xr2.x?)
+.op
+.print
+.list
+.end

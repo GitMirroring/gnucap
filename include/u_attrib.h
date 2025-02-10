@@ -41,15 +41,15 @@ private:
 public:
   ATTRIB_LIST(const std::string& S, ATTRIB_LIST* Up, tag_t Owner) 
     :_s(S), _ref_count(0), _up(Up), _owner(Owner) {
-    if (_up) {
+    if (_up) { untested();
       _up->inc_ref_count();
     }else{
     }
   }
 
   ~ATTRIB_LIST() {
-    if (_up) {
-      if (_up->dec_ref_count()==0) {
+    if (_up) { untested();
+      if (_up->dec_ref_count()==0) { untested();
 	delete _up;
 	_up = nullptr;
       }else{
@@ -65,12 +65,12 @@ public:
 
   tag_t owner()const {return _owner;}
 
-  ATTRIB_LIST& chown(tag_t Old, tag_t New) {
-    if(_owner == Old){
+  ATTRIB_LIST& chown(tag_t Old, tag_t New) { untested();
+    if(_owner == Old){ untested();
       _owner = New;
-      if(_up){
+      if(_up){ untested();
 	_up->chown(Old, New);
-      }else{
+      }else{ untested();
       }
     }else{untested();
     }
@@ -164,18 +164,18 @@ public:
   ATTRIB_LIST const* operator*()const  {untested(); return _p;}
   ATTRIB_LIST*       operator*()       {untested(); return _p;}
 
-  ATTRIB_LIST_p& operator=(const ATTRIB_LIST_p& P) {
+  ATTRIB_LIST_p& operator=(const ATTRIB_LIST_p& P) { untested();
     if (_p) {untested();
       if (_p->dec_ref_count()==0) {untested();
 	delete _p;
 	_p = nullptr;
       }else{untested();
       }
-    }else{
+    }else{ untested();
     }
     assert(!_p);
     _p = P._p;
-    if (_p) {
+    if (_p) { untested();
       _p->inc_ref_count();
     }else{itested();
     }
@@ -194,7 +194,7 @@ public:
       _p = new ATTRIB_LIST(String, _p, Owner);
       assert(_p);
       _p->inc_ref_count();
-    }else{
+    }else{ untested();
     }
     return *this;
   }

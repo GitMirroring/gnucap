@@ -517,7 +517,7 @@ void DEV_SUBCKT::expand()
       CARD* d = (*i)->deflate();
 
       if(d == (*i)){
-      }else{itested();
+      }else{ untested();
 	assert(d->owner() == this);
 	delete *i;
 	*i = d;
@@ -566,8 +566,8 @@ void DEV_SUBCKT::precalc_last()
   assert(!is_constant()); /* because I have more work to do */
 }
 /*--------------------------------------------------------------------------*/
-double DEV_SUBCKT::tr_probe_num(const std::string& x)const
-{untested();
+double DEV_MODULE::tr_probe_num(const std::string& x)const
+{
   if (Umatch(x, "p ")) {untested();
     double power = 0.;
     assert(subckt());
@@ -592,7 +592,7 @@ double DEV_SUBCKT::tr_probe_num(const std::string& x)const
       power += CARD::probe(*ci,"PS");
     }      
     return power;
-  }else{untested();
+  }else{
     return COMPONENT::tr_probe_num(x);
   }
   /*NOTREACHED*/
