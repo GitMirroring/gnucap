@@ -86,7 +86,7 @@ static void parse_args(CS& cmd, CARD* x)
     std::string value = cmd.ctos("", "(", ")");
     try{
       x->set_param_by_name(name, value);
-    }catch (Exception_No_Match&) {untested();
+    }catch (Exception_No_Match&) { untested();
       cmd.warn(bDANGER, here, x->long_label() + ": bad parameter " + name + " ignored");
     }
   }

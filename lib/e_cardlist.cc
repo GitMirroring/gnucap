@@ -534,6 +534,7 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
   {
     map[0] = 0;
     // self test: verify that port node numbering is correct
+    trace3("map_sckt", owner->long_label(), model->net_nodes(), owner->net_nodes());
     for (int port = 0; port < model->net_nodes(); ++port) {
       assert(model->n_(port).e_() <= num_nodes_in_subckt);
       //assert(model->n_(port).e_() == port+1);
