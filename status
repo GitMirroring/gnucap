@@ -4,9 +4,9 @@
 	include/constant.h  include/d_coment.h
 6f3	include/d_dot.h
 	include/d_logic.h  include/declare.h  include/e_aux.h
-6r3	include/e_base.h
+6rmod3	include/e_base.h
 6new	include/e_bits.h
-6mod3	include/e_card.h ***************************
+6mod3	include/e_card.h
 6f3	include/e_cardlist.h
 	include/e_ccsrc.h
 6mod3	include/e_compon.h
@@ -54,7 +54,7 @@
 6mod3	lib/e_card.cc
 6f3	lib/e_cardlist.cc
 6f3	lib/e_ccsrc.cc
-6mod3	lib/e_compon.cc
+6f3	lib/e_compon.cc
 6f3	lib/e_elemnt.cc
 6f3	lib/e_logicnode.cc
 	lib/e_logicval.cc  lib/e_model.cc

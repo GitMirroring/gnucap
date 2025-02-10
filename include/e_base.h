@@ -71,7 +71,7 @@ public: // user stuff
 public: // label
   bool operator!=(const std::string& n)const;
   virtual const std::string long_label()const;
-  const std::string&  short_label()const {return _label;}
+  virtual const std::string&  short_label()const {return _label;}
   void	set_label(const std::string& s) {_label = s;}
 };
 /*--------------------------------------------------------------------------*/
