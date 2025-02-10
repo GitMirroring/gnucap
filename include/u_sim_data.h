@@ -113,6 +113,7 @@ struct INTERFACE SIM_DATA {
   void clear_limit();
   void keep_voltages();
   void restore_voltages();
+  void restore_probes();
   void zero_voltages();
   void map__nodes();		/* s__map.cc */
   void order_reverse();

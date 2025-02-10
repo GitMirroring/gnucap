@@ -1,5 +1,11 @@
 ' 
-#           v(1)      
- 27.        0.81584   
-#           v(1)      
- 27.        0.83376   
+>>>>>.model my_diode d is=2e-14 
+>>>>>.probe op v(1) i(d1) 
+>>>>>.op 
+#           v(1)       i(d1)     
+ 27.        0.81584    1.        
+>>>>>.delete my_diode 
+>>>>>.model my_diode d is=1e-14 
+>>>>>.op 
+#           v(1)       i(d1)     
+ 27.        0.83376    1.        
