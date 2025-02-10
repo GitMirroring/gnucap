@@ -4,5 +4,5 @@ simple diode test
 Gnucap   System status
 iterations: op=9, dc=0, tran=0, fourier=0, total=9
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=2, subckt=0, model=1, total=3
+nodes: user=2, module=1, model=0, logic=0, matrix=3, total=3
 dctran density=77.8%, ac density=77.8%

@@ -1,13 +1,22 @@
 
 verilog
+ground 0
 
 # "Qucsator style" TLIN
 module TLIN (a, b)
+<<<<<<< HEAD
 	// ground \0
   parameter Z=50;
   parameter L=100m;
   parameter Alpha=1;
   parameter Temp=26.85;
+=======
+  parameter Z=50
+  parameter L=100m
+  parameter Alpha=1
+  parameter Temp=26.85
+  ground 0
+>>>>>>> 5663faefd (node rework WIP)
 
   // local
   parameter c0=299792458.0;

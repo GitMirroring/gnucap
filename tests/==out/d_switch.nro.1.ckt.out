@@ -151,7 +151,13 @@ falltime= 5.22999999999995E-9
 risetime= 49.624881E-6
 dt= 49.630047069128E-6
 Gnucap   System status
+<<<<<<< HEAD
 iterations: op=0, dc=0, tran=314, fourier=0, total=457
 transient timesteps: accepted=141, rejected=2, total=143
 nodes: user=1, subckt=0, model=0, total=1
+=======
+iterations: op=0, dc=0, tran=311, fourier=0, total=453
+transient timesteps: accepted=141, rejected=1, total=142
+nodes: user=1, module=0, model=0, logic=0, matrix=1, total=1
+>>>>>>> 5663faefd (node rework WIP)
 dctran density=100.0%, ac density=100.0%

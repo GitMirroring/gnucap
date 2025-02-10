@@ -34,7 +34,6 @@ class FUNCTION : public CKT_BASE {
 #endif
 
   //BUG//needs constructors
-  //BUG//need label support
 public:
   virtual std::string eval(CS&, const CARD_LIST*)const;
   virtual void stack_op(Expression*)const;

@@ -204,7 +204,13 @@ v(1)  -5.               -2.5              0.                2.5              5.
  100.   |              *  .                .                 .                |
         +-----------------+----------------+-----------------+----------------+
 Gnucap   System status
+<<<<<<< HEAD
 iterations: op=0, dc=0, tran=5562, fourier=0, total=7416
 transient timesteps: accepted=1851, rejected=3, total=1854
 nodes: user=1, subckt=0, model=0, total=1
+=======
+iterations: op=0, dc=0, tran=5460, fourier=0, total=7280
+transient timesteps: accepted=1817, rejected=3, total=1820
+nodes: user=1, module=0, model=0, logic=0, matrix=1, total=1
+>>>>>>> 5663faefd (node rework WIP)
 dctran density=100.0%, ac density=100.0%

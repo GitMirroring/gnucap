@@ -234,18 +234,19 @@ void PROBELIST::push_new_probe(const std::string& param,const CARD* object)
   bag.push_back(PROBE(param, object));
 }
 /*--------------------------------------------------------------------------*/
-void PROBELIST::add_all_nodes(const std::string& what, CARD_LIST* scope)
+void PROBELIST::add_all_nodes(const std::string& what, CARD_LIST const* scope)
 {
   assert(scope);
   if (scope == &CARD_LIST::card_list) {
   }else{itested();
   }
-  for (NODE_MAP::const_iterator
-       i = scope->nodes()->begin();
-       i != scope->nodes()->end();
-       ++i) {
-    if ((i->first != "0") && (i->first.find('.') == std::string::npos)) {
-      NODE* node = i->second;
+  NODE_MAP const* nm = scope->nodes();
+  assert(nm);
+  for (NODE_MAP::const_iterator i = nm->begin();
+       i != nm->end(); ++i) {
+    assert (i->second);
+    if (!i->second->is_grounded() && (i->first.find('.') == std::string::npos)) {
+      NODE const* node = i->second;
       assert (node);
       push_new_probe(what, node);
     }else{
@@ -278,6 +279,7 @@ bool PROBELIST::add_branches(const std::string&device,
 	if (card->is_device()
 	    && card->subckt()
 	    && wmatch(card->short_label(), container)) {
+	  trace1("add_branches1", card->long_label());
 	  found_something |= add_branches(dev, param, card->subckt());
 	}else{
 	}
@@ -303,14 +305,19 @@ bool PROBELIST::add_branches(const std::string&device,
     if (device.find_first_of("*?") != std::string::npos) {
       // there's a wild card.  do linear search for all
       { // nodes
-	for (NODE_MAP::const_iterator 
-	     i = scope->nodes()->begin();
-	     i != scope->nodes()->end();
-	     ++i) {
-	  if (i->first != "0") {
-	    NODE* node = i->second;
+	NODE_MAP const* nm = scope->nodes();
+	assert(nm);
+	for (NODE_MAP::const_iterator i = nm->begin();
+	     i != nm->end(); ++i) {
+	  if (!i->second) {
+	    // unused node. ignore.
+	    // (skip?)
+	  }else if (!i->second->is_grounded()) {
+	    NODE const* node = i->second;
 	    assert (node);
 	    if (wmatch(node->short_label(), device)) {
+	      trace2("add_branches2", i->first, node->short_label());
+	      trace2("add_branches2", device, node->long_label());
 	      push_new_probe(param, node);
 	      found_something = true;
 	    }else{
@@ -333,9 +340,13 @@ bool PROBELIST::add_branches(const std::string&device,
     }else{
       // no wild card.  do fast search for one
       { // nodes
-	NODE* node = (*scope->nodes())[device];
-	if (node) {
-	  push_new_probe(param, node);
+	// need NODE* operator[string] ??
+	NODE_P const& node = (*scope->nodes())[device];
+	if (node.is_link()){
+	  unreachable();
+	}else if (!node.is_node()){
+	}else if (node.n_()) {
+	  push_new_probe(param, node.n_());
 	  found_something = true;
 	}else{
 	}

@@ -30,8 +30,8 @@
 class CARD;
 /*--------------------------------------------------------------------------*/
 // external
-class XPROBE;
-class node_t;
+class NODE;
+class NODE_P;
 class CARD_LIST;
 class PARAM_LIST;
 class LANGUAGE;
@@ -128,15 +128,20 @@ public: // subckt
   void	  new_subckt();
   void	  new_subckt(const CARD* model, PARAM_LIST const* p);
   void	  renew_subckt(const CARD* model, PARAM_LIST const* p);
+  //void     new_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
+  //void     renew_subckt(const CARD* model, CARD* owner, const CARD_LIST* scope, PARAM_LIST* p);
+public: // from SIM_DATA.
+  virtual NODE* new_matrix_node(NODE const* proto);
+  virtual NODE* new_logic_node(NODE const* proto);
   //--------------------------------------------------------------------
 public:	// type
   virtual std::string dev_type()const	{unreachable(); return "";}
   virtual void set_dev_type(const std::string&);
   //--------------------------------------------------------------------
 public:	// label -- in CKT_BASE
-  // non-virtual void set_label(const std::string& s) //BASE
-  // non-virtual const std::string& short_label()const //BASE
-  /*virtual*/ const std::string long_label()const final;
+  /*virtual*/ std::string long_label()const final;
+  std::string const& short_label()const final override {return _label;}
+  void	set_label(const std::string& s)final {_label=s;}
   //--------------------------------------------------------------------
 public:	// ports -- mostly defer to COMPONENT
   virtual node_t& n_(int i)const;

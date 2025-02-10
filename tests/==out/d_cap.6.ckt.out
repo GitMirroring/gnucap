@@ -56,5 +56,5 @@ adjusting dtmin to  1.n. requested:  1.p
 Gnucap   System status
 iterations: op=0, dc=0, tran=131, fourier=0, total=588
 transient timesteps: accepted=129, rejected=19, total=148
-nodes: user=2, subckt=0, model=0, total=2
+nodes: user=2, module=0, model=0, logic=0, matrix=2, total=2
 dctran density=100.0%, ac density=100.0%

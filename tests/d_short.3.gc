@@ -1,0 +1,22 @@
+
+
+verilog
+load ./d_short.so
+
+module net(1,2);
+short s2(1,2);
+endmodule
+
+ground gnd;
+
+isource #(.dc(.1)) v1(gnd,2);
+resistor #(.r(2)) r1(3,gnd)
+
+net s1(2,3);
+
+list
+
+print op v(2) v(3) v(gnd) i(v1)
+op
+status notime
+end

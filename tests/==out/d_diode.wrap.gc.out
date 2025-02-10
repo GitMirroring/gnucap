@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 module spice_diode (.\1 (\1 ),.\2 (\2 ));
+=======
+ground 0 
+module spice_diode (1,2);
+>>>>>>> 5663faefd (node rework WIP)
 paramset mydiode d;
  .tnom=NA( 27.); .is=Is; .rs=rs; .n=N; .tt=tt; .cjo=cjo; .pb=vj; .mj=M; .egap=NA( 1.11); .xti=NA( 3.); .fc=NA( 0.5);
 endparamset

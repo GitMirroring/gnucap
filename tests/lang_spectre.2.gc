@@ -1,5 +1,6 @@
 
 simulator lang=spectre
+- ground 0
 
 model zz npn bf=150
 

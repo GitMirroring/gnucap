@@ -87,6 +87,7 @@ private: // local
   void parse_args_instance(CS& cmd, CARD* x); 
   void parse_label(CS& cmd, CARD* x);
   void parse_ports(CS& cmd, COMPONENT* x, bool all_new);
+  void parse_ground(CS& cmd, BASE_SUBCKT*) const;
 
 private: // override virtual, called by print_item
   void print_paramset(OMSTREAM&, const MODEL_CARD*)override;
@@ -344,7 +345,7 @@ void LANG_VERILOG::parse_ports(CS& cmd, COMPONENT* x, bool all_new)
 	  store_attributes(attribs,  x->port_id_tag(Index));
 	  if (all_new) {
 	    if (x->node_is_grounded(Index)) {
-	      cmd.warn(bDANGER, here, "node 0 not allowed here");
+	      cmd.warn(bDANGER, here, "ground not allowed here");
 	      --Index;
 	    }else if (x->subckt() && x->subckt()->nodes()->how_many() != Index+1) {
 	      cmd.warn(bDANGER, here, "duplicate port name, skipping");
@@ -646,6 +647,25 @@ void CMD_MODULE_PARAM::parse(CS& cmd, PARAM_LIST* pl) const
   }
   cmd.check(bDANGER, "syntax error");
 }
+void LANG_VERILOG::parse_ground(CS& cmd, BASE_SUBCKT* x) const
+{
+  CARD* p = device_dispatcher.clone("ground");
+  //DEV_DOT* gd = prechecked_cast<DEV_DOT*>(p);
+  //assert(gd);
+  p->set_owner(x);
+
+  std::string name;
+  cmd >> name;
+  if(cmd >> ";"){
+  }else{
+    cmd.warn(bDANGER, "expecting ';'");
+  }
+
+  p->set_param_by_index(0, name, 0);
+  assert(x->subckt());
+  x->subckt()->push_back(p);
+}
+/*--------------------------------------------------------------------------*/
 /* "module" <name> "(" <ports> ")" ";"
  *    <declarations>
  *    <netlist>
@@ -673,10 +693,16 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 
     if (cmd >> "endmodule ") {
       break;
+<<<<<<< HEAD
     }else if (cmd >> "parameter ") {
       trace1("parameter", cmd.tail());
       module_param.do_it(cmd, x->subckt());
       trace1("/parameter", cmd.tail());
+=======
+    }else if (cmd >> "ground ") {
+      // can't go thgouth new__instance, as it looses the context
+      parse_ground(cmd, x);
+>>>>>>> 5663faefd (node rework WIP)
     }else{
       new__instance(cmd, x, x->subckt());
     }
@@ -871,7 +897,7 @@ void LANG_VERILOG::print_comment(OMSTREAM& o, const DEV_COMMENT* x)
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
-{untested();
+{
   assert(x);
   o << x->s() << '\n';
 }

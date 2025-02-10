@@ -5,9 +5,11 @@ resistor #(.r(1), .$mfactor(5)) r(p,n);
 endmodule
 
 isource #(.dc(1)) i1(\0 ,\1 )
-r #(.$mfactor(2)) r1(\1 ,\0 )
+r #(.$mfactor(2)) r1(\1 ,gnd )
 
 print dc v(nodes)
+dc
+ground gnd
 dc
 status notime
 end

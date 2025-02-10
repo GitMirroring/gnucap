@@ -144,7 +144,13 @@ did not converge
  199.21u    0.069543   10.Meg     4.         0.030284   248.27u    6.         100.u      99.993u   
  200.u      0.14806    10.Meg     4.         0.069543   248.27u    1.         100.u      99.985u   
 Gnucap   System status
+<<<<<<< HEAD
 iterations: op=0, dc=0, tran=747, fourier=0, total=893
 transient timesteps: accepted=142, rejected=4, total=146
 nodes: user=1, subckt=0, model=0, total=1
+=======
+iterations: op=0, dc=0, tran=739, fourier=0, total=885
+transient timesteps: accepted=146, rejected=0, total=146
+nodes: user=1, module=0, model=0, logic=0, matrix=1, total=1
+>>>>>>> 5663faefd (node rework WIP)
 dctran density=100.0%, ac density=100.0%
