@@ -660,6 +660,7 @@ bool NODE_P::is_short_to(NODE_P const& n) const
   }
 }
 /*--------------------------------------------------------------------------*/
+#if 0
 std::string const& NODE::short_label()const
 {
   if(_user_number<0) { untested();
@@ -696,6 +697,7 @@ std::string NODE::long_label()const
     return "$root." + short_label();
   }
 }
+#endif
 /*--------------------------------------------------------------------------*/
 int MATRIX_NODE::flat_number() const
 {

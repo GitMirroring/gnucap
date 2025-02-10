@@ -483,9 +483,9 @@ void COMPONENT::set_port_by_index(int num, std::string& ext_name)
   trace2("spbi", num, ext_name);
   if (num < max_nodes()) {
     n_(num).new_node(ext_name, this);
-    assert(node(num)->short_label() == ext_name);
+    assert(n_(num)->short_label() == ext_name);
     // assert(node(num).short_label() == ext_name);
-    trace2("spbi", num, node(num).user_number());
+    trace2("spbi", num, n_(num).user_number());
 
     if (num+1 > _net_nodes) {
       // Update _net_nodes for net_nodes().  Not really a count.
@@ -493,8 +493,8 @@ void COMPONENT::set_port_by_index(int num, std::string& ext_name)
     }else{
       // probably assigning out of order.
     }
-    trace1("spbi", node(num).short_label());
-    trace1("spbi", node(num).short_label());
+    trace1("spbi", n_(num).short_label());
+    trace1("spbi", n_(num).short_label());
   }else{
     throw Exception_Too_Many(num+1, max_nodes(), 0/*offset*/);
   }

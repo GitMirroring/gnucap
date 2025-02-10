@@ -1,0 +1,125 @@
+6r3	include/ap.h	
+	include/bm.h
+6r3	include/c_comand.h
+	include/constant.h  include/d_coment.h
+6f3	include/d_dot.h
+	include/d_logic.h  include/declare.h  include/e_aux.h
+6r3	include/e_base.h
+6new	include/e_bits.h
+6mod3	include/e_card.h ***************************
+6f3	include/e_cardlist.h
+	include/e_ccsrc.h
+6mod3	include/e_compon.h
+6f3	include/e_elemnt.h
+6f3	include/e_logicmod.h
+6f3	include/e_logicnode.h
+6r1	include/e_logicval.h
+	include/e_model.h
+6mod3	include/e_node.h
+	include/e_paramlist.h  include/e_storag.h
+6f3	include/e_subckt.h
+	include/globals.h  include/io_.h  include/io_dir.h  include/io_error.h  include/io_trace.h
+	include/l_compar.h  include/l_denoise.h  include/l_dispatcher.h
+6r1	include/l_indirect.h
+6r1	include/l_lib.h
+	include/l_stlextra.h  include/l_timer.h  include/m_base.h  include/m_cpoly.h
+	include/m_divdiff.h  include/m_expression.h  include/m_interp.h
+6f3	include/m_matrix.h
+	include/m_phase.h  include/m_spline.h  include/m_wave.h  include/md.h  include/mode.h
+6	include/patchlev.h
+6r3	include/s__.h
+	include/s_tr.h  include/spice-wrapper.cc  include/trace_off.h  include/trace_on.h
+6r1	include/u_attrib.h
+	include/u_cardst.h
+6r3	include/u_function.h
+6r3	include/u_lang.h
+	include/u_limit.h
+6new	include/u_node.h
+6f3	include/u_nodemap.h
+	include/u_opt.h
+6r1	include/u_parameter.h
+6r3	include/u_prblst.h
+6r3	include/u_probe.h
+	include/u_sdp.h
+6f3	include/u_sim_data.h
+	include/u_status.h  include/u_time_pair.h  include/u_xprobe.h
+
+6r1	lib/ap_construct.cc
+	lib/ap_convert.cc  lib/ap_error.cc  lib/ap_get.cc  lib/ap_match.cc  lib/ap_skip.cc
+	lib/bm.cc  lib/bm_cond.cc  lib/bm_value.cc  lib/c__cmd.cc
+6r1	lib/c_attach.cc
+	lib/c_file.cc  lib/d_logicmod.cc
+6f3	lib/d_subckt.cc
+6r3	lib/e_base.cc
+6mod3	lib/e_card.cc
+6f3	lib/e_cardlist.cc
+6f3	lib/e_ccsrc.cc
+6mod3	lib/e_compon.cc
+6f3	lib/e_elemnt.cc
+6f3	lib/e_logicnode.cc
+	lib/e_logicval.cc  lib/e_model.cc
+6mod3	lib/e_node.cc
+	lib/e_paramlist.cc  lib/e_storag.cc
+6new	lib/e_subckt.cc
+	lib/findbr.cc  lib/globals.cc  lib/io.cc  lib/io_contr.cc  lib/io_error.cc  lib/io_findf.cc
+	lib/io_out.cc  lib/io_xopen.cc  lib/l_dispatcher.cc  lib/l_ftos.cc  lib/l_pmatch.cc
+	lib/l_timer.cc  lib/l_trim.cc  lib/l_wmatch.cc  lib/m_base_in.cc  lib/m_base_math.cc
+	lib/m_expression_dump.cc  lib/m_expression_in.cc  lib/m_expression_reduce.cc  lib/m_fft.cc
+	lib/m_spline.cc  lib/plot.cc  lib/test_readline.cc  lib/u_function.cc
+6r1	lib/u_lang.cc
+6new	lib/u_node.cc
+6f3	lib/u_nodemap.cc
+	lib/u_opt1.cc  lib/u_opt2.cc  lib/u_parameter.cc
+6mod3	lib/u_prblst.cc
+6r3	lib/u_probe.cc
+6mod3	lib/u_sim_data.cc
+	lib/u_xprobe.cc
+
+6r1	main/main.cc
+
+	modelgen/mg_.h  modelgen/mg_error.cc  modelgen/mg_in.cc  modelgen/mg_main.cc
+	modelgen/mg_out.h  modelgen/mg_out_common.cc
+6f3	modelgen/mg_out_dev.cc
+	modelgen/mg_out_dump.cc
+6f3	modelgen/mg_out_h.cc
+	modelgen/mg_out_lib.cc  modelgen/mg_out_model.cc
+6f3	modelgen/mg_out_root.cc
+
+	apps/bm_complex.cc  apps/bm_exp.cc  apps/bm_fit.cc  apps/bm_generator.cc  apps/bm_model.cc
+	apps/bm_poly.cc  apps/bm_posy.cc  apps/bm_pulse.cc  apps/bm_pwl.cc  apps/bm_sffm.cc
+	apps/bm_sin.cc  apps/bm_tanh.cc  apps/bmm_semi.cc  apps/bmm_table.cc  apps/c_clear.cc
+6r1	apps/c_comand.cc
+	apps/c_delete.cc  apps/c_exp.cc  apps/c_genrat.cc
+6new	apps/c_ground.cc
+6r3	apps/c_help.cc
+	apps/c_list.cc  apps/c_measure.cc  apps/c_modify.cc  apps/c_param.cc  apps/c_prbcmd.cc
+	apps/c_sim.cc
+6f3	apps/c_status.cc
+	apps/c_sweep.cc  apps/c_system.cc  apps/d_admit.cc
+6r1	apps/d_bjt.model
+	apps/d_cap.cc  apps/d_cccs.cc  apps/d_ccvs.cc
+6r1	apps/d_coil.cc
+	apps/d_cs.cc  apps/d_diode.model
+6f3	apps/d_logic.cc
+	apps/d_meter.cc
+6f3	apps/d_mos.model
+	apps/d_mos1.model  apps/d_mos123.model  apps/d_mos2.model  apps/d_mos3.model
+	apps/d_mos4.model  apps/d_mos5.model  apps/d_mos6.model  apps/d_mos7.model
+	apps/d_mos8.model  apps/d_mos_base.model
+6f3	apps/d_poly_cap.cc
+6f3	apps/d_poly_g.cc
+	apps/d_res.cc  apps/d_switch.cc
+6r1	apps/d_trln.cc
+	apps/d_vcg.cc  apps/d_vcr.cc  apps/d_vcvs.cc  apps/d_vs.cc  apps/func_core.cc
+6f3	apps/lang_spectre.cc
+6f3	apps/lang_spice.cc
+6mod3	apps/lang_verilog.cc
+	apps/measure_at.cc  apps/measure_average.cc  apps/measure_cross.cc  apps/measure_eval.cc
+	apps/measure_integral.cc  apps/measure_max.cc  apps/measure_min.cc  apps/measure_rms.cc
+	apps/measure_slewrate.cc
+6f3	apps/s__init.cc
+	apps/s__out.cc
+6f3	apps/s__solve.cc
+6f3	apps/s_ac.cc
+	apps/s_dc.cc  apps/s_fo.cc  apps/s_tr.cc  apps/s_tr_set.cc  apps/s_tr_swp.cc
+	apps/signon.cc  apps/test_readline.cc

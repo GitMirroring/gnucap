@@ -676,8 +676,10 @@ void LANG_VERILOG::parse_ground(CS& cmd, BASE_SUBCKT* x) const
 BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 {
   assert(x);
-  assert(x->subckt());
-  x->subckt()->set_verilog_math();
+  if(has_attributes(id_tag())) {
+  }else{
+  }
+  assert (!(cmd >> "(*"));
 
   // header
   cmd.reset();
@@ -693,16 +695,9 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
 
     if (cmd >> "endmodule ") {
       break;
-<<<<<<< HEAD
-    }else if (cmd >> "parameter ") {
-      trace1("parameter", cmd.tail());
-      module_param.do_it(cmd, x->subckt());
-      trace1("/parameter", cmd.tail());
-=======
     }else if (cmd >> "ground ") {
       // can't go thgouth new__instance, as it looses the context
       parse_ground(cmd, x);
->>>>>>> 5663faefd (node rework WIP)
     }else{
       new__instance(cmd, x, x->subckt());
     }
@@ -742,6 +737,9 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 void LANG_VERILOG::parse_top_item(CS& cmd, CARD_LIST* Scope)
 {
   cmd.get_line("gnucap-verilog>");
+  while(!parse_attributes(cmd, id_tag()).more()) { untested();
+    cmd.get_line("gnucap-verilog>");
+  }
   new__instance(cmd, nullptr, Scope);
 }
 /*--------------------------------------------------------------------------*/

@@ -29,17 +29,12 @@
 class CS;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CMD : public CKT_BASE {
-private:
-  std::string _label;
 public:
   std::string value_name()const {return "";}
   virtual void do_it(CS&, CARD_LIST*) = 0;
   virtual ~CMD() {}
   static  void  cmdproc(CS&, CARD_LIST*);
   static  void	command(const std::string&, CARD_LIST*);
-public: // label
-  std::string const& short_label()const final override {return _label;}
-  void	set_label(const std::string& s)final {_label=s;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

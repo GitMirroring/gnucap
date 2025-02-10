@@ -60,8 +60,6 @@ enum {CC_STATIC=27342}; // mid-sized arbitrary positive int
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMMON_COMPONENT : public CKT_BASE {
   mutable COMMON_COMPONENT* _next{nullptr};
-private:
-  std::string _label;
 protected: // probably obsolete
   PARAMETER<double>	_tnom_c;  // specification temperature
   PARAMETER<double>	_dtemp;   // rise over enclosing temperature
@@ -78,10 +76,6 @@ public:
   void attach_next(COMMON_COMPONENT* c) { untested(); attach_common(c, &_next); }
   void detach_next() { untested(); detach_common(&_next); }
   bool has_next()const { untested(); return _next; }
-public:	// label -- in CKT_BASE
-  /*virtual*/ std::string long_label()const final {return _label;}
-  std::string const& short_label()const final override {return _label;}
-  void	set_label(const std::string& s)final {_label=s;}
 private:
   COMMON_COMPONENT& operator=(const COMMON_COMPONENT&)
 			      {unreachable(); return *this;}
