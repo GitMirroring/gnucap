@@ -94,6 +94,13 @@ public: // virtuals
 extern NODE ground_node;
 /*--------------------------------------------------------------------------*/
 class INTERFACE node_t {
+private: // NODE_P, this should fit into 64 bits.
+  NODE* _nnn{nullptr};
+  node_t* _link{nullptr};
+private:
+  int _ttt;		// m == nm[t] if properly set up
+  int _m;		// mapped, after reordering
+
 private:
   static bool node_is_valid(int i) {
     if (i == INVALID_NODE) {
@@ -110,11 +117,6 @@ private:
     assert(NODE::_sim->_nm);
     return NODE::_sim->_nm[n];
   }
-
-private:
-  NODE* _nnn;
-  int _ttt;		// m == nm[t] if properly set up
-  int _m;		// mapped, after reordering
 
 public:
   int	      m_()const	{return _m;}
