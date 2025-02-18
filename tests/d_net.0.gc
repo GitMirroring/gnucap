@@ -1,4 +1,4 @@
-
+load ./c_debug.so
 verilog
 
 module net(.a(i), .b(i));
@@ -12,3 +12,5 @@ net n1(.a(n), .b(m));
 
 print dc v(nodes)
 dc
+
+portdump
