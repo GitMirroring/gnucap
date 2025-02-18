@@ -32,8 +32,8 @@
 /* default constructor : unconnected, don't use
  */
 NODE::NODE()
-  :CARD(),
-   _user_number(INVALID_NODE)
+  :CARD()
+   //_user_number(INVALID_NODE)
    //_flat_number(INVALID_NODE)
    //_matrix_number(INVALID_NODE)
 {
@@ -42,8 +42,8 @@ NODE::NODE()
 /* copy constructor : user data only
  */
 NODE::NODE(const NODE& p)
-  :CARD(p),
-   _user_number(p._user_number)
+  :CARD(p)
+   // _user_number(p._user_number)
    //_flat_number(p._flat_number)
    //_matrix_number(INVALID_NODE)
 { untested();
@@ -54,8 +54,8 @@ NODE::NODE(const NODE& p)
  * supposedly not used, but used by a required function that is also not used
  */
 NODE::NODE(const NODE* p)
-  :CARD(*p),
-   _user_number(p->_user_number)
+  :CARD(*p)
+   //_user_number(p->_user_number)
    //_flat_number(p->_flat_number)
    //_matrix_number(INVALID_NODE)
 { untested();
@@ -64,9 +64,9 @@ NODE::NODE(const NODE* p)
 /*--------------------------------------------------------------------------*/
 /* usual initializing constructor : name and index
  */
-NODE::NODE(const std::string& s, int n)
-  :CARD(s),
-   _user_number(n)
+NODE::NODE(const std::string& s)
+  :CARD(s)
+  // _user_number(n)
    //_flat_number(n)
    //_matrix_number(INVALID_NODE)
 {
@@ -103,6 +103,27 @@ node_t& node_t::operator=(const node_t& p)
   _nnn   = p._nnn;
   _ttt = p._ttt;
   _m   = p._m;
+  _own = false;
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+node_t& node_t::operator=(NODE* n)
+{
+  if(_own){ untested();
+    delete _nnn;
+    _own = false;
+  }else{
+  }
+  _nnn = n;
+  // _ttt = n->user_number();
+  //_m   = p._m;
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+node_t& node_t::set_own(NODE* n)
+{
+  operator=(n);
+  _own = true; // take ownership.
   return *this;
 }
 /*--------------------------------------------------------------------------*/
@@ -181,9 +202,24 @@ void node_t::new_node(const std::string& node_name, const CARD* Owner)
   assert(Map);
 
   _nnn = Map->new_node(node_name); // not neessarily "new"
+				   // temporary. will _link instead.
+  assert(is_connected()); // for now.
   assert(_nnn);
-  _ttt = _nnn->user_number();
-  _nnn->set_owner(nullptr);
+  _ttt = _nnn->user_number(); // BUG. _nnn is a USER_NODE. don't copy
+  _nnn->set_owner(nullptr); // Owner?
+}
+/*--------------------------------------------------------------------------*/
+// free memory. NODES are owned by roots in the union forest, but path
+// contraction will make the others point directly to root()->_nnn
+// only delete once.
+node_t::~node_t()
+{
+  if(_own){
+    _nnn->purge();
+    delete _nnn;
+    _nnn = nullptr;
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* new_model_node: a mapped new node, produced through model expansion.

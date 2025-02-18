@@ -25,7 +25,7 @@
 #include "e_node.h"
 #include "u_nodemap.h"
 /*--------------------------------------------------------------------------*/
-NODE ground_node("0",0);
+USER_NODE ground_node("0", 0);
 /*--------------------------------------------------------------------------*/
 NODE_MAP::NODE_MAP()
   : _node_map()
@@ -43,8 +43,9 @@ NODE_MAP::NODE_MAP(const NODE_MAP& p)
   unreachable();
   for (iterator i = _node_map.begin(); i != _node_map.end(); ++i) { untested();
     if (i->first != "0") { untested();
-      assert(i->second);
-      i->second = new NODE(i->second);
+      incomplete(); // not used yet.
+      // assert(i->second);
+      // i->second = new NODE(i->second);
     }else{ untested();
     }
   }
@@ -52,53 +53,54 @@ NODE_MAP::NODE_MAP(const NODE_MAP& p)
 /*--------------------------------------------------------------------------*/
 NODE_MAP::~NODE_MAP()
 {
-  for (iterator i = _node_map.begin(); i != _node_map.end(); ++i) {
-    if (i->first != "0") {
-      assert(i->second);
-      i->second->purge();
-      delete i->second;
-    }else{
-    }
-  }  
+//  for (iterator i = _node_map.begin(); i != _node_map.end(); ++i) {
+//    if (i->first != "0") {
+//      assert(i->second);
+//      i.second->clear();
+//    }else{
+//    }
+//  }  
 }
 /*--------------------------------------------------------------------------*/
 /* return a pointer to a node given a string
  * returns nullptr pointer if no match
  */
-NODE* NODE_MAP::operator[](std::string s)
+NODE* NODE_MAP::operator[](std::string const& s)
 {
-  const_iterator i = _node_map.find(s);
+  iterator i = _node_map.find(s);
   if (i != _node_map.end()) {
     return i->second;
   }else if (OPT::case_insensitive) {
-    notstd::to_lower(&s);
-    i = _node_map.find(s);
+    std::string ls(s);
+    notstd::to_lower(&ls);
+    i = _node_map.find(ls);
   }else{
     return nullptr;
   }
-  return (i != _node_map.end()) ? i->second : nullptr;
+  return (i != _node_map.end()) ? i->second.n_() : nullptr;
 }
 /*--------------------------------------------------------------------------*/
 /* return a pointer to a node given a string
  * creates a new one if it isn't already there.
  */
-NODE* NODE_MAP::new_node(std::string s)
-{  
+NODE* NODE_MAP::new_node(std::string const& S)
+{
+  std::string s(S);
   if (OPT::case_insensitive) {
     notstd::to_lower(&s);
   }else{
   }
-  NODE* node = _node_map[s];
+  node_t& node = _node_map[s];
 
   // increments how_many() when lookup fails (new s)  
-  if (!node) {
+  if (!node.is_connected()) {
     trace2("MAP::new_node", s, how_many());
-    node = new NODE(s, how_many());
-    //                 ^^^^ is really the map number of the new node
-    _node_map[s] = node;
+    // temporary. may need USER_NODE here eventually.
+    node.set_own(new USER_NODE(s, how_many()));
+    //                            ^^^^ is really the map number of the new node
   }
-  assert(node);
-  return node;
+  assert(node.is_connected());
+  return node.n_();
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
