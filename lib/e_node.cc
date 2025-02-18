@@ -115,6 +115,12 @@ node_t& node_t::operator=(NODE* n)
   }else{
   }
   _nnn = n;
+
+  if(n==&ground_node){
+    // BUG. transition.
+    _ttt = 0;
+  }else{
+  }
   // _ttt = n->user_number();
   //_m   = p._m;
   return *this;
