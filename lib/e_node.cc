@@ -176,8 +176,6 @@ LOGIC_NODE& node_t::data()const
     assert(0);
     incomplete();
   }
-  assert(CARD::_sim->_nstat);
-  return CARD::_sim->_nstat[m_()];
 }
 /*--------------------------------------------------------------------------*/
 double NODE::tr_probe_num(const std::string& x)const
@@ -190,8 +188,8 @@ double NODE::tr_probe_num(const std::string& x)const
   }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) {
     assert(0);
     unreachable();
-    assert(_sim->_nstat);
-    return _sim->_nstat[matrix_number()].tr_probe_num(x);
+ //   assert(_sim->_nstat);
+ //   return _sim->_nstat[matrix_number()].tr_probe_num(x);
   }else if (Umatch(x, "mdy ")) {
     // matrix diagonal admittance
     const BSMATRIX<double>&  aaa = _sim->_aa;
@@ -316,7 +314,7 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
       assert(0);
       throw Exception(d->long_label() + ": need more nodes");
     }
-  }else{ untested();
+  }else{
     throw Exception(d->long_label() + ": invalid nodes");
   }
 }
@@ -325,11 +323,23 @@ void node_t::allocate()
 {
   if(is_node()) { untested();
     // done.
-  }else if(_link==this) { untested();
+  }else if(_link==this) {
     int flat_number = CKT_BASE::_sim->newnode_subckt();
     set_own(new LOGIC_NODE(flat_number));
   }
 }
 /*--------------------------------------------------------------------------*/
+bool node_t::is_grounded() const
+{
+  if(_index==0){
+    return true;
+  }else if(_nnn==&ground_node){ untested();
+    return true;
+  }else if(root()){ untested();
+    return root().is_grounded();
+  }else{
+    return false;
+  }
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

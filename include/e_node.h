@@ -173,7 +173,7 @@ public:
   void	new_node(const std::string&, const CARD*);
   void	new_model_node(const std::string& n, CARD* d);
   void	map_subckt_node(node_t* map_array, const CARD* d);
-  bool	is_grounded()const {return (e_() == 0);}
+  bool	is_grounded()const;
   bool	is_connected()const {return _link || (e_() != INVALID_NODE);}
   bool	is_short_to(node_t const& n)const {return root() == n.root();}
 
@@ -215,13 +215,13 @@ public:
 
   // BUG
   void link_to(node_t& nn){
-    if(_own){
+    if(_own){ untested();
       delete _nnn;
     }else{
     }
     _nnn = nullptr;
     if(!_link){
-    }else{ untested();
+    }else{
     }
     _link = &nn;
   }
@@ -231,7 +231,7 @@ public:
     assert(m_() >= 0);
     assert(m_() <= NODE::_sim->_total_nodes);
     assert(n_() || root().n_());
-    //assert(n_()->m_() == m_());
+    assert(n_()->m_() == m_());
     //assert(n_()->v0() == NODE::_sim->_v0[m_()]);
     return NODE::_sim->_v0[m_()];
   }
@@ -240,7 +240,7 @@ public:
     assert(m_() >= 0);
     assert(m_() <= NODE::_sim->_total_nodes);
     assert(n_());
-    //assert(n_()->m_() == m_());
+    assert(n_()->m_() == m_());
     //assert(n_()->vac() == NODE::_ac[m_()]);
     return NODE::_sim->_ac[m_()];
   }
