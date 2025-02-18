@@ -28,26 +28,91 @@
 /*--------------------------------------------------------------------------*/
 class NODE;
 class node_t;
+class NODE_MAP;
+/*--------------------------------------------------------------------------*/
+// make it look like an ordinary map.
+// this kind of stuff happens when exposing STL interfaces...
+// (it is used in u_probe, refactor later. maybe delete this.)
+template<class ITER>
+class WRAP_MAP_ITERATOR{
+public:
+  typedef std::pair<std::string, NODE const*> value_type;
+protected:
+  WRAP_MAP_ITERATOR(ITER i, NODE_MAP const&m)
+    :_i(i), _m(m){ }
+public: // iterator
+  std::pair<std::string, NODE const*> operator*() const;
+  bool operator==(WRAP_MAP_ITERATOR const& i) const{
+    return(_i == i._i);
+  }
+  bool operator!=(WRAP_MAP_ITERATOR const& i) const{
+    return(_i != i._i);
+  }
+  WRAP_MAP_ITERATOR& operator++(){
+    ++_i;
+    return *this;
+  }
+  WRAP_MAP_ITERATOR& operator--(){ untested();
+    --_i;
+    return *this;
+  }
+private:
+  ITER _i;
+  NODE_MAP const& _m;
+  friend class NODE_MAP;
+};
 /*--------------------------------------------------------------------------*/
 class NODE_MAP {
-  typedef std::map<const std::string, node_t> map;
+  class idx{
+    int _i;
+  public:
+    idx() : _i(-1) {}
+    operator int&(){return _i;}
+    operator int const&()const {return _i;}
+    idx& operator=(int i) {_i=i; return *this;}
+    bool is_valid()const {return _i>=0;}
+  };
+  typedef std::map<const std::string, idx> map;
+  typedef std::vector<node_t> vector;
 public:
-  typedef map::iterator iterator;
-  typedef map::const_iterator const_iterator;
+  typedef WRAP_MAP_ITERATOR<map::const_iterator> iterator;
+  typedef WRAP_MAP_ITERATOR<map::const_iterator> const_iterator;
 private:
-  map _node_map;
+  map* _map;
+  vector _nodes;
   explicit  NODE_MAP(const NODE_MAP&);
 
 public:
   explicit  NODE_MAP();
 	   ~NODE_MAP();
   NODE*     operator[](std::string const&);
+ // NODE*     operator[](int i);
+  NODE const* operator[](int i)const;
   NODE*     new_node(std::string const&);
 
-  const_iterator begin()const		{return _node_map.begin();}
-  const_iterator end()const		{return _node_map.end();}
-  int		 how_many()const	{return static_cast<int>(_node_map.size()-1);}
+  const_iterator begin()const;
+  const_iterator end()const;
+  int		 how_many()const	{assert(_map); return static_cast<int>(_map->size()-1);}
 };
+/*--------------------------------------------------------------------------*/
+template<class ITER>
+inline std::pair<std::string, NODE const*>
+WRAP_MAP_ITERATOR<ITER>::operator*() const
+{
+  return value_type(_i->first, _m[_i->second]);
+}
+/*--------------------------------------------------------------------------*/
+inline NODE_MAP::const_iterator NODE_MAP::begin()const
+{
+  assert(_map);
+  return const_iterator(_map->begin(), *this);
+}
+/*--------------------------------------------------------------------------*/
+inline NODE_MAP::const_iterator NODE_MAP::end()const
+{
+  assert(_map);
+  return const_iterator(_map->end(), *this);
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif

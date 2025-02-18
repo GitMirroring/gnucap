@@ -28,20 +28,22 @@
 USER_NODE ground_node("0", 0);
 /*--------------------------------------------------------------------------*/
 NODE_MAP::NODE_MAP()
-  : _node_map()
 {
-  _node_map["0"] = &ground_node;
+  _map = new map;
+  (*_map)["0"] = 0;
+  _nodes.resize(1);
+  _nodes.back() = &ground_node; // BUG. ground is global.
 }
 /*--------------------------------------------------------------------------*/
 /* copy constructor: deep copy
  * The std::map copy constructor does a shallow copy,
  * then replace second with a deep copy.
  */
-NODE_MAP::NODE_MAP(const NODE_MAP& p)
-  : _node_map(p._node_map)
+NODE_MAP::NODE_MAP(const NODE_MAP& )
 { untested();
   unreachable();
-  for (iterator i = _node_map.begin(); i != _node_map.end(); ++i) { untested();
+#if 0
+  for (iterator i = _map->begin(); i != _map->end(); ++i) { untested();
     if (i->first != "0") { untested();
       incomplete(); // not used yet.
       // assert(i->second);
@@ -49,10 +51,13 @@ NODE_MAP::NODE_MAP(const NODE_MAP& p)
     }else{ untested();
     }
   }
+#endif
 }
 /*--------------------------------------------------------------------------*/
 NODE_MAP::~NODE_MAP()
 {
+  delete _map;
+  _map = nullptr;
 //  for (iterator i = _node_map.begin(); i != _node_map.end(); ++i) {
 //    if (i->first != "0") {
 //      assert(i->second);
@@ -67,17 +72,31 @@ NODE_MAP::~NODE_MAP()
  */
 NODE* NODE_MAP::operator[](std::string const& s)
 {
-  iterator i = _node_map.find(s);
-  if (i != _node_map.end()) {
-    return i->second;
+  assert(_map);
+  auto i = _map->find(s);
+  if (i != _map->end()) {
+    assert(i->second < int(_nodes.size()));
+    return _nodes[int(i->second)];
   }else if (OPT::case_insensitive) {
     std::string ls(s);
     notstd::to_lower(&ls);
-    i = _node_map.find(ls);
+    i = _map->find(ls);
   }else{
     return nullptr;
   }
-  return (i != _node_map.end()) ? i->second.n_() : nullptr;
+  if(i != _map->end()){
+    assert(i->second < int(_nodes.size()));
+    return _nodes[i->second];
+  }else{
+    return nullptr;
+  }
+}
+/*--------------------------------------------------------------------------*/
+// access by index. this is a stub.
+NODE const* NODE_MAP::operator[](int i)const
+{
+  assert(i<int(_nodes.size()));
+  return _nodes[i].n_();
 }
 /*--------------------------------------------------------------------------*/
 /* return a pointer to a node given a string
@@ -90,17 +109,16 @@ NODE* NODE_MAP::new_node(std::string const& S)
     notstd::to_lower(&s);
   }else{
   }
-  node_t& node = _node_map[s];
+  idx& i = (*_map)[s];
 
-  // increments how_many() when lookup fails (new s)  
-  if (!node.is_connected()) {
+  if (!i.is_valid()) {
     trace2("MAP::new_node", s, how_many());
     // temporary. may need USER_NODE here eventually.
-    node.set_own(new USER_NODE(s, how_many()));
-    //                            ^^^^ is really the map number of the new node
+    i = how_many(); // the map number of the new node
+    _nodes.push_back(node_t(new USER_NODE(s, how_many())));
+  }else{
   }
-  assert(node.is_connected());
-  return node.n_();
+  return _nodes[i];
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
