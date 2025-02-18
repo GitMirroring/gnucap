@@ -247,13 +247,18 @@ node_t::~node_t()
  */
 void node_t::new_model_node(const std::string& node_name, CARD* Owner)
 {
-  new_node(node_name, Owner);
-  _ttt = CARD::_sim->newnode_model(); // BUG. don't use _ttt
-  auto ln = new LOGIC_NODE(); // TODO: use requested type
-  ln->set_user_number(_ttt);
+  if(_nnn){
+    //it's already there.
+  }else{
+    // new_node(node_name, Owner); // create map. don't touch map.
+    _ttt = CARD::_sim->newnode_model(); // BUG. don't use _ttt
+    auto ln = new LOGIC_NODE(); // TODO: use requested type
+    ln->set_user_number(_ttt);
 
-  _nnn = ln;
-  _own = true; // garbage collect.
+    _nnn = ln;
+    _link = this;
+    _own = true; // garbage collect.
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* (re)connect a port to an external node making use of index.
