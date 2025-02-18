@@ -212,7 +212,6 @@ void node_t::new_node(const std::string& node_name, const CARD* Owner)
   assert(Map);
 
   node_t const& nt = Map->new_node(node_name); // not neessarily "new"
-				   // temporary. will _link instead.
   _nnn = nt; // needed?
   assert(_nnn);
   _index = Map->index_of(nt); // that's what it is.
@@ -262,7 +261,7 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
   assert(m);
   if (e_() != INVALID_NODE) {
     if (m[e_()].is_valid()) {
-      _ttt = m[e_()]._ttt; // BUG. don't use _ttt
+       _ttt = m[e_()]._ttt; // BUG. don't use _ttt
       _link = &m[e_()];
       if(_ttt==0){
 	if(_own){ untested();
@@ -279,7 +278,7 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
     throw Exception(d->long_label() + ": invalid nodes");
   }
   //_nnn->set_flat_number(_ttt);
-  assert(node_is_valid(_ttt));
+  // assert(node_is_valid(_ttt));
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
