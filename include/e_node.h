@@ -102,10 +102,18 @@ public:
 extern USER_NODE ground_node;
 /*--------------------------------------------------------------------------*/
 class INTERFACE node_t {
-private: // NODE_P, this should fit into 64 bits.
+private: // tree structure, 64 bits...
   NODE* _nnn{nullptr};
   node_t* _link{nullptr};
   bool _own{false}; // indicate that _nnn is ours.
+private: // treee stuff.
+  bool is_node()const;
+  bool is_link()const;
+  bool is_root()const;
+  node_t&       root();
+  node_t const& root()const;
+  node_t*       link() {return _link;}
+  node_t const* link()const {return _link;}
 private:
   int _ttt;		// m == nm[t] if properly set up
   int _m;		// mapped, after reordering
@@ -140,6 +148,7 @@ public:
     }else if(_ttt == 0){
       // has been set to ground? ddid not update _nnn?
       incomplete();
+    }else if(_ttt == _nnn->user_number()) {
     }else{
       incomplete();
     }
@@ -232,6 +241,47 @@ public:
   }
 #endif
 };
+/*--------------------------------------------------------------------------*/
+inline bool node_t::is_node() const
+{ untested();
+  assert(!_nnn || _link == this);
+  return _nnn;
+}
+/*--------------------------------------------------------------------------*/
+inline bool node_t::is_link() const
+{ untested();
+  assert(!_nnn || _link == this);
+  return !_nnn && _link;
+}
+/*--------------------------------------------------------------------------*/
+inline bool node_t::is_root() const
+{ untested();
+  if(is_node()){ untested();
+    return true;
+  }else if(is_link()) { untested();
+    return link() == this;
+  }else{ untested();
+    return false;
+  }
+}
+/*--------------------------------------------------------------------------*/
+inline node_t& node_t::root()
+{ untested();
+  node_t* r = this;
+  while (r->is_link() && r->link() != r) { untested();
+    r = r->link();
+  }
+  return *r;
+}
+/*--------------------------------------------------------------------------*/
+inline node_t const& node_t::root() const
+{
+  node_t const* r = this;
+  while (r->is_link() && r->link() != r) {
+    r = r->link();
+  }
+  return *r;
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
