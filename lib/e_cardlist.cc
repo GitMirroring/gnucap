@@ -563,7 +563,7 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
       //assert(model->n_(port).e_() == port+1);
       trace3("ports", port, model->n_(port).e_(), owner->n_(port).t_());
       assert(owner->n_(port).is_connected());
-      node_map[port+1].link_to(owner->n_(port)); // BUG. use assign, but prepare.
+      node_map[port+1] = owner->n_(port);
       assert(node_map[port+1].is_link());
     }
     for (int i=model->net_nodes() + 1; i <= num_nodes_in_subckt; ++i) {
