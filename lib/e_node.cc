@@ -206,6 +206,10 @@ void node_t::new_node(const std::string& node_name, const CARD* Owner)
   assert(is_connected()); // for now.
   assert(_nnn);
   _ttt = _nnn->user_number(); // BUG. _nnn is a USER_NODE. don't copy
+  if(_ttt==0){
+    assert(_nnn==&ground_node);
+  }else{
+  }
   _nnn->set_owner(nullptr); // Owner?
 }
 /*--------------------------------------------------------------------------*/
@@ -232,7 +236,11 @@ void node_t::new_model_node(const std::string& node_name, CARD* Owner)
 {
   new_node(node_name, Owner);
   _ttt = CARD::_sim->newnode_model();
-  //assert(_ttt == _nnn->flat_number());
+  auto ln = new LOGIC_NODE(); // TODO: use requested type
+  ln->set_user_number(_ttt);
+
+  _nnn = ln;
+  _own = true; // garbage collect.
 }
 /*--------------------------------------------------------------------------*/
 void node_t::map_subckt_node(int* m, const CARD* d)
@@ -241,6 +249,14 @@ void node_t::map_subckt_node(int* m, const CARD* d)
   if (e_() != INVALID_NODE) {
     if (node_is_valid(m[e_()])) {
       _ttt = m[e_()];
+      if(_ttt==0){
+	if(_own){ untested();
+	  delete _nnn;
+	}else{
+	}
+	_nnn = &ground_node;
+      }else{
+      }
     }else{
       throw Exception(d->long_label() + ": need more nodes");
     }
