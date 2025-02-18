@@ -211,12 +211,13 @@ void node_t::new_node(const std::string& node_name, const CARD* Owner)
   NODE_MAP* Map = Owner->scope()->nodes();
   assert(Map);
 
-  _nnn = Map->new_node(node_name); // not neessarily "new"
+  node_t const& nt = Map->new_node(node_name); // not neessarily "new"
 				   // temporary. will _link instead.
-  assert(is_connected()); // for now.
+  _nnn = nt; // needed?
   assert(_nnn);
-  _ttt = _nnn->user_number(); // _ttt is obsolete.
-  _index = _nnn->user_number();
+  _index = Map->index_of(nt); // that's what it is.
+  _ttt = _index; // needed??
+  assert(is_connected()); // for now.
   assert((*Map)[_index].n_() == _nnn); // for now.
 
   if(_ttt==0){
