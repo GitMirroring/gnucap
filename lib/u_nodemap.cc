@@ -113,22 +113,22 @@ int NODE_MAP::how_many() const
 /* return a pointer to a node given a string
  * creates a new one if it isn't already there.
  */
-NODE* NODE_MAP::new_node(std::string const& S)
+node_t const& NODE_MAP::new_node(std::string const& S)
 {
   std::string s(S);
   if (OPT::case_insensitive) {
     notstd::to_lower(&s);
   }else{
   }
-  idx& i = (*_map)[s];
+  idx_t& i = (*_map)[s];
 
   if (!i.is_valid()) {
     trace2("MAP::new_node", s, how_many());
-    // temporary. may need USER_NODE here eventually.
     i = how_many() + 1; // the map number of the new node
-    _nodes.push_back(node_t(new USER_NODE(s, i)));
+    _nodes.push_back(node_t(new USER_NODE(s, i))); // possibly unneeded.
   }else{
   }
+ // assert(_nodes[i].idx()==i); // not needed.
   return _nodes[i];
 }
 /*--------------------------------------------------------------------------*/
