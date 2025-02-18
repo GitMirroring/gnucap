@@ -28,7 +28,7 @@
 USER_NODE ground_node("0", 0);
 /*--------------------------------------------------------------------------*/
 NODE_MAP::NODE_MAP()
-{
+{ untested();
   _map = new map;
   (*_map)["0"] = 0;
   _nodes.resize(1);
@@ -36,22 +36,20 @@ NODE_MAP::NODE_MAP()
 }
 /*--------------------------------------------------------------------------*/
 /* copy constructor: deep copy
- * The std::map copy constructor does a shallow copy,
- * then replace second with a deep copy.
+ * replicate number of nodes and their names
+ * connectivity will be dealt with elsewhere
  */
-NODE_MAP::NODE_MAP(const NODE_MAP& )
+NODE_MAP::NODE_MAP(const NODE_MAP& p)
 { untested();
-  unreachable();
-#if 0
-  for (iterator i = _map->begin(); i != _map->end(); ++i) { untested();
-    if (i->first != "0") { untested();
-      incomplete(); // not used yet.
-      // assert(i->second);
-      // i->second = new NODE(i->second);
-    }else{ untested();
-    }
+  _map = new map(); // additional names
+		    // TODO: share/keep exising names
+  _nodes.resize(p._nodes.size());
+
+  { untested(); // BUG: special treatment for ground node
+    (*_map)["0"] = 0;
+    assert(_nodes.size());
+    _nodes[0] = &ground_node; // BUG. ground is global.
   }
-#endif
 }
 /*--------------------------------------------------------------------------*/
 NODE_MAP::~NODE_MAP()
