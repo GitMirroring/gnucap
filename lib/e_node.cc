@@ -256,6 +256,9 @@ void node_t::new_model_node(const std::string& node_name, CARD* Owner)
   _own = true; // garbage collect.
 }
 /*--------------------------------------------------------------------------*/
+/* (re)connect a port to an external node making use of index.
+ * m: external nodes are in m. usually m == d->scope->nodes.
+ */
 void node_t::map_subckt_node(node_t* m, const CARD* d)
 {
   assert(m);
@@ -264,11 +267,15 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
        _ttt = m[e_()]._ttt; // BUG. don't use _ttt
       _link = &m[e_()];
       if(_ttt==0){
+	assert(_link);
 	if(_own){ untested();
 	  delete _nnn;
 	}else{
 	}
-	_nnn = &ground_node;
+	_nnn = nullptr;
+	assert(root()._nnn);
+	assert(root()._nnn == &ground_node);
+	_nnn = &ground_node; // not needed.
       }else{
       }
     }else{
