@@ -41,7 +41,7 @@ LOGIC_NODE::LOGIC_NODE(int i)
 {
   if(i!=-1){
     incomplete(); // transition
-    set_user_number(i);
+    set_flat_number(i);
   }else{
   }
 }

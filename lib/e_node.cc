@@ -174,6 +174,7 @@ double NODE::tr_probe_num(const std::string& x)const
   }else if (Umatch(x, "z ")) {
     return port_impedance(node_t(const_cast<NODE*>(this)), node_t(&ground_node), _sim->_aa, 0.);
   }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) {
+    assert(0);
     unreachable();
     assert(_sim->_nstat);
     return _sim->_nstat[matrix_number()].tr_probe_num(x);
@@ -274,7 +275,7 @@ void node_t::new_model_node(const std::string& node_name, CARD* Owner)
     // new_node(node_name, Owner); // create map. don't touch map.
     int idx = CARD::_sim->newnode_model();
     auto ln = new LOGIC_NODE(); // TODO: use requested type
-    ln->set_user_number(idx);
+    ln->set_flat_number(idx);
 
     _nnn = ln;
     _link = this;

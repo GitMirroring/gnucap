@@ -330,22 +330,24 @@ void SIM_DATA::alloc_hold_vectors()
   assert(is_first_expand());
 
   assert(!_nstat);
-  _nstat = new LOGIC_NODE[_total_nodes+1];
-  for (int ii=0;  ii <= _total_nodes;  ++ii) {
-    // _nstat[ii].set_owner(nullptr);
-    // _nstat[ii].set_user_number(ii); // BUG
-    _nstat[_nm[ii]].set_owner(nullptr);
-    _nstat[_nm[ii]].set_user_number(ii); // BUG
-
+  _nstat = new LOGIC_NODE[_user_nodes+1]; // 1 extra for ground..
+  for (int ii=0;  ii <= _user_nodes;  ++ii) {
+    _nstat[ii].set_owner(nullptr);
   }
+
+  for (int ii=0;  ii <= _total_nodes;  ++ii) {
+    if(_nm[ii] <= _user_nodes) {
+     _nstat[_nm[ii]].set_flat_number(ii); // BUG
+    }
+  }
+
   NODE_MAP& top_nodes = *CARD_LIST::card_list.nodes();
   assert(top_nodes[0] == &ground_node);
   top_nodes[0] = &ground_node;
 
-
-  for (int ii=1;  ii <= top_nodes.how_many();  ++ii) { untested();
+  for (int ii=1;  ii <= _user_nodes;  ++ii) { untested();
     // TODO: only allocate required nodes.
-    LOGIC_NODE* nn = &_nstat[_nm[ii]];
+    LOGIC_NODE* nn = &_nstat[ii];
     nn->set_label(top_nodes[ii].short_label()); // BUG. duplicate label storage
     top_nodes[ii] = nn;
     assert(top_nodes[ii].is_node());
