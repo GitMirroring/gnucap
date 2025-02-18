@@ -80,6 +80,8 @@ public:
 private:
   map* _map;
   vector _nodes;
+
+public:
   explicit  NODE_MAP(const NODE_MAP&);
 
 public:
@@ -87,12 +89,13 @@ public:
 	   ~NODE_MAP();
   NODE*     operator[](std::string const&);
  // NODE*     operator[](int i);
-  NODE const* operator[](int i)const;
+  node_t    const& operator[](int i)const;
+  node_t&          operator[](int i);
   NODE*     new_node(std::string const&);
 
   const_iterator begin()const;
   const_iterator end()const;
-  int		 how_many()const	{assert(_map); return static_cast<int>(_map->size()-1);}
+  int		 how_many()const;
 };
 /*--------------------------------------------------------------------------*/
 template<class ITER>
