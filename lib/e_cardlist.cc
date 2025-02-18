@@ -540,10 +540,6 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
   int num_nodes_in_subckt = model->subckt()->nodes()->how_many();
   trace2("",  model->net_nodes(),  num_nodes_in_subckt);
   assert(model->net_nodes() <= num_nodes_in_subckt);
-  int* map = new int[num_nodes_in_subckt+1];
-
-  // "map" now contains a translation list,
-  // from subckt local numbers to matrix index numbers
 
   NODE_MAP& node_map = *nodes();
   // node_map supposedy contains the actual connections
@@ -570,18 +566,12 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
     if ((**ci).is_device()) {
       for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
 	// for each connection node in card
-	try{
-	  (**ci).n_(ii).map_subckt_node(&node_map[0], owner);
-	}catch(...){
-	  delete[] map;
-	  throw;
-	}
+	(**ci).n_(ii).map_subckt_node(&node_map[0], owner);
       }
     }else{
       assert(dynamic_cast<MODEL_CARD*>(*ci));
     }
   }
-  delete[] map;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
