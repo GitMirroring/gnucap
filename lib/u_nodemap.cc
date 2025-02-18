@@ -91,15 +91,14 @@ NODE* NODE_MAP::operator[](std::string const& s)
   }
 }
 /*--------------------------------------------------------------------------*/
-// access by index. this is a stub.
-node_t const& NODE_MAP::operator[](int i)const
+node_t const& NODE_MAP::at(int i)const
 { untested();
   assert(i<int(_nodes.size()));
   return _nodes[i];
 }
 /*--------------------------------------------------------------------------*/
 node_t& NODE_MAP::operator[](int i)
-{ untested();
+{
   assert(i<int(_nodes.size()));
   return _nodes[i];
 }

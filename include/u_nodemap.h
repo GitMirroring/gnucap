@@ -89,7 +89,8 @@ public:
 	   ~NODE_MAP();
   NODE*     operator[](std::string const&);
  // NODE*     operator[](int i);
-  node_t    const& operator[](int i)const;
+  node_t    const& at(int i)const;
+  node_t    const& operator[](int i)const {return at(i);}
   node_t&          operator[](int i);
   node_t const&    new_node(std::string const&);
 
