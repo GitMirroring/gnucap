@@ -63,16 +63,16 @@ private:
 };
 /*--------------------------------------------------------------------------*/
 class NODE_MAP {
-  class idx{
+  class idx_t{
     int _i;
   public:
-    idx() : _i(-1) {}
+    idx_t() : _i(-1) {}
     operator int&(){return _i;}
     operator int const&()const {return _i;}
-    idx& operator=(int i) {_i=i; return *this;}
+    idx_t& operator=(int i) {_i=i; return *this;}
     bool is_valid()const {return _i>=0;}
   };
-  typedef std::map<const std::string, idx> map;
+  typedef std::map<const std::string, idx_t> map;
   typedef std::vector<node_t> vector;
 public:
   typedef WRAP_MAP_ITERATOR<map::const_iterator> iterator;
@@ -91,7 +91,7 @@ public:
  // NODE*     operator[](int i);
   node_t    const& operator[](int i)const;
   node_t&          operator[](int i);
-  NODE*     new_node(std::string const&);
+  node_t const&    new_node(std::string const&);
 
   const_iterator begin()const;
   const_iterator end()const;
