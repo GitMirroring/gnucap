@@ -55,7 +55,7 @@ public: // raw data access (rvalues)
   virtual int user_number()const	{return INVALID_NODE;}
   //int	flat_number()const	{itested();return _flat_number;}
 public: // simple calculated data access (rvalues)
-  int	matrix_number()const	{return _sim->_nm[user_number()];} // TODO: -> MATRIX_NODE
+  virtual int	matrix_number()const	{return _sim->_nm[user_number()];} // TODO: -> MATRIX_NODE
   int	m_()const		{return matrix_number();}
 public: // maniputation
   //NODE&	set_user_number(int n)	{_user_number = n; return *this;}
@@ -115,6 +115,8 @@ private: // treee stuff.
   node_t const& root()const;
   node_t*       link() {return _link;}
   node_t const* link()const {return _link;}
+public:
+  void allocate();
 private:
   int _index{INVALID_NODE}; // index in node map
   int _m{INVALID_NODE};	// mapped, after reordering
@@ -173,10 +175,9 @@ public:
   void	map_subckt_node(node_t* map_array, const CARD* d);
   bool	is_grounded()const {return (e_() == 0);}
   bool	is_connected()const {return _link || (e_() != INVALID_NODE);}
-  bool	is_short_to(node_t const& n)const {return n_() == n.n_();} // BUG. doesn't work
+  bool	is_short_to(node_t const& n)const {return root() == n.root();}
 
-  node_t&     map() { untested();
-    // if (t_() != INVALID_NODE) {
+  node_t&     map() {
     if (_link) {
       assert(root()._nnn);
       _nnn = root()._nnn;
@@ -207,7 +208,7 @@ public:
   node_t& operator=(NODE* p);
   node_t& set_own(NODE* p);
 
-  bool operator==(const node_t& p) {return _nnn==p._nnn && _m==p._m;}
+  bool operator==(const node_t& p)const { return _link==p._link && _nnn==p._nnn && _m==p._m;}
 
   // used in u_probe.
   operator NODE*()const { return _nnn;}
@@ -219,8 +220,8 @@ public:
     }else{
     }
     _nnn = nullptr;
-    if(!_link){ untested();
-    }else{ untested();
+    if(!_link){
+    }else{
     }
     _link = &nn;
   }
@@ -261,7 +262,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 inline bool node_t::is_node() const
-{ untested();
+{
   assert(!_nnn || _link == this);
   return _nnn;
 }
@@ -284,9 +285,9 @@ inline bool node_t::is_root() const
 }
 /*--------------------------------------------------------------------------*/
 inline node_t& node_t::root()
-{ untested();
+{
   node_t* r = this;
-  while (r->is_link() && r->link() != r) { untested();
+  while (r->is_link() && r->link() != r) {
     r = r->link();
   }
   return *r;

@@ -34,10 +34,11 @@ class MODEL_LOGIC;
 class INTERFACE LOGIC_NODE : public NODE {
 private: // BUG. transition
   int _user_number{0};
-public: // BUG: transition
-  int user_number()const override {incomplete(); return _user_number;}
+public: // BUG: transition/debugging
+  int user_number()const override {/*incomplete();*/ return _user_number;}
 public: // BUG: _nstat ...
   void set_flat_number(int i) { _user_number=i; }
+  int	matrix_number()const override;
 
 private:
   const MODEL_LOGIC *_family;	/* logic family */

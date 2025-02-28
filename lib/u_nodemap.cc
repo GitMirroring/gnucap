@@ -28,7 +28,7 @@
 USER_NODE ground_node("0", 0);
 /*--------------------------------------------------------------------------*/
 NODE_MAP::NODE_MAP()
-{ untested();
+{
   _map = new map;
   (*_map)["0"] = 0;
   _nodes.resize(1);
@@ -40,12 +40,12 @@ NODE_MAP::NODE_MAP()
  * connectivity will be dealt with elsewhere
  */
 NODE_MAP::NODE_MAP(const NODE_MAP& p)
-{ untested();
+{
   _map = new map(); // additional names
 		    // TODO: share/keep exising names
   _nodes.resize(p._nodes.size());
 
-  { untested(); // BUG: special treatment for ground node
+  { // BUG: special treatment for ground node
     (*_map)["0"] = 0;
     assert(_nodes.size());
     _nodes[0] = &ground_node; // BUG. ground is global.
@@ -57,13 +57,6 @@ NODE_MAP::~NODE_MAP()
 {
   delete _map;
   _map = nullptr;
-//  for (iterator i = _node_map.begin(); i != _node_map.end(); ++i) {
-//    if (i->first != "0") {
-//      assert(i->second);
-//      i.second->clear();
-//    }else{
-//    }
-//  }  
 }
 /*--------------------------------------------------------------------------*/
 /* return a pointer to a node given a string
@@ -92,12 +85,12 @@ NODE* NODE_MAP::operator[](std::string const& s)
 }
 /*--------------------------------------------------------------------------*/
 node_t const& NODE_MAP::at(int i)const
-{ untested();
+{
   assert(i<int(_nodes.size()));
   return _nodes[i];
 }
 /*--------------------------------------------------------------------------*/
-node_t& NODE_MAP::operator[](int i)
+node_t& NODE_MAP::at(int i)
 {
   assert(i<int(_nodes.size()));
   return _nodes[i];
