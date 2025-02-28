@@ -92,6 +92,7 @@ NODE* NODE_MAP::new_node(std::string s)
 
   // increments how_many() when lookup fails (new s)  
   if (!node) {
+    trace2("MAP::new_node", s, how_many());
     node = new NODE(s, how_many());
     //                 ^^^^ is really the map number of the new node
     _node_map[s] = node;
