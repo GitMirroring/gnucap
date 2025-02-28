@@ -27,20 +27,22 @@
 #include "md.h"
 /*--------------------------------------------------------------------------*/
 class NODE;
+class node_t;
 /*--------------------------------------------------------------------------*/
 class NODE_MAP {
+  typedef std::map<const std::string, node_t> map;
+public:
+  typedef map::iterator iterator;
+  typedef map::const_iterator const_iterator;
 private:
-  std::map<const std::string, NODE*> _node_map;
+  map _node_map;
   explicit  NODE_MAP(const NODE_MAP&);
 
 public:
   explicit  NODE_MAP();
 	   ~NODE_MAP();
-  NODE*     operator[](std::string);
-  NODE*     new_node(std::string);
-
-  typedef std::map<const std::string, NODE*>::iterator iterator;
-  typedef std::map<const std::string, NODE*>::const_iterator const_iterator;
+  NODE*     operator[](std::string const&);
+  NODE*     new_node(std::string const&);
 
   const_iterator begin()const		{return _node_map.begin();}
   const_iterator end()const		{return _node_map.end();}

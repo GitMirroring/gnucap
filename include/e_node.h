@@ -36,31 +36,29 @@ enum {
   INVALID_NODE = -1
 };
 /*--------------------------------------------------------------------------*/
+// base class vor various NODEs
+// avoiding stuff that is not needed everywere.
+// shield from accidental use
 class NODE : public CARD {
-private:
-  // meets short,int,bool (7 bytes)
-  int	_user_number;
-  //int	_flat_number;
-  //int	_matrix_number;
 protected:
   explicit NODE();
 private: // inhibited
   explicit NODE(const NODE& p);
 public:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
-  explicit NODE(const std::string& s, int n);
+  explicit NODE(const std::string& s);
   ~NODE() {}
 
   CARD* clone()const override	{untested(); return new NODE(*this);}
 
 public: // raw data access (rvalues)
-  int	user_number()const	{return _user_number;}
+  virtual int user_number()const	{return INVALID_NODE;}
   //int	flat_number()const	{itested();return _flat_number;}
 public: // simple calculated data access (rvalues)
-  int	matrix_number()const	{return _sim->_nm[_user_number];}
+  int	matrix_number()const	{return _sim->_nm[user_number()];} // TODO: -> MATRIX_NODE
   int	m_()const		{return matrix_number();}
 public: // maniputation
-  NODE&	set_user_number(int n)	{_user_number = n; return *this;}
+  //NODE&	set_user_number(int n)	{_user_number = n; return *this;}
   //NODE& set_flat_number(int n) {itested();_flat_number = n; return *this;}
   //NODE& set_matrix_number(int n){untested();_matrix_number = n;return *this;}
 public: // virtuals
@@ -91,12 +89,23 @@ public: // virtuals
     return _sim->_ac[m_()];
   }
 };
-extern NODE ground_node;
+/*--------------------------------------------------------------------------*/
+// basically a NODE, but with user_number.
+// user_number is not needed in NODE
+class USER_NODE : public NODE {
+  int _user_number{INVALID_NODE};
+  int user_number()const override {return _user_number;}
+public:
+  explicit USER_NODE(std::string const& s, int i) : NODE(s), _user_number(i) {}
+};
+/*--------------------------------------------------------------------------*/
+extern USER_NODE ground_node;
 /*--------------------------------------------------------------------------*/
 class INTERFACE node_t {
 private: // NODE_P, this should fit into 64 bits.
   NODE* _nnn{nullptr};
   node_t* _link{nullptr};
+  bool _own{false}; // indicate that _nnn is ours.
 private:
   int _ttt;		// m == nm[t] if properly set up
   int _m;		// mapped, after reordering
@@ -157,7 +166,7 @@ public:
   explicit    node_t();
 	      node_t(const node_t&);
   explicit    node_t(NODE*);
-	      ~node_t() {}
+	      ~node_t();
 
 private: // raw data access (lvalues)
   LOGIC_NODE&	data()const;
@@ -168,8 +177,13 @@ public:
   LOGIC_NODE*	    operator->()	{return &data();}
 
   node_t& operator=(const node_t& p);
+  node_t& operator=(NODE* p);
+  node_t& set_own(NODE* p);
 
   bool operator==(const node_t& p) {return _nnn==p._nnn && _ttt==p._ttt && _m==p._m;}
+
+  // used in u_probe.
+  operator NODE*()const { return _nnn;}
 
 public:
   double      v0()const {
