@@ -53,8 +53,9 @@ public:
 
 public: // raw data access (rvalues)
   virtual int flat_number()const	{return 0;} // only ground.
+  virtual int user_number()const	{return INVALID_NODE;}
 public: // simple calculated data access (rvalues)
-  virtual int	matrix_number()const	{untested(); return 0;}// only gnd getting here.
+  virtual int	matrix_number()const	{ return 0;}// only gnd getting here.
   int	m_()const		{return matrix_number();}
 public: // virtuals
   double	tr_probe_num(const std::string&)const override;
@@ -85,13 +86,6 @@ public: // virtuals
   }
 };
 /*--------------------------------------------------------------------------*/
-// basically a NODE, but in a NODE_MAP
-class USER_NODE : public NODE {
-public:
-  explicit USER_NODE(std::string const& s) : NODE(s) {}
-};
-/*--------------------------------------------------------------------------*/
-extern USER_NODE ground_node;
 /*--------------------------------------------------------------------------*/
 class INTERFACE node_t {
 private: // tree structure, 64 bits...
@@ -110,7 +104,7 @@ public: // debugging
 public: // debugging
   node_t*       link() {return _link;}
   node_t const* link()const {return _link;}
-  int rank()const {return 0;} // TODO
+  int rank()const {return !!_nnn;} // TODO: hierarchy.
   int inc_rank()const {return 0;} // TODO
 private: // union find
   friend node_t* root(node_t const*);
@@ -124,6 +118,8 @@ private:
   int _index{INVALID_NODE}; // index in node map
   int _m{INVALID_NODE};	// mapped, after reordering
 
+public: // BUG
+  void clear();
 private:
   static bool node_is_valid(int i) {
     if (i == INVALID_NODE) {
@@ -136,7 +132,9 @@ private:
     return i>=0 && i<=NODE::_sim->_total_nodes;
   }
   static int  to_internal(int n) {
-    if(NODE::_sim->_nm){
+    if(n == 0){
+      return 0;
+    }else if(NODE::_sim->_nm){
       assert(node_is_valid(n));
       return NODE::_sim->_nm[n];
     }else{
@@ -158,10 +156,9 @@ public:
   }
 
   int	      e_()const {return _index;}
-  const NODE* n_()const {return _nnn;}
-  NODE*	      n_()	{return _nnn;}
+  NODE const* n_()const {return _nnn;}
+  NODE*       n_()      {return _nnn;}
 
-  
   const std::string  short_label()const {
     if (n_()){
       return n_()->short_label();
@@ -171,7 +168,7 @@ public:
       return "?????";
     }
   }
-  void	set_to_ground(CARD* Owner)	{new_node("0", Owner);}
+  void	set_to_ground(CARD* Owner);
   void	new_node(const std::string&, const CARD*);
   void	new_model_node(const std::string& n, CARD* d);
   void	map_subckt_node(node_t* map_array, const CARD* d);
@@ -180,13 +177,18 @@ public:
   bool	is_short_to(node_t const& n)const {return root() == n.root();}
 
   node_t&     map() {
-    if (_link) {
-      assert(root()._nnn);
+    if (_nnn) {
+      _m = _nnn->matrix_number();
+    }else if (_link) {
+      _own = false;
       _nnn = root()._nnn;
       _link = this;
-      _m = _nnn->matrix_number();
     }else{
       assert(_m == INVALID_NODE);
+    }
+    if (_nnn) {
+      _m = _nnn->matrix_number();
+    }else{
     }
     return *this;
   } // e_compon.cc:COMPONENT::map_nodes:522
@@ -194,6 +196,7 @@ public:
   explicit    node_t();
 	      node_t(const node_t&);
 	      node_t(node_t&&);
+  explicit    node_t(int i) : _index(i) {};
   explicit    node_t(NODE*);
 	      ~node_t();
 
@@ -204,6 +207,7 @@ public:
   //LOGIC_NODE&	    operator*()const	{untested();return data();}
   const LOGIC_NODE* operator->()const	{return &data();}
   LOGIC_NODE*	    operator->()	{return &data();}
+  operator bool()const { return _nnn;}
 
   node_t& operator=(const node_t& p);
   node_t& operator=(node_t&& p);
@@ -216,7 +220,8 @@ public:
   operator NODE*()const { return _nnn;}
 
   // BUG private:
-  node_t& link_to(node_t& nn){
+  node_t& link_to(node_t* nn){
+    assert(nn);
     if(_own){ untested();
       delete _nnn;
     }else{
@@ -225,11 +230,11 @@ public:
     if(!_link){
     }else{
     }
-    _link = &nn;
+    _link = nn;
     // TODO: simplify
-    assert(nn._link == nullptr || nn._link == &nn
-	 || nn.root()._nnn == &ground_node
-	 || nn.root()._nnn == nullptr);
+//    assert(nn->_link == nullptr || nn->_link == nn
+//	 || nn->root()._nnn == &ground_node
+//	 || nn->root()._nnn == nullptr);
     return *this;
   }
 
@@ -293,6 +298,7 @@ inline bool node_t::is_root() const
 /*--------------------------------------------------------------------------*/
 inline node_t& node_t::root()
 {
+ // call find_subset?
   node_t* r = this;
   while (r->is_link() && r->link() != r) {
     r = r->link();
@@ -307,7 +313,7 @@ inline node_t* set_parent(node_t* n, node_t* p)
 {
   assert(n);
   assert(p);
-  n->link_to(*p);
+  n->link_to(p);
   return p;
 }
 /*--------------------------------------------------------------------------*/

@@ -25,58 +25,52 @@
 #ifndef U_NODEMAP_H
 #define U_NODEMAP_H
 #include "md.h"
+#include "e_node.h" // node_t
 /*--------------------------------------------------------------------------*/
 class NODE;
 class node_t;
 class NODE_MAP;
 /*--------------------------------------------------------------------------*/
-// make it look like an ordinary map.
-// this kind of stuff happens when exposing STL interfaces...
-// (it is used in u_probe, refactor later. maybe delete this.)
-template<class ITER, class VALUE>
-class WRAP_MAP_ITERATOR{
+// USER_NODE is permanent, and admits probes.
+// .. refers to the NODE used in simulation,
+// has an index. (NODE does not), stored in a node_t.
+// mapping as in a 1-net-node device.
+class USER_NODE : public NODE {
+  mutable node_t _n;
+  bool _global{false};
 public:
-  typedef std::pair<std::string, VALUE> value_type;
-protected:
-  WRAP_MAP_ITERATOR(ITER i, NODE_MAP const&m)
-    :_i(i), _m(m){ }
-public: // iterator
-  std::pair<std::string, VALUE> operator*() const;
-  bool operator==(WRAP_MAP_ITERATOR const& i) const{
-    return(_i == i._i);
+  explicit USER_NODE(std::string const& s, int i=INVALID_NODE)
+    : NODE(s), _n(i) {
+    assert(_n.t_() == i);
   }
-  bool operator!=(WRAP_MAP_ITERATOR const& i) const{
-    return(_i != i._i);
+public:
+  int user_number()const override {return _n.t_();}
+  void set_to_ground() { _global=true; _n.set_to_ground(nullptr); }
+  bool is_global()const {return _global;}
+  // int matrix_number()const override {untested(); return _n.m_();} // ??
+private: // probes
+  double	tr_probe_num(const std::string& s)const override;
+  XPROBE	ac_probe_ext(const std::string&)const override;
+public: // connection
+  int net_nodes()const override {return 1;}
+  node_t& n_(int i)const override {
+    (void)i;
+    assert(i==0);
+    return _n;
   }
-  WRAP_MAP_ITERATOR& operator++(){
-    ++_i;
-    return *this;
+  void map_nodes()override {
+    _n.map();
   }
-  WRAP_MAP_ITERATOR& operator--(){ untested();
-    --_i;
-    return *this;
-  }
-private:
-  ITER _i;
-  NODE_MAP const& _m;
-  friend class NODE_MAP;
 };
 /*--------------------------------------------------------------------------*/
+extern USER_NODE ground_node;
+/*--------------------------------------------------------------------------*/
 class NODE_MAP {
-  class idx_t{
-    int _i;
-  public:
-    idx_t() : _i(-1) {}
-    operator int&(){return _i;}
-    operator int const&()const {return _i;}
-    idx_t& operator=(int i) {_i=i; return *this;}
-    bool is_valid()const {return _i>=0;}
-  };
-  typedef std::map<const std::string, idx_t> map;
+  typedef std::map<std::string, USER_NODE*> map;
   typedef std::vector<node_t> vector;
 public:
-  typedef WRAP_MAP_ITERATOR<map::iterator, NODE*> iterator;
-  typedef WRAP_MAP_ITERATOR<map::const_iterator, NODE const*> const_iterator;
+  typedef map::iterator iterator;
+  typedef map::const_iterator const_iterator;
 private:
   map* _map;
   vector _nodes;
@@ -87,54 +81,23 @@ public:
 public:
   explicit  NODE_MAP();
 	   ~NODE_MAP();
-  NODE*     operator[](std::string const&);
+  NODE*     operator[](std::string);
  // NODE*     operator[](int i);
   node_t    const& at(int i)const;
   node_t&          at(int i);
   node_t    const& operator[](int i)const {return at(i);}
   node_t&          operator[](int i) {return at(i);}
-  node_t const&    new_node(std::string const&);
+  USER_NODE*       new_node(std::string);
 
-  iterator begin();
-  iterator end();
-  const_iterator begin()const;
-  const_iterator end()const;
-  int		 how_many()const;
+  iterator begin() {assert(_map); return _map->begin();}
+  iterator end() {assert(_map); return _map->end();}
+  const_iterator begin()const {assert(_map); return _map->begin();}
+  const_iterator end()const {assert(_map); return _map->end();}
+  int		 size()const {return int(_nodes.size());}
 
-  int index_of(node_t const&)const;
   std::string const& name(int)const;
+  void map_nodes();
 };
-/*--------------------------------------------------------------------------*/
-template<class ITER, class VALUE>
-inline std::pair<std::string, VALUE>
-WRAP_MAP_ITERATOR<ITER, VALUE>::operator*() const
-{
-  return value_type(_i->first, _m[_i->second]);
-}
-/*--------------------------------------------------------------------------*/
-inline NODE_MAP::iterator NODE_MAP::begin()
-{
-  assert(_map);
-  return iterator(_map->begin(), *this);
-}
-/*--------------------------------------------------------------------------*/
-inline NODE_MAP::iterator NODE_MAP::end()
-{
-  assert(_map);
-  return iterator(_map->end(), *this);
-}
-/*--------------------------------------------------------------------------*/
-inline NODE_MAP::const_iterator NODE_MAP::begin()const
-{
-  assert(_map);
-  return const_iterator(_map->begin(), *this);
-}
-/*--------------------------------------------------------------------------*/
-inline NODE_MAP::const_iterator NODE_MAP::end()const
-{
-  assert(_map);
-  return const_iterator(_map->end(), *this);
-}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
