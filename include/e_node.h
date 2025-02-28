@@ -188,6 +188,12 @@ public:
       assert(_nnn);
 
       _m = to_internal(t_()); // BUG. ask _nnn
+      //  if(dynamic_cast<USER_NODE const*>(_nnn)){ untested();
+      //    incomplete();
+      //  }else{ untested();
+      //    // presumably conected to LOGIC_NODE (temporary hack)
+      //    assert(_m == _nnn->matrix_number());
+      //  }
     }else{
       assert(_m == INVALID_NODE);
     }

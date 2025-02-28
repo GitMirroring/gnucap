@@ -302,6 +302,23 @@ void SIM_DATA::alloc_hold_vectors()
   }
   NODE_MAP& top_nodes = *CARD_LIST::card_list.nodes();
   assert(top_nodes[0] == &ground_node);
+
+  { // CARD_LIST::card_list.map_subckt_nodes(top_nodes); <= too much
+    // just reconnect top level devices.
+    CARD_LIST& tcl = CARD_LIST::card_list;
+    for (CARD_LIST::iterator ci = tcl.begin(); ci != tcl.end(); ++ci) {
+      // for each card in card_list
+      if ((**ci).is_device()) {
+	for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
+	  // for each connection node in card
+	  (**ci).n_(ii).map_subckt_node(&top_nodes[0], nullptr);
+	}
+      }else{
+//	assert(dynamic_cast<MODEL_CARD*>(*ci));
+      }
+    }
+  }
+
   for (int ii=1;  ii <= top_nodes.how_many();  ++ii) { untested();
     // TODO: only allocate required nodes.
     LOGIC_NODE* nn = &_nstat[_nm[ii]];
