@@ -67,7 +67,8 @@ node_t& node_t::operator=(const node_t& p)
     assert(p._m   == INVALID_NODE);
   }
   _nnn   = p._nnn;
-  _ttt = p._ttt;
+  _ttt = p._ttt; // BUG.
+  _index = p._index;
   _m   = p._m;
   _own = false;
   return *this;
@@ -85,6 +86,7 @@ node_t& node_t::operator=(NODE* n)
   if(n==&ground_node){
     // BUG. transition.
     _ttt = 0;
+    _index = 0;
   }else{
   }
   // _ttt = n->user_number();
@@ -97,6 +99,7 @@ node_t& node_t::set_own(NODE* n)
   operator=(n);
   _own = true; // take ownership.
   _ttt = n->user_number(); // BUG: transition.
+  _index = n->user_number();
   return *this;
 }
 /*--------------------------------------------------------------------------*/
@@ -178,7 +181,10 @@ void node_t::new_node(const std::string& node_name, const CARD* Owner)
 				   // temporary. will _link instead.
   assert(is_connected()); // for now.
   assert(_nnn);
-  _ttt = _nnn->user_number(); // BUG. _nnn is a USER_NODE. don't copy
+  _ttt = _nnn->user_number(); // _ttt is obsolete.
+  _index = _nnn->user_number();
+  assert((*Map)[_index].n_() == _nnn); // for now.
+
   if(_ttt==0){
     assert(_nnn==&ground_node);
   }else{
@@ -208,7 +214,7 @@ node_t::~node_t()
 void node_t::new_model_node(const std::string& node_name, CARD* Owner)
 {
   new_node(node_name, Owner);
-  _ttt = CARD::_sim->newnode_model();
+  _ttt = CARD::_sim->newnode_model(); // BUG. don't use _ttt
   auto ln = new LOGIC_NODE(); // TODO: use requested type
   ln->set_user_number(_ttt);
 
@@ -222,6 +228,7 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
   if (e_() != INVALID_NODE) {
     if (m[e_()].is_valid()) {
       _ttt = m[e_()]._ttt; // BUG. don't use _ttt
+      _link = &m[e_()];
       if(_ttt==0){
 	if(_own){ untested();
 	  delete _nnn;
