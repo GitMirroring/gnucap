@@ -52,15 +52,10 @@ public:
   CARD* clone()const override	{untested(); return new NODE(*this);}
 
 public: // raw data access (rvalues)
-  virtual int user_number()const	{return INVALID_NODE;}
-  //int	flat_number()const	{itested();return _flat_number;}
+  virtual int flat_number()const	{return 0;} // only ground.
 public: // simple calculated data access (rvalues)
   virtual int	matrix_number()const	{untested(); return 0;}// only gnd getting here.
   int	m_()const		{return matrix_number();}
-public: // maniputation
-  //NODE&	set_user_number(int n)	{_user_number = n; return *this;}
-  //NODE& set_flat_number(int n) {itested();_flat_number = n; return *this;}
-  //NODE& set_matrix_number(int n){untested();_matrix_number = n;return *this;}
 public: // virtuals
   double	tr_probe_num(const std::string&)const override;
   XPROBE	ac_probe_ext(const std::string&)const override;
@@ -90,11 +85,8 @@ public: // virtuals
   }
 };
 /*--------------------------------------------------------------------------*/
-// basically a NODE, but with user_number.
-// user_number is not needed in NODE
+// basically a NODE, but in a NODE_MAP
 class USER_NODE : public NODE {
-  int _user_number{INVALID_NODE};
-  int user_number()const override {return 0;} // only gnd getting here.
 public:
   explicit USER_NODE(std::string const& s) : NODE(s) {}
 };

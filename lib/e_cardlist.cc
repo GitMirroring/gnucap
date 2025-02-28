@@ -190,9 +190,6 @@ CARD_LIST& CARD_LIST::expand()
     assert(nodes());
     for(int i = nodes()->how_many(); i; --i) {
       nodes()->at(i).allocate();
-      if(nodes()->at(i).is_node()){
-	trace2("CARD_LIST::alloc", i, nodes()->at(i)->user_number());
-      }
     }
   }else{
   }
