@@ -236,7 +236,7 @@ CARD_LIST& CARD_LIST::map_nodes()
   if(_nm){
     // needed for probes
     _nm->map_nodes();
-  }else{
+  }else{ untested();
   }
   for (iterator ci=begin(); ci!=end(); ++ci) {
     trace_func_comp();
@@ -545,8 +545,6 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
     }else{
     }
   }
-  // HERE: clone node map.
-
 }
 /*--------------------------------------------------------------------------*/
 // set up the map of external to expanded node numbers

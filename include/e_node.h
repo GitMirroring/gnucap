@@ -43,7 +43,7 @@ class NODE : public CARD {
 protected:
   explicit NODE() : CARD() {}
 private: // inhibited
-  explicit NODE(const NODE& p) : CARD(p) {unreachable();}
+  explicit NODE(const NODE& p) : CARD(p) { untested();unreachable();}
 public:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
   explicit NODE(const std::string& s) : CARD(s) {}
@@ -103,7 +103,7 @@ public: // debugging
   }
 public: // debugging
   node_t*       link() {return _link;}
-  node_t const* link()const {return _link;}
+  node_t const* link()const { untested();return _link;}
   int rank()const {return !!_nnn;} // TODO: hierarchy.
   int inc_rank()const {return 0;} // TODO
 private: // union find
@@ -122,7 +122,7 @@ public: // BUG
   void clear();
 private:
   static bool node_is_valid(int i) {
-    if (i == INVALID_NODE) {
+    if (i == INVALID_NODE) { untested();
     }else if (i < 0) { untested();
       unreachable();
     }else if (i > NODE::_sim->_total_nodes) { untested();
@@ -132,12 +132,12 @@ private:
     return i>=0 && i<=NODE::_sim->_total_nodes;
   }
   static int  to_internal(int n) {
-    if(n == 0){
+    if(n == 0){ untested();
       return 0;
     }else if(NODE::_sim->_nm){
       assert(node_is_valid(n));
       return NODE::_sim->_nm[n];
-    }else{
+    }else{ untested();
       // possibly building map. no need for this
       // (remove later)
       return INVALID_NODE;
@@ -151,7 +151,7 @@ public:
     return _index;
   }	// e_cardlist.cc:CARD_LIST::map_subckt_nodes:436 and
 	// e_node.h:node_t::map:263,265 only
-  bool is_valid() const {
+  bool is_valid() const { untested();
     return _link || _nnn;
   }
 
@@ -159,12 +159,12 @@ public:
   NODE const* n_()const {return _nnn;}
   NODE*       n_()      {return _nnn;}
 
-  const std::string  short_label()const {
-    if (n_()){
+  const std::string  short_label()const { untested();
+    if (n_()){ untested();
       return n_()->short_label();
-    }else if(root().n_()) {
+    }else if(root().n_()) { untested();
       return root().n_()->short_label();
-    }else{
+    }else{ untested();
       return "?????";
     }
   }
@@ -216,9 +216,6 @@ public:
 
   bool operator==(const node_t& p)const { return _link==p._link && _nnn==p._nnn && _m==p._m;}
 
-  // used in u_probe.
-  operator NODE*()const { return _nnn;}
-
   // BUG private:
   node_t& link_to(node_t* nn){
     assert(nn);
@@ -231,10 +228,6 @@ public:
     }else{
     }
     _link = nn;
-    // TODO: simplify
-//    assert(nn->_link == nullptr || nn->_link == nn
-//	 || nn->root()._nnn == &ground_node
-//	 || nn->root()._nnn == nullptr);
     return *this;
   }
 

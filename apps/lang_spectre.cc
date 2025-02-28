@@ -152,7 +152,6 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
       try{
 	std::string value;
 	cmd >> value;
-	trace2("spec::spbn", index, value);
 	x->set_port_by_index(index, value);
 	if (all_new) {untested();
 	  if (value == "0" /*x->node_is_grounded(index)*/) {untested();
@@ -173,9 +172,7 @@ static void parse_ports(CS& cmd, COMPONENT* x, bool all_new)
   if (index < x->min_nodes()) {
     cmd.warn(bDANGER, "need " + to_string(x->min_nodes()-index) +" more nodes, grounding");
     for (int iii = index;  iii < x->min_nodes();  ++iii) {
-      trace1("spec::sptg", iii);
       x->set_port_to_ground(iii);
-      trace1("spec::sptg", x->net_nodes());
     }
   }else{
   }

@@ -45,7 +45,7 @@ public:
   }
 public:
   int user_number()const override {return _n.t_();}
-  void set_to_ground() { _global=true; _n.set_to_ground(nullptr); }
+  void set_to_ground() { untested(); _global=true; _n.set_to_ground(nullptr); }
   bool is_global()const {return _global;}
   // int matrix_number()const override {untested(); return _n.m_();} // ??
 private: // probes
@@ -85,7 +85,7 @@ public:
  // NODE*     operator[](int i);
   node_t    const& at(int i)const;
   node_t&          at(int i);
-  node_t    const& operator[](int i)const {return at(i);}
+  node_t    const& operator[](int i)const { untested();return at(i);}
   node_t&          operator[](int i) {return at(i);}
   USER_NODE*       new_node(std::string);
 

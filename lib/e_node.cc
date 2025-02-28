@@ -117,14 +117,6 @@ node_t& node_t::operator=(NODE* n)
   _link = this;
   _nnn = n;
 
-#if 0
-  if(n==&ground_node){
-    // BUG. transition.
-    _index = 0;
-    _link = this;
-  }else{
-  }
-#endif
   _index = n->user_number();
   return *this;
 }
@@ -148,7 +140,7 @@ LOGIC_NODE& node_t::data()const
     //  d_cccs.2.ckt
     static LOGIC_NODE logic_ground(0);
     return logic_ground;
-  }else{
+  }else{ untested();
     assert(0);
     incomplete();
   }
@@ -161,7 +153,7 @@ double NODE::tr_probe_num(const std::string& x)const
     return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {
     return port_impedance(node_t(const_cast<NODE*>(this)), node_t(&ground_node), _sim->_aa, 0.);
-  }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) {
+  }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) { untested();
     assert(0);
     unreachable();
  //   assert(_sim->_nstat);
@@ -294,7 +286,7 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
     }else if(_own){ untested();
       delete _nnn;
       _own = false;
-    }else{
+    }else{ untested();
     }
     _nnn = nullptr;
   }else{
@@ -304,7 +296,7 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
 /*--------------------------------------------------------------------------*/
 void node_t::allocate(int u)
 {
-  if(is_node()) {
+  if(is_node()) { untested();
     // done.
     trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
     assert(_link);
@@ -347,9 +339,9 @@ void node_t::set_to_ground(CARD* Owner)
 /*--------------------------------------------------------------------------*/
 bool node_t::is_grounded() const
 {
-  if(_nnn==&ground_node){
+  if(_nnn==&ground_node){ untested();
     return true;
-  }else if(&root()!=this){
+  }else if(&root()!=this){ untested();
     return root().is_grounded();
   }else{
     return false;
@@ -359,7 +351,7 @@ bool node_t::is_grounded() const
 void node_t::clear()
 {
   if(!_nnn){
-  }else if(_own){
+  }else if(_own){ untested();
     _nnn->purge();
     delete _nnn;
   }else{
@@ -381,7 +373,7 @@ XPROBE USER_NODE::ac_probe_ext(const std::string& s) const
 {
   if(_n) {
     return _n.n_()->ac_probe_ext(s);
-  }else{
+  }else{ untested();
     return XPROBE(NOT_VALID);
   }
 }

@@ -366,7 +366,6 @@ void SIM_DATA::alloc_hold_vectors()
 
   ground_node.set_owner(nullptr);
   top_nodes[0].root() = &ground_node;
-  assert(top_nodes[0].root() == &ground_node);
   for(auto p : top_nodes) {
     int idx = p.second->user_number();
     if( top_nodes[idx].n_()){

@@ -121,7 +121,7 @@ USER_NODE* NODE_MAP::new_node(std::string s)
 }
 /*--------------------------------------------------------------------------*/
 // int NODE_MAP::index_of(node_t const& t) const
-// {
+// { untested();
 //   assert(up_order(&_nodes[0], &t, &_nodes.back()));
 //   int idx = int(&t - &_nodes[0]);
 //   assert(&_nodes[idx] == &t);
@@ -168,7 +168,7 @@ void NODE_MAP::map_nodes()
       n->map_nodes();
       continue;
     }
-  }else{
+  }else{ untested();
   }
 }
 /*--------------------------------------------------------------------------*/
