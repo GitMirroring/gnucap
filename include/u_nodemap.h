@@ -102,6 +102,7 @@ public:
   int		 how_many()const;
 
   int index_of(node_t const&)const;
+  std::string const& name(int)const;
 };
 /*--------------------------------------------------------------------------*/
 template<class ITER, class VALUE>
