@@ -34,6 +34,7 @@ class MODEL_LOGIC;
 class INTERFACE LOGIC_NODE : public NODE {
 private: // BUG. transition
   int _user_number{0};
+public: // BUG: transition
   int user_number()const override {return _user_number;}
 public: // BUG: _nstat ...
   void set_user_number(int i) { _user_number=i; }
@@ -126,7 +127,7 @@ public: // action, used by logic
 private: // inhibited
   explicit LOGIC_NODE(const LOGIC_NODE&):NODE(){incomplete();unreachable();}
 public: // general use
-  explicit LOGIC_NODE();
+  explicit LOGIC_NODE(int i=-1);
 	   ~LOGIC_NODE() {}
 
 public: // used by matrix
