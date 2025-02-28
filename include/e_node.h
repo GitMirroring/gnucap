@@ -265,7 +265,7 @@ inline bool node_t::is_node() const
 /*--------------------------------------------------------------------------*/
 inline bool node_t::is_link() const
 { untested();
-  assert(!_nnn || _link == this);
+  assert(!_nnn || _link == this || !_link);
   return !_nnn && _link;
 }
 /*--------------------------------------------------------------------------*/
