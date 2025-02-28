@@ -122,9 +122,14 @@ private:
     return i>=0 && i<=NODE::_sim->_total_nodes;
   }
   static int  to_internal(int n) {
-    assert(node_is_valid(n));
-    assert(NODE::_sim->_nm);
-    return NODE::_sim->_nm[n];
+    if(NODE::_sim->_nm){
+      assert(node_is_valid(n));
+      return NODE::_sim->_nm[n];
+    }else{
+      // possibly building map. no need for this
+      // (remove later)
+      return INVALID_NODE;
+    }
   }
 
 public:
