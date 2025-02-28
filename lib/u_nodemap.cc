@@ -25,7 +25,7 @@
 #include "e_node.h"
 #include "u_nodemap.h"
 /*--------------------------------------------------------------------------*/
-USER_NODE ground_node("0", 0);
+USER_NODE ground_node("0");
 /*--------------------------------------------------------------------------*/
 NODE_MAP::NODE_MAP()
 {
@@ -116,7 +116,7 @@ node_t const& NODE_MAP::new_node(std::string const& S)
   if (!i.is_valid()) {
     trace2("MAP::new_node", s, how_many());
     i = how_many() + 1; // the map number of the new node
-    _nodes.push_back(node_t(new USER_NODE(s, i))); // possibly unneeded.
+    _nodes.push_back(node_t(new USER_NODE(s))); // possibly unneeded.
   }else{
   }
  // assert(_nodes[i].idx()==i); // not needed.

@@ -55,7 +55,7 @@ public: // raw data access (rvalues)
   virtual int user_number()const	{return INVALID_NODE;}
   //int	flat_number()const	{itested();return _flat_number;}
 public: // simple calculated data access (rvalues)
-  virtual int	matrix_number()const	{return _sim->_nm[user_number()];} // TODO: -> MATRIX_NODE
+  virtual int	matrix_number()const	{untested(); return 0;}// only gnd getting here.
   int	m_()const		{return matrix_number();}
 public: // maniputation
   //NODE&	set_user_number(int n)	{_user_number = n; return *this;}
@@ -94,9 +94,9 @@ public: // virtuals
 // user_number is not needed in NODE
 class USER_NODE : public NODE {
   int _user_number{INVALID_NODE};
-  int user_number()const override {return _user_number;}
+  int user_number()const override {return 0;} // only gnd getting here.
 public:
-  explicit USER_NODE(std::string const& s, int i) : NODE(s), _user_number(i) {}
+  explicit USER_NODE(std::string const& s) : NODE(s) {}
 };
 /*--------------------------------------------------------------------------*/
 extern USER_NODE ground_node;
