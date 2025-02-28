@@ -93,10 +93,21 @@ NODE* NODE_MAP::operator[](std::string const& s)
 }
 /*--------------------------------------------------------------------------*/
 // access by index. this is a stub.
-NODE const* NODE_MAP::operator[](int i)const
-{
+node_t const& NODE_MAP::operator[](int i)const
+{ untested();
   assert(i<int(_nodes.size()));
-  return _nodes[i].n_();
+  return _nodes[i];
+}
+/*--------------------------------------------------------------------------*/
+node_t& NODE_MAP::operator[](int i)
+{ untested();
+  assert(i<int(_nodes.size()));
+  return _nodes[i];
+}
+/*--------------------------------------------------------------------------*/
+int NODE_MAP::how_many() const
+{
+  return int(_nodes.size()-1);
 }
 /*--------------------------------------------------------------------------*/
 /* return a pointer to a node given a string
@@ -114,8 +125,8 @@ NODE* NODE_MAP::new_node(std::string const& S)
   if (!i.is_valid()) {
     trace2("MAP::new_node", s, how_many());
     // temporary. may need USER_NODE here eventually.
-    i = how_many(); // the map number of the new node
-    _nodes.push_back(node_t(new USER_NODE(s, how_many())));
+    i = how_many() + 1; // the map number of the new node
+    _nodes.push_back(node_t(new USER_NODE(s, i)));
   }else{
   }
   return _nodes[i];
