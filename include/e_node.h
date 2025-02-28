@@ -163,7 +163,6 @@ public:
 
   
   const std::string  short_label()const {
-    incomplete();
     if (n_()){
       return n_()->short_label();
     }else if(root().n_()) {
