@@ -29,47 +29,13 @@
 #include "u_xprobe.h"
 #include "e_logicnode.h"
 /*--------------------------------------------------------------------------*/
-/* default constructor : unconnected, don't use
- */
-NODE::NODE()
-  :CARD()
-   //_user_number(INVALID_NODE)
-   //_flat_number(INVALID_NODE)
-   //_matrix_number(INVALID_NODE)
-{
-}
-/*--------------------------------------------------------------------------*/
-/* copy constructor : user data only
- */
-NODE::NODE(const NODE& p)
-  :CARD(p)
-   // _user_number(p._user_number)
-   //_flat_number(p._flat_number)
-   //_matrix_number(INVALID_NODE)
-{ untested();
-  unreachable();
-}
-/*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
  * supposedly not used, but used by a required function that is also not used
  */
 NODE::NODE(const NODE* p)
   :CARD(*p)
-   //_user_number(p->_user_number)
-   //_flat_number(p->_flat_number)
-   //_matrix_number(INVALID_NODE)
 { untested();
   unreachable();
-}
-/*--------------------------------------------------------------------------*/
-/* usual initializing constructor : name and index
- */
-NODE::NODE(const std::string& s)
-  :CARD(s)
-  // _user_number(n)
-   //_flat_number(n)
-   //_matrix_number(INVALID_NODE)
-{
 }
 /*--------------------------------------------------------------------------*/
 node_t::node_t()

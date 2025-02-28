@@ -41,12 +41,12 @@ enum {
 // shield from accidental use
 class NODE : public CARD {
 protected:
-  explicit NODE();
+  explicit NODE() : CARD() {}
 private: // inhibited
-  explicit NODE(const NODE& p);
+  explicit NODE(const NODE& p) : CARD(p) {unreachable();}
 public:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
-  explicit NODE(const std::string& s);
+  explicit NODE(const std::string& s) : CARD(s) {}
   ~NODE() {}
 
   CARD* clone()const override	{untested(); return new NODE(*this);}
