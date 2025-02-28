@@ -149,7 +149,7 @@ public:
     }else if(_ttt == 0){
       // has been set to ground? ddid not update _nnn?
       incomplete();
-    }else if(_ttt == _nnn->user_number()) {
+    // }else if(_ttt == _nnn->user_number()) {
     }else{
       incomplete();
     }
@@ -163,6 +163,7 @@ public:
   int	      e_()const {
     if(_nnn) {
       // assert(_index == _nnn->user_number());
+      return _ttt;
       return _nnn->user_number();
     }else{
       assert(_index==INVALID_NODE);

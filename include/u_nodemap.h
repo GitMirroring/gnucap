@@ -33,15 +33,15 @@ class NODE_MAP;
 // make it look like an ordinary map.
 // this kind of stuff happens when exposing STL interfaces...
 // (it is used in u_probe, refactor later. maybe delete this.)
-template<class ITER>
+template<class ITER, class VALUE>
 class WRAP_MAP_ITERATOR{
 public:
-  typedef std::pair<std::string, NODE const*> value_type;
+  typedef std::pair<std::string, VALUE> value_type;
 protected:
   WRAP_MAP_ITERATOR(ITER i, NODE_MAP const&m)
     :_i(i), _m(m){ }
 public: // iterator
-  std::pair<std::string, NODE const*> operator*() const;
+  std::pair<std::string, VALUE> operator*() const;
   bool operator==(WRAP_MAP_ITERATOR const& i) const{
     return(_i == i._i);
   }
@@ -75,8 +75,8 @@ class NODE_MAP {
   typedef std::map<const std::string, idx_t> map;
   typedef std::vector<node_t> vector;
 public:
-  typedef WRAP_MAP_ITERATOR<map::const_iterator> iterator;
-  typedef WRAP_MAP_ITERATOR<map::const_iterator> const_iterator;
+  typedef WRAP_MAP_ITERATOR<map::iterator, NODE*> iterator;
+  typedef WRAP_MAP_ITERATOR<map::const_iterator, NODE const*> const_iterator;
 private:
   map* _map;
   vector _nodes;
@@ -93,16 +93,32 @@ public:
   node_t&          operator[](int i);
   node_t const&    new_node(std::string const&);
 
+  iterator begin();
+  iterator end();
   const_iterator begin()const;
   const_iterator end()const;
   int		 how_many()const;
+
+  int index_of(node_t const&)const;
 };
 /*--------------------------------------------------------------------------*/
-template<class ITER>
-inline std::pair<std::string, NODE const*>
-WRAP_MAP_ITERATOR<ITER>::operator*() const
+template<class ITER, class VALUE>
+inline std::pair<std::string, VALUE>
+WRAP_MAP_ITERATOR<ITER, VALUE>::operator*() const
 {
   return value_type(_i->first, _m[_i->second]);
+}
+/*--------------------------------------------------------------------------*/
+inline NODE_MAP::iterator NODE_MAP::begin()
+{
+  assert(_map);
+  return iterator(_map->begin(), *this);
+}
+/*--------------------------------------------------------------------------*/
+inline NODE_MAP::iterator NODE_MAP::end()
+{
+  assert(_map);
+  return iterator(_map->end(), *this);
 }
 /*--------------------------------------------------------------------------*/
 inline NODE_MAP::const_iterator NODE_MAP::begin()const

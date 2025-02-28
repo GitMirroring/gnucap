@@ -131,5 +131,13 @@ node_t const& NODE_MAP::new_node(std::string const& S)
   return _nodes[i];
 }
 /*--------------------------------------------------------------------------*/
+int NODE_MAP::index_of(node_t const& t) const
+{
+  assert(up_order(&_nodes[0], &t, &_nodes.back()));
+  int idx = int(&t - &_nodes[0]);
+  assert(&_nodes[idx] == &t);
+  return idx;
+}
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

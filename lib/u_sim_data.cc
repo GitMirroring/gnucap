@@ -291,7 +291,7 @@ void SIM_DATA::init(CARD_LIST* scope)
  * if they already exist, leave them alone to save data
  */
 void SIM_DATA::alloc_hold_vectors()
-{
+{ untested();
   assert(is_first_expand());
 
   assert(!_nstat);
@@ -299,6 +299,19 @@ void SIM_DATA::alloc_hold_vectors()
   for (int ii=0;  ii <= _total_nodes;  ++ii) {
     _nstat[_nm[ii]].set_owner(nullptr);
     _nstat[_nm[ii]].set_user_number(ii); // BUG
+  }
+  NODE_MAP& top_nodes = *CARD_LIST::card_list.nodes();
+  assert(top_nodes[0] == &ground_node);
+  for (int ii=1;  ii <= top_nodes.how_many();  ++ii) { untested();
+    // TODO: only allocate required nodes.
+    LOGIC_NODE* nn = &_nstat[_nm[ii]];
+   // nn->set_label(top_nodes[ii].short_label()); // BUG. duplicate label storage
+    top_nodes[ii] = nn;
+    assert(top_nodes[ii].n_() == nn);
+    nn->set_owner(nullptr);
+  }
+  for(auto p : top_nodes) {
+    p.second->set_label(p.first);
   }
 
   assert(!_vdc);
