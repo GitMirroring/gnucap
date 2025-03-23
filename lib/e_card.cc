@@ -87,6 +87,19 @@ const std::string CARD::long_label()const
   return buffer;
 }
 /*--------------------------------------------------------------------------*/
+#include "trace_on.h"
+void CARD:: make_fanout()
+{
+  if (is_device()) {
+    for (int ii = 0;  ii < net_nodes();  ++ii) {
+      trace3(long_label(), n_(ii).n_()->long_label(),  n_(ii).t_(), intptr_t(n_(ii).n_()));
+	     //++(n_(ii).n_()->_probes));
+    }
+  }else{untested();
+  }
+}
+#include "trace_off.h"
+/*--------------------------------------------------------------------------*/
 /* connects_to: does this part connect to this node?
  * input: a node
  * returns: how many times this part connects to it.

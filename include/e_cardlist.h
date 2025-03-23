@@ -115,6 +115,7 @@ public: // more types
   CARD_LIST& precalc_first();
   CARD_LIST& expand();
   CARD_LIST& precalc_last();
+  CARD_LIST& make_fanout();
   CARD_LIST& map_nodes();
   CARD_LIST& tr_iwant_matrix();
   CARD_LIST& tr_begin();
