@@ -44,6 +44,7 @@ class INTERFACE CARD : public CKT_BASE {
     CARD_LIST* _scope{nullptr};
   };
 private:
+public:
   CARD_LIST*	_subckt;
   owner_tag_t 	_owner_tag;
   mutable short _probes;	// number of probes set
@@ -74,6 +75,7 @@ public:	// "elaborate"
   virtual void	 expand_first()		{}
   virtual void	 expand()		{}
   virtual void	 expand_last()		{}
+  virtual void	 make_fanout();
   virtual void	 precalc_last()		{}
   virtual void	 map_nodes()		{}
   virtual CARD*  deflate()		{itested(); return this;}
