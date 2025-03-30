@@ -74,6 +74,7 @@ public: // override virtual, called by commands
   DEV_COMMENT*	parse_comment(CS&, DEV_COMMENT*)override;
   DEV_DOT*	parse_command(CS&, DEV_DOT*)override;
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override;
+  BASE_SUBCKT*  parse_discipline(CS&, BASE_SUBCKT*);
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
   std::string	find_type_in_string(CS&)override;
@@ -683,6 +684,30 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   return x;
 }
 /*--------------------------------------------------------------------------*/
+BASE_SUBCKT* LANG_VERILOG::parse_discipline(CS& cmd, BASE_SUBCKT* x)
+{
+  assert(x);
+
+  // header
+  cmd.reset();
+  (cmd >> "discipline ");
+  parse_label(cmd, x);
+//  parse_ports(cmd, x, true/*all new*/);
+  cmd >> ';';
+
+  // body
+  for (;;) {
+    cmd.get_line("verilog-discipline>");
+
+    if (cmd >> "enddiscipline ") {
+      break;
+    }else{
+      new__instance(cmd, x, x->subckt());
+    }
+  }
+  return x;
+}
+/*--------------------------------------------------------------------------*/
 COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
 {
   assert(x);
@@ -846,7 +871,7 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
     print_item(o, *ci);
   }
   
-  o << "endmodule // " << x->short_label() << "\n\n";
+  o << "end" << what << " // " << x->short_label() << "\n\n";
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
@@ -934,6 +959,53 @@ class CMD_MODULE : public CMD {
   }
 } p2;
 DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "module|macromodule", &p2);
+/*--------------------------------------------------------------------------*/
+class CMD_DISC : public CMD {
+  class DC : public CMD{
+  public:
+    DC(BASE_SUBCKT* p) : _p(p){}
+    void do_it(CS& cmd, CARD_LIST* Scope){
+      incomplete();
+    }
+    BASE_SUBCKT* _p;
+  };
+public:
+  ~CMD_DISC(){
+    for( auto i : _cmds){
+      command_dispatcher.uninstall(i);
+      delete(i);
+    }
+  }
+  void do_it(CS& cmd, CARD_LIST* Scope)
+  {
+    BASE_SUBCKT* new_module = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("discipline"));
+    assert(new_module);
+    assert(!new_module->owner());
+    assert(new_module->subckt());
+    assert(new_module->subckt()->is_empty());
+    assert(!new_module->is_device());
+    lang_verilog.parse_discipline(cmd, new_module);
+    CMD* b = new DC(new_module);
+    _cmds.push_back(b);
+
+    std::string what=((COMPONENT*)new_module)->short_label();
+    error(bLOG, "command %s\n", what.c_str());
+    new DISPATCHER<CMD>::INSTALL(&command_dispatcher, what, b);
+
+    Scope->push_back(new_module);
+  }
+private:
+  std::list<CMD*> _cmds;
+} p3;
+DISPATCHER<CMD>::INSTALL d3(&command_dispatcher, "discipline", &p3);
+/*--------------------------------------------------------------------------*/
+class CMD_DOM : public CMD {
+  void do_it(CS& cmd, CARD_LIST* Scope)
+  {
+    incomplete();
+  }
+} p4;
+DISPATCHER<CMD>::INSTALL d4(&command_dispatcher, "domain", &p4);
 /*--------------------------------------------------------------------------*/
 class CMD_VERILOG : public CMD {
 public:

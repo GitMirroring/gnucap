@@ -1,0 +1,8 @@
+discipline logic 
+^ ? discipline: no match
+domain discrete; 
+^ ? domain: no match
+enddiscipline 
+^ ? enddiscipline: no match
+logic 3 
+        ^ ? '(' required (parse ports) (grounding)

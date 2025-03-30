@@ -1,0 +1,10 @@
+options trace log
+verilog
+
+discipline logic
+	domain discrete;
+enddiscipline
+
+logic 3
+
+list
