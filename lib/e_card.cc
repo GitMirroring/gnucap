@@ -92,8 +92,8 @@ void CARD:: make_fanout()
 {
   if (is_device()) {
     for (int ii = 0;  ii < net_nodes();  ++ii) {
-      trace3(long_label(), n_(ii).n_()->long_label(),  n_(ii).t_(), intptr_t(n_(ii).n_()));
-	     //++(n_(ii).n_()->_probes));
+      trace4(long_label(), n_(ii).n_()->long_label(),  n_(ii).t_(), intptr_t(n_(ii).n_()),
+	     ++(n_(ii).n_()->_probes));
     }
   }else{untested();
   }

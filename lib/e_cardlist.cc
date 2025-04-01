@@ -181,15 +181,7 @@ CARD_LIST& CARD_LIST::expand()
     trace_func_comp();
     (**ci).expand_last();
   }
-  return *this;
-}
-/*--------------------------------------------------------------------------*/
-CARD_LIST& CARD_LIST::make_fanout()
-{
-  for (iterator ci=begin(); ci!=end(); ++ci) {
-    trace_func_comp();
-    (**ci).make_fanout();
-  }
+  make_fanout();
   return *this;
 }
 /*--------------------------------------------------------------------------*/
