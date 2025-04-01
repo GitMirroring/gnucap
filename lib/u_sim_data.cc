@@ -270,6 +270,7 @@ void SIM_DATA::init(CARD_LIST* scope)
     uninit();
     init_node_count(scope->nodes()->how_many(), 0, 0);
     scope->expand();
+    //scope->make_fanout();
     map__nodes();
     scope->map_nodes();
     alloc_hold_vectors();
