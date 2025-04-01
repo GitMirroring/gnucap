@@ -195,7 +195,6 @@ CARD_LIST& CARD_LIST::expand()
     trace_func_comp();
     (**ci).expand_last();
   }
-
   // fill in missing nodes.
   assert(nodes());
   for(int i = nodes()->size(); i;) {
