@@ -22,6 +22,7 @@
  * Base class for "cards" in the circuit description file
  */
 //testing=script 2014.07.04
+#include "e_logicnode.h"
 #include "e_card.h"
 #include "u_xprobe.h"
 #include "u_prblst.h"
@@ -93,7 +94,7 @@ void CARD:: make_fanout()
   if (is_device()) {
     for (int ii = 0;  ii < net_nodes();  ++ii) {
       trace4(long_label(), n_(ii).n_()->long_label(),  n_(ii).t_(), n_(ii).e_(),
-	     ++(n_(ii).n_()->_probes));
+	     ++(n_(ii).data()._probes));
     }
   }else{untested();
   }

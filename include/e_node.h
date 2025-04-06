@@ -213,7 +213,7 @@ public:
   explicit    node_t(NODE*);
 	      ~node_t();
 
-private: // raw data access (lvalues)
+  //private: // raw data access (lvalues)
   LOGIC_NODE&	data()const;
 
 public:
