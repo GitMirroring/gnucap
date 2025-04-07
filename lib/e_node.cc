@@ -39,6 +39,16 @@ NODE::NODE(const NODE* p)
   unreachable();
 }
 /*--------------------------------------------------------------------------*/
+NODE::~NODE()
+{
+  if(subckt()){
+    for(auto&i : *subckt()){
+      i = nullptr;
+    }
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 node_t::node_t(const node_t& p)
   :_nnn(p._nnn),
    _link(p._link),
