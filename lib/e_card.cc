@@ -88,18 +88,24 @@ const std::string CARD::long_label()const
   return buffer;
 }
 /*--------------------------------------------------------------------------*/
-#include "trace_on.h"
+//#include "trace_on.h"
 void CARD:: make_fanout()
 {
   if (is_device()) {
     for (int ii = 0;  ii < net_nodes();  ++ii) {
-      trace4(long_label(), n_(ii).n_()->long_label(),  n_(ii).t_(), n_(ii).e_(),
-	     ++(n_(ii).data()._probes));
+      trace3(long_label(), n_(ii).n_()->long_label(), n_(ii).m_(), ++(n_(ii).data()._probes));
+      if (n_(ii).data().subckt()) {untested();
+      }else{untested();
+	n_(ii).data().new_subckt();
+	assert(n_(ii).data().subckt());
+      }
+      assert(n_(ii).data().subckt());
+      n_(ii).data().subckt()->push_back(this);
     }
   }else{untested();
   }
 }
-#include "trace_off.h"
+//#include "trace_off.h"
 /*--------------------------------------------------------------------------*/
 /* connects_to: does this part connect to this node?
  * input: a node
