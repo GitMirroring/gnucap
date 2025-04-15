@@ -225,10 +225,6 @@ void SIM_DATA::map__nodes(CARD_LIST* scope)
   case oFORWARD: order_forward(); break;
   }
   ::status.order.stop();
-  NODE_MAP* top_nodes = scope->nodes();
-  assert(top_nodes);
-  top_nodes->at(0).map();
-  assert(top_nodes->at(0).m_()==0);
 }
 /*--------------------------------------------------------------------------*/
 /* order_reverse: force ordering to reverse of user ordering
@@ -343,9 +339,9 @@ void SIM_DATA::init(CARD_LIST* scope)
     map_toplevel_nodes(scope);
     scope->expand();
     alloc_hold_vectors(scope);
-    //scope->make_fanout();	// does not recognize ground
+    scope->make_fanout();	// does not recognize ground
     map__nodes(scope);
-    scope->make_fanout();	// ok, pre m_()
+    // scope->make_fanout();	// ok, pre m_()
     scope->map_nodes();
     //scope->make_fanout();	// ok, post m_()
     _aa.reinit(_total_nodes);
@@ -402,6 +398,9 @@ void SIM_DATA::alloc_hold_vectors(CARD_LIST* scope)
 
   assert(_nstat);
   assert(_vdc);
+
+  top_nodes[0].map();
+  assert(top_nodes[0].m_()==0);
 }
 /*--------------------------------------------------------------------------*/
 /* alloc_vectors:
