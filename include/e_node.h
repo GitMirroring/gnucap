@@ -48,7 +48,7 @@ public:
   explicit NODE(const NODE* p); // u_nodemap.cc:49 (deep copy)
   explicit NODE(const std::string& s, int idx=0)
     : CARD(s) {(void)idx; assert(!idx);}
-  ~NODE() {}
+  ~NODE();
 
   CARD* clone()const override	{untested(); return new NODE(*this);}
 
@@ -213,7 +213,7 @@ public:
   explicit    node_t(NODE*);
 	      ~node_t();
 
-  //private: // raw data access (lvalues)
+private: // raw data access (lvalues)
   LOGIC_NODE&	data()const;
 
 public:

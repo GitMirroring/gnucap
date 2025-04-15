@@ -44,7 +44,6 @@ class INTERFACE CARD : public CKT_BASE {
     CARD_LIST* _scope{nullptr};
   };
 private:
-public:
   CARD_LIST*	_subckt;
   owner_tag_t 	_owner_tag;
   mutable short _probes;	// number of probes set

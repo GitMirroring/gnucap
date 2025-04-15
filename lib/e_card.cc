@@ -93,16 +93,20 @@ void CARD:: make_fanout()
 {
   if (is_device()) {
     for (int ii = 0;  ii < net_nodes();  ++ii) {
-      trace3(long_label(), n_(ii).n_()->long_label(), n_(ii).m_(), ++(n_(ii).data()._probes));
-      if (n_(ii).data().subckt()) {untested();
-      }else{untested();
-	n_(ii).data().new_subckt();
-	assert(n_(ii).data().subckt());
+      if (!n_(ii).is_grounded()) {
+	if (!n_(ii)->subckt()) {
+	  n_(ii)->new_subckt();
+	  assert(n_(ii)->subckt());
+	}else{
+	}
+	assert(n_(ii)->subckt());
+	n_(ii)->subckt()->push_back(this);
+	trace3(long_label(),ii, n_(ii).m_(), n_(ii)->subckt()->size());
+      }else{
+	trace2(long_label(),ii, n_(ii).m_());
       }
-      assert(n_(ii).data().subckt());
-      n_(ii).data().subckt()->push_back(this);
     }
-  }else{untested();
+  }else{
   }
 }
 //#include "trace_off.h"

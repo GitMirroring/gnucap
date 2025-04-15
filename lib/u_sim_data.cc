@@ -342,18 +342,12 @@ void SIM_DATA::init(CARD_LIST* scope)
     init_node_count(0, 0, 0);
     map_toplevel_nodes(scope);
     scope->expand();
-    untested();
     alloc_hold_vectors(scope);
-    untested();
-    //scope->make_fanout();
+    //scope->make_fanout();	// does not recognize ground
     map__nodes(scope);
-    untested();
-    //scope->make_fanout();	// fails
-    untested();
+    scope->make_fanout();	// ok, pre m_()
     scope->map_nodes();
-    untested();
-    scope->make_fanout();	// works here
-    untested();
+    //scope->make_fanout();	// ok, post m_()
     _aa.reinit(_total_nodes);
     _acx.reinit(_total_nodes);
     scope->tr_iwant_matrix();
