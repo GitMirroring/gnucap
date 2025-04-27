@@ -51,6 +51,7 @@ protected: // override virtual
   void  precalc_last()override { COMPONENT::precalc_last();
     if(subckt()){ subckt()->precalc_last();} else { untested(); } }
   //void  map_nodes();
+  void	  make_fanout()override	{assert(subckt()); subckt()->make_fanout();}
   void	  tr_begin()override	{assert(subckt()); subckt()->tr_begin();}
   void	  tr_restore()override	{assert(subckt()); subckt()->tr_restore();}
   void	  dc_advance()override	{assert(subckt()); subckt()->dc_advance();}
