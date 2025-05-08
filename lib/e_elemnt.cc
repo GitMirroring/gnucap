@@ -267,6 +267,18 @@ void ELEMENT::tr_advance()
   _dt = _time[0] - _time[1];
 }
 /*--------------------------------------------------------------------------*/
+void ELEMENT::tr_advance_recursive()
+{
+  if (tr_needs_advance()) {untested();
+    tr_advance();
+    for (int ii=0; ii<net_nodes(); ++ii) {untested();
+      assert(n_(ii));
+      n_(ii)->tr_advance_recursive();
+    }
+  }else{untested();
+  }
+}
+/*--------------------------------------------------------------------------*/
 void ELEMENT::tr_regress()
 {
   assert(_time[0] >= _sim->_time0); // moving backwards
