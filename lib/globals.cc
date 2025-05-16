@@ -27,6 +27,7 @@
 #include "u_status.h"
 #include "patchlev.h"
 #include "e_card.h"
+#include "e_disc.h"
 /*--------------------------------------------------------------------------*/
 // here to make sure they get constructed and destructed in proper order
 // first construct, last destruct
@@ -49,6 +50,8 @@ DISPATCHER<FUNCTION> measure_dispatcher;
 DISPATCHER<CKT_BASE> status_dispatcher;
 DISPATCHER<CKT_BASE> help_dispatcher;
 DISPATCHER<PROBELIST> probe_dispatcher;
+INTERFACE DISPATCHER<DISCIPLINE> discipline_dispatcher;
+INTERFACE DISPATCHER<NATURE> nature_dispatcher;
 
 INDIRECT<ATTRIB_LIST_p> CKT_BASE::_attribs;
 INDIRECT<CARD::owner_tag_t,CARD*> CARD::_owner_index;
