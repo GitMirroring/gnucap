@@ -275,8 +275,7 @@ static void map_toplevel_nodes(CARD_LIST* scope)
   // assert(top_nodes[0].n_() == &ground_node);
 
   for (int i=0; i<top_nodes.size(); ++i) {
-    node_t none;
-    top_nodes[i] = none;
+    top_nodes[i].clear();
   }
 #if 0
   top_nodes[0].set_to_ground(nullptr); // link_to(top_nodes["0"]);
