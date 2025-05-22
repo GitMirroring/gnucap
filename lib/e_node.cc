@@ -92,23 +92,11 @@ node_t& node_t::operator=(node_t& p)
 /*--------------------------------------------------------------------------*/
 node_t& node_t::operator=(const node_t& p)
 {
-  if(_own){
-    delete _nnn;
-  }else{
-  }
-  _nnn = nullptr;
-
   if(!p.n_()){
-    _link = p._link;
   }else{ untested();
-    // not sure if this is UB, but using operator=(node_t& p) anyway.
-    _link = const_cast<node_t*>(&p);
+    // not sure if this is UB, note the const_cast...
   }
-
-  _index = p._index;// wrong scope ??
-  _m   = p._m;
-  _own = false;
-  return *this;
+  return operator=(const_cast<node_t&>(p));
 }
 /*--------------------------------------------------------------------------*/
 node_t& node_t::operator=(node_t&& p)
