@@ -135,6 +135,7 @@ private: // union find
   friend node_t* parent(node_t*);
   friend node_t* set_parent(node_t* n, node_t* p);
 public:
+  void set_none(){ _dir = dir_none; }
   void set_input(){ _dir = dir_t(_dir | dir_in); }
   void set_output(){ _dir = dir_t(_dir | dir_out); }
   bool is_port()const {untested(); return _dir == dir_none; }
