@@ -117,6 +117,7 @@ node_t& node_t::operator=(node_t&& p)
 // ordinary pointer assignment
 node_t& node_t::operator=(NODE* n)
 {
+  assert(n);
   assert(!_link || _link == this);
   // clear();
   if(!_nnn){
@@ -127,7 +128,7 @@ node_t& node_t::operator=(NODE* n)
     _own = false;
   }else{
   }
-  _link = this; // yikes.
+  _link = nullptr;
   _nnn = n;
 
   _index = n->user_number();
@@ -313,7 +314,6 @@ void node_t::allocate(int u /*, CARD* owner*/)
   if(is_node()) {
     // done.
     trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
-    assert(_link);
   }else if(_link==this) {
     int flat_number = INVALID_NODE;
     switch(u) {
