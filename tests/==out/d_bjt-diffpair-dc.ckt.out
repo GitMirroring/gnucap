@@ -58,5 +58,5 @@ difpair ckt - simple differential pair
 Gnucap   System status
 iterations: op=9, dc=0, tran=0, fourier=0, total=243
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=9, subckt=0, model=4, total=13
+nodes: user=13, subckt=0, model=0, total=13
 dctran density=65.7%, ac density=65.7%

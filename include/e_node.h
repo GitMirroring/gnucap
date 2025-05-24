@@ -153,7 +153,6 @@ private:
 public: // BUG
   void clear();
 private:
-  bool node_is_used()const;
   static bool node_is_valid(int i) {
     if (i == INVALID_NODE) { untested();
     }else if (i < 0) { untested();

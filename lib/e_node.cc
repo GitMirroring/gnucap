@@ -37,7 +37,6 @@
 NODE::NODE(const NODE* p)
   :CARD()
 {
-  unreachable();
 }
 /*--------------------------------------------------------------------------*/
 node_t::node_t(node_t& p)
@@ -356,14 +355,6 @@ void node_t::allocate(int u /*, CARD* owner*/)
     // repeat call.
   }else{
   }
-  if(u==2){
-    if(_link == this){
-      // modelnode hack
-      // operator=(&used_node);
-    }else{
-    }
-  }else{
-  }
 
   if(_nnn == &used_node){
     int index = _nnn->user_number();
@@ -423,23 +414,6 @@ void node_t::clear()
   _nnn = nullptr;
   _link = nullptr;
   _dir = dir_none;
-}
-/*--------------------------------------------------------------------------*/
-// indicate that an internal node needs allocation.
-// when contrating nets, some nodes do not.
-// also, when deleting devices, nodes may be unneccessary
-bool node_t::node_is_used() const
-{
-  if(is_node() && is_port()) {
-    // done.
-    trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
-    return false;
-  }else if(n_() == &used_node){
-    incomplete();
-    return true;
-  }else{
-    return _link == this;
-  }
 }
 /*--------------------------------------------------------------------------*/
 int node_t::rank() const
