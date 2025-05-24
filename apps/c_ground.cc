@@ -60,6 +60,8 @@ public:
     assert(np);
     trace2("ground node", name, np->user_number());
     np->set_to_ground();
+    np->set_global();
+    assert(np->is_global());
     trace2("ground node", name, np->user_number());
 
     Scope->push_back(dd);

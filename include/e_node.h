@@ -52,6 +52,9 @@ public:
 
   CARD* clone()const override	{untested(); return new NODE(*this);}
 
+public:
+  NODE* deflate()override;
+
 public: // raw data access (rvalues)
   virtual int user_number()const;
 public: // simple calculated data access (rvalues)
@@ -126,7 +129,7 @@ private:
   node_t*       link() { assert(!_nnn || !_link); return _link; }
   node_t const* link()const { untested();return _link;}
 private: // union find
-  int rank()const {return !!_nnn;} // TODO: hierarchy.
+  int rank()const;
   int inc_rank()const {return 0;} // TODO
   friend node_t* root(node_t const*);
   friend int     rank(node_t const*);
@@ -200,7 +203,7 @@ public:
   void	map_subckt_node(node_t* map_array, const CARD* d);
   bool	is_grounded()const;
   bool	is_connected()const { return _nnn || _link || e_()!=INVALID_NODE; }
-  bool	is_short_to(node_t const& n)const {return root() == n.root();}
+  bool	is_short_to(node_t const& n)const {return &root() == &n.root();}
 
   node_t&     map() {
     if (_nnn) {
@@ -250,7 +253,7 @@ public: // top level kludge. u_sim_data.cc line 457
       assert(nn==&nn->root());
       if(_own){ untested();
 	delete _nnn;
-      }else if(_nnn){ untested();
+      }else if(_nnn){
       }else{
       }
       _nnn = nullptr;
