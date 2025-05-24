@@ -40,6 +40,19 @@ NODE::NODE(const NODE* p)
   unreachable();
 }
 /*--------------------------------------------------------------------------*/
+node_t::node_t(node_t& p)
+  :_nnn(p._nnn),
+   _link(p._link),
+   _index(p._index),
+   _m(p._m)
+{
+  if(_nnn){
+    _nnn = nullptr;
+    _link = &p;
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
 node_t::node_t(const node_t& p)
   :_nnn(p._nnn),
    _link(p._link),
@@ -95,7 +108,7 @@ node_t& node_t::operator=(const node_t& p)
 {
   if(!p.n_()){
   }else{ untested();
-    assert(0);
+    assert(_link!=this);
     // not sure if this is UB, note the const_cast...
   }
   return operator=(const_cast<node_t&>(p));
@@ -160,7 +173,7 @@ LOGIC_NODE& node_t::data()const
     //  d_cccs.2.ckt
     static LOGIC_NODE logic_ground(0);
     return logic_ground;
-  }else{ untested();
+  }else{
     unreachable();
     static LOGIC_NODE logic_ground(0);
     return logic_ground;
@@ -289,11 +302,11 @@ void node_t::new_model_node(const std::string& node_name, CARD* Owner)
   (void) Owner;
   assert(!_nnn);
   node_t* n = find_subset(this);
-//   assert(n);
-//   *n = &used_node;
-//   assert(n->_nnn == &used_node);
-//   assert(!n->_own);
-//   assert(!n->_link);
+   assert(n);
+   *n = &used_node;
+   assert(n->_nnn == &used_node);
+   assert(!n->_own);
+   assert(!n->_link);
 }
 /*--------------------------------------------------------------------------*/
 /* (re)connect a port to an external node making use of index.
@@ -346,7 +359,7 @@ void node_t::allocate(int u /*, CARD* owner*/)
   if(u==2){
     if(_link == this){
       // modelnode hack
-      operator=(&used_node);
+      // operator=(&used_node);
     }else{
     }
   }else{

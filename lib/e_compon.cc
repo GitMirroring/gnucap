@@ -682,6 +682,10 @@ void COMPONENT::set_parameters(const std::string& Label, CARD *Owner,
   obsolete_set_value(Value);
   attach_common(Common);
 
+  for(int i=0; i< node_count; ++i){
+    assert(!Nodes[i].n_());
+  }
+
   assert(node_count <= net_nodes());
   std::copy_n(Nodes, node_count, &n_(0)); // EEEK
 }
