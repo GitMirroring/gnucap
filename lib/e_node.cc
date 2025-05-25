@@ -354,22 +354,14 @@ void node_t::allocate(int u /*, CARD* owner*/)
 void node_t::set_to_ground(CARD* Owner)
 {
   assert(!_link || _link == this);
+  (void) Owner;
   int idx = _index;
   clear();
   assert(!_nnn);
-  new_node("0", Owner);
-  if(Owner){
-    assert(Owner->scope());
-    assert(Owner->scope()->nodes());
-    NODE_MAP& nodes = *Owner->scope()->nodes();
-    _link = &nodes["0"]->n_(0);
-    _index = nodes["0"]->user_number();
-  }else{
-    NODE_MAP& nodes = *CARD_LIST::card_list.nodes();
-    _link = &nodes["0"]->n_(0);
-    // must retain index. connection is in _link...
-    _index = idx;
-  }
+  NODE_MAP& nodes = *CARD_LIST::card_list.nodes();
+  _link = &nodes["0"]->n_(0);
+  // must retain index. connection is in _link...
+  _index = idx;
   _m = 0;
 }
 /*--------------------------------------------------------------------------*/
