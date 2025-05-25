@@ -126,7 +126,7 @@ node_t& node_t::operator=(NODE* n)
     _nnn->purge();
     delete _nnn;
     _own = false;
-  }else{
+  }else{ untested();
   }
   _link = nullptr;
   _nnn = n;
@@ -283,7 +283,18 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
 {
   assert(m);
   if (e_() != INVALID_NODE) {
-    clear(); // keep index.
+   // clear(); // keep index.
+    if(!_nnn){
+    }else if(_own){ untested();
+      _nnn->purge(); // BUG. need to carry along type
+      delete _nnn;
+    }else{
+    }
+    _own = false;
+    _nnn = nullptr;
+    // _link = nullptr;
+    _dir = dir_none;
+
     m[e_()].connect(*this);
     assert(_link);
     assert(!_nnn);
@@ -388,6 +399,8 @@ void node_t::clear()
   }
   _own = false;
   _nnn = nullptr;
+  _link = nullptr;
+  _dir = dir_none;
 }
 /*--------------------------------------------------------------------------*/
 // make a connection to a node, usually further up the hierarchy.
