@@ -118,7 +118,7 @@ private: // other internal
   }
 
 public: // action, used by logic
-  void	      set_event(double delay, LOGICVAL v);
+  void	      set_event(double delay, LOGICVAL v, CARD*);
   void	      force_initial_value(LOGICVAL v);
   void	      propagate();
   void	      unpropagate();
