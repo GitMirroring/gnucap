@@ -232,6 +232,7 @@ public:
   LOGIC_NODE*	    operator->()	{return &data();}
   operator bool()const {return _nnn;}
 
+  node_t& operator=(node_t& p);
   node_t& operator=(const node_t& p);
   node_t& operator=(node_t&& p);
   node_t& operator=(NODE* p);

@@ -70,6 +70,26 @@ node_t::node_t(NODE* n)
   assert(n!=&ground_node || _m==0);
 }
 /*--------------------------------------------------------------------------*/
+node_t& node_t::operator=(node_t& p)
+{
+  if(_own){
+    delete _nnn;
+  }else{
+  }
+  _nnn = nullptr;
+
+  if(!p.n_()){
+    _link = p._link;
+  }else{
+    _link = &p;
+  }
+
+  _index = p._index;// wrong scope ??
+  _m   = p._m;
+  _own = false;
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
 node_t& node_t::operator=(const node_t& p)
 {
   if(_own){
@@ -77,7 +97,14 @@ node_t& node_t::operator=(const node_t& p)
   }else{
   }
   _nnn = nullptr;
-  _link = p._link;
+
+  if(!p.n_()){
+    _link = p._link;
+  }else{ untested();
+    // not sure if this is UB, but using operator=(node_t& p) anyway.
+    _link = const_cast<node_t*>(&p);
+  }
+
   _index = p._index;// wrong scope ??
   _m   = p._m;
   _own = false;
