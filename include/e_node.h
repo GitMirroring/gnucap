@@ -224,6 +224,7 @@ public:
 
   explicit    node_t(int i=INVALID_NODE) : _index(i) {};
 	      node_t(const node_t&);
+	      node_t(node_t&);
 	      node_t(node_t&&);
   explicit    node_t(NODE*);
 	      ~node_t();
