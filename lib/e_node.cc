@@ -231,13 +231,21 @@ XPROBE NODE::ac_probe_ext(const std::string& x)const
   }
 }
 /*--------------------------------------------------------------------------*/
-NODE* NODE::deflate()
+NODE* NODE::allocate(int u, CARD*)
 {
   int flat_number = INVALID_NODE;
-  if(owner()){ untested();
+  switch(u) {
+  case 0:
     flat_number = CKT_BASE::_sim->newnode_subckt();
-  }else{
+    break;
+  case 1:
     flat_number = CKT_BASE::_sim->newnode_user();
+    break;
+  case 2:
+    flat_number = CKT_BASE::_sim->newnode_model();
+    break;
+  default:
+    unreachable();
   }
   NODE* nn = new LOGIC_NODE(flat_number);
   return nn;
@@ -358,7 +366,7 @@ void node_t::allocate(int u, CARD* owner)
 
   if(_nnn == &used_node){
     int index = _nnn->user_number();
-    NODE* nn = _nnn->deflate();
+    NODE* nn = _nnn->allocate(u, owner);
     if(nn!=_nnn){
       nn->set_owner(owner);
       set_own(nn);
