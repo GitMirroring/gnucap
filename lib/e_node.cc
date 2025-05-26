@@ -29,13 +29,14 @@
 #include "u_xprobe.h"
 #include "e_logicnode.h"
 #include "m_union.h"
+#include "u_node.h" // BUG
 /*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
  * supposedly not used, but used by a required function that is also not used
  */
 NODE::NODE(const NODE* p)
-  :CARD(*p)
-{ untested();
+  :CARD()
+{
   unreachable();
 }
 /*--------------------------------------------------------------------------*/
@@ -94,6 +95,7 @@ node_t& node_t::operator=(const node_t& p)
 {
   if(!p.n_()){
   }else{ untested();
+    assert(0);
     // not sure if this is UB, note the const_cast...
   }
   return operator=(const_cast<node_t&>(p));
@@ -122,11 +124,11 @@ node_t& node_t::operator=(NODE* n)
   // clear();
   if(!_nnn){
     _own = false;
-  }else if(_own){ untested();
+  }else if(_own){
     _nnn->purge();
     delete _nnn;
     _own = false;
-  }else{ untested();
+  }else{
   }
   _link = nullptr;
   _nnn = n;
@@ -136,9 +138,11 @@ node_t& node_t::operator=(NODE* n)
 }
 /*--------------------------------------------------------------------------*/
 // take ownership
+NODE used_node(nullptr);
 node_t& node_t::set_own(NODE* n)
 {
   assert(n != &ground_node);
+  assert(n != &used_node);
   operator=(n);
   _own = true; // take ownership.
   return *this;
@@ -215,6 +219,18 @@ XPROBE NODE::ac_probe_ext(const std::string& x)const
   }
 }
 /*--------------------------------------------------------------------------*/
+NODE* NODE::deflate()
+{
+  int flat_number = INVALID_NODE;
+  if(owner()){ untested();
+    flat_number = CKT_BASE::_sim->newnode_subckt();
+  }else{
+    flat_number = CKT_BASE::_sim->newnode_user();
+  }
+  NODE* nn = new LOGIC_NODE(flat_number);
+  return nn;
+}
+/*--------------------------------------------------------------------------*/
 /* new_node: a raw new node, as when a netlist is parsed
  * It's only "new" if this is the first use in this scope.
  * If it is not the first use of this node, it makes a connection.
@@ -272,7 +288,12 @@ void node_t::new_model_node(const std::string& node_name, CARD* Owner)
   (void) node_name;
   (void) Owner;
   assert(!_nnn);
-  find_subset(this);
+  node_t* n = find_subset(this);
+//   assert(n);
+//   *n = &used_node;
+//   assert(n->_nnn == &used_node);
+//   assert(!n->_own);
+//   assert(!n->_link);
 }
 /*--------------------------------------------------------------------------*/
 /* (re)connect a port to an external node making use of index.
@@ -322,32 +343,28 @@ void node_t::allocate(int u /*, CARD* owner*/)
     // repeat call.
   }else{
   }
-  if(is_node() && is_port()) {
-    // done.
-    trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
-  }else if(node_is_used()) {
-    int flat_number = INVALID_NODE;
-    switch(u) {
-    case 0:
-      flat_number = CKT_BASE::_sim->newnode_subckt();
-      break;
-    case 1:
-      flat_number = CKT_BASE::_sim->newnode_user();
-      break;
-    case 2:
-      flat_number = CKT_BASE::_sim->newnode_model();
-      break;
-    default:
-      unreachable();
+  if(u==2){
+    if(_link == this){
+      // modelnode hack
+      operator=(&used_node);
+    }else{
     }
-    trace3("node_t::allocate new", this, &root(), flat_number);
-    NODE* nn = new LOGIC_NODE(flat_number);
-    nn->set_owner(nullptr);
-    set_own(nn);
-    set_output();
-    assert(is_node() && is_port());
   }else{
-    trace2("node_t::allocate no allocate", _index, u);
+  }
+
+  if(_nnn == &used_node){
+    int index = _nnn->user_number();
+    NODE* nn = _nnn->deflate();
+    if(nn!=_nnn){
+      nn->set_owner(nullptr); // here?
+      set_own(nn);
+      _index = index;
+    }else{ untested();
+      assert(dynamic_cast<USER_NODE const*>(_nnn));
+    }
+  }else if(!_nnn){
+  }else if(_nnn == &ground_node){
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -400,11 +417,28 @@ void node_t::clear()
 // also, when deleting devices, nodes may be unneccessary
 bool node_t::node_is_used() const
 {
-  if(n_()){
+  if(is_node() && is_port()) {
+    // done.
+    trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
+    return false;
+  }else if(n_() == &used_node){
     incomplete();
     return true;
   }else{
     return _link == this;
+  }
+}
+/*--------------------------------------------------------------------------*/
+int node_t::rank() const
+{
+  if(!_nnn){
+    return 0;
+  }else if(_nnn==&ground_node){
+    return 3;
+  }else if(auto u = dynamic_cast<USER_NODE const*>(_nnn)){
+    return 1 + u->is_global();
+  }else{
+    return 1;
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -417,9 +451,20 @@ bool node_t::node_is_used() const
 // - map to resulting structure
 void node_t::connect(node_t& target)
 {
-  build_union(&target, this);
+  node_t* root = build_union(&target, this);
   assert(_nnn || _link);
   assert(!_nnn || !_link);
+  if(root->_nnn == &ground_node){
+ // }else if(root->_nnn && root->_nnn->is_global()){
+  }else{
+    if(root->_own){
+      delete root->_nnn;
+    }else{
+    }
+    root->_nnn = &used_node;
+    root->_link = nullptr;
+    root->_own = false;
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
