@@ -145,7 +145,7 @@ public:
   bool is_input()const {return _dir & dir_in; }
   bool is_output()const {return _dir & dir_out; }
   bool is_inout()const {return _dir == dir_none || _dir == dir_io; }
-  void allocate(int u=0);
+  void allocate(int u=0, CARD* owner=nullptr);
 private:
   int _index{INVALID_NODE}; // index in node map
   int _m{INVALID_NODE};	// mapped, after reordering
@@ -153,7 +153,6 @@ private:
 public: // BUG
   void clear();
 private:
-  bool node_is_used()const;
   static bool node_is_valid(int i) {
     if (i == INVALID_NODE) { untested();
     }else if (i < 0) { untested();

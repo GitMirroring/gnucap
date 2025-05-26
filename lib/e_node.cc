@@ -29,15 +29,14 @@
 #include "u_xprobe.h"
 #include "e_logicnode.h"
 #include "m_union.h"
-#include "u_node.h" // BUG
+#include "u_node.h" // rank
 /*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
  * supposedly not used, but used by a required function that is also not used
  */
-NODE::NODE(const NODE* p)
+NODE::NODE(const NODE*)
   :CARD()
 {
-  unreachable();
 }
 /*--------------------------------------------------------------------------*/
 node_t::node_t(node_t& p)
@@ -349,19 +348,11 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
 // 0: subckt, module, DEV_SUBCKT "subckt_node"
 // 1: top level                  "user_node"
 // 2: misc device internal nodes "model_node"
-void node_t::allocate(int u /*, CARD* owner*/)
+void node_t::allocate(int u, CARD* owner)
 {
   if(_nnn == &ground_node){
   }else if(is_node() && CKT_BASE::_sim->is_first_expand()) {
     // repeat call.
-  }else{
-  }
-  if(u==2){
-    if(_link == this){
-      // modelnode hack
-      // operator=(&used_node);
-    }else{
-    }
   }else{
   }
 
@@ -369,11 +360,11 @@ void node_t::allocate(int u /*, CARD* owner*/)
     int index = _nnn->user_number();
     NODE* nn = _nnn->deflate();
     if(nn!=_nnn){
-      nn->set_owner(nullptr); // here?
+      nn->set_owner(owner);
       set_own(nn);
       _index = index;
     }else{ untested();
-      assert(dynamic_cast<USER_NODE const*>(_nnn));
+     // assert(dynamic_cast<USER_NODE const*>(_nnn));
     }
   }else if(!_nnn){
   }else if(_nnn == &ground_node){
@@ -423,23 +414,6 @@ void node_t::clear()
   _nnn = nullptr;
   _link = nullptr;
   _dir = dir_none;
-}
-/*--------------------------------------------------------------------------*/
-// indicate that an internal node needs allocation.
-// when contrating nets, some nodes do not.
-// also, when deleting devices, nodes may be unneccessary
-bool node_t::node_is_used() const
-{
-  if(is_node() && is_port()) {
-    // done.
-    trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
-    return false;
-  }else if(n_() == &used_node){
-    incomplete();
-    return true;
-  }else{
-    return _link == this;
-  }
 }
 /*--------------------------------------------------------------------------*/
 int node_t::rank() const

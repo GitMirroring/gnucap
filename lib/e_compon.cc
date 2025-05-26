@@ -687,7 +687,7 @@ void COMPONENT::set_parameters(const std::string& Label, CARD *Owner,
   }
 
   assert(node_count <= net_nodes());
-  std::copy_n(Nodes, node_count, &n_(0)); // EEEK
+  std::copy_n(Nodes, node_count, &n_(0));
 }
 /*--------------------------------------------------------------------------*/
 /* set_slave: force evaluation whenever the owner is evaluated.
