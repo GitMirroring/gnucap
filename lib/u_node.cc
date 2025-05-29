@@ -26,7 +26,10 @@
 /*--------------------------------------------------------------------------*/
 double USER_NODE::tr_probe_num(const std::string& s) const
 {
-  if(_n) {
+  if(_n.n_() == this){ untested();
+    // not allocated, not used
+    return NOT_VALID;
+  }else if(_n) {
     return _n->tr_probe_num(s);
   }else{
     return NOT_VALID;
@@ -35,7 +38,10 @@ double USER_NODE::tr_probe_num(const std::string& s) const
 /*--------------------------------------------------------------------------*/
 XPROBE USER_NODE::ac_probe_ext(const std::string& s) const
 {
-  if(_n) {
+  if(_n.n_() == this){ untested();
+    // not allocated, not used
+    return XPROBE(NOT_VALID);
+  }else if(_n){
     return _n->ac_probe_ext(s);
   }else{ untested();
     return XPROBE(NOT_VALID);
