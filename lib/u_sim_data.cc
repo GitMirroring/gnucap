@@ -275,10 +275,20 @@ static void map_toplevel_nodes(CARD_LIST* scope)
   // assert(top_nodes[0].n_() == &ground_node);
 
   for (int i=0; i<top_nodes.size(); ++i) {
-    top_nodes[i].clear();
+    top_nodes[i].clear(); // needed?
+    assert(!top_nodes[i].is_port());
+  }
+  for (NODE_MAP::iterator p = top_nodes.begin(); p != top_nodes.end(); ++p ){
+    NODE* n = (*p).second;
+    assert(n->net_nodes()==1);
+    int u = n->user_number();
+    assert(u>=0);
+    assert(u<=top_nodes.size());
+    top_nodes[u] = p->second;
   }
   top_nodes[0] = &ground_node;
   top_nodes[0].set_output();
+  assert(top_nodes[0].n_() == &ground_node);
 
   for (CARD_LIST::iterator ci = scope->begin(); ci != scope->end(); ++ci) {
     // for each card in card_list
@@ -292,28 +302,40 @@ static void map_toplevel_nodes(CARD_LIST* scope)
     }
   }
 
+  assert(top_nodes[0].n_() == &ground_node);
+  for (int i=0; i<top_nodes.size(); ++i) {
+    trace2("list top", i, rank(&top_nodes[i]));
+  }
+
   // also map USER_NODEs
   for (NODE_MAP::iterator p = top_nodes.begin(); p != top_nodes.end(); ++p ){
     USER_NODE* un = dynamic_cast<USER_NODE*>((*p).second);
     NODE* n = (*p).second;
     assert(n->net_nodes()==1);
+    trace2("map UN", p->first, un->user_number());
 
     if(un->user_number()==0){
+      // assert(un->is_global()); why not? BUG?
       n->n_(0).map_subckt_node(&top_nodes[0], nullptr);
+      assert(top_nodes[0].n_() == &ground_node);
     }else if(un->is_global()){
       // node has link. must be global.. map as usual
       n->n_(0).map_subckt_node(&top_nodes[0], nullptr);
+      assert(top_nodes[0].n_() == &ground_node); // ???
     }else{
       // just link, but do not mark for allocation.
       int u = n->user_number();
       assert(u == n->n_(0).e_());
       n->n_(0).clear();
       n->n_(0).link_to(&top_nodes[u]);
+      assert(top_nodes[0].n_() == &ground_node);
     }
+    assert(top_nodes[0].n_() == &ground_node);
     assert((*p).first == n->short_label()); // BUG: redundant storage.
 					    // use std::set and c++14?
   }
 
+  assert(top_nodes[0].n_() == &ground_node);
 }
 /*--------------------------------------------------------------------------*/
 /* init: allocate, set up, etc ... for any type of simulation
@@ -363,9 +385,11 @@ void SIM_DATA::alloc_hold_vectors(CARD_LIST* scope)
 
   assert(!_nstat);
   _nstat = true;
+  assert(top_nodes[0].n_() == &ground_node);
 
   assert(top_nodes.size());
   for (int ii=top_nodes.size(); --ii;) {
+    trace2("list alloc", ii, &top_nodes[ii]);
     top_nodes[ii].allocate(1 /*bump user node count*/);
   }
 

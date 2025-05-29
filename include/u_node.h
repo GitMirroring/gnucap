@@ -43,6 +43,7 @@ public:
   void set_to_ground() { _global=true; _n.set_to_ground(nullptr); }
   void set_global() { _global=true; }
   bool is_global()const {return _global;}
+  NODE* deflate()override {return this;}
 private: // probe proxy
   double	tr_probe_num(const std::string&)const override;
   XPROBE	ac_probe_ext(const std::string&)const override;
