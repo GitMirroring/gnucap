@@ -9,10 +9,10 @@ h1.x.b: can't find subckt: logicinv1, forcing digital
 Gnucap   System status
 iterations: op=0, dc=3, tran=0, fourier=0, total=3
 transient timesteps: accepted=0, rejected=0, total=0
-nodes: user=9, subckt=0, model=0, total=9
+nodes: user=7, subckt=2, model=0, total=9
 dctran density=11.1%, ac density=11.1%
 name   ...
-have 9 nodes. model: 0 sckt: 0
+have 9 nodes. model: 0 sckt: 2
 
 logic
 mypmos

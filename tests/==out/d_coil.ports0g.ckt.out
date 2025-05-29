@@ -28,7 +28,7 @@ Mutual inductance portdump, 2a only, with extra ground
  316.23     0.99437    0.090258   0.081619  
  1.K        0.99943    0.028812   0.026134  
 name   ...
-have 11 nodes. model: 0 sckt: 0
+have 11 nodes. model: 6 sckt: 0
 
 
 trans3a 6 8 0
@@ -170,10 +170,10 @@ rg 2 2 0
 Gnucap   System status
 iterations: op=0, dc=0, tran=351, fourier=0, total=488
 transient timesteps: accepted=116, rejected=3, total=119
-nodes: user=11, subckt=0, model=0, total=11
+nodes: user=5, subckt=0, model=6, total=11
 dctran density=62.0%, ac density=62.0%
 name   ...
-have 11 nodes. model: 0 sckt: 0
+have 11 nodes. model: 6 sckt: 0
 
 
 trans3a 6 8 0

@@ -53,7 +53,7 @@ public:
   CARD* clone()const override	{untested(); return new NODE(*this);}
 
 public:
-  NODE* deflate()override;
+  virtual NODE* allocate(int, CARD*);
 
 public: // raw data access (rvalues)
   virtual int user_number()const;

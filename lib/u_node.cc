@@ -26,7 +26,7 @@
 /*--------------------------------------------------------------------------*/
 double USER_NODE::tr_probe_num(const std::string& s) const
 {
-  if(_n.n_() == this){ untested();
+  if(_n.n_() == this){
     // not allocated, not used
     return NOT_VALID;
   }else if(_n) {
