@@ -324,7 +324,7 @@ void node_t::allocate(int u /*, CARD* owner*/)
     // repeat call.
   }else{
   }
-  if(is_node()) {
+  if(is_node() && !is_port()) {
     // done.
     trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
   }else if(_link==this) {
@@ -346,6 +346,8 @@ void node_t::allocate(int u /*, CARD* owner*/)
     NODE* nn = new LOGIC_NODE(flat_number);
     nn->set_owner(nullptr);
     set_own(nn);
+    set_output();
+    assert(is_node() && !is_port());
   }else{
     trace2("node_t::allocate no allocate", _index, u);
   }
