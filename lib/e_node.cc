@@ -131,7 +131,7 @@ node_t& node_t::operator=(node_t&& p)
 node_t& node_t::operator=(NODE* n)
 {
   assert(n);
-  assert(!_link || _link == this);
+  assert(!_link || !_nnn);
   // clear();
   if(!_nnn){
     _own = false;
