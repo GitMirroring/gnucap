@@ -277,11 +277,8 @@ static void map_toplevel_nodes(CARD_LIST* scope)
   for (int i=0; i<top_nodes.size(); ++i) {
     top_nodes[i].clear();
   }
-#if 0
-  top_nodes[0].set_to_ground(nullptr); // link_to(top_nodes["0"]);
-#else
   top_nodes[0] = &ground_node;
-#endif
+  top_nodes[0].set_output();
 
   for (CARD_LIST::iterator ci = scope->begin(); ci != scope->end(); ++ci) {
     // for each card in card_list
