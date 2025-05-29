@@ -338,7 +338,7 @@ void node_t::allocate(int u /*, CARD* owner*/)
   if(is_node() && is_port()) {
     // done.
     trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
-  }else if(_link==this) {
+  }else if(node_is_used()) {
     int flat_number = INVALID_NODE;
     switch(u) {
     case 0:
@@ -414,6 +414,19 @@ void node_t::clear()
   _nnn = nullptr;
   _link = nullptr;
   _dir = dir_none;
+}
+/*--------------------------------------------------------------------------*/
+// indicate that an internal node needs allocation.
+// when contrating nets, some nodes do not.
+// also, when deleting devices, nodes may be unneccessary
+bool node_t::node_is_used() const
+{
+  if(n_()){
+    incomplete();
+    return true;
+  }else{
+    return _link == this;
+  }
 }
 /*--------------------------------------------------------------------------*/
 // make a connection to a node, usually further up the hierarchy.
