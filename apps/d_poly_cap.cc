@@ -259,8 +259,8 @@ void DEV_CPOLY_CAP::set_parameters(const std::string& Label, CARD *Owner,
 
   set_label(Label);
   set_owner(Owner);
-  set_value(Value);
   attach_common(Common);
+  set_value(Value);
 
   if (first_time) {
     _n_ports = n_nodes/2; // sets num_nodes() = _n_ports*2
