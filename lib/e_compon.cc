@@ -249,7 +249,7 @@ std::string COMMON_COMPONENT::param_value(int)const
   untested(); return "";
 }
 /*--------------------------------------------------------------------------*/
-void COMMON_COMPONENT::precalc_last(const CARD_LIST* Scope)
+void COMMON_COMPONENT::precalc_last(const PARAM_LIST* Scope)
 {
   assert(Scope);
 }
@@ -546,7 +546,7 @@ void COMPONENT::precalc_first()
   CARD::precalc_first();
   if (has_common()) {
     try {
-      mutable_common()->precalc_first(scope());
+      mutable_common()->precalc_first(scope()->params());
     }catch (Exception_Precalc& e) {untested();
       error(bWARNING, long_label() + ": " + e.message());
     }
@@ -578,7 +578,7 @@ void COMPONENT::precalc_last()
     COMMON_COMPONENT* c = common()->clone();
     assert(c);
     try {
-      c->precalc_last(scope());
+      c->precalc_last(scope()->params());
     }catch (Exception_Precalc& e) {
       error(bWARNING, long_label() + ": " + e.message());
     }catch (Exception& e) {
