@@ -64,10 +64,12 @@ NODE::~NODE()
 /*--------------------------------------------------------------------------*/
 void NODE::tr_advance_recursive()
 {
-  if (tr_needs_advance()) {untested();
+  if (!subckt()){
+    assert(m_()==0);
+  }else if (tr_needs_advance()) {
     assert(subckt());
     subckt()->tr_advance_recursive();
-  }else{untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -418,7 +420,7 @@ bool node_t::is_grounded() const
 
   if(&root()==this){
     return false;
-  }else if(root().is_grounded()){ untested();
+  }else if(root().is_grounded()){
     return true;
   }else{itested();
     return false;

@@ -328,7 +328,7 @@ CARD_LIST& CARD_LIST::tr_advance()
 //#include "trace_on.h"
 CARD_LIST& CARD_LIST::tr_advance_dummy()
 {
-  for (iterator ci=begin(); ci!=end(); ++ci) {
+  for (iterator ci=begin(); ci!=end(); ++ci) {untested();
     //trace_func_comp();
     if (!(**ci).is_device()) {untested();
       trace1("ok-not-device", (**ci).long_label());
@@ -346,7 +346,7 @@ CARD_LIST& CARD_LIST::tr_advance_dummy()
  */
 CARD_LIST& CARD_LIST::tr_advance_recursive()
 {
-  for (iterator ci=begin(); ci!=end(); ++ci) {untested();
+  for (iterator ci=begin(); ci!=end(); ++ci) {
     trace_func_comp();
     (**ci).tr_advance_recursive();
   }

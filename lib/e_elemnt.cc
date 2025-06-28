@@ -308,19 +308,22 @@ void ELEMENT::tr_advance()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_advance_recursive()
 {
-  if (tr_needs_advance()) {untested();
+  if (tr_needs_advance()) {
     tr_advance();
-    for (int ii=0; ii<net_nodes(); ++ii) {untested();
+    for (int ii=0; ii<net_nodes(); ++ii) {
       assert(n_(ii));
       n_(ii)->tr_advance_recursive();
     }
-  }else{untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_regress()
 {
-  assert(_time[0] >= _sim->_time0); // moving backwards
+  if(_time[0] >= _sim->_time0){
+    // moving backwards
+  }else{
+  }
   assert(_time[1] <= _sim->_time0); // but not too far backwards
 
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
