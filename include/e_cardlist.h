@@ -130,6 +130,7 @@ public:
   CARD_LIST& tr_restore();
   CARD_LIST& dc_advance();
   CARD_LIST& tr_advance();
+  CARD_LIST& tr_advance_dummy();
   CARD_LIST& tr_advance_recursive();
   CARD_LIST& tr_regress();
   bool	     tr_needs_eval()const;

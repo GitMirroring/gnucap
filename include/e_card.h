@@ -89,8 +89,8 @@ public:	// dc-tran
   virtual void	 tr_advance()		{}
   virtual void	 tr_advance_recursive()	{incomplete();}
   virtual void	 tr_regress()		{}
-  virtual bool	 tr_needs_advance()const {
-    bool status = _adv_iter < _sim->_iter[iTOTAL];
+	  bool	 tr_needs_advance()const {
+    bool status = _adv_iter != _sim->_iter[iTOTAL];
     _adv_iter = _sim->_iter[iTOTAL];
     return status;
   }
