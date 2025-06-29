@@ -148,6 +148,7 @@ private: // no-ops for prototype
   void precalc_first()override {}
   void expand()override {}
   void precalc_last()override {}
+  void make_fanout()override {}
   void map_nodes()override {}
   void tr_begin()override {}
   void tr_load()override {}
@@ -197,6 +198,7 @@ private: // no-ops for prototype
   void precalc_first()override {}
   void expand()override {}
   void precalc_last()override {}
+  void make_fanout()override {}
   void map_nodes()override {}
   void tr_begin()override {}
   void tr_load()override {}
