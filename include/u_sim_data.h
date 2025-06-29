@@ -41,17 +41,17 @@ enum TRI_STATE {tsNO=0, tsYES=1, tsBAD=-1};
 class EVENT {
 private:
   double    _time  {NEVER};
-  const CKT_BASE* _owner {nullptr};
+  CARD* _owner {nullptr};
   EVENT() = delete;
 public:
-  EVENT(double Time, const CKT_BASE* Owner)
+  EVENT(double Time, CARD* Owner)
     : _time(Time), _owner(Owner) {}
   EVENT(const EVENT& E)
     : _time(E._time), _owner(E._owner) {}
   ~EVENT() {}
   operator double() const {return _time;}
   double time() const     {return _time;}
-  const CKT_BASE* owner() const {untested(); assert(_owner); return _owner;}
+  CARD* owner() const {assert(_owner); return _owner;}
 };
 /*--------------------------------------------------------------------------*/
 struct INTERFACE SIM_DATA {
@@ -138,7 +138,7 @@ public:
     case tsNO:  break;
     }
   }
-  double new_event(double Time, const CKT_BASE* Owner=NULL) {
+  double new_event(double Time, CARD* Owner=nullptr) {
     assert(Time <= BIGBIG);
     double time;
     if (_dtmin <= 0.) {

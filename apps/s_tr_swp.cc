@@ -305,6 +305,7 @@ bool TRANSIENT::next()
   TIME_t newtime(_time_by_user_request);
   TIME_t new_dt = newtime - reftime;
   STEP_CAUSE new_control = scUSER;
+  _event_device = nullptr;
   check_consistency2();
   
   // event queue, events that absolutely will happen
@@ -317,6 +318,7 @@ bool TRANSIENT::next()
     newtime = TIME_t(_sim->_eq.top());
     new_dt = newtime - reftime;
     new_control = scEVENTQ;
+    _event_device = _sim->_eq.top().owner();
     check_consistency2();
   }else{//43111
   }

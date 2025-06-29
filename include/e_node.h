@@ -58,6 +58,7 @@ public: // simple calculated data access (rvalues)
   virtual int matrix_number()const;
   int	m_()const		{return matrix_number();}
 public: // virtuals
+  void		tr_advance_recursive()override;
   double	tr_probe_num(const std::string&)const override;
   XPROBE	ac_probe_ext(const std::string&)const override;
 
