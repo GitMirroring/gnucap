@@ -40,7 +40,7 @@ LOGIC_NODE::LOGIC_NODE(int i)
    _quality(qBAD),
    _failure_mode("initial")
 {
-  if(i!=-1){ untested();
+  if(i!=-1){
   }else{ untested();
   }
 }
