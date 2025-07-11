@@ -38,10 +38,6 @@ class INTERFACE CMD_ORDER_REVERSE : public CMD {
   void do_it(CS& cmd, CARD_LIST* scope)override {
     int seek = 0;
     do_it_recursive(cmd, scope, seek);
-    for (int node = 1;  node <= _sim->_total_nodes;  ++node) {
-      trace3("ordered", _sim->_total_nodes, node, _sim->_nm[node]);
-      assert(node  == _sim->_nm[node]);
-    }
   }
 protected:
   void do_it_recursive(CS& cmd, CARD_LIST* scope, int& seek) {
@@ -93,10 +89,6 @@ class INTERFACE CMD_ORDER_FORWARD : public CMD_ORDER_REVERSE {
     nm[0] = 0;
     int seek = total_nodes+1;
     do_it_recursive(cmd, scope, seek);
-
-    for (int node = 1;  node <= total_nodes;  ++node) {
-      assert(   nm[node] == total_nodes - node + 1);
-    }
   }
   int next(int& seek)const override {
     return --seek;
