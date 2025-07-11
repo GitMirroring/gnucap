@@ -99,7 +99,7 @@ C28    36  37  150.p
 E2     34   0  32  33  10.K
 E3     37   0  35  36  10.K
 .ends eq
-.option order=reverse
+.option order=trace
 .print op iter(0) v(1) v(2)
 .print dc v(2)
 .print ac vm(2) vdb(2) vp(2)

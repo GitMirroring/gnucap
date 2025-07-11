@@ -26,6 +26,7 @@
 #include "e_cardlist.h"
 #include "e_compon.h"
 #include "e_logicnode.h"
+#include "e_elemnt.h"
 #include "c_comand.h"
 /*--------------------------------------------------------------------------*/
 namespace {
@@ -35,43 +36,43 @@ namespace {
  *  subcircuits at beginning, results on border at the bottom
  */
 class INTERFACE CMD_ORDER_REVERSE : public CMD {
-  void do_it(CS& cmd, CARD_LIST* scope)override {
+  void do_it(CS& cmd, CARD_LIST* scope)override { untested();
     int seek = 0;
     do_it_recursive(cmd, scope, seek);
   }
 protected:
-  void do_it_recursive(CS& cmd, CARD_LIST* scope, int& seek) {
+  void do_it_recursive(CS& cmd, CARD_LIST* scope, int& seek) { untested();
     assert(scope);
-    for (CARD_LIST::reverse_iterator ci=scope->rbegin(); ci!=scope->rend(); ++ci) {
-      if(CARD_LIST* s=(**ci).subckt()){
+    for (CARD_LIST::reverse_iterator ci=scope->rbegin(); ci!=scope->rend(); ++ci) { untested();
+      if(CARD_LIST* s=(**ci).subckt()){ untested();
 	do_it_recursive(cmd, s, seek);
-      }else{
+      }else{ untested();
       }
-      if(COMPONENT* c=dynamic_cast<COMPONENT*>(*ci)) {
-	for(int i=c->ext_nodes()+c->int_nodes(); i>c->net_nodes();){
+      if(COMPONENT* c=dynamic_cast<COMPONENT*>(*ci)) { untested();
+	for(int i=c->ext_nodes()+c->int_nodes(); i>c->net_nodes();){ untested();
 	  number(c->n_(--i), seek);
 	}
-      }else{
+      }else{ untested();
       }
     }
     assert(scope->nodes());
     NODE_MAP& n = *scope->nodes();
-    for(int i = n.size(); i;) {
+    for(int i = n.size(); i;) { untested();
       number(n[--i], seek);
     }
   }
-  virtual int next(int& seek)const {
+  virtual int next(int& seek)const { untested();
     return ++seek;
   }
 private:
-  void number(node_t& n, int& seek)const {
+  void number(node_t& n, int& seek)const { untested();
     int flat = n->flat_number();
     int* nm = _sim->_nm; // TODO: use scope
-    if(!n.n_()) {
+    if(!n.n_()) { untested();
       // link to another node. possibly further up. ignore
-    }else if(flat == 0){
+    }else if(flat == 0){ untested();
     }else if(flat == INVALID_NODE){ untested();
-    }else if(nm[flat] == INVALID_NODE){
+    }else if(nm[flat] == INVALID_NODE){ untested();
       nm[flat] = next(seek);
     }else{ untested();
     }
@@ -83,18 +84,69 @@ DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "order_reverse|order_auto", &p0
  * results in border at the top (worst possible if lots of subcircuits)
  */
 class INTERFACE CMD_ORDER_FORWARD : public CMD_ORDER_REVERSE {
-  void do_it(CS& cmd, CARD_LIST* scope)override {
+  void do_it(CS& cmd, CARD_LIST* scope)override { untested();
     int* nm = _sim->_nm; // TODO: use scope
     int total_nodes = _sim->_total_nodes;
     nm[0] = 0;
     int seek = total_nodes+1;
     do_it_recursive(cmd, scope, seek);
   }
-  int next(int& seek)const override {
+  int next(int& seek)const override { untested();
     return --seek;
   }
 }p1;
 DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "order_forward", &p1);
+/*--------------------------------------------------------------------------*/
+class INTERFACE CMD_ORDER_TRACE : public CMD {
+  void do_it(CS&, CARD_LIST* scope)override {
+    int seek = 0;
+   // seek = _sim->_total_nodes+1;
+    do_it_recursive(scope, seek);
+  }
+protected:
+  void do_it_recursive(CARD_LIST* scope, int& seek)const {
+    assert(scope);
+    for (CARD_LIST::reverse_iterator ci=scope->rbegin(); ci!=scope->rend(); ++ci) {
+      if(CARD_LIST* s=(**ci).subckt()){
+	do_it_recursive(s, seek);
+      }else{
+      }
+      if(COMPONENT* c=dynamic_cast<COMPONENT*>(*ci)) {
+	for(int i=c->ext_nodes()+c->int_nodes(); i>c->net_nodes();){ untested();
+	  number(c->n_(--i), seek);
+	}
+      }else{ untested();
+      }
+    }
+    assert(scope->nodes());
+    NODE_MAP& n = *scope->nodes();
+    for(int i = n.size(); i;) {
+      number(n[--i], seek);
+    }
+  }
+  virtual int next(int& seek)const {
+    return ++seek;
+    return --seek;
+  }
+private:
+  void number(node_t& n, int& seek)const {
+    int flat = n->flat_number();
+    int* nm = _sim->_nm; // TODO: use scope
+    if(!n.n_()) {
+      // link to another node. possibly further up. ignore
+    }else if(flat == 0){
+    }else if(flat == INVALID_NODE){ untested();
+    }else if(nm[flat] == INVALID_NODE){
+      nm[flat] = next(seek);
+      if(n->subckt()){
+	do_it_recursive(n->subckt(), seek);
+      }else{ untested();
+      }
+    }else{ untested();
+    }
+  }
+}p2;
+DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "order_trace", &p2);
 /*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/

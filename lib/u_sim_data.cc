@@ -231,6 +231,9 @@ void SIM_DATA::map__nodes(CARD_LIST* scope)
     error(bDANGER, "invalid order spec: %d\n", OPT::order);
   }
   ::status.order.stop();
+  for (int node = 1;  node <= _total_nodes;  ++node) {
+    trace2("order", node, _nm[node]);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
