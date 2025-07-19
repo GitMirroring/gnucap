@@ -38,43 +38,38 @@ namespace {
 class DEV_D_A : public ELEMENT {
 public:
   enum {OUTNODE=0,BEGIN_IN=1}; //node labels
-  enum {PORTS_PER_GATE = 10};
 private:
-  int		_lastchangenode;
-  int		_quality;
-  std::string	_failuremode;
-  smode_t	_gatemode;
   static int	_count;
-  mutable node_t _nodes[PORTS_PER_GATE];	/* PORTS_PER_GATE <= PORTSPERSUBCKT */
+  mutable node_t _nodes[2];
 public:
   explicit	DEV_D_A(COMMON_COMPONENT* c=nullptr);
   explicit	DEV_D_A(const DEV_D_A& p);
 		~DEV_D_A()		{--_count;}
 private: // override virtuals
-  char	   id_letter()const override	{return 'U';}
+  char	   id_letter()const override	{return '\0';}
   std::string value_name()const override{return "";}
   bool	      print_type_in_spice()const override{return true;}
   std::string dev_type()const override{assert(has_common()); return common()->name();}
   int	   tail_size()const override {return 2;}
-  int	   max_nodes()const override {return PORTS_PER_GATE;}
-  int	   min_nodes()const override {return BEGIN_IN+1;}
-  int	   matrix_nodes()const override	{ untested();return 2;}
+  int	   max_nodes()const override {return 2;}
+  int	   min_nodes()const override {return 2;}
+  int	   matrix_nodes()const override	{untested(); return 1;}
   int	   net_nodes()const override {return _net_nodes;}
 
-  CARD*	   clone()const override {return NULL;} ////////new DEV_D_A(*this);}
-  void	   precalc_first()override {ELEMENT::precalc_first();}
+  CARD*	   clone()const override	{return new DEV_D_A(*this);}
+  //void   precalc_first() override
   void	   expand()override;
-  void	   precalc_last() override;
+  //void   precalc_last() override
   //void   map_nodes();
 
-  //void   tr_iwant_matrix()override;
-  void	   tr_begin()override;
-  void	   tr_restore()override;
+  void	   tr_iwant_matrix()override {}
+  //void   tr_begin()override;
+  //void   tr_restore()override;
   void	   dc_advance()override;
   void	   tr_advance()override;
   void	   tr_regress()override;
   bool	   tr_needs_eval()const override;
-  void	   tr_queue_eval()override;
+  //void   tr_queue_eval()override;
   bool	   do_tr()override;
   void	   tr_load()override;
   void	   tr_unload()override;
@@ -87,8 +82,8 @@ private: // override virtuals
   //double tr_amps()const		//ELEMENT
   double   tr_probe_num(const std::string&)const override;
 
-  void	   ac_iwant_matrix()override;
-  void	   ac_begin()override;
+  void	   ac_iwant_matrix()override {}
+  void	   ac_begin()override {}
   void	   do_ac()override	{untested();}
   void	   ac_load()override	{untested();}
   COMPLEX  ac_involts()const override	{ untested();unreachable(); return 0.;}
@@ -96,132 +91,23 @@ private: // override virtuals
   XPROBE   ac_probe_ext(const std::string&)const override;
 
   node_t& n_(int i)const override {
-    assert(_nodes); assert(i>=0); assert(i<PORTS_PER_GATE); return _nodes[i];
+    assert(_nodes); assert(i>=0); assert(i<max_nodes()); return _nodes[i];
   }
   std::string port_name(int i)const override {
     assert(i >= 0);
-    assert(i < PORTS_PER_GATE);
+    assert(i < max_nodes());
     const COMMON_LOGIC* c = dynamic_cast<const COMMON_LOGIC*>(common());
     assert(c);
     return c->port_name(i);
-    //static std::string names[PORTS_PER_GATE] = {"out",
+    //static std::string names[max_nodes()] = {"out",
     //    "in1", "in2", "in3", "in4", "in5", "in6", "in7", "in8", "in9"};
     //return names[i];
   }
 public:
   static int count()			{untested();return _count;}
 private:
-  bool	   tr_eval_digital();
-  bool	   want_analog()const {return false;}
-  bool	   want_digital()const {return true;}
-};
-/*--------------------------------------------------------------------------*/
-class LOGIC_AND : public COMMON_LOGIC {
-private:
-  explicit LOGIC_AND(const LOGIC_AND& p) :COMMON_LOGIC(p){++_count;}
-  COMMON_COMPONENT* clone()const override{return new LOGIC_AND(*this);}
-public:
-  explicit LOGIC_AND(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n,  int incount)const override {
-    LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {
-      out &= n[ii]->lv();
-    }
-    return out;
-  }
-  std::string name()const override	  {return "xxand";}
-};
-/*--------------------------------------------------------------------------*/
-class LOGIC_NAND : public COMMON_LOGIC {
-private:
-  explicit LOGIC_NAND(const LOGIC_NAND&p):COMMON_LOGIC(p){++_count;}
-  COMMON_COMPONENT* clone()const override {return new LOGIC_NAND(*this);}
-public:
-  explicit LOGIC_NAND(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override {
-    LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {
-      out &= n[ii]->lv();
-    }
-    return ~out;
-  }
-  std::string name()const override	  {return "xxnand";}
-};
-/*--------------------------------------------------------------------------*/
-class LOGIC_OR : public COMMON_LOGIC {
-private:
-  explicit LOGIC_OR(const LOGIC_OR& p)	 :COMMON_LOGIC(p){itested();++_count;}
-  COMMON_COMPONENT* clone()const override {itested(); return new LOGIC_OR(*this);}
-public:
-  explicit LOGIC_OR(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override{untested();
-    LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {untested();
-      out |= n[ii]->lv();
-    }
-    return out;
-  }
-  std::string name()const override	  {itested();return "xxor";}
-};
-/*--------------------------------------------------------------------------*/
-class LOGIC_NOR : public COMMON_LOGIC {
-private:
-  explicit LOGIC_NOR(const LOGIC_NOR& p) :COMMON_LOGIC(p) {++_count;}
-  COMMON_COMPONENT* clone()const override {return new LOGIC_NOR(*this);}
-public:
-  explicit LOGIC_NOR(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override {
-    LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {
-      out |= n[ii]->lv();
-    }
-    return ~out;
-  }
-  std::string name()const override	  {return "xxnor";}
-};
-/*--------------------------------------------------------------------------*/
-class LOGIC_XOR : public COMMON_LOGIC {
-private:
-  explicit LOGIC_XOR(const LOGIC_XOR& p) :COMMON_LOGIC(p){itested();++_count;}
-  COMMON_COMPONENT* clone()const override {itested(); return new LOGIC_XOR(*this);}
-public:
-  explicit LOGIC_XOR(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override {untested();
-    LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {untested();
-      out ^= n[ii]->lv();
-    }
-    return out;
-  }
-  std::string name()const override	  {itested();return "xxxor";}
-};
-/*--------------------------------------------------------------------------*/
-class LOGIC_XNOR : public COMMON_LOGIC {
-private:
-  explicit LOGIC_XNOR(const LOGIC_XNOR&p):COMMON_LOGIC(p){itested();++_count;}
-  COMMON_COMPONENT* clone()const override {itested(); return new LOGIC_XNOR(*this);}
-public:
-  explicit LOGIC_XNOR(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int incount)const override {untested();
-    LOGICVAL out(n[0]->lv());
-    for (int ii=1; ii<incount; ++ii) {untested();
-      out ^= n[ii]->lv();
-    }
-    return ~out;
-  }
-  std::string name()const override	  {itested();return "xxxnor";}
-};
-/*--------------------------------------------------------------------------*/
-class LOGIC_INV : public COMMON_LOGIC {
-private:
-  explicit LOGIC_INV(const LOGIC_INV& p) :COMMON_LOGIC(p){++_count;}
-  COMMON_COMPONENT* clone()const override {return new LOGIC_INV(*this);}
-public:
-  explicit LOGIC_INV(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t* n, int)const override {
-    return ~n[0]->lv();
-  }
-  std::string name()const override	  {return "xxinv";}
+  bool	   want_analog()const {return true;}
+  bool	   want_digital()const {return false;}
 };
 /*--------------------------------------------------------------------------*/
 class LOGIC_BUF : public COMMON_LOGIC {
@@ -249,32 +135,18 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 DEV_D_A::DEV_D_A(COMMON_COMPONENT* c)
-  :ELEMENT(c),
-   _lastchangenode(0),
-   _quality(qGOOD),
-   _failuremode("ok"),
-   _gatemode(moUNKNOWN)   
+  :ELEMENT(c)
 {
   ++_count;
 }
 /*--------------------------------------------------------------------------*/
 DEV_D_A::DEV_D_A(const DEV_D_A& p)
-  :ELEMENT(p),
-   _lastchangenode(0),
-   _quality(qGOOD),
-   _failuremode("ok"),
-   _gatemode(moUNKNOWN)   
+  :ELEMENT(p)
 {
-  assert(max_nodes() == PORTS_PER_GATE);
   for (int ii = 0;  ii < max_nodes();  ++ii) {
     _nodes[ii] = p._nodes[ii];
   }
   ++_count;
-}
-/*--------------------------------------------------------------------------*/
-void DEV_D_A::precalc_last()
-{
-  ELEMENT::precalc_last();
 }
 /*--------------------------------------------------------------------------*/
 void DEV_D_A::expand()
@@ -292,19 +164,6 @@ void DEV_D_A::expand()
 
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-void DEV_D_A::tr_begin()
-{
-  ELEMENT::tr_begin();
-  _gatemode = moDIGITAL;
-  n_(OUTNODE)->set_mode(_gatemode);
-}
-/*--------------------------------------------------------------------------*/
-void DEV_D_A::tr_restore()
-{untested();
-  ELEMENT::tr_restore();
-  _gatemode = moDIGITAL;
-}
 /*--------------------------------------------------------------------------*/
 void DEV_D_A::dc_advance()
 {
@@ -334,7 +193,7 @@ void DEV_D_A::tr_advance()
   }else{
   }
 }
-
+/*--------------------------------------------------------------------------*/
 void DEV_D_A::tr_regress()
 {
   ELEMENT::tr_regress();
@@ -355,24 +214,11 @@ void DEV_D_A::tr_regress()
  */
 bool DEV_D_A::tr_needs_eval()const
 {
-  //assert(!is_q_for_eval());
-  if (_sim->analysis_is_restore()) {untested();
-  }else if (_sim->analysis_is_static()) {
-  }else{
-  }
   return (_sim->analysis_is_static() || _sim->analysis_is_restore());
-  unreachable();
-  return false;
 }
 /*--------------------------------------------------------------------------*/
-void DEV_D_A::tr_queue_eval()
+bool DEV_D_A::do_tr()
 {
- ELEMENT::tr_queue_eval();
-}
-/*--------------------------------------------------------------------------*/
-bool DEV_D_A::tr_eval_digital()
-{
-  assert(_gatemode == moDIGITAL);
   if (_sim->analysis_is_restore()) {untested();
   }else if (_sim->analysis_is_static()) {
   }else{
@@ -400,12 +246,6 @@ bool DEV_D_A::tr_eval_digital()
   return converged();
 }
 /*--------------------------------------------------------------------------*/
-bool DEV_D_A::do_tr()
-{  
-  set_converged(tr_eval_digital());
-  return converged();
-}
-/*--------------------------------------------------------------------------*/
 void DEV_D_A::tr_load()
 {
   tr_load_diagonal_point(n_(OUTNODE), &_m0.c1, &_m1.c1);
@@ -422,10 +262,10 @@ void DEV_D_A::tr_unload()
 TIME_PAIR DEV_D_A::tr_review()
 {
   // not calling ELEMENT::tr_review();
-  
+
   q_accept();
   //digital mode queues events explicitly in tr_accept
-  
+
   _time_by.reset();
   return _time_by;
 }
@@ -435,7 +275,6 @@ TIME_PAIR DEV_D_A::tr_review()
  */
 void DEV_D_A::tr_accept()
 {
-  assert(_gatemode == moDIGITAL || _gatemode == moANALOG);
   const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
   assert(c);
   const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
@@ -443,117 +282,6 @@ void DEV_D_A::tr_accept()
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   /* Check quality and get node info to local array. */
   /* side effect --- generate digital values for analog nodes */
-  assert(PORTS_PER_GATE == max_nodes());
-  {
-    n_(OUTNODE)->to_logic(m);
-    _quality = n_(OUTNODE)->quality();  /* the worst quality on this device */
-    _failuremode = n_(OUTNODE)->failure_mode();    /* what is wrong with it? */
-    _lastchangenode = OUTNODE;		/* which node changed most recently */
-    int lastchangeiter=n_(OUTNODE)->d_iter();/* iteration # when it changed */
-    trace0(long_label().c_str());
-    trace2(n_(OUTNODE)->failure_mode().c_str(), OUTNODE, n_(OUTNODE)->quality());
-    
-    for (int ii = BEGIN_IN;  ii < net_nodes();  ++ii) {
-      n_(ii)->to_logic(m);
-      if (n_(ii)->quality() < _quality) {
-	_quality = n_(ii)->quality();
-	_failuremode = n_(ii)->failure_mode();
-      }else{
-      }
-      if (n_(ii)->d_iter() >= lastchangeiter) {
-	lastchangeiter = n_(ii)->d_iter();
-	_lastchangenode = ii;
-      }else{
-      }
-      trace2(n_(ii)->failure_mode().c_str(), ii, n_(ii)->quality());
-    }
-    /* If _lastchangenode == OUTNODE, no new changes, bypass may be ok.
-     * Otherwise, an input changed.  Need to evaluate.
-     * If all quality are good, can evaluate as digital.
-     * Otherwise need to evaluate as analog.
-     */
-    trace3(_failuremode.c_str(), _lastchangenode, lastchangeiter, _quality);
-  }
-  /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */  
-  if (want_analog()) {
-    if (_gatemode == moDIGITAL) {untested();
-      error(bTRACE, "%s:%u:%g switch to analog, %s\n", long_label().c_str(),
-	    _sim->iteration_tag(), _sim->_time0, _failuremode.c_str());
-      _gatemode = moANALOG;
-    }else{
-    }
-    assert(_gatemode == moANALOG);
-  }else{
-    assert(want_digital());
-    if (_gatemode == moANALOG) {
-      error(bTRACE, "%s:%u:%g switch to digital\n",
-	    long_label().c_str(), _sim->iteration_tag(), _sim->_time0);
-      _gatemode = moDIGITAL;
-    }else{
-    }
-    assert(_gatemode == moDIGITAL);
-    if (_sim->analysis_is_restore()) {untested();
-    }else if (_sim->analysis_is_static()) {
-    }else{
-    }
-    if (!_sim->_bypass_ok
-	|| _lastchangenode != OUTNODE
-	|| _sim->analysis_is_static()
-	|| _sim->analysis_is_restore()) {
-      LOGICVAL future_state = c->logic_eval(&n_(BEGIN_IN), net_nodes()-BEGIN_IN);
-      //		         ^^^^^^^^^^
-      if ((n_(OUTNODE)->is_unknown()) &&
-	  (_sim->analysis_is_static() || _sim->analysis_is_restore())) {
-	n_(OUTNODE)->force_initial_value(future_state);
-	n_(OUTNODE)->store_old_lv();
-	/* This happens when initial DC is digital.
-	 * Answers could be wrong if order in netlist is reversed 
-	 */
-      }else if (future_state != n_(OUTNODE)->lv()) {
-	assert(future_state != lvUNKNOWN);
-	switch (future_state) {
-	case lvSTABLE0:	/*nothing*/		break;
-	case lvRISING:  future_state=lvSTABLE0;	break;
-	case lvFALLING: future_state=lvSTABLE1;	break;
-	case lvSTABLE1:	/*nothing*/		break;
-	case lvUNKNOWN: unreachable();		break;
-	}
-	/* This handling of rising and falling may seem backwards.
-	 * These states occur when the value has been contaminated 
-	 * by another pending action.  The "old" value is the
-	 * value without this contamination.
-	 * This code is planned for replacement as part of VHDL/Verilog
-	 * conversion, so the kluge stays in for now.
-	 */
-	assert(future_state.lv_old() == future_state.lv_future());
-	if (n_(OUTNODE)->lv() == lvUNKNOWN
-	    || future_state.lv_future() != n_(OUTNODE)->lv_future()) {
-	  n_(OUTNODE)->set_event(c->_real_delay, future_state);
-	  //assert(future_state == n_(OUTNODE).lv_future());
-	  if (_lastchangenode == OUTNODE) {untested();
-	    unreachable();
-	    error(bDANGER, "%s:%u:%g non-event state change\n",
-		  long_label().c_str(), _sim->iteration_tag(), _sim->_time0);
-	  }else{
-	  }
-	}else{
-	}
-      }else{
-      }
-    }else{
-    }
-    n_(OUTNODE)->store_old_last_change_time();
-    n_(OUTNODE)->store_old_lv(); // needed? yes
-  }
-}
-/*--------------------------------------------------------------------------*/
-void DEV_D_A::ac_iwant_matrix()
-{
-}
-/*--------------------------------------------------------------------------*/
-void DEV_D_A::ac_begin()
-{untested();
-    error(bWARNING, long_label() + ": no logic in AC analysis\n");
 }
 /*--------------------------------------------------------------------------*/
 double DEV_D_A::tr_probe_num(const std::string& what)const
@@ -571,41 +299,6 @@ int DEV_D_A::_count = -1;
 static LOGIC_NONE Default_LOGIC(CC_STATIC);
 static DEV_D_A p1(&Default_LOGIC);
 static DISPATCHER<CARD>::INSTALL d1(&device_dispatcher, "xxlogic", &p1);
-
-static LOGIC_AND  c_and(CC_STATIC);
-DISPATCHER<COMMON_COMPONENT>::INSTALL dc_and(&bm_dispatcher, "xxand", &c_and);
-static DEV_D_A d_and(&c_and);
-static DISPATCHER<CARD>::INSTALL dd_and(&device_dispatcher, "xxand", &d_and);
-
-static LOGIC_NAND c_nand(CC_STATIC);
-DISPATCHER<COMMON_COMPONENT>::INSTALL dc_nand(&bm_dispatcher, "xxnand", &c_nand);
-static DEV_D_A d_nand(&c_nand);
-static DISPATCHER<CARD>::INSTALL dd_nand(&device_dispatcher, "xxnand", &d_nand);
-
-static LOGIC_OR   c_or(CC_STATIC);
-DISPATCHER<COMMON_COMPONENT>::INSTALL dc_or(&bm_dispatcher, "xxor", &c_or);
-static DEV_D_A d_or(&c_or);
-static DISPATCHER<CARD>::INSTALL dd_or(&device_dispatcher, "xxor", &d_or);
-
-static LOGIC_NOR  c_nor(CC_STATIC);
-DISPATCHER<COMMON_COMPONENT>::INSTALL dc_nor(&bm_dispatcher, "xxnor", &c_nor);
-static DEV_D_A d_nor(&c_nor);
-static DISPATCHER<CARD>::INSTALL dd_nor(&device_dispatcher, "xxnor", &d_nor);
-
-static LOGIC_XOR  c_xor(CC_STATIC);
-DISPATCHER<COMMON_COMPONENT>::INSTALL dc_xor(&bm_dispatcher, "xxxor", &c_xor);
-static DEV_D_A d_xor(&c_xor);
-static DISPATCHER<CARD>::INSTALL dd_xor(&device_dispatcher, "xxxor", &d_xor);
-
-static LOGIC_XNOR c_xnor(CC_STATIC);
-DISPATCHER<COMMON_COMPONENT>::INSTALL dc_xnor(&bm_dispatcher, "xxxnor", &c_xnor);
-static DEV_D_A d_xnor(&c_xnor);
-static DISPATCHER<CARD>::INSTALL dd_xnor(&device_dispatcher, "xxxnor", &d_xnor);
-
-static LOGIC_INV  c_inv(CC_STATIC);
-DISPATCHER<COMMON_COMPONENT>::INSTALL dc_inv(&bm_dispatcher, "xxinv", &c_inv);
-static DEV_D_A d_inv(&c_inv);
-static DISPATCHER<CARD>::INSTALL dd_inv(&device_dispatcher, "xxinv", &d_inv);
 
 static LOGIC_BUF  c_buf(CC_STATIC);
 DISPATCHER<COMMON_COMPONENT>::INSTALL dc_buf(&bm_dispatcher, "xxbuf", &c_buf);
