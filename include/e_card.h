@@ -66,7 +66,7 @@ protected: // create and destroy.
 public:
   virtual  ~CARD();
 	  void	 purge() override;
-  virtual CARD*	 clone()const {return NULL;}
+  virtual CARD*	 clone()const = 0;
   virtual CARD*	 clone_instance()const  {return clone();}
   //--------------------------------------------------------------------
 public:	// "elaborate"
