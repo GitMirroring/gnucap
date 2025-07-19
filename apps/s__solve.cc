@@ -162,7 +162,7 @@ void SIM::advance_time(void)
       if (OPT::predictor!=0. && time1 > time2) {//42447 // 
 	double dtdt = (_sim->_time0 - time1) / (time1 - time2);
 	trace4("", _sim->_time0, time1, time2, dtdt);
-	if (dtdt <= OPT::predictor) {//42094 // normal prediction
+	if (dtdt <= OPT::predictor && 1./dtdt <= OPT::predictor) {//42094 // normal prediction
 	  for (int ii=1; ii <= _sim->_total_nodes; ++ii) {
 	    double vt2 = _sim->_v0[ii];
 	    double vt1 = _sim->_vt1[ii];
