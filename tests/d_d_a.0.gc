@@ -1,0 +1,19 @@
+verilog
+
+.model logic logic ( delay=1n rise=1n fall=1n  rs= 100.  rw= 1.G thh= 0.75  thl= 0.25  mr= 5.  mf= 5.  over=10k vmax= 5.  vmin= 0. )
+
+xxbuf #(.model(logic)) b1 (.out(a1), .in1(d2));
+inv #(.model(logic)) i3 (.out(d2), .in1(d1));
+inv #(.model(logic)) i3 (.out(d1), .in1(a0));
+
+ground gnd;
+resistor #(1k) r1(a1, gnd);
+
+spice
+
+Ven a0 0 pulse iv=0 pv=5 rise=1n width=5n fall=1n
+
+.print tran l(a1) v(nodes) l(d*)
+.tran .5u basic
+
+
