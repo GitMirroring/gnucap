@@ -31,6 +31,7 @@
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
+static bool flag_block1 = true;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CMD_ORDER_TRACE : public CMD {
   void do_it(CS&, CARD_LIST* scope)override {
@@ -46,9 +47,12 @@ protected:
       }else{
       }
       if(auto* e=dynamic_cast<ELEMENT*>(*ci)) {
-        for(int i=0; i<e->ext_nodes()+e->int_nodes(); ++i){
-          number(e->n_(i), seek);
-        }
+	if(!flag_block1||e->been_here()){
+	  for(int i=0; i<e->ext_nodes()+e->int_nodes(); ++i){
+	    number(e->n_(i), seek);
+	  }
+	}else{
+	}
       }
     }
     assert(scope->nodes());
