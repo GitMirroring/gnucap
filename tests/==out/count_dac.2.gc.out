@@ -240,3 +240,6 @@ iterations: op=0, dc=62, tran=1112, fourier=0, total=1420
 transient timesteps: accepted=234, rejected=12, total=246
 nodes: user=37, subckt=289, model=0, total=326
 dctran density=9.4%, ac density=9.4%
+fpnreq: 9056
+fpsize: 326
+nnz: 2838
