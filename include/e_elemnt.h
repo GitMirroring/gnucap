@@ -287,41 +287,43 @@ inline void ELEMENT::tr_unload_shunt()
 inline void ELEMENT::tr_load_trln(double z0, double* if0, double* if1,
                                              double* ir0, double* ir1)
 {
-  //BUG// explicit mfactor
-  double lvf = NOT_VALID; // load value, forward
-  double lvr = NOT_VALID; // load value, reflected
+  //BUG// explicit inc_mode
   if (!_sim->is_inc_mode()) {
-    _sim->_aa.load_symmetric(n_(OUT1).m_(), n_(OUT2).m_(), mfactor()/z0);
-    _sim->_aa.load_symmetric(n_(IN1).m_(),  n_(IN2).m_(),  mfactor()/z0);
-    lvf = *if0;
-    lvr = *ir0;
+    double g0 = 1./z0;
+    double g = dampdiff(&g0, 0.);
+    _sim->_aa.load_symmetric(n_(OUT1).m_(), n_(OUT2).m_(), g);
+    _sim->_aa.load_symmetric(n_(IN1).m_(),  n_(IN2).m_(),  g);
   }else{
-    lvf = dn_diff(*if0, *if1);
-    lvr = dn_diff(*ir0, *ir1);
   }
+
+  // load source, forward
+  double lvf = dampdiff(if0, *if1);
   if (lvf != 0.) {
     if (n_(OUT1).m_() != 0) {
-      n_(OUT1).i() += mfactor() * lvf;
+      n_(OUT1).i() += lvf;
     }else{untested();
     }
     if (n_(OUT2).m_() != 0) {untested();
-      n_(OUT2).i() -= mfactor() * lvf;
-    }else{
-    }
-  }else{
-  }
-  if (lvr != 0.) {
-    if (n_(IN1).m_() != 0) {
-      n_(IN1).i() += mfactor() * lvr;
-    }else{untested();
-    }
-    if (n_(IN2).m_() != 0) {untested();
-      n_(IN2).i() -= mfactor() * lvr;
+      n_(OUT2).i() -= lvf;
     }else{
     }
   }else{
   }
   *if1 = *if0;
+
+  // load source, reflected
+  double lvr = dampdiff(ir0, *ir1);
+  if (lvr != 0.) {
+    if (n_(IN1).m_() != 0) {
+      n_(IN1).i() += lvr;
+    }else{untested();
+    }
+    if (n_(IN2).m_() != 0) {untested();
+      n_(IN2).i() -= lvr;
+    }else{
+    }
+  }else{
+  }
   *ir1 = *ir0;
 }
 /*--------------------------------------------------------------------------*/
