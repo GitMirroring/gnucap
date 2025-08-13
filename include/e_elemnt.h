@@ -119,6 +119,14 @@ protected: // inline, below
   void	   tr_unload_active();
   void	   ac_load_active();
 
+#if 1
+  // used in legacy trln, and there to stay for now
+  void	   tr_load_trln(double z0, double* if0, double* if1,
+                                   double* ir0, double* ir1);
+  // void	   tr_unload_trln();
+  void ac_load_trln(COMPLEX const& y11, COMPLEX const& y12);
+#endif
+
   // don't use. misleading name
   void	   tr_load_extended(const node_t& no1, const node_t& no2,
 			    const node_t& ni1, const node_t& ni2,
@@ -164,6 +172,7 @@ protected: // in .cc
   void	   tr_iwant_matrix_control();
   void	   tr_iwant_matrix_all();
   void	   tr_iwant_matrix_inode();
+  void	   tr_iwant_matrix_trln();
   void	   tr_iwant_matrix_shunt(){
     tr_iwant_matrix_passive();
   }
@@ -273,6 +282,57 @@ inline void ELEMENT::tr_unload_shunt()
   _loss0 = 0.;
   _sim->mark_inc_mode_bad();
   tr_load_shunt();
+}
+/*--------------------------------------------------------------------------*/
+inline void ELEMENT::tr_load_trln(double z0, double* if0, double* if1,
+                                             double* ir0, double* ir1)
+{
+  //BUG// explicit mfactor
+  double lvf = NOT_VALID; // load value, forward
+  double lvr = NOT_VALID; // load value, reflected
+  if (!_sim->is_inc_mode()) {
+    _sim->_aa.load_symmetric(n_(OUT1).m_(), n_(OUT2).m_(), mfactor()/z0);
+    _sim->_aa.load_symmetric(n_(IN1).m_(),  n_(IN2).m_(),  mfactor()/z0);
+    lvf = *if0;
+    lvr = *ir0;
+  }else{
+    lvf = dn_diff(*if0, *if1);
+    lvr = dn_diff(*ir0, *ir1);
+  }
+  if (lvf != 0.) {
+    if (n_(OUT1).m_() != 0) {
+      n_(OUT1).i() += mfactor() * lvf;
+    }else{untested();
+    }
+    if (n_(OUT2).m_() != 0) {untested();
+      n_(OUT2).i() -= mfactor() * lvf;
+    }else{
+    }
+  }else{
+  }
+  if (lvr != 0.) {
+    if (n_(IN1).m_() != 0) {
+      n_(IN1).i() += mfactor() * lvr;
+    }else{untested();
+    }
+    if (n_(IN2).m_() != 0) {untested();
+      n_(IN2).i() -= mfactor() * lvr;
+    }else{
+    }
+  }else{
+  }
+  *if1 = *if0;
+  *ir1 = *ir0;
+}
+/*--------------------------------------------------------------------------*/
+inline void ELEMENT::ac_load_trln(COMPLEX const& y11, COMPLEX const& y12)
+{
+  _sim->_acx.load_symmetric(n_(OUT1).m_(), n_(OUT2).m_(), mfactor() * y11);
+  _sim->_acx.load_symmetric(n_(IN1).m_(),  n_(IN2).m_(),  mfactor() * y11);
+  _sim->_acx.load_asymmetric(n_(OUT1).m_(),n_(OUT2).m_(), n_(IN2).m_(),  n_(IN1).m_(),
+			     mfactor() * y12);
+  _sim->_acx.load_asymmetric(n_(IN1).m_(), n_(IN2).m_(), n_(OUT2).m_(), n_(OUT1).m_(),
+			     mfactor() * y12);
 }
 /*--------------------------------------------------------------------------*/
 inline void ELEMENT::ac_load_shunt()

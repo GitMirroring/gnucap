@@ -401,6 +401,12 @@ void ELEMENT::tr_iwant_matrix_inode()
   _sim->_aa.iwant2(n_(OUT2).m_(),n_(IN1).m_());
 }
 /*--------------------------------------------------------------------------*/
+void ELEMENT::tr_iwant_matrix_trln()
+{
+  _sim->_aa.iwant(n_(OUT1).m_(),n_(OUT2).m_());
+  _sim->_aa.iwant(n_(IN1).m_(), n_(IN2).m_());
+}
+/*--------------------------------------------------------------------------*/
 void ELEMENT::ac_iwant_matrix_passive()
 {
   trace2(long_label().c_str(), n_(OUT1).m_(), n_(OUT2).m_());
