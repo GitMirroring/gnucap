@@ -35,59 +35,56 @@ namespace {
 /*--------------------------------------------------------------------------*/
 class FOOTPRINT {
   typedef int value_type;
-  typedef std::deque<value_type> list_t;
-  typedef std::pair<list_t, list_t> lists_t;
-  typedef std::deque<lists_t> container_t;
+  typedef std::set<value_type> list_t;
+  typedef std::vector<list_t> container_t;
   typedef container_t::const_iterator const_iterator;
 
 private:
   int _nreq{0};
 public: // BUG
-  container_t _data;
+  container_t _rows;
+  container_t _cols;
 public:
   explicit FOOTPRINT(int s){
     init(s);
   }
 
   void want(int, int);
-  int size()const {return int(_data.size());}
+  int size()const {return int(_rows.size());}
   int nreq()const {return _nreq;}
   void init(int s) {
-    _data.resize(s);
+    assert(_cols.empty());
+    assert(_rows.empty());
+    _cols.resize(s);
+    _rows.resize(s);
   }
   void uninit(){
-    _data.clear();
+    _cols.clear();
+    _rows.clear();
   }
 
   void dumpgr(){ untested();
     int s = 0;
-    for(auto& i : _data){ untested();
-      s += int(i.first.size());
+    for(auto& i : _rows){ untested();
+      s += int(i.size());
     }
-    std::cout << "p tw " << to_string(int(_data.size())) << " " << to_string(s) << "\n";
+    std::cout << "p tw " << to_string(size()) << " " << to_string(s) << "\n";
     auto ii = 0;
-    for(auto& i : _data){ untested();
+    for(auto& i : _rows){ untested();
       ++ii;
-      for(auto& j : i.first){ untested();
+      for(auto const& j : i){ untested();
 	std::cout << ii << " " << j << "\n";
       }
     }
   }
 
-  void sort(){
-    for(auto& i : _data){
-      std::sort(i.first.begin(), i.first.end());
-      auto e = std::unique(i.first.begin(), i.first.end());
-      i.first.erase(e, i.first.end());
+  void sort(){ }
 
-      std::sort(i.second.begin(), i.second.end());
-      e = std::unique(i.second.begin(), i.second.end());
-      i.second.erase(e, i.second.end());
-    }
-  }
-
-  const_iterator begin()const {return _data.begin();}
-  const_iterator end()const {return _data.end();}
+  container_t const& cols()const {return _cols;}
+  container_t const& rows()const {return _rows;}
+public: // used in compute_lu_fill
+  list_t& cols(int i) {return _cols[i];}
+  list_t& rows(int i) {return _rows[i];}
 };
 /*--------------------------------------------------------------------------*/
 inline void FOOTPRINT::want(int i, int j)
@@ -96,10 +93,10 @@ inline void FOOTPRINT::want(int i, int j)
   assert(j);
   if(i<j){
     // upper
-    _data[i-1].first.push_back(j);
+    _rows[i-1].insert(j);
   }else if(j<i){
     // lower
-    _data[j-1].second.push_back(i);
+    _cols[j-1].insert(i);
   }else{
   }
   ++_nreq;
@@ -319,6 +316,8 @@ public:
   int fpnreq()const { return _fp.nreq(); }
   int nnz()const { return _nzcount; }
   FOOTPRINT const& fp()const {return _fp;}
+private:
+  FOOTPRINT& fp() {return _fp;}
 }; // CBS
 /*--------------------------------------------------------------------------*/
 template<class T>
@@ -823,19 +822,23 @@ void CBS<T>::tag_wanted()
 
   _fp.sort();
   int mm = 1;
-  for(auto const& d : _fp._data) {
+  for(auto const& d : _fp.rows()) {
     T* prev = &aad(mm);
-    nz += int(d.first.size());
-    for(auto i : d.first){
+    nz += int(d.size());
+    for(auto i : d){
       assert(mm<i);
       col(*prev) = i;
       prev = &aau(mm, i);
     }
     col(*prev) = -1;
+    ++mm;
+  }
 
-    prev = &aad(mm);
-    nz += int(d.second.size());
-    for(auto j : d.second){
+  mm = 1;
+  for(auto const& d : fp().cols()) {
+    T* prev = &aad(mm);
+    nz += int(d.size());
+    for(auto j : d){
       // lower(i, mm)
       assert(mm<j);
       row(*prev) = j;
@@ -859,12 +862,12 @@ void BSSMATRIX<T>::zero()
 template <class T>
 void CBS<T>::propagate(int m)
 {
-  for( auto node : _fp._data[m-1].first ) {
+  for( auto node : fp().rows()[m-1]) {
     // upper
     assert(node>m);
     set_changed(m, node);
   }
-  for( auto node : _fp._data[m-1].second ) {
+  for( auto node : fp().cols()[m-1]) {
     // lower
     assert(node>m);
     set_changed(node, m);
@@ -1224,7 +1227,7 @@ void CBS<T>::compute_lu_fill()
 	  ++lnz;
 	  dot = lu_tag();
 	  assert(ii<mm);
-	  _fp._data[ii-1].first.push_back(mm);
+	  fp().cols(ii-1).insert(mm);
 	  ++f;
 	  gap = 0;
 	}else{
@@ -1251,7 +1254,7 @@ void CBS<T>::compute_lu_fill()
 	}else if(nonzero_lu(mm,jj,jj)){
 	  dot = lu_tag();
 	  ++lnz;
-	  _fp._data[jj-1].second.push_back(mm);
+	  fp().rows(jj-1).insert(mm);
 	  ++f;
 	  gap = 0;
 	}else{
@@ -1570,9 +1573,10 @@ public:
     OMSTREAM o = IO::mstdout;
     assert(m);
     int i = 0;
-    for(auto p : m->fp()) {
+    CBS<double> const* cm = m;
+    for(auto p : cm->fp().cols()) {
       ++i;
-      for(auto q : p.first) {
+      for(auto q : p) {
 	o << i << " " << q << "\n";
       }
     }

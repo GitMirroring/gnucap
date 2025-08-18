@@ -80,3 +80,4 @@ nodes: user=12, subckt=0, model=2, total=14
 dctran density=39.8%, ac density=39.8%
 fpnreq: 24
 fpsize: 14
+nnz: 27
