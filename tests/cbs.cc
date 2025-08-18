@@ -541,7 +541,7 @@ bool CBS<T>::nonzero_lu(int rr, int cc, int dd)
 {
   assert(!idx(aam(rr, cc)));
   assert(!nz(aam(rr, cc)));
-  int kk = std::max(aalownode_u(rr), aalownode_l(cc));
+  int kk = std::max(aalownode_l(rr), aalownode_u(cc));
   int len = dd - kk;
   if (len > 0) {
     T* row = &(aal(rr,kk));
@@ -889,7 +889,6 @@ void CBS<T>::lu_decomp(bool do_partial)
    }
   for (int mm=1; mm<=size(); ++mm) {
     int ln = aalownode_u(mm);
-    assert(ln == aalownode_l(mm));
     T* ui = _lu.colptr(mm);
     int ii = 1;
     skip(ui, ii);
@@ -1387,7 +1386,6 @@ void CBS<T>::check_consistency(int m)
     T* u = _lu.colptr(m);
     T* l = _lu.rowptr(m);
 
-    assert(aalownode_u(m) == aalownode_l(m)); // for now?
     assert(aalownode_u(m));
     if(aalownode_u(m)!=1){
       assert(idx(u));
