@@ -26,3 +26,8 @@ iterations: op=0, dc=30, tran=0, fourier=0, total=40
 transient timesteps: accepted=0, rejected=0, total=0
 nodes: user=2, subckt=1151, model=0, total=1153
 dctran density=0.5%, ac density=0.5%
+iwant points:   0.3% (3520)
+load size   :   0.3% (4033)
+footprint   :   0.3% (4225)
+nnz         :   0.5% (6526)
+fill size   :   0.0% (192)
