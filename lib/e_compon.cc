@@ -618,6 +618,7 @@ void COMPONENT::expand()
 {
   CARD::expand();
   if (_sim->is_first_expand()) {
+    _been_here = false;
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
       n_(i).clear();
     }

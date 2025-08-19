@@ -113,7 +113,7 @@ public:
     }
   }
 public:
-  virtual void precalc_first(const PARAM_LIST*) {};
+  virtual void precalc_first(const PARAM_LIST*) {}
   virtual void expand(const COMPONENT*);
   virtual COMMON_COMPONENT* deflate()		{return this;}
   virtual void precalc_last(const PARAM_LIST*) {};
@@ -194,6 +194,7 @@ private:
  */
 /*--------------------------------------------------------------------------*/
 class INTERFACE COMPONENT : public CARD {
+  bool _been_here{false};
 private:
   // meets short,int,bool (7 bytes, needs 1)
   bool	    _converged{false};
@@ -211,6 +212,7 @@ protected: // create and destroy.
 	     ~COMPONENT();
   //--------------------------------------------------------------------
 public:	// "elaborate"
+  bool been_here(){ bool b=_been_here; _been_here=true; return b; }
   void	precalc_first() override;
   void	expand() override;
   void	precalc_last() override;
