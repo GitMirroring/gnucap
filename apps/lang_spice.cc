@@ -112,6 +112,17 @@ public:
 DISPATCHER<LANGUAGE>::INSTALL
 	da(&language_dispatcher, lang_acs.name(), &lang_acs);
 /*--------------------------------------------------------------------------*/
+class LANG_SACS : public LANG_SPICE_BASE {
+public:
+  LANG_SACS() {}
+  ~LANG_SACS() {}
+  std::string name()const override {return "sacs";}
+  bool case_insensitive()const override {return false;}
+  UNITS units()const override {return uSI;}
+} lang_sacs;
+DISPATCHER<LANGUAGE>::INSTALL
+	dsa(&language_dispatcher, lang_sacs.name(), &lang_sacs);
+/*--------------------------------------------------------------------------*/
 DEV_COMMENT p0;
 DISPATCHER<CARD>::INSTALL
 	d0(&device_dispatcher, ";|#|*|'|\"|dev_comment", &p0);
@@ -1081,6 +1092,14 @@ public:
   }
 } p9;
 DISPATCHER<CMD>::INSTALL d9(&command_dispatcher, "acs", &p9);
+/*--------------------------------------------------------------------------*/
+class CMD_SACS : public CMD {
+public:
+  void do_it(CS&, CARD_LIST* Scope)override {itested();
+    command("options lang=sacs", Scope);
+  }
+} p9s;
+DISPATCHER<CMD>::INSTALL d9s(&command_dispatcher, "sacs", &p9s);
 /*--------------------------------------------------------------------------*/
 class CMD_ENDC : public CMD {
 public:

@@ -196,6 +196,7 @@ static void process_cmd_line(int argc, const char *argv[])
       }else if (strcasecmp(argv[ii], "-b") == 0) {
 	try {
 	  ++ii;
+	  CMD::command("acs", &CARD_LIST::card_list);
 	  if (ii < argc) {
 	    CMD::command(std::string("< ") + argv[ii++], &CARD_LIST::card_list);
 	  }else{untested();
