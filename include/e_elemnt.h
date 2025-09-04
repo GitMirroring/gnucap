@@ -28,6 +28,7 @@
 #include "m_cpoly.h"
 #include "l_denoise.h"
 #include "e_compon.h"
+#include "m_matrix_solver.h"
 /*--------------------------------------------------------------------------*/
 class INTERFACE ELEMENT : public COMPONENT {
 protected:
