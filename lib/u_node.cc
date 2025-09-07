@@ -20,7 +20,7 @@
  *------------------------------------------------------------------
  * user nodes
  */
-#include "u_node.h"
+#include "e_usernode.h"
 #include "u_xprobe.h"
 /*--------------------------------------------------------------------------*/
 double USER_NODE::tr_probe_num(const std::string& s) const
