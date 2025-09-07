@@ -73,6 +73,7 @@ double	OPT::ydivisions = 4.;
 phase_t	OPT::phase = pDEGREES;
 order_t OPT::order = "auto";
 smode_t	OPT::mode = moMIXED;
+std::string OPT::default_discipline = "electrical";
 int	OPT::transits = 2;
 bool	OPT::dupcheck = false;
 bool	OPT::bypass = true;

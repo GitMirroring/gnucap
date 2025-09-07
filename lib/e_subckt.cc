@@ -38,7 +38,7 @@ void BASE_SUBCKT::precalc_first()
       assert(!mutable_common()->has_next());
       mutable_common()->attach_next(hspl);
     }
-  }else{ untested();
+  }else{
     // device without common, but with hs params
     attach_common(new HS_PARAM());
   }

@@ -136,6 +136,7 @@ public:
   static phase_t phase;	    // how to print phase (degrees or radians)
   static order_t order;     // ordering method
   static smode_t mode;	    // mixed-mode mode preference
+  static std::string default_discipline; // VAMS LRM Section 3.8
   static int transits;	    // number of good transitions for digital
   static bool dupcheck;	    // check for duplicates on read
   static bool bypass;	    // bypass model evaluation, if appropriate

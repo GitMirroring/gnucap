@@ -29,6 +29,7 @@
 #include "e_subckt.h"
 #include "e_model.h"
 #include "e_node.h" // net_decl
+#include "e_disc.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -77,6 +78,7 @@ public: // override virtual, called by commands
   MODEL_CARD*	parse_paramset(CS&, MODEL_CARD*)override;
   BASE_SUBCKT*  parse_module(CS&, BASE_SUBCKT*)override;
   COMPONENT*	parse_instance(CS&, COMPONENT*)override;
+  NODE*		parse_node(CS&, NODE*)const override;
   std::string	find_type_in_string(CS&)override;
 private: // local
   void skip_attributes(CS& cmd);
@@ -95,6 +97,7 @@ private: // override virtual, called by print_item
   void print_instance(OMSTREAM&, const COMPONENT*)override;
   void print_comment(OMSTREAM&, const DEV_COMMENT*)override;
   void print_command(OMSTREAM& o, const DEV_DOT*)override;
+  void print_node(OMSTREAM&, const NODE*)const override;
 private: // local
   void print_attributes(OMSTREAM&, tag_t);
   void print_args(OMSTREAM&, const MODEL_CARD*);
@@ -408,6 +411,7 @@ DEV_DOT* LANG_VERILOG::parse_command(CS& cmd, DEV_DOT* x)
     // "module" etc gets here.
   }
   parse_attributes(cmd, x->id_tag());
+  trace1("dot?", cmd.fullstring());
   CMD::cmdproc(cmd, scope);
   x->purge();
   delete x;
@@ -702,7 +706,8 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   // header
   cmd.reset();
   parse_attributes(cmd, x->id_tag());
-  (cmd >> "module |macromodule ");
+  (cmd >> "module |macromodule |connectmodule ");
+  x->set_dev_type(cmd.trimmed_last_match());
   parse_label(cmd, x);
   parse_ports(cmd, x, true/*all new*/);
   cmd >> ';';
@@ -738,6 +743,24 @@ COMPONENT* LANG_VERILOG::parse_instance(CS& cmd, COMPONENT* x)
   return x;
 }
 /*--------------------------------------------------------------------------*/
+NODE* LANG_VERILOG::parse_node(CS& cmd, NODE* n) const
+{
+  n->set_label("");
+  std::string type;
+  cmd >> type;
+  n->set_dev_type(type);
+
+  std::string name;
+  while(cmd.more() && !(cmd >> ';')){
+    name = get_identifier(cmd, ",;");
+   // NODE* mn = nm.new_node(name);
+    int s = n->param_count();
+    n->set_param_by_index(s, name, 0);
+    // node_t& nn = mn->n_(0);
+  }
+  return n;
+}
+/*--------------------------------------------------------------------------*/
 std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 {
   skip_attributes(cmd);
@@ -750,6 +773,7 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
     cmd >> type;
   }
   cmd.reset(here); // where the type is.
+  trace1("found type", type);
   return type;
 }
 /*--------------------------------------------------------------------------*/
@@ -880,26 +904,41 @@ void LANG_VERILOG::print_module(OMSTREAM& o, const BASE_SUBCKT* x)
 {
   assert(x);
   assert(x->subckt());
+  COMPONENT const* c = x;
 
   print_attributes(o, x->id_tag());
-  o << "module " <<  x->short_label();
-  print_ports_long(o, x);
+  std::string type = c->dev_type();
+  o << type;
+  o << " " <<  x->short_label();
+  if(type != "connectrules"){
+    print_ports_long(o, x);
+  }else{
+  }
   o << ";\n";
   
   for (CARD_LIST::const_iterator ci = x->subckt()->begin(); ci != x->subckt()->end(); ++ci) {
     print_item(o, *ci);
   }
   
-  o << "endmodule // " << x->short_label() << "\n\n";
+  o << "end" << type << " // " << x->short_label() << "\n\n";
 }
 /*--------------------------------------------------------------------------*/
 void LANG_VERILOG::print_instance(OMSTREAM& o, const COMPONENT* x)
 {
   print_attributes(o, x->id_tag());
   print_type(o, x);
-  print_args(o, x);
-  print_label(o, x);
-  print_ports_long(o, x);
+  if(x->dev_type() != "connect") {
+    print_args(o, x);
+    print_label(o, x);
+    print_ports_long(o, x);
+  }else{
+    o << " ";
+    print_label(o, x);
+    if(x->param_is_printable(0)){
+      o << " " << x->param_value(0);
+    }else{
+    }
+  }
   o << ";\n";
 }
 /*--------------------------------------------------------------------------*/
@@ -919,6 +958,27 @@ void LANG_VERILOG::print_command(OMSTREAM& o, const DEV_DOT* x)
   o << x->s() << '\n';
 }
 /*--------------------------------------------------------------------------*/
+void LANG_VERILOG::print_node(OMSTREAM& o, const NODE* x) const
+{
+  if(dynamic_cast<DISCIPLINE const*>(x)){
+    o << "discipline " << x->short_label() << ";\n";
+    for(int ii=0; ii<x->param_count(); ++ii) {
+      if (x->param_is_printable(ii)) {
+	o << "  " << x->param_name(ii) << ' ' << x->param_value(ii) << ";\n";
+      }else{
+      }
+    }
+    o << "enddiscipline\n";
+  }else{
+    o << x->dev_type() << " ";
+    std::string sep;
+    for(int i=0; i<x->param_count(); ++i) {
+      o << sep << x->param_value(i);
+      sep = ", ";
+    }
+    o << ";\n";
+  }
+}
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 class CMD_PARAMSET : public CMD {
@@ -977,7 +1037,7 @@ class CMD_MODULE : public CMD {
     }
   }
 } p2;
-DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "module|macromodule", &p2);
+DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "module|macromodule|connectmodule", &p2);
 /*--------------------------------------------------------------------------*/
 class CMD_VERILOG : public CMD {
 public:
