@@ -20,10 +20,11 @@
  *------------------------------------------------------------------
  * user nodes
  */
-#ifndef U_NODE_H
-#define U_NODE_H
+#ifndef E_USERNODE_H
+#define E_USERNODE_H
 #include "e_node.h"
 #include "e_logicnode.h"
+#include "u_node.h" // node_t
 /*--------------------------------------------------------------------------*/
 // USER_NODE is permanent, and acts as a proxy for probes.
 // .. n_(0) refers to the NODE used in simulation,
