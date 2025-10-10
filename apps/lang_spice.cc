@@ -106,8 +106,8 @@ public:
   LANG_ACS() {}
   ~LANG_ACS() {}
   std::string name()const override {return "acs";}
-  bool case_insensitive()const override {return true;}
-  UNITS units()const override {return uSPICE;}
+  bool case_insensitive()const override {return false;}
+  UNITS units()const override {return uSI;}
 } lang_acs;
 DISPATCHER<LANGUAGE>::INSTALL
 	da(&language_dispatcher, lang_acs.name(), &lang_acs);

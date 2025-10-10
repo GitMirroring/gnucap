@@ -194,6 +194,8 @@ static void process_cmd_line(int argc, const char *argv[])
 	}else{untested();
 	}
       }else if (strcasecmp(argv[ii], "-b") == 0) {
+	CMD::command("options insensitive", &CARD_LIST::card_list);
+	CMD::command("options units=spice", &CARD_LIST::card_list);
 	try {
 	  ++ii;
 	  if (ii < argc) {
