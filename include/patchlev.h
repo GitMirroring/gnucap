@@ -1,1 +1,1 @@
-#define PATCHLEVEL "trace_order 2025.10.30"
+#define PATCHLEVEL "diode_temp 2025.11.03"
