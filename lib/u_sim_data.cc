@@ -289,6 +289,30 @@ static void map_toplevel_nodes(CARD_LIST* scope)
 
 }
 /*--------------------------------------------------------------------------*/
+// part of map_toplevel_nodes kludge
+// there must be a better way.
+node_t& node_t::link_to(node_t* nn)
+{
+  if(nn != this){
+    assert(nn);
+    assert(nn==&nn->root());
+    if(_own){ untested();
+      delete _nnn; // !
+    }else if(_nnn){ untested();
+    }else{
+    }
+    _nnn = nullptr;
+    if(!_link){
+    }else{
+    }
+    _link = nn;
+  }else if(!_nnn){
+    _link = this;
+  }else{
+  }
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
 /* init: allocate, set up, etc ... for any type of simulation
  * also called by status and probe for access to internals and subckts
  */

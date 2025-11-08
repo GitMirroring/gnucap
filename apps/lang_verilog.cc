@@ -21,13 +21,14 @@
  */
 //testing=script 2023.10.25
 #include "u_nodemap.h"
+#include "u_lang.h"
 #include "globals.h"
 #include "c_comand.h"
 #include "d_dot.h"
 #include "d_coment.h"
 #include "e_subckt.h"
 #include "e_model.h"
-#include "u_lang.h"
+#include "e_node.h" // net_decl
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/

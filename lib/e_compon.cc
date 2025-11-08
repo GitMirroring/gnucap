@@ -1109,5 +1109,22 @@ void COMMON_COMPONENT::print_common_obsolete_callback(OMSTREAM& o, LANGUAGE* lan
   }
 }
 /*--------------------------------------------------------------------------*/
+node_t&    node_t::map()
+{
+  if (_nnn) {
+  }else if (_link) {
+    _own = false;
+    _nnn = root()._nnn;
+  }else if(_m==0){itested();
+  }else{
+    assert(_m == INVALID_NODE);
+  }
+  if (_nnn) {
+    _m = _nnn->matrix_number(); // !
+    _link = nullptr;
+  }else{
+  }
+  return *this;
+}
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:

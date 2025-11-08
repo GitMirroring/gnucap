@@ -25,7 +25,7 @@
 #ifndef U_NODEMAP_H
 #define U_NODEMAP_H
 #include "md.h"
-#include "e_node.h" // node_t
+#include "u_node.h"
 /*--------------------------------------------------------------------------*/
 class NODE;
 class node_t;
