@@ -46,6 +46,7 @@ class DISCIPLINES : public NODE_MAP {
 class DISCIPLINE : public NODE {
   typedef DISPATCHER<DISCIPLINE>::INSTALL inst;
   domain_type _domain{dom_default};
+  int _user_number{-1};
   std::string _potential;
   std::string _flow;
   inst* _installer{nullptr};

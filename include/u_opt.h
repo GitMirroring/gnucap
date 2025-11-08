@@ -29,6 +29,7 @@
 class CS;
 class LANGUAGE;
 class CARD_LIST;
+class BASE_SUBCKT;
 /*--------------------------------------------------------------------------*/
 /* integration method selector -- not all methods are implemented */
 enum method_t {meUNKNOWN=0,	// no method set
@@ -137,6 +138,7 @@ public:
   static order_t order;     // ordering method
   static smode_t mode;	    // mixed-mode mode preference
   static std::string default_discipline; // VAMS LRM Section 3.8
+  static BASE_SUBCKT const* connect_rules;
   static int transits;	    // number of good transitions for digital
   static bool dupcheck;	    // check for duplicates on read
   static bool bypass;	    // bypass model evaluation, if appropriate

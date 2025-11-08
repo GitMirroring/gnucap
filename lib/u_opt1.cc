@@ -74,6 +74,7 @@ phase_t	OPT::phase = pDEGREES;
 order_t OPT::order = "auto";
 smode_t	OPT::mode = moMIXED;
 std::string OPT::default_discipline = "electrical";
+BASE_SUBCKT const* OPT::connect_rules = nullptr;
 int	OPT::transits = 2;
 bool	OPT::dupcheck = false;
 bool	OPT::bypass = true;
