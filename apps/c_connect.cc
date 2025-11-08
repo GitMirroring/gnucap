@@ -44,14 +44,14 @@ namespace {
   discipline_identifier_or_exclude ::= discipline_identifier | exclude
 */
 class CMD_CONNECTRULES : public CMD {
-  void do_it(CS& cmd, CARD_LIST* Scope)override { untested();
+  void do_it(CS& cmd, CARD_LIST* Scope)override {
     BASE_SUBCKT* new_cr = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("connectrules"));
     assert(new_cr);
     new_cr->set_owner(nullptr);
     assert(new_cr->subckt());
     assert(new_cr->subckt()->is_empty());
     assert(!new_cr->is_device());
-    try { untested();
+    try {
       parse_connectrules(cmd, new_cr);
       Scope->push_back(new_cr);
       OPT::connect_rules = new_cr;
@@ -88,14 +88,14 @@ class CONNECT_INSERT : public COMPONENT {
   mutable node_t _nodes[2];
   std::string _mode;
 public:
-  CONNECT_INSERT* clone()const override { untested();return new CONNECT_INSERT(*this);}
+  CONNECT_INSERT* clone()const override {return new CONNECT_INSERT(*this);}
 public:
  // void set_dev_type(std::string const&s)override{ untested();
  //   _type = s;
  // }
-  std::string dev_type()const override { untested();return "connect";}
-  int param_count()const override { untested(); return 1; }
-  bool param_is_printable(int)const override { untested(); return _mode!="";}
+  std::string dev_type()const override {return "connect";}
+  int param_count()const override { return 1; }
+  bool param_is_printable(int)const override { return _mode!="";}
   std::string param_name(int i, int)const override { untested();
     return param_name(i);
   }
@@ -105,14 +105,14 @@ public:
     default: return COMPONENT::param_name(i-1);
     }
   }
-  void set_param_by_index(int i, std::string& s, int offset)override { untested();
-    if(i==0){ untested();
+  void set_param_by_index(int i, std::string& s, int offset)override {
+    if(i==0){
       _mode=s;
     }else{ untested();
       COMPONENT::set_param_by_index(i-1, s, i+offset);
     }
   }
-  std::string param_value(int i)const override { untested();
+  std::string param_value(int i)const override {
     switch(i){
     case 0: return _mode;
     default: return COMPONENT::param_value(i-1);
@@ -120,50 +120,50 @@ public:
   }
   std::string port_name(int)const override { untested();return "";}
 
-  int net_nodes()const override { untested();return 2;}
+  int net_nodes()const override {return 2;}
   node_t& n_(int i)const override { untested();return _nodes[i];}
   bool print_type_in_spice()const override { untested();return false;}
 }ci;
 /*--------------------------------------------------------------------------*/
 static CARD* parse_connect_insert(CS& cmd, std::string const& what)
-{ untested();
+{
   COMPONENT* connect = ci.clone();
   connect->set_label(what);
   trace1("insert", cmd.tail());
-  if(cmd >> "split"){ untested();
+  if(cmd >> "split"){
     std::string v = "split";
     connect->set_param_by_index(0, v, 0);
-  }else if(cmd >> "merged"){ untested();
+  }else if(cmd >> "merged"){
     std::string w = "merged";
     connect->set_param_by_index(0, w, 0);
-  }else{ untested();
+  }else{
   }
 
   return connect;
 }
 /*--------------------------------------------------------------------------*/
 static DEV_DOT* parse_resolveto(CS& cmd, DEV_DOT* d)
-{ untested();
+{
   trace1("DOT?", cmd.fullstring());
-  if(discipline_dispatcher[cmd]){ untested();
+  if(discipline_dispatcher[cmd]){
   }else{ untested();
     cmd.warn(bDANGER, "expecting discipline");
     delete d;
     return nullptr;
   }
-  while(cmd.more()){ untested();
+  while(cmd.more()){
     if(discipline_dispatcher[cmd]){ untested();
-    }else{ untested();
+    }else{
       break;
     }
   }
-  if(cmd >> "resolveto"){ untested();
+  if(cmd >> "resolveto"){
   }else{ untested();
     cmd.warn(bDANGER, "expecting discipline or resolveto");
     delete d;
     return nullptr;
   }
-  if(discipline_dispatcher[cmd]){ untested();
+  if(discipline_dispatcher[cmd]){
     d->set(cmd.fullstring());
     return d;
   }else{ untested();
@@ -174,28 +174,29 @@ static DEV_DOT* parse_resolveto(CS& cmd, DEV_DOT* d)
 }
 /*--------------------------------------------------------------------------*/
 void CMD_CONNECTRULES::parse_connectrules(CS& cmd, BASE_SUBCKT* cr) const
-{ untested();
+{
   std::string label;
   cmd >> label;
   cr->set_label(label);
-  if(cmd >> ';'){ untested();
+  if(cmd >> ';'){
   }else{ untested();
     throw Exception_CS("expecting ';'", cmd);
   }
 
   cmd.getline("cr>");
-  while(cmd >> "connect"){ untested();
+  while(cmd >> "connect"){
     std::string what;
     size_t here = cmd.cursor();
     cmd >> what;
     assert(OPT::language);
-    if(discipline_dispatcher[what]) { untested();
+    trace1("disc parse", what);
+    if(discipline_dispatcher[what]) {
       DEV_DOT* d = new DEV_DOT();
-      if((d = parse_resolveto(cmd, d))) { untested();
+      if((d = parse_resolveto(cmd, d))) {
 	cr->subckt()->push_back(d);
       }else{ untested();
       }
-    }else if(CARD const* c = OPT::language->find_proto(what, nullptr)){ untested();
+    }else if(CARD const* c = OPT::language->find_proto(what, nullptr)){
       CARD* cm = c->clone();
       assert(cm);
       auto cc = dynamic_cast<COMPONENT*>(cm);
@@ -203,15 +204,15 @@ void CMD_CONNECTRULES::parse_connectrules(CS& cmd, BASE_SUBCKT* cr) const
 	delete cm;
 	cm = nullptr;
 	error(bDANGER, "not suitable");
-      }else{ untested();
+      }else{
       }
 
-      if(cm){ untested();
+      if(cm){
 	cm = parse_connect_insert(cmd, what);
       }else{ untested();
       }
 
-      if(cm){ untested();
+      if(cm){
 	cr->subckt()->push_back(cm);
       }else{ untested();
       }
@@ -225,7 +226,7 @@ void CMD_CONNECTRULES::parse_connectrules(CS& cmd, BASE_SUBCKT* cr) const
     }
     cmd.getline("cr>");
   }
-  if(cmd >> "endconnectrules "){ untested();
+  if(cmd >> "endconnectrules "){
   }else{ untested();
     throw Exception_CS("expecting endconnectrules", cmd);
   }

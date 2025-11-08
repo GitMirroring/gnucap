@@ -1,4 +1,4 @@
-/*                -*- C++ -*-
+/*                       -*- C++ -*-
  * Copyright (C) 2025 Felix Salfelder
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
@@ -17,47 +17,55 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
- *------------------------------------------------------------------
- * discipline and nature
  */
-#include "e_disc.h"
+#include "u_lang.h"
 #include "globals.h"
-/*--------------------------------------------------------------------------*/
-DISCIPLINE::DISCIPLINE(std::string const& name, std::string p, std::string f)
-  : NODE(name),
-    _user_number(int(discipline_dispatcher.size())),
-    _potential(p),
-    _flow(f)
-{
-  trace3("new_disc", name, user_number(), discipline_dispatcher.size());
-  assert(!_installer);
-  _installer = new inst(&discipline_dispatcher, name, this);
-}
-/*--------------------------------------------------------------------------*/
-DISCIPLINE::~DISCIPLINE()
-{
-  delete _installer;
-  _installer = nullptr;
-  if (_sim) {
-    _sim->uninit();
-  }else{
-  }
-}
-/*--------------------------------------------------------------------------*/
-void DISCIPLINE::clear()
-{
-  incomplete();
-}
+#include "c_comand.h"
+#include "e_disc.h"
+#include "e_cardlist.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
-class ELECTRICAL : public DISCIPLINE {
-public:
-  explicit ELECTRICAL() : DISCIPLINE("electrical", "Voltage", "Current") {
-    set_continuous();
+class CMD_DISCIPLINE : public CMD {
+  void do_it(CS& cmd, CARD_LIST* Scope)override {
+    std::string label;
+    cmd >> label;
+    NODE* nn = new DISCIPLINE(label);
+
+    Scope->push_back(nn);
+    if(cmd >> ';'){
+    }else{
+      cmd.warn(bDANGER, "expecting ';'");
+    }
+
+    while(1){
+      if(!cmd.more()){
+	cmd.getline("discipline>");
+      }else{
+      }
+      if(cmd >> "enddiscipline"){
+	break;
+      }else{
+	std::string n, v;
+	cmd >> n;
+	cmd >> v;
+	nn->set_param_by_name(n, v);
+	if(cmd >> ';'){
+	}else{
+	  cmd.warn(bDANGER, "expecting ';'");
+	}
+      }
+    }
   }
-}p1;
+} p1;
+DISPATCHER<CMD>::INSTALL d1(&command_dispatcher, "discipline", &p1);
 /*--------------------------------------------------------------------------*/
+class CMD_DEFAULT_DISC : public CMD {
+  void do_it(CS& cmd, CARD_LIST*)override {
+    cmd >> OPT::default_discipline;
+  }
+} p2;
+DISPATCHER<CMD>::INSTALL d2(&command_dispatcher, "`default_discipline", &p2);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

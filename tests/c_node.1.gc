@@ -8,14 +8,24 @@ discipline disc2;
 enddiscipline
 discipline disc2;
 enddiscipline
+discipline disc3;
+enddiscipline
 
+connectmodule cm0(out, in);
+output out;
+input in;
+endmodule
+connectmodule cm1(out, in);
+output out;
+input in;
+endmodule
 connectmodule cm2(out, in);
 output out;
 input in;
 endmodule
 
 connectrules foo;
-	connect a b resolveto c;
+	connect disc1 disc2 resolveto disc3;
 	connect cm0;
 	connect cm1 merged;
 	connect cm2 split;
