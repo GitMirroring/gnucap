@@ -26,10 +26,10 @@
 #include "m_random.h"
 #include "u_nodemap.h"
 #include "u_status.h"
-#include "u_node.h"
 #include "e_logicnode.h"
 #include "e_cardlist.h"
 #include "c_comand.h"
+#include "e_usernode.h"
 /*--------------------------------------------------------------------------*/
 SIM_DATA::SIM_DATA()
   :_time0(0.),
