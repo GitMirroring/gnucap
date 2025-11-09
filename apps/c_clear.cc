@@ -43,6 +43,7 @@ public:
     command("print clear", Scope);
     command("delete all", Scope);
     command("title '", Scope);
+    command("__clear", Scope);
   }
 } p0;
 DISPATCHER<CMD>::INSTALL d0(&command_dispatcher, "clear", &p0);
