@@ -357,7 +357,7 @@ void INSTANCE::prepare_overload(CARD* model, std::string modelname, DEV_INSTANCE
 	trace2("DEV_INSTANCE_PROTO::po sth wrong", i, v);
       }
     }
-    if(Proto->net_nodes() < c->min_nodes()){ untested();
+    if(Proto->net_nodes() < c->min_nodes()){
       throw Exception("not enough nodes, have "
 	    + std::to_string(Proto->net_nodes()) + " need "
 	    + std::to_string(c->min_nodes()) +"\n");
