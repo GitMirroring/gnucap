@@ -1,6 +1,6 @@
 module sink (.a(a));
   ground gnd;
-resistor #(.r(1)) r (.p(gnd),.n(a));
+resistor #(.(1)) r (gnd, a);
 endmodule // sink
 
 ground gg
