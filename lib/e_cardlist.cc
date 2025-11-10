@@ -29,6 +29,7 @@
 #include "e_node.h"
 #include "e_model.h"
 #include "m_union.h"
+#include "l_find_cache.h"
 /*--------------------------------------------------------------------------*/
 #define trace_func_comp() trace1(__func__, (**ci).short_label())
 /*--------------------------------------------------------------------------*/
@@ -116,8 +117,15 @@ CARD_LIST::const_iterator CARD_LIST::find_again(const std::string& short_name,
   return notstd::find_ptr(Begin, end(), short_name);
 }
 /*--------------------------------------------------------------------------*/
+CARD_LIST::const_reverse_iterator CARD_LIST::find_again(const std::string& short_name,
+						CARD_LIST::const_reverse_iterator Begin)const
+{
+  return notstd::find_ptr(Begin, rend(), short_name);
+}
+/*--------------------------------------------------------------------------*/
 CARD_LIST& CARD_LIST::erase(iterator ci)
 {
+  clear_find_cache();
   assert(ci != end());
   if (*ci) {
     (*ci)->purge();
@@ -131,6 +139,7 @@ CARD_LIST& CARD_LIST::erase(iterator ci)
 CARD_LIST& CARD_LIST::erase(CARD* c)
 {
   if (c) {
+    clear_find_cache();
     c->purge();
     delete c;
     _cl.remove(c);
@@ -144,6 +153,7 @@ CARD_LIST& CARD_LIST::erase(CARD* c)
  */
 CARD_LIST& CARD_LIST::erase_all()
 {
+  clear_find_cache();
   while (!_cl.empty()) {
     if (_cl.back()) {
       _cl.back()->purge();
@@ -557,6 +567,7 @@ void CARD_LIST::shallow_copy(const CARD_LIST* p)
 {
   assert(p);
   _parent = p;
+  clear_find_cache();
   for (const_iterator ci = p->begin(); ci != p->end(); ++ci) {
     trace_func_comp();
     if ((**ci).is_device() || dynamic_cast<MODEL_CARD*>(*ci)) {
@@ -651,6 +662,32 @@ void CARD_LIST::set_verilog_math(bool m)
   params();
   assert(_params);
   _params->set_verilog(m);
+}
+/*--------------------------------------------------------------------------*/
+CARD_LIST::find_cache_t& CARD_LIST::find_cache() const
+{
+  if(_find_cache){
+  }else{
+    _find_cache = new find_cache_t(*this);
+  }
+  return *_find_cache;
+}
+/*--------------------------------------------------------------------------*/
+void CARD_LIST::add_to_find_cache(CARD* c)
+{
+  assert(c);
+  if(_find_cache){ itested();
+    // this is really needed in repeat finds during sckt parse.
+    // (most calls are no-ops)
+    _find_cache->add(c);
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void CARD_LIST::clear_find_cache()
+{
+  delete _find_cache;
+  _find_cache = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

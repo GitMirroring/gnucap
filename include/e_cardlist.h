@@ -36,17 +36,22 @@ class PARAM_LIST;
 class NODE_MAP;
 class LANGUAGE;
 struct TIME_PAIR;
+template<class T> class FIND_CACHE;
 /*--------------------------------------------------------------------------*/
 class INTERFACE CARD_LIST {
 public: // base types
-  typedef std::list<CARD*> list;
+  typedef CARD value_type;
+  typedef std::list<value_type*> list;
   typedef list::iterator iterator;
   typedef list::const_iterator const_iterator;
   typedef list::reverse_iterator reverse_iterator;
+  typedef list::const_reverse_iterator const_reverse_iterator;
+  typedef FIND_CACHE<CARD_LIST> find_cache_t;
 private: // data members
   const CARD_LIST* _parent;
   mutable NODE_MAP* _nm;
   mutable PARAM_LIST* _params;
+  mutable find_cache_t *_find_cache{nullptr};
   list _cl;
 public: // more types
   class fat_iterator {
@@ -85,6 +90,11 @@ public: // more types
   size_t size()const			{return _cl.size();}
   const CARD_LIST* parent()const	{return _parent;}
 
+  // find
+  find_cache_t& find_cache()const;
+  void clear_find_cache();
+  void add_to_find_cache(CARD*);
+
   // return an iterator
   iterator begin()			{return _cl.begin();}
   iterator end()			{return _cl.end();}
@@ -94,20 +104,25 @@ public: // more types
 
   reverse_iterator rbegin()		{ return _cl.rbegin();}
   reverse_iterator rend()		{ return _cl.rend();}
+  const_reverse_iterator rbegin()const	{ return _cl.rbegin();}
+  const_reverse_iterator rend()const	{ return _cl.rend();}
 
 public:
   // return a const_iterator
   const_iterator begin()const		{return _cl.begin();}
   const_iterator end()const		{return _cl.end();}
   const_iterator find_again(const std::string& short_name, const_iterator)const;
+  const_reverse_iterator find_again(const std::string& short_name, const_reverse_iterator)const;
   const_iterator find_(const std::string& short_name)const
 					{return find_again(short_name, begin());}
+  const_reverse_iterator find_reverse_(const std::string& short_name)const
+					{return find_again(short_name, rbegin());}
 
   // add to it
-  CARD_LIST& push_front(CARD* c)	{_cl.push_front(c); return *this;}
-  CARD_LIST& push_back(CARD* c)		{_cl.push_back(c);  return *this;}
+  CARD_LIST& push_front(CARD* c)	{clear_find_cache(); _cl.push_front(c); return *this;}
+  CARD_LIST& push_back(CARD* c)		{add_to_find_cache(c); _cl.push_back(c);  return *this;}
   CARD_LIST& insert(CARD_LIST::iterator i, CARD* c)
-					{_cl.insert(i, c);  return *this;}
+					{clear_find_cache(); _cl.insert(i, c);  return *this;}
 
   // take things out
   CARD_LIST& erase(iterator i);

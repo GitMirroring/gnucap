@@ -29,6 +29,7 @@
 #include "u_time_pair.h"
 #include "e_cardlist.h"
 #include "e_node.h"
+#include "l_find_cache.h"
 /*--------------------------------------------------------------------------*/
 double CARD::tr_probe_num(const std::string&)const {return NOT_VALID;}
 XPROBE CARD::ac_probe_ext(const std::string&)const {return XPROBE(NOT_VALID, mtNONE);}
@@ -187,13 +188,13 @@ CARD* CARD::find_in_my_scope(const std::string& name)
   assert(name != "");
   assert(scope());
 
-  CARD_LIST::iterator i = scope()->find_(name);
-  if (i == scope()->end()) {
+  auto i = scope()->find_cache().find(name);
+  if (i == scope()->find_cache().end()) {
     throw Exception_Cant_Find(long_label(), name,
 			      ((owner()) ? owner()->long_label() : "(root)"));
   }else{
   }
-  return *i;
+  return const_cast<CARD*>(*i);
 }
 /*--------------------------------------------------------------------------*/
 /* find_in_my_scope: find in same scope as myself
@@ -206,8 +207,8 @@ const CARD* CARD::find_in_my_scope(const std::string& name)const
   assert(name != "");
   assert(scope());
 
-  CARD_LIST::const_iterator i = scope()->find_(name);
-  if (i == scope()->end()) {
+  auto i = scope()->find_cache().find(name);
+  if (i == scope()->find_cache().end()) {
     throw Exception_Cant_Find(long_label(), name,
 			      ((owner()) ? owner()->long_label() : "(root)"));
   }else{
@@ -226,8 +227,8 @@ const CARD* CARD::find_in_parent_scope(const std::string& name)const
   assert(name != "");
   const CARD_LIST* p_scope = (scope()->parent()) ? scope()->parent() : scope();
 
-  CARD_LIST::const_iterator i = p_scope->find_(name);
-  if (i == p_scope->end()) {
+  auto i = p_scope->find_cache().find(name);
+  if (i == p_scope->find_cache().end()) {
     throw Exception_Cant_Find(long_label(), name);
   }else{
   }
@@ -247,8 +248,9 @@ const CARD* CARD::find_looking_out(const std::string& name)const
       return owner()->find_looking_out(name);
     }else if (makes_own_scope()) {
       // probably a subckt or "module"
-      CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(name);
-      if (i != CARD_LIST::card_list.end()) {
+      // BUG? why not "find_again?"
+      auto i = CARD_LIST::card_list.find_cache().find(name);
+      if (i != CARD_LIST::card_list.find_cache().end()) {
 	return *i;
       }else{
 	throw;
