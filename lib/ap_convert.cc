@@ -352,18 +352,18 @@ double CS::ctof()
     std::pow(10,21), std::pow(10,22) };
   // negative powers, long double multiplication is faster than double division
   static long double neg_pwr[22] = {
-    std::powl(10, -1), std::powl(10, -2), std::powl(10, -3), std::powl(10, -4),
-    std::powl(10, -5), std::powl(10, -6), std::powl(10, -7), std::powl(10, -8),
-    std::powl(10, -9), std::powl(10,-10), std::powl(10,-11), std::powl(10,-12),
-    std::powl(10,-13), std::powl(10,-14), std::powl(10,-15), std::powl(10,-16),
-    std::powl(10,-17), std::powl(10,-18), std::powl(10,-19), std::powl(10,-20),
-    std::powl(10,-21), std::powl(10,-22)
+    powl(10, -1), powl(10, -2), powl(10, -3), powl(10, -4),
+    powl(10, -5), powl(10, -6), powl(10, -7), powl(10, -8),
+    powl(10, -9), powl(10,-10), powl(10,-11), powl(10,-12),
+    powl(10,-13), powl(10,-14), powl(10,-15), powl(10,-16),
+    powl(10,-17), powl(10,-18), powl(10,-19), powl(10,-20),
+    powl(10,-21), powl(10,-22)
   };
 
   // compute sign * val * 10^{expon}.
   double ret = sign * val;
   if(expon > 22){ // 38
-    ret = double(ret * std::powl(10., expon));
+    ret = double(ret * powl(10., expon));
   }else if(expon > 0){
     ret *= pos_pwr[expon-1];
   }else if(expon == 0){
@@ -372,7 +372,7 @@ double CS::ctof()
     ret = double(ret * neg_pwr[-expon-1]);
   }else{ // 20
     // fallback to simple long double (slow)
-    ret = double(ret * std::powl(10., expon));
+    ret = double(ret * powl(10., expon));
   }
 
 #ifdef DEBUG
