@@ -210,6 +210,15 @@ public:
 #include "io_trace.h"
 #include "io_error.h"
 /*--------------------------------------------------------------------------*/
+#ifndef __GNUC__
+using std::powl; // since C++-11
+#elif __GNUC__ < 14
+  // g++ < 14 lacks std::powl
+  #define powl __builtin_powl
+#else
+using std::powl;
+#endif
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:
