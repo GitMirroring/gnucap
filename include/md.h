@@ -210,6 +210,18 @@ public:
 #include "io_trace.h"
 #include "io_error.h"
 /*--------------------------------------------------------------------------*/
+// g++ < 14 lacks std::powl
+#if defined(__GNUC__) && __GNUC__ < 14
+inline long double std__powl(long double a, long double b)
+{ itested();
+  // NB: clang messes with __GNUC__, getting here (but works)
+  return __builtin_powl(a, b);
+}
+#else
+  // this should work. from C++11
+  #define std__powl std::powl
+#endif
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:
