@@ -221,7 +221,7 @@ const CARD* CARD::find_in_parent_scope(const std::string& name)const
   CARD_LIST::const_iterator j = i;
   if (i == p_scope->end()) {
     throw Exception_Cant_Find(long_label(), name);
-  }else if(p_scope->find_again(name, ++j) != p_scope->end()){
+  }else if(p_scope->find_again(name, ++j) != p_scope->end()){ untested();
     error(bWARNING, "duplicate match " + name + " in " + long_label() + "\n");
   }else{
   }
@@ -241,7 +241,8 @@ const CARD* CARD::find_looking_out(const std::string& name)const
       return owner()->find_looking_out(name);
     }else if (makes_own_scope()) {
       // probably a subckt or "module"
-      CARD_LIST::const_iterator i = CARD_LIST::card_list.find_(name);
+      // BUG? why not "find_again?"
+      auto i = CARD_LIST::card_list.find_(name);
       if (i != CARD_LIST::card_list.end()) {
 	return *i;
       }else{
