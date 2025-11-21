@@ -173,6 +173,7 @@ static void finish(void)
 static void process_cmd_line(int argc, const char *argv[])
 {
   for (int ii = 1;  ii < argc;  /*inside*/) {
+    trace2("main", ii, argv[ii]);
     try {
       if (strncmp(argv[ii], "--", 2) == 0) {itested();
 	if (ii < argc) {itested();
