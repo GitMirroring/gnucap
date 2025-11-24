@@ -776,7 +776,7 @@ std::string LANG_VERILOG::find_type_in_string(CS& cmd)
 {
   if (extended) {
     // another just like this one
-    return ",";
+    return "";
   }else{
     skip_attributes(cmd);
     size_t here = cmd.cursor();
