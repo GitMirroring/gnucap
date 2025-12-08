@@ -30,6 +30,7 @@
 #include "e_elemnt.h"
 #include "e_model.h"
 #include "e_cardlist.h"
+#include <typeindex>
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
   :CKT_BASE(p),
@@ -80,17 +81,20 @@ void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
     ++(c->_attach_count);
     trace1("++1", c->_attach_count);
     *to = c;
+    unique_common(to);
   }else if (*c != **to) {
     // They are different, usually by edit.
     detach_common(to);
     ++(c->_attach_count);
     trace1("++2", c->_attach_count);
     *to = c;
+    unique_common(to);
   }else if (c->_attach_count == 0) {
     // The new and old are identical.
     // Use the old one.
     // The new one is not used anywhere, so throw it away.
     trace1("delete", c->_attach_count);    
+    unlink_common(c);
     delete c;
   }else if (c->_attach_count == CC_STATIC) { untested();
     // need to cleanup anyway.
@@ -112,6 +116,7 @@ void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
     trace1("--", (**from)._attach_count);
     if ((**from)._attach_count == 0) {
       trace1("delete", (**from)._attach_count);
+      unlink_common(*from);
       delete *from;
     }else if ((**from)._attach_count == CC_STATIC) {
       trace1("cleanup", (**from)._attach_count);
@@ -122,6 +127,21 @@ void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
     *from = nullptr;
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_COMPONENT::unique_common(COMMON_COMPONENT**c)
+{
+  assert(c);
+  assert(*c);
+  if((*c)->has_less()){ untested();
+    *c = COMMON_COMPONENT::_commons[*c];
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_COMPONENT::unlink_common(COMMON_COMPONENT*c)
+{
+  COMMON_COMPONENT::_commons.unlink(c);
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::attach_model(const COMPONENT* d)const
@@ -360,6 +380,22 @@ void COMMON_COMPONENT::ac_eval(ELEMENT*x)const
     // should not get here.
     // but need to get rid of _model anyway.
     // incomplete();
+  }
+}
+/*--------------------------------------------------------------------------*/
+bool COMMON_COMPONENT::operator<(const COMMON_COMPONENT& x) const
+{
+  assert(has_less());
+  if(std::type_index(typeid(*this)) < std::type_index(typeid(x))) {
+    return true;
+  }else if(intptr_t(next_common()) < intptr_t(x.next_common())) {
+    return true;
+  }else if(intptr_t(_model) < intptr_t(x._model)) {
+    return true;
+  }else if(_modelname < x._modelname) {
+    return true;
+  }else{
+    return false;
   }
 }
 /*--------------------------------------------------------------------------*/
