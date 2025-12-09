@@ -51,6 +51,8 @@ public:
   virtual PARA_BASE* clone()const = 0;
   virtual PARA_BASE* pclone(void*)const = 0;
   virtual bool operator==(const PARA_BASE& p) const = 0;
+  // bool operator<(const PARA_BASE& p) const {untested(); return _s < p._s;}
+  virtual int compare(const PARA_BASE& p) const {untested(); return _s.compare(p._s);}
 
 	  bool	has_hard_value()const {return (_s != "");}
   virtual bool	has_good_value()const = 0;
@@ -156,6 +158,15 @@ public:
   bool  operator==(const PARA_BASE& b)const override {
     PARAMETER const* p = dynamic_cast<PARAMETER const*>(&b);
     return (p && _v == p->_v  &&  _s == p->_s);
+  }
+  int compare(const PARA_BASE& b)const override {
+    PARAMETER const* p = prechecked_cast<PARAMETER const*>(&b);
+    assert(p);
+    if(int c = _v.compare(p->_v)) { untested();
+      return c;
+    }else{ untested();
+      return PARA_BASE::compare(b);
+    }
   }
   bool  operator==(const T& v)const {
     if (data_type<T>().is_input(v)) {
