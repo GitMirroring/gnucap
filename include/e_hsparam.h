@@ -109,6 +109,8 @@ public:
   }
   ~HS_PARAM() {}
   bool operator==(const COMMON_COMPONENT& x)const override;
+  bool operator<(const COMMON_COMPONENT& x)const override;
+  bool has_less()const override { untested(); return true;}
   HS_PARAM* clone()const override { return new HS_PARAM(*this); }
 
   bool param_is_printable(int i)const override;

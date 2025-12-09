@@ -52,6 +52,31 @@ bool HS_PARAM::operator==(const COMMON_COMPONENT& x) const
   return ret;
 }
 /*--------------------------------------------------------------------------*/
+bool HS_PARAM::operator<(const COMMON_COMPONENT& x) const
+{ untested();
+  auto* p = prechecked_cast<HS_PARAM const*>(&x);
+  bool ret = (COMMON_COMPONENT::operator<(x)
+      // these depend on OPT
+      // need to take extra care
+         || _method_fixed < p->_method_fixed
+         || _temperature_fixed < p->_temperature_fixed
+      || _mfactor == p->_mfactor
+      || _xposition == p->_xposition
+      || _yposition == p->_yposition
+      || _zposition == p->_zposition
+      || _hflip == p->_hflip
+      || _vflip == p->_vflip
+      || _zflip == p->_zflip
+      || _angle == p->_angle
+      || _method == p->_method
+      || _temperature == p->_temperature
+      || _dtemp == p->_dtemp
+      || _tnom == p->_tnom
+      || _temp_c == p->_temp_c
+      || _tnom_c == p->_tnom_c);
+  return ret;
+}
+/*--------------------------------------------------------------------------*/
 bool HS_PARAM::param_is_printable(int I) const
 {
   switch(I) {
