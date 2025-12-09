@@ -30,6 +30,7 @@
 #include "e_elemnt.h"
 #include "e_model.h"
 #include "e_cardlist.h"
+#include <typeindex>
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
   :CKT_BASE(p),
@@ -50,6 +51,7 @@ COMMON_COMPONENT::COMMON_COMPONENT(int c)
 /*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::~COMMON_COMPONENT()
 {
+  unlink_common(this);
   detach_next();
   trace1("common,destruct", _attach_count);
   if(_attach_count == 0){
@@ -77,20 +79,23 @@ void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
     detach_common(to);
   }else if (!*to) {
     // No old one, but have a new one.
-    ++(c->_attach_count);
     trace1("++1", c->_attach_count);
     *to = c;
+    unique_common(to);
+    ++((*to)->_attach_count);
   }else if (*c != **to) {
     // They are different, usually by edit.
     detach_common(to);
-    ++(c->_attach_count);
     trace1("++2", c->_attach_count);
     *to = c;
+    unique_common(to);
+    ++((*to)->_attach_count);
   }else if (c->_attach_count == 0) {
     // The new and old are identical.
     // Use the old one.
     // The new one is not used anywhere, so throw it away.
     trace1("delete", c->_attach_count);    
+    unlink_common(c);
     delete c;
   }else if (c->_attach_count == CC_STATIC) { untested();
     // need to cleanup anyway.
@@ -112,6 +117,7 @@ void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
     trace1("--", (**from)._attach_count);
     if ((**from)._attach_count == 0) {
       trace1("delete", (**from)._attach_count);
+      unlink_common(*from);
       delete *from;
     }else if ((**from)._attach_count == CC_STATIC) {
       trace1("cleanup", (**from)._attach_count);
@@ -122,6 +128,27 @@ void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
     *from = nullptr;
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_COMPONENT::unique_common(COMMON_COMPONENT**c)
+{
+  assert(c);
+  assert(*c);
+  if((*c)->has_less()){
+    COMMON_COMPONENT* d = COMMON_COMPONENT::_commons[*c];
+    if(d != *c){
+      assert(!((*c)->_attach_count));
+      delete(*c);
+      *c = d;
+    }else{
+    }
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void COMMON_COMPONENT::unlink_common(COMMON_COMPONENT*c)
+{
+  COMMON_COMPONENT::_commons.unlink(c);
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::attach_model(const COMPONENT* d)const
@@ -361,6 +388,40 @@ void COMMON_COMPONENT::ac_eval(ELEMENT*x)const
     // but need to get rid of _model anyway.
     // incomplete();
   }
+}
+/*--------------------------------------------------------------------------*/
+int COMMON_COMPONENT::compare(const COMMON_COMPONENT& x) const
+{
+  intptr_t c0 = &typeid(*this) - &typeid(x);
+  if(c0 < 0) {
+    return -1;
+  }else if(c0 > 0) {
+    return 1;
+  }else{
+  }
+
+  c0 =  intptr_t(next_common()) - intptr_t(x.next_common());
+  if(c0 < 0) { untested();
+    return -1;
+  }else if(c0 > 0) { untested();
+    return 1;
+  }else{
+  }
+
+  c0 = intptr_t(_model) - intptr_t(x._model);
+  if(c0 < 0) { untested();
+    return -1;
+  }else if(c0 > 0) { untested();
+    return 1;
+  }else{
+  }
+
+  if(int c1 = _modelname.compare(x._modelname)) { untested();
+    return c1;
+  }else{
+  }
+
+  return 0;
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_COMPONENT::operator==(const COMMON_COMPONENT& x)const
@@ -625,6 +686,8 @@ void COMPONENT::expand()
   }
   if (has_common()) {
     COMMON_COMPONENT* new_common = common()->clone();
+    assert(*new_common == *common());
+    assert(*common() == *new_common);
     new_common->expand(this);
     COMMON_COMPONENT* deflated_common = new_common->deflate();
     if (deflated_common != common()) {

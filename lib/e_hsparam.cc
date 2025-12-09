@@ -53,28 +53,64 @@ bool HS_PARAM::operator==(const COMMON_COMPONENT& x) const
 }
 /*--------------------------------------------------------------------------*/
 bool HS_PARAM::operator<(const COMMON_COMPONENT& x) const
-{ untested();
+{
+  #define return_if \
+  if(c < 0) {       \
+    return true;    \
+  }else if(c > 0) { \
+    return false;   \
+  }else{            \
+  }
   auto* p = prechecked_cast<HS_PARAM const*>(&x);
-  bool ret = (COMMON_COMPONENT::operator<(x)
-      // these depend on OPT
-      // need to take extra care
-         || _method_fixed < p->_method_fixed
-         || _temperature_fixed < p->_temperature_fixed
-      || _mfactor == p->_mfactor
-      || _xposition == p->_xposition
-      || _yposition == p->_yposition
-      || _zposition == p->_zposition
-      || _hflip == p->_hflip
-      || _vflip == p->_vflip
-      || _zflip == p->_zflip
-      || _angle == p->_angle
-      || _method == p->_method
-      || _temperature == p->_temperature
-      || _dtemp == p->_dtemp
-      || _tnom == p->_tnom
-      || _temp_c == p->_temp_c
-      || _tnom_c == p->_tnom_c);
-  return ret;
+
+  int c = COMMON_COMPONENT::compare(x);
+  return_if
+
+  // kludge, see op==
+  c = ::compare(_method_fixed, p->_method_fixed);
+  return_if
+  double c2 = (_temperature_fixed - p->_temperature_fixed);
+  if(c2 < 0) {
+    return true;
+  }else if(c2 > 0) {
+    return false;
+  }else{
+  }
+
+  // parameters
+  c = _mfactor.compare(p->_mfactor);
+  return_if
+  c = _xposition.compare(p->_xposition);
+  return_if
+  c = _yposition.compare(p->_yposition);
+  return_if
+  c = _zposition.compare(p->_zposition);
+  return_if
+  c = _hflip.compare(p->_hflip);
+  return_if
+  c = _vflip.compare(p->_vflip);
+  return_if
+  c = _zflip.compare(p->_zflip);
+  return_if
+  c = _angle.compare(p->_angle);
+  return_if
+  c = _method.compare(p->_method);
+  return_if
+  c = _temperature.compare(p->_temperature);
+  return_if
+  c = _dtemp.compare(p->_dtemp);
+  return_if
+  c = _tnom.compare(p->_tnom);
+  return_if
+  c = _temp_c.compare(p->_temp_c);
+  return_if
+  c = _tnom_c.compare(p->_tnom_c);
+  if(c<0){untested();
+    return true;
+  }else{
+    return false;
+  }
+  #undef return_if
 }
 /*--------------------------------------------------------------------------*/
 bool HS_PARAM::param_is_printable(int I) const

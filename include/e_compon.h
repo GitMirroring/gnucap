@@ -27,6 +27,7 @@
 #include "u_sim_data.h"
 #include "u_time_pair.h"
 #include "u_parameter.h"
+#include "l_pool.h"
 #include "e_card.h"
 /*--------------------------------------------------------------------------*/
 // this file
@@ -56,6 +57,7 @@ enum {CC_STATIC=27342}; // mid-sized arbitrary positive int
 // pass this as an argument to a common constructor to mark it as static,
 // so it won't be deleted
 /*--------------------------------------------------------------------------*/
+class COMMON_CACHE;
 class INTERFACE COMMON_COMPONENT : public CKT_BASE {
   mutable COMMON_COMPONENT* _next{nullptr};
 protected: // probably obsolete
@@ -66,6 +68,8 @@ private:
 public:
   static void attach_common(COMMON_COMPONENT* c, COMMON_COMPONENT** to);
   static void detach_common(COMMON_COMPONENT** from);
+  static void unique_common(COMMON_COMPONENT**c);
+  static void unlink_common(COMMON_COMPONENT*c);
   bool is_shared()const {return _attach_count > 1;}
   void attach_next(COMMON_COMPONENT* c) { attach_common(c, &_next); }
   void detach_next() { detach_common(&_next); }
@@ -131,6 +135,9 @@ public:
 
   virtual std::string name()const	= 0;
   virtual bool  operator==(const COMMON_COMPONENT&x)const;
+  virtual bool  operator<(const COMMON_COMPONENT&x)const { return compare(x)<0; }
+  virtual int   compare(const COMMON_COMPONENT&x)const;
+  virtual bool  has_less()const {return false;}
 
   bool operator!=(const COMMON_COMPONENT& x)const {return !(*this == x);}
   std::string	      modelname()const	{return _modelname;}
@@ -176,6 +183,7 @@ private:
   friend class COMPONENT;
   void precalc_first_chain(PARAM_LIST const* p);
   void precalc_last_chain(PARAM_LIST const* p);
+  static POOL<COMMON_COMPONENT> _commons;
 };
 /*--------------------------------------------------------------------------*/
 /* note on _attach_count ...
