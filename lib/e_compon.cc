@@ -629,6 +629,11 @@ void COMPONENT::expand()
     COMMON_COMPONENT* deflated_common = new_common->deflate();
     if (deflated_common != common()) {
       attach_common(deflated_common);
+      if (deflated_common != new_common) {//93
+	assert(new_common->_attach_count == 0);
+	delete new_common;
+      }else{//100179
+      }
     }else{untested();
     }
   }else{
