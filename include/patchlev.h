@@ -1,1 +1,1 @@
-#define PATCHLEVEL "parse 2025.11.25"
+#define PATCHLEVEL "deflate-bug-2 2025.12.16"

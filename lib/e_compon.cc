@@ -623,15 +623,29 @@ void COMPONENT::expand()
     }
   }else{ untested();
   }
-  if (has_common()) {
+  if (has_common()) {//100281
     COMMON_COMPONENT* new_common = common()->clone();
     new_common->expand(this);
     COMMON_COMPONENT* deflated_common = new_common->deflate();
-    if (deflated_common != common()) {
+    assert(deflated_common != common()); //100272
+    if (*deflated_common != *common()) {//2806
       attach_common(deflated_common);
-    }else{untested();
+    }else{//97466
     }
-  }else{
+    assert(common()->_attach_count > 0);
+    if (common() != new_common) {//97559 was//93
+      if (common()->_attach_count >= CC_STATIC) {//10714
+	trace1("share ", common()->_attach_count-CC_STATIC);
+      }else{//86845
+	trace1("share ", common()->_attach_count);
+      }
+      assert(new_common->_attach_count == 0);
+      delete new_common;
+    }else{//2713 was//100179
+      trace1("unique", common()->_attach_count);
+      assert(new_common->_attach_count > 0);
+    }
+  }else{//4
   }
 }
 /*--------------------------------------------------------------------------*/
