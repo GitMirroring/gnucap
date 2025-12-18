@@ -449,14 +449,14 @@ int COMMON_COMPONENT::compare(const COMMON_COMPONENT& x) const
   }
 
   c0 = intptr_t(_model) - intptr_t(x._model);
-  if(c0 < 0) { untested();
+  if(c0 < 0) {
     return -1;
-  }else if(c0 > 0) { untested();
+  }else if(c0 > 0) {
     return 1;
   }else{
   }
 
-  if(int c1 = _modelname.compare(x._modelname)) { untested();
+  if(int c1 = _modelname.compare(x._modelname)) {
     return c1;
   }else{
   }

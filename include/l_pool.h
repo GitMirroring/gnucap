@@ -81,9 +81,10 @@ public:
     }else if(size() <=   4){
     }else if(size() <=   8){
     }else if(size() <=  16){
-    }else if(size() <=  32){
-    }else if(size() <=  64){
-    }else if(size() <= 128){
+    }else if(size() <=  32){ untested();
+    }else if(size() <=  64){ untested();
+    }else if(size() <= 128){ untested();
+    }else if(size() <= 256){ untested();
     }else{ untested();
     }
     return ret;
