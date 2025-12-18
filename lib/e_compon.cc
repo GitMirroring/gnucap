@@ -61,9 +61,9 @@ COMMON_COMPONENT::~COMMON_COMPONENT()
   trace1("common,destruct", _attach_count);
   if(_attach_count == 0){
     // not attached to anything.
-  }else if(_attach_count == CC_STATIC) {
+  }else if(_attach_count == CC_STATIC) { itested();
     // static, not attached to anything.
-    unlink_common(this);
+ //   unlink_common(this); // too late.
   }else if(_attach_count > CC_STATIC) { untested();
     // static, still attached to another common
     // the other is static (presumably), but
@@ -77,21 +77,26 @@ COMMON_COMPONENT::~COMMON_COMPONENT()
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
 {
-  trace1("attach", c);
-
   assert(to);
+  trace2("attach", c, *to);
+  int which;
+
   if (c == *to) {
+    which = 0;
     // The new and old are the same object.  Do nothing.
   }else if (!c) {
+    which = 1;
     // There is no new common.  probably a simple element
     detach_common(to);
   }else if (!*to) {
+    which = 2;
     // No old one, but have a new one.
     unique_common(&c);
     ++(c->_attach_count);
     trace1("++1", c->_attach_count);
     *to = c;
   }else if (*c != **to) {
+    which = 3;
     // They are different, usually by edit.
     unique_common(&c);
     assert(c != *to);
@@ -101,21 +106,25 @@ void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
     trace1("++2", c->_attach_count);
     *to = c;
   }else if (c->_attach_count == 0) {
+    which = 4;
     // The new and old are identical.
     // Use the old one.
     // The new one is not used anywhere, so throw it away.
     trace1("delete", c->_attach_count);    
     delete c;
   }else if (c->_attach_count == CC_STATIC) { untested();
+    which = 5;
     // need to cleanup anyway.
     c->detach_next();
   }else{untested();
+    which = 6;
     trace2("identical", c->_attach_count, *to);
     assert(!c->has_less());
     // The new and old are identical.
     // Use the old one.
     // The new one is also used somewhere else, so keep it.
   }
+  trace3("attached", which, c, *to);
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
@@ -354,6 +363,7 @@ std::string COMMON_COMPONENT::param_value(int i) const
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::expand(const COMPONENT* comp)
 {
+  check_pool_consistency();
   if(has_next()){
     COMMON_COMPONENT* c = next_common()->clone();
     assert(c);
@@ -751,6 +761,7 @@ void COMPONENT::deflate_common()
 /*--------------------------------------------------------------------------*/
 void COMPONENT::expand()
 {
+  check_pool_consistency();
   trace2("COMPONENT::expand", long_label(), common());
   CARD::expand();
   if (_sim->is_first_expand()) {
@@ -760,6 +771,7 @@ void COMPONENT::expand()
   }else{ untested();
   }
   if (has_common()) {
+    check_pool_consistency();
     COMMON_COMPONENT* new_common = common()->clone();
     assert(*new_common == *common());
     assert(*common() == *new_common);
@@ -770,7 +782,9 @@ void COMPONENT::expand()
     }else{
     }
     if (deflated_common != common()) {
+      check_pool_consistency();
       attach_common(deflated_common);
+      check_pool_consistency();
     }else{untested();
     }
     delete new_common;
