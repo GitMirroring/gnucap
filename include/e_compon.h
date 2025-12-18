@@ -137,7 +137,7 @@ public:
   virtual bool  operator==(const COMMON_COMPONENT&x)const;
   virtual bool  operator<(const COMMON_COMPONENT&x)const {untested(); unreachable(); return compare(x)<0; }
   virtual int   compare(const COMMON_COMPONENT&x)const;
-  virtual bool  has_less()const {return false;}
+  virtual bool  has_less()const { return false;}
 
   bool operator!=(const COMMON_COMPONENT& x)const {return !(*this == x);}
   std::string	      modelname()const	{return _modelname;}

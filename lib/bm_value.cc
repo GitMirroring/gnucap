@@ -123,7 +123,7 @@ COMMON_COMPONENT* EVAL_BM_VALUE::deflate()
 {
   if(has_ext_args()){
     return this; // no deflate.
-  }else if(modelname() != ""){ untested();
+  }else if(modelname() != ""){
     return this; // not sure what this is.
 		 // but need to get rid of model anyway
   }else{
