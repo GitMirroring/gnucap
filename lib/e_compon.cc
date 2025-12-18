@@ -32,6 +32,13 @@
 #include "e_cardlist.h"
 #include <typeindex>
 /*--------------------------------------------------------------------------*/
+static void check_pool_consistency()
+{
+#ifdef DEBUG_POOL
+  COMMON_COMPONENT::_commons.consistency_check();
+#endif
+}
+/*--------------------------------------------------------------------------*/
 COMMON_COMPONENT::COMMON_COMPONENT(const COMMON_COMPONENT& p)
   :CKT_BASE(p),
    _modelname(p._modelname),
@@ -466,14 +473,18 @@ int COMMON_COMPONENT::compare(const COMMON_COMPONENT& x) const
 /*--------------------------------------------------------------------------*/
 bool COMMON_COMPONENT::operator==(const COMMON_COMPONENT& x)const
 {
-#ifdef NDEBUG
-  if(this == &x){
+#ifndef NDEBUG
+  if(this == &x){ untested();
     // redundant call, should not get here.
     unreachable();
+    // return true;
+  }else if(&typeid(*this) != &typeid(x)){ untested();
+    // impossible call, should not get here.
+    unreachable();
+    // return false;
   }else{
   }
 #endif
-  // return false; // test re-attach logic. BUG: breaks mos1.
   return (_modelname == x._modelname
 	  && _next == x._next
 	  && _model == x._model);
@@ -796,7 +807,7 @@ void COMPONENT::precalc_first()
   }else{
   }
 
-  trace2("COMPONENT::precalc_first2", long_label(), common());
+  check_pool_consistency();
 }
 /*--------------------------------------------------------------------------*/
 // .. bypassed in mg_out_dev.
@@ -838,6 +849,8 @@ void COMPONENT::precalc_last()
   assert(mfactor() == _mfactor_fixed);
   trace2("COMPONENT::pl", long_label(), mfactor());
   trace2("COMPONENT::precalc_last2", long_label(), common());
+
+  check_pool_consistency();
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::map_nodes()

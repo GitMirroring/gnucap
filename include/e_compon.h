@@ -64,6 +64,7 @@ protected: // probably obsolete
 private:
   mutable const MODEL_CARD* _model;
   int		_attach_count;
+  static POOL<COMMON_COMPONENT> _commons;
 public:
   static void attach_common(COMMON_COMPONENT* c, COMMON_COMPONENT** to);
   static void detach_common(COMMON_COMPONENT** from);
@@ -182,7 +183,6 @@ private:
   friend class COMPONENT;
   void precalc_first_chain(PARAM_LIST const* p);
   void precalc_last_chain(PARAM_LIST const* p);
-  static POOL<COMMON_COMPONENT> _commons;
 };
 /*--------------------------------------------------------------------------*/
 /* note on _attach_count ...
