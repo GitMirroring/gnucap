@@ -1,1 +1,1 @@
-#define PATCHLEVEL "diode_temp 2025.11.03"
+#define PATCHLEVEL "modelgen 2025.12.18"
