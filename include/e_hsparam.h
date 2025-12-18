@@ -105,7 +105,10 @@ public:
   HS_PARAM* clone()const override {return new HS_PARAM(*this);}
 
   bool operator==(const COMMON_COMPONENT& x)const override;
-  bool operator<(const COMMON_COMPONENT& x)const override;
+  bool operator<(const COMMON_COMPONENT& x)const override {
+    return HS_PARAM::compare(x) < 0;
+  }
+  int compare(const COMMON_COMPONENT& x)const override;
   bool has_less()const override { untested(); return false;}
 
   bool param_is_printable(int i)const override;

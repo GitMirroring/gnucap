@@ -56,54 +56,53 @@ bool HS_PARAM::operator==(const COMMON_COMPONENT& x) const
   return ret;
 }
 /*--------------------------------------------------------------------------*/
-bool HS_PARAM::operator<(const COMMON_COMPONENT& x) const
+int HS_PARAM::compare(const COMMON_COMPONENT& x) const
 {
-  #define return_if \
-  if(c < 0) {       \
-    return true;    \
-  }else if(c > 0) { \
-    return false;   \
-  }else{            \
-  }
-  auto* p = prechecked_cast<HS_PARAM const*>(&x);
-
-  int c = COMMON_COMPONENT::compare(x);
-  return_if
-
-  // parameters
-  c = _mfactor.compare(p->_mfactor);
-  return_if
-  c = _xposition.compare(p->_xposition);
-  return_if
-  c = _yposition.compare(p->_yposition);
-  return_if
-  c = _zposition.compare(p->_zposition);
-  return_if
-  c = _hflip.compare(p->_hflip);
-  return_if
-  c = _vflip.compare(p->_vflip);
-  return_if
-  c = _zflip.compare(p->_zflip);
-  return_if
-  c = _angle.compare(p->_angle);
-  return_if
-  c = _method.compare(p->_method);
-  return_if
-  c = _temperature.compare(p->_temperature);
-  return_if
-  c = _dtemp.compare(p->_dtemp);
-  return_if
-  c = _tnom.compare(p->_tnom);
-  return_if
-  c = _temp_c.compare(p->_temp_c);
-  return_if
-  c = _tnom_c.compare(p->_tnom_c);
-  if(c<0){untested();
-    return true;
+  if(this == &x){
+    return 0;
   }else{
+  }
+
+  int c;
+  if((c = COMMON_PARAMLIST::compare(x))) {
+    return c;
+  }else{
+  }
+
+  auto* p = prechecked_cast<HS_PARAM const*>(&x);
+  assert(p);
+
+  if((c = _mfactor.compare(p->_mfactor))) { untested();
+    return c;
+  }else if((c = _xposition.compare(p->_xposition))) { untested();
+    return c;
+  }else if((c = _yposition.compare(p->_yposition))) { untested();
+    return c;
+  }else if((c = _zposition.compare(p->_zposition))) { untested();
+    return c;
+  }else if((c = _hflip.compare(p->_hflip))) { untested();
+    return c;
+  }else if((c = _vflip.compare(p->_vflip))) { untested();
+    return c;
+  }else if((c = _zflip.compare(p->_zflip))) { untested();
+    return c;
+  }else if((c = _angle.compare(p->_angle))) { untested();
+    return c;
+  }else if((c = _method.compare(p->_method))) {
+    return c;
+  }else if((c = _temperature.compare(p->_temperature))) { untested();
+    return c;
+  }else if((c = _dtemp.compare(p->_dtemp))) { untested();
+    return c;
+  }else if((c = _tnom.compare(p->_tnom))) { untested();
+    return c;
+  }else if((c = _temp_c.compare(p->_temp_c))) {
+    return c;
+  }else if((c = _tnom_c.compare(p->_tnom_c))) { untested();
+    return c;
+  }else{ untested();
     return false;
   }
-  #undef return_if
 }
 /*--------------------------------------------------------------------------*/
 bool HS_PARAM::param_is_printable(int I) const
