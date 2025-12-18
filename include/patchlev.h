@@ -1,1 +1,1 @@
-#define PATCHLEVEL "parse 2025.11.25"
+#define PATCHLEVEL "diode_temp 2025.11.03"
