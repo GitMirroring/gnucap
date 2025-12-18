@@ -195,10 +195,10 @@ device BUILT_IN_BJT {
     calculated_parameters {
       double oik  "" calculate="m->invrollofff / c->area";
       double oikr "" calculate="m->invrolloffr / c->area";
-      double _vt "vt";
+		double _vt "";
     }
     code_pre {
-      double temp_k = c->temp_k();
+      double temp_k = c->temp_k(par_scope);
       _vt = P_K_Q * temp_k;
     }
   }
@@ -382,7 +382,7 @@ model BUILT_IN_BJT {
     code_pre {
       const double reftemp = 300.15;
       double temp_k =
-	((has_hard_value(c->temp_c)) ? (c->temp_c + P_CELSIUS0) : c->temp_k());
+	((has_hard_value(c->temp_c)) ? (c->temp_c + P_CELSIUS0) : c->temp_k(par_scope->params()));
       double fact1 = m->tnom_k / reftemp;
       double fact2 = temp_k / reftemp;
       double tempratio  = temp_k / m->tnom_k; // fact2/fact1
