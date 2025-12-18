@@ -159,7 +159,7 @@ void COMMON_COMPONENT::unique_common(COMMON_COMPONENT**c)
   }else if(ac == CC_STATIC){
     d = COMMON_COMPONENT::_commons[*c];
     assert(d == *c);
-  }else if(ac > CC_STATIC){ untested();
+  }else if(ac > CC_STATIC){
   }else{
     assert(*c == COMMON_COMPONENT::_commons[*c]);
     assert(d->_attach_count);
@@ -740,6 +740,7 @@ void COMPONENT::deflate_common()
 /*--------------------------------------------------------------------------*/
 void COMPONENT::expand()
 {
+  trace2("COMPONENT::expand", long_label(), common());
   CARD::expand();
   if (_sim->is_first_expand()) {
     for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
@@ -768,6 +769,7 @@ void COMPONENT::expand()
 /*--------------------------------------------------------------------------*/
 void COMPONENT::precalc_first()
 {
+  trace2("COMPONENT::precalc_first1", long_label(), common());
   for(int i = 0; i < min_nodes(); ++i){
     if(!node_is_connected(i)) {
       throw Exception(long_label() + ": invalid nodes");
@@ -793,12 +795,14 @@ void COMPONENT::precalc_first()
     attach_common(c);
   }else{
   }
+
+  trace2("COMPONENT::precalc_first2", long_label(), common());
 }
 /*--------------------------------------------------------------------------*/
 // .. bypassed in mg_out_dev.
 void COMPONENT::precalc_last()
 {
-  trace3("COMPONENT::pl0", long_label(), mfactor(), hsparam());
+  trace2("COMPONENT::precalc_last1", long_label(), common());
   PARAM_LIST const* params = scope()->params();
   CARD::precalc_last();
   if (has_common()) {
@@ -833,6 +837,7 @@ void COMPONENT::precalc_last()
   _mfactor_fixed = mfactor_new;
   assert(mfactor() == _mfactor_fixed);
   trace2("COMPONENT::pl", long_label(), mfactor());
+  trace2("COMPONENT::precalc_last2", long_label(), common());
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::map_nodes()
