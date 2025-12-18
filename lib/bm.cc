@@ -147,7 +147,7 @@ bool EVAL_BM_ACTION_BASE::operator==(const COMMON_COMPONENT& x)const
   return rv;
 }
 /*--------------------------------------------------------------------------*/
-bool EVAL_BM_ACTION_BASE::operator<(const COMMON_COMPONENT& x) const
+bool EVAL_BM_ACTION_BASE::operator<(const COMMON_COMPONENT&) const
 { untested();
   return EVAL_BM_ACTION_BASE::compare(x) < 0;
 }
