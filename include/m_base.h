@@ -209,11 +209,11 @@ public:
   std::string val_string()const override{return std::to_string(_data);}
   bool to_bool()const override		{return (_input && _data != 0);}
   int compare(Integer const& i)const {
-    if(_data < i._data){ untested();
+    if(_data < i._data){
       return -1;
-    }else if(_data > i._data){ untested();
+    }else if(_data > i._data){
       return 1;
-    }else{ untested();
+    }else{
       return 0;
     }
   }
