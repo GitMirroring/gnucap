@@ -74,7 +74,7 @@ int HS_PARAM::compare(const COMMON_COMPONENT& x) const
 
   if((c = _mfactor.compare(p->_mfactor))) {
     return c;
-  }else if((c = _xposition.compare(p->_xposition))) { untested();
+  }else if((c = _xposition.compare(p->_xposition))) {
     return c;
   }else if((c = _yposition.compare(p->_yposition))) { untested();
     return c;
@@ -100,7 +100,7 @@ int HS_PARAM::compare(const COMMON_COMPONENT& x) const
     return c;
   }else if((c = _tnom_c.compare(p->_tnom_c))) { untested();
     return c;
-  }else{ untested();
+  }else{
     return false;
   }
 }
