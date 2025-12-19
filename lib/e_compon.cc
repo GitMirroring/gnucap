@@ -67,39 +67,46 @@ COMMON_COMPONENT::~COMMON_COMPONENT()
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::attach_common(COMMON_COMPONENT*c, COMMON_COMPONENT**to)
-{
+{untested();//1795936,1893541
   trace1("attach", c);
   assert(to);
-  if (c == *to) {
+  if (c == *to) {untested();//1002040,1002027
     // The new and old are the same object.  Do nothing.
-  }else if (!c) {
+
+  }else if (!c) {untested();//189,189
     // There is no new common.  probably a simple element
     detach_common(to);
-  }else if (!*to) {
+
+  }else if (!*to) {untested();//220590,220603
     // No old one, but have a new one.
     ++(c->_attach_count);
     trace1("++1", c->_attach_count);
     *to = c;
-  }else if (*c != **to) {
+
+  }else if (*c != **to) {untested();//24881,24979
     // They are different, usually by edit.
     detach_common(to);
     ++(c->_attach_count);
     trace1("++2", c->_attach_count);
     *to = c;
-  }else if (c->_attach_count == 0) {
+
+  }else if (c->_attach_count == 0) {untested();//548236,645743
     // The new and old are identical.
     // Use the old one.
     // The new one is not used anywhere, so throw it away.
     trace1("delete", c->_attach_count);    
     delete c;
-  }else if (c->_attach_count == CC_STATIC) { untested();
+
+  }else if (c->_attach_count == CC_STATIC) {untested();untested();//0,0
     // need to cleanup anyway.
     c->detach_next();
-  }else{untested();
+
+  }else{untested();untested();//0,0
     // The new and old are identical.
     // Use the old one.
     // The new one is also used somewhere else, so keep it.
   }
+
 }
 /*--------------------------------------------------------------------------*/
 void COMMON_COMPONENT::detach_common(COMMON_COMPONENT** from)
@@ -615,37 +622,45 @@ void COMPONENT::deflate_common()
 }
 /*--------------------------------------------------------------------------*/
 void COMPONENT::expand()
-{
+{untested();//100285
   CARD::expand();
-  if (_sim->is_first_expand()) {
-    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){
+  if (_sim->is_first_expand()) {untested();//100285
+    for(int i=net_nodes(); i<ext_nodes()+int_nodes(); ++i){untested();//11727
       n_(i).clear();
     }
-  }else{ untested();
+  }else{untested(); untested();//0
   }
-  if (has_common()) {//100281
-    COMMON_COMPONENT* new_common = common()->clone();
-    new_common->expand(this);
+  if (has_common()) {untested();//100281
+    COMMON_COMPONENT* new_common = common()->clone();untested();//100281
+    new_common->expand(this);untested();//100272 lost 9 to exceptions
     COMMON_COMPONENT* deflated_common = new_common->deflate();
-    assert(deflated_common != common()); //100272
-    if (*deflated_common != *common()) {//2806
+    assert(deflated_common != common());
+    if (deflated_common == new_common) {untested();//97466,100179
       attach_common(deflated_common);
-    }else{//97466
+    }else if (*deflated_common != *common()) {untested();//2806,93
+      assert(new_common->_attach_count == 0);
+      //delete new_common;
+      attach_common(deflated_common);
+      assert(new_common->_attach_count == 0);
+    }else if (deflated_common == new_common) {untested();//97466,0
+      attach_common(deflated_common);
+    }else{untested();//0,0
+      attach_common(deflated_common);
     }
     assert(common()->_attach_count > 0);
-    if (common() != new_common) {//97559 was//93
-      if (common()->_attach_count >= CC_STATIC) {//10714
+    if (common() != new_common) {untested();//97559
+      if (common()->_attach_count >= CC_STATIC) {untested();//10714
 	trace1("share ", common()->_attach_count-CC_STATIC);
-      }else{//86845
+      }else{untested();//86845
 	trace1("share ", common()->_attach_count);
       }
       assert(new_common->_attach_count == 0);
-      delete new_common;
-    }else{//2713 was//100179
+      //delete new_common;
+    }else{untested();//2713
       trace1("unique", common()->_attach_count);
       assert(new_common->_attach_count > 0);
     }
-  }else{//4
+  }else{untested();//4
   }
 }
 /*--------------------------------------------------------------------------*/
