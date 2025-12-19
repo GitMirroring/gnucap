@@ -165,7 +165,7 @@ void COMMON_COMPONENT::unique_common(COMMON_COMPONENT**c)
     d = COMMON_COMPONENT::_commons[*c];
     if(d == *c){
       // assert(d->_attach_count);
-    }else{
+    }else{ // 70566
       // using d which is attached to sth else.
       // c is no longer needed.
       assert(d->_attach_count);
