@@ -27,6 +27,10 @@
 #include <iostream>
 #endif
 
+#if __cplusplus >= 202002L
+#include <utility> // feature testing
+#endif
+
 /* allow multiple inclusions with different DO_TRACE */
 #undef trace_line
 #undef trace
@@ -41,7 +45,9 @@
 #undef trace8
 #undef untested
 #undef itested
+#ifndef __cpp_lib_unreachable // C++ >= 23
 #undef unreachable
+#endif
 #undef unreachable_trap
 #undef incomplete
 /*--------------------------------------------------------------------------*/
@@ -148,11 +154,14 @@
 #endif
 
 #ifdef __cplusplus
-
+#ifdef __cpp_lib_unreachable // C++ >= 23
+    using std::unreachable;
+#else
 #define unreachable() ( \
     std::cerr << "@@#\n@@@unreachable:" \
               << __FILE__ << ":" << __LINE__ << ":" << __func__ << "\n"); \
     unreachable_trap()
+#endif
 
 #define incomplete() ( \
     std::cerr << "@@#\n@@@incomplete:" \
