@@ -167,10 +167,10 @@ static void make_common_operator_compare(std::ofstream& out, const Device& d)
     "  assert(p);\n";
 
   out <<
-	 "  // if(intptr_t s = intptr_t(_sdp) - intptr_t(p->_sdp)){\n"
-    "  //   return s < 0;\n"
-    "  // }else{\n"
-    "  // }\n";
+	 "  if(intptr_t s = intptr_t(_sdp) - intptr_t(p->_sdp)){\n"
+    "    return (s < 0)?-1:1;\n"
+    "  }else{\n"
+    "  }\n";
 
   std::string sep;
   if(d.common().calculated().size()){
