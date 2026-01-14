@@ -1,14 +1,27 @@
+>>>>>module bbb (a,b);
+>>>>>module aaa (a,b);
+>>>>>list
+module bbb (.a(a),.b(b));
+endmodule // bbb
+
 module aaa (.a(a),.b(b));
   resistor #(.(100)) r1 (a, b);
-  r1 #() r2 (a, b);
-  r2 #(.r(300)) r2 (a, b);
+  bbb #() r2 (a, b);
+  r1 #() r3 (a, b);
 endmodule // aaa
 
-aaa.r2: no candidates found for r1
-aaa.r2: no candidates found for r2
-a1.r2: no valid prototype found for r1
-aaa.r2: no candidates found for r1
-aaa.r2: no candidates found for r2
-aaa.r2: no candidates found for r1
-aaa.r2: no candidates found for r2
-a1.r2: no valid prototype found for r1
+>>>>>print dc v(a)
+aaa.r1: resistor from device_dispatcher
+aaa.r1: 1 candidate found for resistor
+aaa.r2: bbb from top level
+aaa.r2: 1 candidate found for bbb
+aaa.r3: r1 from my scope
+aaa.r3: 1 candidate found for r1
+.r3:p0: no candidates found for r1
+.r3:p0: no candidates found for r1
+a1.r3: no valid prototype found for r1
+>>>>>dc
+.r3:p0: no candidates found for r1
+.r3:p0: no candidates found for r1
+a1.r3: no valid prototype found for r1
+>>>>>end

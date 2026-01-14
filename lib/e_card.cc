@@ -193,7 +193,7 @@ CARD* CARD::find_in_my_scope(const std::string& name)
     throw Exception_Cant_Find(long_label(), name,
 			      ((owner()) ? owner()->long_label() : "(root)"));
   }else if(scope()->find_again(name, ++j) != scope()->end()){
-    error(bWARNING, "duplicate match " + name + " in " + long_label() + "\n");
+    error(bWARNING, "duplicate " + name + " in " + long_label() + " (ignored).\n");
   }else{
   }
   return *i;
@@ -222,7 +222,7 @@ const CARD* CARD::find_in_parent_scope(const std::string& name)const
   if (i == p_scope->end()) {
     throw Exception_Cant_Find(long_label(), name);
   }else if(p_scope->find_again(name, ++j) != p_scope->end()){
-    error(bWARNING, "duplicate match " + name + " in " + long_label() + "\n");
+    error(bWARNING, "duplicate " + name + " in " + long_label() + " (ignored).\n");
   }else{
   }
   return *i;
