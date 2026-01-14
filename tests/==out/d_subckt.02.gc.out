@@ -1,5 +1,5 @@
 module r (.a(a),.b(b));
-  resistor #(.(x+y)) r1 (a, b);
+  resistor #(x+y) r1 (a, b);
 endmodule // r
 
 module rr (.a(a),.b(b));

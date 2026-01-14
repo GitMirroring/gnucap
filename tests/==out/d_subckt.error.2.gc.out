@@ -3,9 +3,9 @@ m #() mm(.a(\1 ), .b(\0 ));
 m #() mm(.x(\1 ), .d(\0 ));
          ^ ? mm: mismatch x ignored
 module m (.a(a),.d(d));
-  resistor #(.(1)) r0 (a, b);
-  resistor #(.(1)) r1 (b, c);
-  resistor #(.(1)) r2 (c, d);
+  resistor #(1) r0 (a, b);
+  resistor #(1) r1 (b, c);
+  resistor #(1) r2 (c, d);
 endmodule // m
 
 m #() mm (.a(\1 ));

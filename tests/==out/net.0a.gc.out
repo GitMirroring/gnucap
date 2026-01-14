@@ -3,9 +3,9 @@ endmodule // net
 
 module main ();
   ground g;
-  resistor #(.(1.)) r1 (\2 , g);
+  resistor #(1.) r1 (\2 , g);
   net #() n1 (.a(\1 ),.b(\2 ),.c(\4 ),.d(g));
-  vsource #(.(1.)) v1 (\1 , \4 );
+  vsource #(1.) v1 (\1 , \4 );
 endmodule // main
 
 #           i(Xm.r1)  

@@ -1,8 +1,8 @@
 module a (.b(b),.c(c),.d(d),.e(e),.f(f),.g(g));
-  resistor #(.r(1k)) r1 (.p(b),.n(c));
-  resistor #(.r(1k)) r2 (.p(c),.n(d));
-  resistor #(.r(1k)) r3 (.p(e),.n(f));
-  resistor #(.r(1k)) r4 (.p(f),.n(g));
+  resistor #(1k) r1 (b, c);
+  resistor #(1k) r2 (c, d);
+  resistor #(1k) r3 (e, f);
+  resistor #(1k) r4 (f, g);
 endmodule // a
 
 ground gnd;
