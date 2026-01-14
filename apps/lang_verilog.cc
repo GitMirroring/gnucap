@@ -721,25 +721,63 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
   x->subckt()->set_verilog_math();
 
   // header
+#if 1
   cmd.reset();
   parse_attributes(cmd, x->id_tag());
+#else
+  // todo. stash attributes somewhere.
+  move_attributes(tag_t(&cmd), x->id_tag());
+#endif
   (cmd >> "module |macromodule ");
   parse_label(cmd, x);
   parse_ports(cmd, x, true/*all new*/);
   cmd >> ';';
 
+  bool have_instance = false;
+
   // body
   for (;;) {
+
     cmd.getline("verilog-module>");
+#if 0
+    while (!parse_attributes(cmd, tag_t(&cmd)).more()){
+      cmd.getline("verilog-module>");
+    }
+#else
+    while (!cmd.more()){
+      cmd.getline("verilog-module>");
+    }
+#endif
 
     if (cmd >> "endmodule ") {
       break;
-    }else if (cmd >> "parameter ") {
+    }else if (!have_instance && (cmd >> "parameter ")) {
       module_param.do_it(cmd, x->subckt());
+    }else if (cmd >> "//") {
+      cmd.reset();
+      new__instance(cmd, x, x->subckt());
+    }else if (cmd >> "ground ") {
+      cmd.reset();
+      new__instance(cmd, x, x->subckt());
     }else if (cmd >> "wire |electrical |inout |input |output ") {
       net_decl.do_it(cmd, x->subckt());
-    }else{
+    }else if (cmd >> "paramset ") { untested();
+      cmd.reset();
+      cmd.check(bDANGER, "ERROR: This will not work. Need top level.");
       new__instance(cmd, x, x->subckt());
+    }else{
+      trace1("parse_module: instance", cmd.tail());
+      have_instance = true;
+      BASE_SUBCKT* new_instance = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("__stub"));
+      assert(new_instance);
+      CARD_LIST* Scope = x->subckt();
+      trace3("parse_module instance", cmd.tail(), Scope, Scope->nodes());
+      assert(Scope);
+
+      new_instance->set_owner(x);
+      parse_instance(cmd, new_instance);
+
+      Scope->push_back(new_instance);
     }
   }
   return x;
@@ -819,10 +857,19 @@ void LANG_VERILOG::print_args(OMSTREAM& o, const MODEL_CARD* x)
   if (x->use_obsolete_callback_print()) { untested();
     x->print_args_obsolete_callback(o, this);  //BUG//callback//
   }else{
+    std::string sep = "";
     for (int ii = 0; ii < x->param_count(); ++ii) {
       if (x->param_is_printable(ii)) {
-	std::string arg = " ." + x->param_name(ii) + '=' + x->param_value(ii) + ';';
-	o << arg;
+	o << sep;
+	print_attributes(o, x->param_id_tag(ii));
+	std::string pn = x->param_name(ii);
+	if(pn==""){
+	  o << x->param_value(ii);
+	  sep = ", ";
+	}else{
+	  o << "." << pn << "(" << x->param_value(ii) << ")";
+	  sep = ",";
+	}
       }else{
       }
     }

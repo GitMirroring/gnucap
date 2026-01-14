@@ -1,8 +1,8 @@
 module m (.a(a),.b(b),.c(c));
   ground \0 ;
-  capacitor #(.c(1),.$xposition(2),.$method("euler")) ca (.p(a),.n(\0 ));
-  capacitor #(.c(1),.$method("euleronly")) cb (.p(b),.n(\0 ));
-  capacitor #(.c(1),.$method("trap")) cc (.p(c),.n(\0 ));
+  capacitor #(.$method("euler"),.$xposition(2),.c(1)) ca (a, \0 );
+  capacitor #(.$method("euleronly"),.c(1)) cb (b, \0 );
+  capacitor #(.c(1),.$method("trap")) cc (c, \0 );
 endmodule // m
 
 m #(.$method("traponly")) mm (.a(a),.b(b),.c(c));

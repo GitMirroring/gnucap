@@ -3,10 +3,10 @@ endmodule // net
 
 module main ();
   ground \0 ;
-  resistor #(.r(1.)) r1 (.p(\2 ),.n(\0 ));
+  resistor #(.(1.)) r1 (\2 , \0 );
   net #() n1 (.a(\1 ),.b(\3 ));
-  net #() n2 (.a(\3 ),.b(\2 ));
-  vsource #(.dc(1.)) v1 (.p(\1 ),.n(\0 ));
+  net #() n2 (\3 , \2 );
+  vsource #(.(1.)) v1 (\1 , \0 );
 endmodule // main
 
 #           i(Xm.r1)  
