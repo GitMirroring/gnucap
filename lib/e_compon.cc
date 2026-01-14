@@ -963,6 +963,7 @@ void COMPONENT::set_parameters(const std::string& Label, CARD *Owner,
 			       int , double [],
 			       int node_count, const node_t Nodes[])
 {
+  trace3("COMPONENT::set_parameters", dev_type(), long_label(), Common);
   check_pool_consistency();
   set_label(Label);
   set_owner(Owner);
