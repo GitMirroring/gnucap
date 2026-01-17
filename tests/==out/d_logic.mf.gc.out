@@ -1,13 +1,13 @@
 paramset mos logic;
- .delay=1n; .vmax=5.; .vmin=0.; .unknown=NA( 2.5); .rise=1n; .fall=1n; .rs=100.; .rw=1.G; .thh=0.75; .thl=0.25; .mr=5.; .mf=5.; .over=10k; .tnom=NA( 27.);
+.delay(1n),.vmax(5.),.vmin(0.),.unknown(NA( 2.5)),.rise(1n),.fall(1n),.rs(100.),.rw(1.G),.thh(0.75),.thl(0.25),.mr(5.),.mf(5.),.over(10k),.tnom(NA( 27.))
 endparamset
 
 paramset nmos nmos2;
- .level=2; .nfs=0.; .neff=1.; .delta=0.; .vto=0.; .gamma=0.; .phi=0.6; .tox=100.n; .uo=600.; .tpg=1; .tnom=NA( 27.); .fc=0.5; .pb=0.8; .cj=0.; .mj=0.5; .cjsw=0.; .mjsw=0.33; .is=10.E-15; .rsh=0.; .cgso=0.; .cgdo=0.; .cgbo=0.; .ld=0.;
+.level(2),.nfs(0.),.neff(1.),.delta(0.),.vto(0.),.gamma(0.),.phi(0.6),.tox(100.n),.uo(600.),.tpg(1),.tnom(NA( 27.)),.fc(0.5),.pb(0.8),.cj(0.),.mj(0.5),.cjsw(0.),.mjsw(0.33),.is(10.E-15),.rsh(0.),.cgso(0.),.cgdo(0.),.cgbo(0.),.ld(0.)
 endparamset
 
 paramset pmos pmos2;
- .level=2; .nfs=0.; .neff=1.; .delta=0.; .vto=0.; .gamma=0.; .phi=0.6; .tox=100.n; .uo=600.; .tpg=1; .tnom=NA( 27.); .fc=0.5; .pb=0.8; .cj=0.; .mj=0.5; .cjsw=0.; .mjsw=0.33; .is=10.E-15; .rsh=0.; .cgso=0.; .cgdo=0.; .cgbo=0.; .ld=0.;
+.level(2),.nfs(0.),.neff(1.),.delta(0.),.vto(0.),.gamma(0.),.phi(0.6),.tox(100.n),.uo(600.),.tpg(1),.tnom(NA( 27.)),.fc(0.5),.pb(0.8),.cj(0.),.mj(0.5),.cjsw(0.),.mjsw(0.33),.is(10.E-15),.rsh(0.),.cgso(0.),.cgdo(0.),.cgbo(0.),.ld(0.)
 endparamset
 
 inv #(.model(mos)) U1 (.out(\2 ),.in1(\1 ));

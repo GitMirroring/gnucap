@@ -3,21 +3,15 @@ vccs #(.gm({alpha*adap}))) iF(0 f cd 0);
 vccs #(.gm({alpha*adap}))) iF(0 f cd 0);
                          ^ ? '(' required (parse ports) (grounding)
 vccs #(.gm({alpha*adap}))) iF(0 f cd 0);
-                         ^ ? sink: port unconnected, grounding
-vccs #(.gm({alpha*adap}))) iF(0 f cd 0);
-                         ^ ? src: port unconnected, grounding
-vccs #(.gm({alpha*adap}))) iF(0 f cd 0);
-                         ^ ? ps: port unconnected, grounding
-vccs #(.gm({alpha*adap}))) iF(0 f cd 0);
-                         ^ ? ns: port unconnected, grounding
-vccs #(.gm({alpha*adap}))) iF(0 f cd 0);
                          ^ ? what's this?
 crash(x, y);
      ^ ? label required
 module crash (.iout(iout),.nC(nC));
   // extra paren in vccs 
-  vccs #(.gm({alpha*adap})) G_unnamed (.sink(\????? ),.src(\????? ),.ps(\????? ),.ns(\????? ));
+  vccs #(.gm({alpha*adap})) X_unnamed ();
 endmodule // crash
 
 // syntax error, no label
 crash #() X_unnamed (.iout(x),.nC(y));
+crash.X_unnamed: no candidates found for vccs
+X_unnamed.X_unnamed: no valid prototype found for vccs

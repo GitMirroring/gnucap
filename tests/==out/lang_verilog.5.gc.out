@@ -1,10 +1,13 @@
  wireww; // no match
- ^ ? wireww: no match
+       ^ ? label required
+ wireww; // no match
+       ^ ? '(' required (parse ports) (grounding)
 module test (.p(x),.q(y));
    electrical x, y;
    inout x;
    inout y;
    wire w;
-  resistor #() r1 (.p(a),.n(b));
+  wireww #() X_unnamed ();
+  resistor #() r1 (a, b);
 endmodule // test
 
