@@ -44,6 +44,7 @@ public:
 };
 /*--------------------------------------------------------------------------*/
 class INTERFACE MODEL_CARD : public CARD{
+  mutable int _refs{0};
 private:
   explicit	MODEL_CARD() {unreachable();}
 protected:
@@ -52,6 +53,10 @@ public:
   explicit	MODEL_CARD(const COMPONENT* p);
 		~MODEL_CARD();
 
+public: // refcount.
+  void	inc_refs()const	{++_refs;}
+  void	dec_refs()const	{assert(_refs>0); --_refs;}
+  bool	has_refs()const	{return _refs > 0;}
 public: // override virtuals
   char	id_letter()const override	{untested();return '\0';}
   CARD*	clone_instance()const override	{return (_component_proto) ? _component_proto->clone() : nullptr;}
