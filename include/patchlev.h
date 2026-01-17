@@ -1,1 +1,1 @@
-#define PATCHLEVEL "stdfix 2026.01.05"
+#define PATCHLEVEL "stub 2025.12.04"
