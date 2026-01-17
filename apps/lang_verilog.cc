@@ -765,6 +765,10 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       cmd.reset();
       cmd.check(bDANGER, "ERROR: This will not work. Need top level.");
       new__instance(cmd, x, x->subckt());
+    }else if (cmd >> "module |macromodule ") {
+      cmd.reset();
+      cmd.check(bWARNING, "nonstandard nesting in " + x->long_label() + ".");
+      new__instance(cmd, x, x->subckt());
     }else{
       trace1("parse_module: instance", cmd.tail());
       have_instance = true;
