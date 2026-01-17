@@ -5,7 +5,7 @@ paramset zz npn;
 endparamset
 
 module dumb_resistor (.a(a),.b(b));
-  resistor #(.(r)) R1 (a, b);
+  resistor #(r) R1 (a, b);
 endmodule // dumb_resistor
 
 module foo (.vcc(vcc),.in(in),.out(out));

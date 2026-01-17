@@ -771,17 +771,24 @@ BASE_SUBCKT* LANG_VERILOG::parse_module(CS& cmd, BASE_SUBCKT* x)
       new__instance(cmd, x, x->subckt());
     }else{
       trace1("parse_module: instance", cmd.tail());
-      have_instance = true;
-      BASE_SUBCKT* new_instance = dynamic_cast<BASE_SUBCKT*>(device_dispatcher.clone("__stub"));
-      assert(new_instance);
       CARD_LIST* Scope = x->subckt();
-      trace3("parse_module instance", cmd.tail(), Scope, Scope->nodes());
+      BASE_SUBCKT* new_instance;
+      if(extended){
+	trace1("parse_module: extended", cmd.tail());
+	assert(have_instance);
+	assert(Scope->back());
+	new_instance = dynamic_cast<BASE_SUBCKT*>(Scope->back()->clone_instance());
+      }else{
+	new_instance = dynamic_cast<BASE_SUBCKT*>(device_dispatcher["__stub"]->clone_instance());
+	assert(new_instance);
+      }
       assert(Scope);
 
       new_instance->set_owner(x);
       parse_instance(cmd, new_instance);
 
       Scope->push_back(new_instance);
+      have_instance = true;
     }
   }
   return x;
@@ -896,7 +903,7 @@ void LANG_VERILOG::print_args(OMSTREAM& o, const COMPONENT* x)
 	o << sep;
 	print_attributes(o, x->param_id_tag(ii));
 	std::string pn = x->param_name(ii);
-	if(pn==""){ untested();
+	if(pn==""){
 	  o << x->param_value(ii);
 	  sep = ", ";
 	}else{
