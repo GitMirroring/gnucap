@@ -115,7 +115,17 @@ void Expression::leaf(CS& File)
 {
   trace1("leaf?", File.tail().substr(0,20));
   size_t here = File.cursor();
-  if (File.peek() == '"') {
+  if (strchr("0123456789.", File.peek())) {
+    Name_String name(File);
+    if (!File.stuck(&here)) {
+      arglist(File);
+      trace1("got leaf", name);
+      push_back(new Token_LITERAL(name));
+    }else{
+      trace1("leafstuck", File.tail().substr(0,20));
+      throw Exception_CS("what's this?", File);
+    }
+  }else if (File.peek() == '"') {
     vString* s = new vString(File);
     if (File.stuck(&here)) {
       delete s;
