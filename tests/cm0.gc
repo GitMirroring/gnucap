@@ -1,0 +1,21 @@
+options trace
+spice
+
+.model mos logic
+.ground z0;
+V1 z1 z0 pulse iv=0 pv=5 delay=0 rise=500p
+V2 z2 z0 pulse iv=0 pv=5 delay=0 rise=500p
+.verilog
+V1 V3 (.p(z3), .n(z0));
+inv #(.model(mos)) U1 (.out(x1), .in1(z1));
+c_a_d #(.model(mos)) U2 (.out(x2), .in(z2));
+c_a_d #(.model(mos)) U3 (.out(z3), .in(z3));
+c_a_d #(.model(mos)) U3 (.out(z0), .in(z0));
+
+list
+
+print tr v(nodes) logic(nodes)
+tr 2n trace=a basic
+status notime
+
+end
