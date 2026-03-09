@@ -79,10 +79,8 @@ const CARD* LANGUAGE::find_proto(const std::string& Name, const CARD* Scope)
     return p;
   }else if ((p = model_dispatcher[Name])) {
     return p;
-#if 0
   }else if ((p = discipline_dispatcher[Name])) {
     return p;
-#endif
   }else{
     assert(!p);
     std::string s;

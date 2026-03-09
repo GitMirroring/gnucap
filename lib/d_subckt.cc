@@ -127,6 +127,7 @@ public:
 int DEV_SUBCKT::_count = -1;
 /*--------------------------------------------------------------------------*/
 class DEV_MODULE_PROTO : public DEV_SUBCKT {
+  std::string _type{"module"};
 private:
   explicit	DEV_MODULE_PROTO(const DEV_MODULE_PROTO&p) : DEV_SUBCKT(p)
   {
@@ -137,6 +138,8 @@ public:
 		~DEV_MODULE_PROTO(){}
   bool		is_device()const override	{ return false;}
   bool		makes_own_scope()const override	{ return true;}
+  std::string   dev_type()const override	{ return _type;}
+  void		set_dev_type(std::string const& d)override {_type = d; }
   CARD*		clone()const override		{ return new DEV_MODULE_PROTO(*this);}
   CARD*		clone_instance()const override {
     auto m = DEV_SUBCKT::clone();
@@ -186,7 +189,7 @@ public: // override virtual
   CARD*		clone_instance()const override;
   bool		print_type_in_spice()const override { untested();unreachable(); return false;}
   std::string   value_name()const override	{untested();incomplete(); return "";}
-  std::string   dev_type()const override	{itested(); return "";}
+  std::string   dev_type()const override	{ return "module";}
   int		max_nodes()const override	{return PORTS_PER_SUBCKT;}
   int		min_nodes()const override	{return 0;}
   int		matrix_nodes()const override	{untested();return 0;}

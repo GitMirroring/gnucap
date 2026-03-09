@@ -20,10 +20,12 @@
  *------------------------------------------------------------------
  * user nodes
  */
-#ifndef U_NODE_H
-#define U_NODE_H
-#include "e_node.h"
+#ifndef E_USERNODE_H
+#define E_USERNODE_H
+#include "u_nodemap.h"
+#include "e_node.h" // node_t
 #include "e_logicnode.h"
+#include "e_cardlist.h"
 /*--------------------------------------------------------------------------*/
 // USER_NODE is permanent, and acts as a proxy for probes.
 // .. n_(0) refers to the NODE used in simulation,
@@ -55,6 +57,41 @@ public: // connection
   }
   void map_nodes()override {
     _n.map();
+  }
+};
+/*--------------------------------------------------------------------------*/
+// declare nodes. as in "electrical a, b, c;"
+class NODE_DECL : public NODE {
+  int _disc_idx;
+  mutable std::vector<node_t> _n;
+  std::string _type;
+public:
+  explicit NODE_DECL(std::string const& type) : NODE(type) {
+    _type = type;
+  }
+  void set_param_by_index(int num, std::string& ext_name, int)override {
+    assert(num==param_count());
+    _n.resize(param_count()+1);
+    n_(num).new_node(ext_name, this);  // Really look-up node, make new if needed.
+  }
+  int param_count()const override {return int(_n.size());}
+  std::string dev_type()const override {return _type;}
+  std::string param_value(int i)const override {
+    assert(i<int(_n.size()));
+
+    int idx = n_(i).e_();
+    assert(scope());
+    assert(scope()->nodes());
+    if(idx>=0){
+      return scope()->nodes()->name(idx);
+    }else{ untested();
+      return "?????";
+    }
+  }
+public: // connection
+  node_t& n_(int i)const override {
+    assert(i<int(_n.size()));
+    return _n[i];
   }
 };
 /*--------------------------------------------------------------------------*/

@@ -1,0 +1,77 @@
+>>>>>discipline disc1;
+>>>>>discipline disc2;
+>>>>>discipline disc2;
+>>>>>discipline disc3;
+>>>>>connectmodule cm0(out, in);
+>>>>>connectmodule cm1(out, in);
+>>>>>connectmodule cm2(out, in);
+>>>>>connectrules foo;
+>>>>>list
+discipline disc1;
+enddiscipline
+discipline disc2;
+enddiscipline
+discipline disc2;
+enddiscipline
+discipline disc3;
+enddiscipline
+connectmodule cm0 (.out(out),.in(in));
+  output out;
+  input in;
+endconnectmodule // cm0
+
+connectmodule cm1 (.out(out),.in(in));
+  output out;
+  input in;
+endconnectmodule // cm1
+
+connectmodule cm2 (.out(out),.in(in));
+  output out;
+  input in;
+endconnectmodule // cm2
+
+connectrules foo;
+   connect disc1 disc2 resolveto disc3;
+  connect cm0;
+  connect cm1 merged;
+  connect cm2 split;
+endconnectrules // foo
+
+>>>>>`disciplines
+discipline disc1;
+enddiscipline
+discipline disc2;
+enddiscipline
+discipline disc2:0;
+enddiscipline
+discipline disc3;
+enddiscipline
+discipline electrical;
+  domain continuous;
+  potential Voltage;
+  flow Current;
+enddiscipline
+>>>>>delete disc2
+>>>>>`disciplines
+discipline disc1;
+enddiscipline
+discipline disc2;
+enddiscipline
+discipline disc3;
+enddiscipline
+discipline electrical;
+  domain continuous;
+  potential Voltage;
+  flow Current;
+enddiscipline
+>>>>>delete disc2
+>>>>>`disciplines
+discipline disc1;
+enddiscipline
+discipline disc3;
+enddiscipline
+discipline electrical;
+  domain continuous;
+  potential Voltage;
+  flow Current;
+enddiscipline
