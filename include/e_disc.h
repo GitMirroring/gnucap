@@ -31,8 +31,9 @@
 /*--------------------------------------------------------------------------*/
 enum domain_type {
   dom_default = 0,
-  dom_continuous = 1,
-  dom_discrete = 2
+  dom_hybrid = 1,
+  dom_continuous = 2,
+  dom_discrete = 3
 };
 /*--------------------------------------------------------------------------*/
 class NATURE : public CKT_BASE {
@@ -57,6 +58,7 @@ public:
     return new NODE_DECL(short_label());
   }
   void set_continuous() {_domain = dom_continuous;}
+  void set_hybrid() {_domain = dom_hybrid;}
   int param_count()const override { return 3; }
   using NODE::param_name;
   std::string param_name(int i)const override {
@@ -68,9 +70,11 @@ public:
     }
   }
   std::string param_value(int i)const override {
-    static std::string d[3] = {"", "continuous", "discrete"};
+    static std::string d[4] = {"default", "hybrid", "continuous", "discrete"};
     switch(i){
-    case 0: return d[_domain];
+    case 0:
+      assert(_domain < 4);
+      return d[_domain];
     case 1: return _potential;
     case 2: return _flow;
     default: unreachable(); return "???";

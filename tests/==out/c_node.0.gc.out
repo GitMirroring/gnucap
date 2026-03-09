@@ -38,3 +38,8 @@ discipline electrical;
   potential Voltage;
   flow Current;
 enddiscipline
+discipline mixed;
+  domain hybrid;
+  potential Voltage;
+  flow Current;
+enddiscipline

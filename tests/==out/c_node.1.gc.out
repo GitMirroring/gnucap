@@ -51,6 +51,11 @@ discipline electrical;
   potential Voltage;
   flow Current;
 enddiscipline
+discipline mixed;
+  domain hybrid;
+  potential Voltage;
+  flow Current;
+enddiscipline
 >>>>>delete disc2
 >>>>>`disciplines
 discipline disc1;
@@ -64,6 +69,11 @@ discipline electrical;
   potential Voltage;
   flow Current;
 enddiscipline
+discipline mixed;
+  domain hybrid;
+  potential Voltage;
+  flow Current;
+enddiscipline
 >>>>>delete disc2
 >>>>>`disciplines
 discipline disc1;
@@ -72,6 +82,11 @@ discipline disc3;
 enddiscipline
 discipline electrical;
   domain continuous;
+  potential Voltage;
+  flow Current;
+enddiscipline
+discipline mixed;
+  domain hybrid;
   potential Voltage;
   flow Current;
 enddiscipline
