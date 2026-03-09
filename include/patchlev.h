@@ -1,1 +1,1 @@
-#define PATCHLEVEL "cmd 2026.03.09"
+#define PATCHLEVEL "lang_node 2025.11.08"
