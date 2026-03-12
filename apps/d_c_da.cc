@@ -119,6 +119,8 @@ void DEV_D_A::expand()
   assert(c);
 
   attach_model();
+  c = prechecked_cast<const COMMON_LOGIC*>(common());
+  assert(c);
   const MODEL_LOGIC* m = dynamic_cast<const MODEL_LOGIC*>(c->model());
   if (!m) {untested();
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
