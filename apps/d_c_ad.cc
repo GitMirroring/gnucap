@@ -47,7 +47,7 @@ private: // override virtuals
   char	   id_letter()const override	{return '\0';}
   std::string value_name()const override{return "";}
   bool	   print_type_in_spice()const override{return true;}
-  std::string dev_type()const override	{return "d_d_a";}
+  std::string dev_type()const override	{return "c_a_d";}
   int	   tail_size()const override	{return 2;}
   int	   max_nodes()const override	{return 2;}
   int	   min_nodes()const override	{return 2;}
@@ -58,7 +58,7 @@ private: // override virtuals
   void	   precalc_first()override	{ELEMENT::precalc_first();}
   void	   expand()override;
   void	   precalc_last() override	{ELEMENT::precalc_last();}
-  void	   tr_iwant_matrix()override	{untested();}
+  void	   tr_iwant_matrix()override	{}
   void	   tr_begin()override		{ELEMENT::tr_begin();}
   void	   tr_restore()override		{ELEMENT::tr_restore();}
   void	   dc_advance()override;
@@ -79,7 +79,7 @@ private: // override virtuals
   double   tr_probe_num(const std::string& what)const override
 					{untested(); return n_(OUTNODE)->tr_probe_num(what);}
 
-  void	   ac_iwant_matrix()override	{untested();}
+  void	   ac_iwant_matrix()override	{}
   void	   ac_begin()override
 		{untested(); error(bWARNING, long_label() + ": no logic in AC analysis\n");}
   void	   do_ac()override		{untested();}
@@ -237,8 +237,21 @@ void DEV_A_D::tr_accept()
 /*--------------------------------------------------------------------------*/
 int DEV_A_D::_count = -1;
 /*--------------------------------------------------------------------------*/
-DEV_A_D d_buf;
-DISPATCHER<CARD>::INSTALL dd_buf(&device_dispatcher, "xxad", &d_buf);
+class LOGIC_NONE : public COMMON_LOGIC {
+private:
+  explicit LOGIC_NONE(const LOGIC_NONE&p):COMMON_LOGIC(p){++_count;}
+  COMMON_COMPONENT* clone()const override {return new LOGIC_NONE(*this);}
+public:
+  explicit LOGIC_NONE(int c=0)		  :COMMON_LOGIC(c) {}
+  LOGICVAL logic_eval(const node_t*, int)const override {untested();
+    return lvUNKNOWN;
+  }
+  std::string name()const override	  {untested();return "error";}
+};
+/*--------------------------------------------------------------------------*/
+LOGIC_NONE c_buf(CC_STATIC);
+DEV_A_D d_buf(&c_buf);
+DISPATCHER<CARD>::INSTALL dd_buf(&device_dispatcher, "c_a_d", &d_buf);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
