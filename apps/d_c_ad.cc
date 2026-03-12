@@ -122,6 +122,7 @@ void DEV_A_D::expand()
   assert(c);
 
   attach_model();
+  assert(c == common());
   const MODEL_LOGIC* m = dynamic_cast<const MODEL_LOGIC*>(c->model());
   if (!m) {
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");

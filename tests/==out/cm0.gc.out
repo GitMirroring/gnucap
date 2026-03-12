@@ -10,26 +10,31 @@ endparamset
 .ground z0; 
 vsource #(pulse.iv( 0.), .pv( 5.), .delay( 0.), .rise( 500.p), .fall(NA( 0.)), .width(NA( Inf)), .period(NA( Inf))) V1 (.p(z1),.n(z0));
 vsource #(pulse.iv( 0.), .pv( 5.), .delay( 0.), .rise( 500.p), .fall(NA( 0.)), .width(NA( Inf)), .period(NA( Inf))) V2 (.p(z2),.n(z0));
-vsource #(pulse.iv( 0.), .pv( 5.), .delay( 0.), .rise( 500.p), .fall(NA( 0.)), .width(NA( Inf)), .period(NA( Inf))) V3 (.p(x3),.n(z0));
+vsource #(pulse.iv( 0.), .pv( 5.), .delay( 0.), .rise( 500.p), .fall(NA( 0.)), .width(NA( Inf)), .period(NA( Inf))) V3 (.p(z3),.n(z0));
 inv #(.model(mos)) U1 (.out(x1),.in1(z1));
-xxad #(.model(mos)) U2 (.out(x2),.in(z2));
->>>>>print tr control(0) hidden(0) last(z1) final(z1) v(nodes) logic(nodes)
+c_a_d #(.model(mos)) U2 (.out(x2),.in(z2));
+c_a_d #(.model(mos)) U3 (.out(z3),.in(z3));
+c_a_d #(.model(mos)) U4 (.out(z0),.in(z0));
+c_d_a #(.model(mos)) U5 (.out(y1),.in(x1));
+>>>>>print tr v(nodes) logic(nodes)
 U1: can't find subckt: mosinv1, forcing digital
->>>>>tr 2n trace=a basic
-#Time       control(0) hidden(0)  last(z1)   final(z1)  v(x1)      v(x2)      v(x3)      v(z0)      v(z1)      v(z2)      logic(x1)  logic(x2)  logic(x3)  logic(z0)  logic(z1)  logic(z2) 
+>>>>>tr 3n trace=a basic
+#Time       v(x1)      v(x2)      v(y1)      v(z0)      v(z1)      v(z2)      v(z3)      logic(x1)  logic(x2)  logic(y1)  logic(z0)  logic(z1)  logic(z2)  logic(z3) 
 new max = 5, new limit = 5.5
- 0.         1.         0.         0.         0.         5.         0.         0.         0.         0.         0.         3.         0.01       4.21       4.21       0.01       4.21      
- 20.E-12    9.         0.         20.E-12    0.         5.         0.         0.2        0.         0.2        0.2        3.         0.01       4.21       4.21       0.01       4.21      
- 86.E-12    6.         0.         86.E-12    0.         5.         0.         0.86       0.         0.86       0.86       3.         0.01       4.21       4.21       0.01       4.21      
- 152.E-12   6.         0.         152.E-12   0.         5.         0.         1.52       0.         1.52       1.52       3.         1.01       4.21       4.21       1.01       4.21      
+ 0.         5.         0.         5.         0.         0.         0.         0.         3.         0.01       4.21       0.01       0.01       4.21       0.01      
+ 30.E-12    5.         0.         5.         0.         0.3        0.3        0.3        3.         0.01       4.21       0.01       0.01       4.21       0.01      
+ 60.E-12    5.         0.         5.         0.         0.6        0.6        0.6        3.         0.01       4.21       0.01       0.01       4.21       0.01      
+ 109.E-12   5.         0.         5.         0.         1.09       1.09       1.09       3.         0.01       4.21       0.01       0.01       4.21       0.01      
 x1:20:1.5e-09 new event
- 500.E-12   7.         0.         500.E-12   0.         5.         0.         5.         0.         5.         5.         2.         3.01       4.21       4.21       3.01       4.21      
- 1.5E-9     2.         0.         1.5E-9     0.         0.         0.         5.         0.         5.         5.         0.         3.01       4.21       4.21       3.01       4.21      
- 2.E-9      1.         0.         2.E-9      0.         0.         0.         5.         0.         5.         5.         0.         3.01       4.21       4.21       3.01       4.21      
+ 500.E-12   5.         0.         5.         0.         5.         5.         5.         2.         3.01       4.21       0.01       3.01       4.21       3.01      
+ 1.5E-9     0.         0.         0.         0.         5.         5.         5.         0.         3.01       4.21       0.01       3.01       4.21       3.01      
+ 2.E-9      0.         0.         0.         0.         5.         5.         5.         0.         3.01       4.21       0.01       3.01       4.21       3.01      
+ 2.5E-9     0.         0.         0.         0.         5.         5.         5.         0.         3.01       4.21       0.01       3.01       4.21       3.01      
+ 3.E-9      0.         0.         0.         0.         5.         5.         5.         0.         3.01       4.21       0.01       3.01       4.21       3.01      
 >>>>>status notime
 Gnucap   System status
-iterations: op=0, dc=0, tran=21, fourier=0, total=28
-transient timesteps: accepted=7, rejected=0, total=7
-nodes: user=5, subckt=0, model=0, total=5
-dctran density=20.0%, ac density=20.0%
+iterations: op=0, dc=0, tran=27, fourier=0, total=36
+transient timesteps: accepted=9, rejected=0, total=9
+nodes: user=6, subckt=0, model=0, total=6
+dctran density=16.7%, ac density=16.7%
 >>>>>end
