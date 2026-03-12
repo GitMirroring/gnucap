@@ -41,23 +41,23 @@ public:
   explicit DEV_D_A(const DEV_D_A& p);
 	   ~DEV_D_A()			{--_count;}
 private: // override virtuals
-  char	   id_letter()const override	{return '\0';}
-  std::string value_name()const override{return "";}
-  bool	   print_type_in_spice()const override{return true;}
-  std::string dev_type()const override	{return "d_d_a";}
-  int	   tail_size()const override	{return 2;}
+  char	   id_letter()const override	{untested();return '\0';}
+  std::string value_name()const override{untested();return "";}
+  bool	   print_type_in_spice()const override{untested();return true;}
+  std::string dev_type()const override	{return "c_d_a";}
+  int	   tail_size()const override	{untested();return 2;}
   int	   max_nodes()const override	{return 2;}
   int	   min_nodes()const override	{return 2;}
-  int	   matrix_nodes()const override	{return 2;}
+  int	   matrix_nodes()const override	{untested();return 2;}
   int	   net_nodes()const override	{return _net_nodes;}
 
   CARD*	   clone()const override	{return new DEV_D_A(*this);}
   void	   precalc_first()override	{ELEMENT::precalc_first();}
   void	   expand()override;
   void	   precalc_last() override	{ELEMENT::precalc_last();}
-  void	   tr_iwant_matrix()override	{untested();}
+  void	   tr_iwant_matrix()override	{}
   void	   tr_begin()override		{ELEMENT::tr_begin();}
-  void	   tr_restore()override		{ELEMENT::tr_restore();}
+  void	   tr_restore()override		{untested();ELEMENT::tr_restore();}
   void	   dc_advance()override;
   void	   tr_advance()override;
   void	   tr_regress()override;
@@ -67,16 +67,16 @@ private: // override virtuals
   void	   tr_load()override;
   void	   tr_unload()override;
   TIME_PAIR tr_review()override;
-  //void   tr_accept()override;
-  double   tr_involts()const override	{ untested();unreachable(); return 0;}
+  void	   tr_accept()override;
+  double   tr_involts()const override	{untested();unreachable(); return 0;}
   //double tr_input()const		//ELEMENT
-  double   tr_involts_limited()const override { untested();unreachable(); return 0;}
+  double   tr_involts_limited()const override {untested();unreachable(); return 0;}
   //double tr_input_limited()const	//ELEMENT
   //double tr_amps()const		//ELEMENT
   double   tr_probe_num(const std::string& what)const override
 					{untested(); return n_(OUTNODE)->tr_probe_num(what);}
 
-  void	   ac_iwant_matrix()override	{untested();}
+  void	   ac_iwant_matrix()override	{}
   void	   ac_begin()override
 		{untested(); error(bWARNING, long_label() + ": no logic in AC analysis\n");}
   void	   do_ac()override		{untested();}
@@ -120,7 +120,7 @@ void DEV_D_A::expand()
 
   attach_model();
   const MODEL_LOGIC* m = dynamic_cast<const MODEL_LOGIC*>(c->model());
-  if (!m) {
+  if (!m) {untested();
     throw Exception_Model_Type_Mismatch(long_label(), c->modelname(), "logic family (LOGIC)");
   }else{
   }
@@ -129,7 +129,7 @@ void DEV_D_A::expand()
 void DEV_D_A::dc_advance()
 {
   ELEMENT::dc_advance();
-  if (n_(INNODE)->in_transit()) {
+  if (n_(INNODE)->in_transit()) {untested();
     //q_eval(); evalq is not used for DC
     n_(INNODE)->propagate();
   }else{
@@ -143,11 +143,11 @@ void DEV_D_A::tr_advance()
 {
   ELEMENT::tr_advance();
 
-  if (n_(INNODE)->in_transit()) {
+  if (n_(INNODE)->in_transit()) {untested();untested();
     q_eval();
-    if (_sim->_time0 >= n_(INNODE)->final_time()) {
+    if (_sim->_time0 >= n_(INNODE)->final_time()) {untested();untested();
       n_(INNODE)->propagate();
-    }else{
+    }else{untested();untested();
       // not ready to propagate.
     }
   }else{
@@ -155,16 +155,16 @@ void DEV_D_A::tr_advance()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_D_A::tr_regress()
-{
+{untested();
   ELEMENT::tr_regress();
 
   q_eval();
-  if (n_(INNODE)->last_change_time() > _sim->_time0) {
+  if (n_(INNODE)->last_change_time() > _sim->_time0) {untested();
     n_(INNODE)->unpropagate();
     assert(_sim->_time0 < n_(INNODE)->final_time());
   }else if (_sim->_time0 >= n_(INNODE)->final_time()) {untested();
     n_(INNODE)->propagate();
-  }else{
+  }else{untested();
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -174,10 +174,11 @@ void DEV_D_A::tr_regress()
  */
 bool DEV_D_A::tr_needs_eval()const
 {
+  return true;
   //assert(!is_q_for_eval());
   if (_sim->analysis_is_restore()) {untested();
-  }else if (_sim->analysis_is_static()) {
-  }else{
+  }else if (_sim->analysis_is_static()) {untested();
+  }else{untested();
   }
   return (_sim->analysis_is_static() || _sim->analysis_is_restore());
 }
@@ -218,7 +219,7 @@ void DEV_D_A::tr_load()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_D_A::tr_unload()
-{
+{untested();
   _m0.c0 = _m0.c1 = 0.;
   _sim->mark_inc_mode_bad();
   tr_load();
@@ -233,10 +234,145 @@ TIME_PAIR DEV_D_A::tr_review()
   return _time_by;
 }
 /*--------------------------------------------------------------------------*/
+/* tr_accept: This runs after everything has passed "review".
+ * It sets up and queues transitions, and sometimes determines logic states.
+ */
+void DEV_D_A::tr_accept()
+{
+  const COMMON_LOGIC* c = prechecked_cast<const COMMON_LOGIC*>(common());
+  assert(c);
+  const MODEL_LOGIC* m = prechecked_cast<const MODEL_LOGIC*>(c->model());
+  assert(m);
+
+  //LOGICVAL future_state = lvSTABLE0;
+  //n_(OUTNODE)->set_event(c->_real_delay, future_state);
+
+#if 0
+  /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+  /* Check quality and get node info to local array. */
+  /* side effect --- generate digital values for analog nodes */
+  {
+    n_(OUTNODE)->to_logic(m, n_(OUTNODE)->v0());
+    int lastchangeiter=n_(OUTNODE)->d_iter();/* iteration # when it changed */
+    trace0(long_label().c_str());
+    trace2(n_(OUTNODE)->failure_mode().c_str(), OUTNODE, n_(OUTNODE)->quality());
+    
+    for (int ii = BEGIN_IN;  ii < net_nodes();  ++ii) {
+      n_(ii)->to_logic(m, n_(ii)->v0());
+      if (n_(ii)->quality() < _quality) {
+	_quality = n_(ii)->quality();
+	_failuremode = n_(ii)->failure_mode();
+      }else{
+      }
+      if (n_(ii)->d_iter() >= lastchangeiter) {
+	lastchangeiter = n_(ii)->d_iter();
+	_lastchangenode = ii;
+      }else{
+      }
+      trace2(n_(ii)->failure_mode().c_str(), ii, n_(ii)->quality());
+    }
+    /* If _lastchangenode == OUTNODE, no new changes, bypass may be ok.
+     * Otherwise, an input changed.  Need to evaluate.
+     * If all quality are good, can evaluate as digital.
+     * Otherwise need to evaluate as analog.
+     */
+    trace3(_failuremode.c_str(), _lastchangenode, lastchangeiter, _quality);
+  }
+  /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */  
+#endif
+#if 0
+  if (want_analog()) {
+    if (_gatemode == moDIGITAL) {untested();
+      error(bTRACE, "%s:%u:%g switch to analog, %s\n", long_label().c_str(),
+	    _sim->iteration_tag(), _sim->_time0, _failuremode.c_str());
+      _oldgatemode = _gatemode;
+      _gatemode = moANALOG;
+    }else{
+    }
+    assert(_gatemode == moANALOG);
+  }else{
+    assert(want_digital());
+    if (_gatemode == moANALOG) {
+      error(bTRACE, "%s:%u:%g switch to digital\n",
+	    long_label().c_str(), _sim->iteration_tag(), _sim->_time0);
+      _oldgatemode = _gatemode;
+      _gatemode = moDIGITAL;
+    }else{
+    }
+    assert(_gatemode == moDIGITAL);
+    if (_sim->analysis_is_restore()) {untested();
+    }else if (_sim->analysis_is_static()) {
+    }else{
+    }
+    if (!_sim->_bypass_ok
+	|| _lastchangenode != OUTNODE
+	|| _sim->analysis_is_static()
+	|| _sim->analysis_is_restore()) {
+      LOGICVAL future_state = c->logic_eval(&n_(BEGIN_IN), net_nodes()-BEGIN_IN);
+      //		         ^^^^^^^^^^
+      if ((n_(OUTNODE)->is_unknown()) &&
+	  (_sim->analysis_is_static() || _sim->analysis_is_restore())) {
+	n_(OUTNODE)->force_initial_value(future_state);
+	n_(OUTNODE)->store_old_lv();
+	/* This happens when initial DC is digital.
+	 * Answers could be wrong if order in netlist is reversed 
+	 */
+      }else if (future_state != n_(OUTNODE)->lv()) {
+	assert(future_state != lvUNKNOWN);
+	switch (future_state) {
+	case lvSTABLE0:	/*nothing*/		break;
+	case lvRISING:  future_state=lvSTABLE0;	break;
+	case lvFALLING: future_state=lvSTABLE1;	break;
+	case lvSTABLE1:	/*nothing*/		break;
+	case lvUNKNOWN: unreachable();		break;
+	}
+	/* This handling of rising and falling may seem backwards.
+	 * These states occur when the value has been contaminated 
+	 * by another pending action.  The "old" value is the
+	 * value without this contamination.
+	 * This code is planned for replacement as part of VHDL/Verilog
+	 * conversion, so the kluge stays in for now.
+	 */
+	assert(future_state.lv_old() == future_state.lv_future());
+	if (n_(OUTNODE)->lv() == lvUNKNOWN
+	    || future_state.lv_future() != n_(OUTNODE)->lv_future()) {
+	  n_(OUTNODE)->set_event(c->_real_delay, future_state);
+	  //assert(future_state == n_(OUTNODE).lv_future());
+	  if (_lastchangenode == OUTNODE) {untested();
+	    unreachable();
+	    error(bDANGER, "%s:%u:%g non-event state change\n",
+		  long_label().c_str(), _sim->iteration_tag(), _sim->_time0);
+	  }else{
+	  }
+	}else{
+	}
+      }else{
+      }
+    }else{
+    }
+    n_(OUTNODE)->store_old_last_change_time();
+    n_(OUTNODE)->store_old_lv(); // needed? yes
+  }
+#endif
+}
+/*--------------------------------------------------------------------------*/
 int DEV_D_A::_count = -1;
 /*--------------------------------------------------------------------------*/
-DEV_D_A d_buf;
-DISPATCHER<CARD>::INSTALL dd_buf(&device_dispatcher, "xxda", &d_buf);
+class LOGIC_NONE : public COMMON_LOGIC {
+private:
+  explicit LOGIC_NONE(const LOGIC_NONE&p):COMMON_LOGIC(p){++_count;}
+  COMMON_COMPONENT* clone()const override {return new LOGIC_NONE(*this);}
+public:
+  explicit LOGIC_NONE(int c=0)		  :COMMON_LOGIC(c) {}
+  LOGICVAL logic_eval(const node_t*, int)const override {untested();
+    return lvUNKNOWN;
+  }
+  std::string name()const override	  {untested();return "error";}
+};
+/*--------------------------------------------------------------------------*/
+LOGIC_NONE c_buf(CC_STATIC);
+DEV_D_A d_buf(&c_buf);
+DISPATCHER<CARD>::INSTALL dd_buf(&device_dispatcher, "c_d_a", &d_buf);
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

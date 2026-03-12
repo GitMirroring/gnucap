@@ -7,15 +7,17 @@ V1 z1 z0 pulse iv=0 pv=5 delay=0 rise=500p
 V2 z2 z0 pulse iv=0 pv=5 delay=0 rise=500p
 .verilog
 V1 V3 (.p(z3), .n(z0));
-inv #(.model(mos)) U1 (.out(x1), .in1(z1));
-c_a_d #(.model(mos)) U2 (.out(x2), .in(z2));
-c_a_d #(.model(mos)) U3 (.out(z3), .in(z3));
-c_a_d #(.model(mos)) U3 (.out(z0), .in(z0));
+inv   #(.model(mos)) U1 (.out(x1), .in1(z1));
+c_a_d #(.model(mos)) U2 (.out(x2), .in(z2));	// as buffer a-d  z2 to x2
+c_a_d #(.model(mos)) U3 (.out(z3), .in(z3));	// a-d cm on z3
+c_a_d #(.model(mos)) U4 (.out(z0), .in(z0));	// a-d cm on ground
+c_d_a #(.model(mos)) U5 (.out(y1), .in(x1));	// as buffer d-a x1 to y1
+
 
 list
 
 print tr v(nodes) logic(nodes)
-tr 2n trace=a basic
+tr 3n trace=a basic
 status notime
 
 end
