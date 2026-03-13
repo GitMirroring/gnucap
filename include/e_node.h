@@ -114,6 +114,8 @@ private: // this should eventually fit into 64 bits.
     dir_out  = 2,
     dir_io   = 3
   } _dir{dir_none};
+  int _index{INVALID_NODE}; // index in node map
+  int _m{INVALID_NODE};	// mapped, after reordering
 private: // treee stuff.
   bool is_node()const;
   bool is_link()const;
@@ -143,10 +145,6 @@ public:
   bool is_output()const {return _dir & dir_out; }
   bool is_inout()const {return _dir == dir_none || _dir == dir_io; }
   void allocate(int u=0);
-private:
-  int _index{INVALID_NODE}; // index in node map
-  int _m{INVALID_NODE};	// mapped, after reordering
-
 public: // BUG
   void clear();
 private:
