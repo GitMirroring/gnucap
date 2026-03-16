@@ -262,8 +262,18 @@ static void map_toplevel_nodes(CARD_LIST* scope)
       //	assert(dynamic_cast<MODEL_CARD*>(*ci));
     }
   }
-
-  // also map USER_NODEs
+}
+/*--------------------------------------------------------------------------*/
+/* map USER_NODEs (top level only)
+ */
+static void map_user_nodes(CARD_LIST* scope)
+{
+  assert(scope);
+  if (scope == &CARD_LIST::card_list) {
+  }else{itested();
+  }
+  assert(scope->nodes());
+  NODE_MAP& top_nodes = *scope->nodes();
   for (NODE_MAP::iterator p = top_nodes.begin(); p != top_nodes.end(); ++p ){
     NODE* n = (*p).second;
     USER_NODE* un = prechecked_cast<USER_NODE*>(n);
@@ -301,6 +311,7 @@ void SIM_DATA::init(CARD_LIST* scope)
     uninit();
     init_node_count(0, 0, 0);
     map_toplevel_nodes(scope);
+    map_user_nodes(scope);
     scope->expand();
     expand_last();
     alloc_hold_vectors(scope);
