@@ -138,7 +138,7 @@ std::string const& NODE_MAP::name(int i) const
   assert(i<size());
   static std::string dunno("??????");
   node_t const& n = at(i);
-  if(n.n_()) {
+  if(n.n_() && n.n_() != dummy_() ) {
     std::string const& l = n.n_()->short_label();
     assert(!_map || _map->at(l)->user_number() == i);
     trace2("NODE_MAP::name", i, l);

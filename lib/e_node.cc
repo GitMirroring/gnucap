@@ -29,7 +29,13 @@
 #include "u_xprobe.h"
 #include "e_logicnode.h"
 #include "m_union.h"
+#include "e_discipline.h"
 #include "e_usernode.h"
+/*--------------------------------------------------------------------------*/
+static DISCIPLINE dummy;
+NODE const* dummy_(){
+  return &dummy;
+}
 /*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
  * supposedly not used, but used by a required function that is also not used
@@ -46,6 +52,9 @@ node_t::node_t(node_t& p)
    _index(p._index),
    _m(p._m)
 {
+  if(_nnn == &dummy){ untested();
+  }else{
+  }
   if(_nnn){
     _nnn = nullptr;
     _link = &p;
@@ -77,6 +86,9 @@ node_t::node_t(node_t&& p)
    _index(p._index),
    _m(p._m)
 {
+  if(_nnn == &dummy){ untested();
+  }else{
+  }
   if(p._link == &p) { untested();
     _link = this;
   }else{
@@ -96,13 +108,21 @@ node_t::node_t(NODE* n)
 /*--------------------------------------------------------------------------*/
 node_t& node_t::operator=(node_t& p)
 {
+  if(p.n_() == &dummy){ untested();
+  }else{
+  }
+  if(n_() == &dummy){
+  }else{
+  }
   if(_own){
     delete _nnn;
   }else{
   }
   _nnn = nullptr;
 
-  if(!p.n_()){
+  if(p.n_() == &dummy){ untested();
+    _link = &p;
+  }else if(!p.n_()){
     _link = p._link;
   }else{
     _link = &p;
@@ -116,6 +136,9 @@ node_t& node_t::operator=(node_t& p)
 /*--------------------------------------------------------------------------*/
 node_t& node_t::operator=(const node_t& p)
 {
+  if(p.n_() == &dummy){ untested();
+  }else{
+  }
   if(!p.n_()){
   }else{ untested();
     // not sure if this is UB, note the const_cast...
@@ -125,6 +148,12 @@ node_t& node_t::operator=(const node_t& p)
 /*--------------------------------------------------------------------------*/
 node_t& node_t::operator=(node_t&& p)
 {
+  if(p.n_() == &dummy){ untested();
+  }else{
+  }
+  if(n_() == &dummy){ untested();
+  }else{
+  }
   _nnn   = nullptr; // p._nnn;
   _link   = p._link;
   _index = p._index;
@@ -141,6 +170,9 @@ node_t& node_t::operator=(node_t&& p)
 // ordinary pointer assignment
 node_t& node_t::operator=(NODE* n)
 {
+  if(n == &dummy){ untested();
+  }else{
+  }
   assert(n);
   assert(!_link || _link == this);
   // clear();
@@ -162,6 +194,9 @@ node_t& node_t::operator=(NODE* n)
 // take ownership
 node_t& node_t::set_own(NODE* n)
 {
+  if(n == &dummy){ untested();
+  }else{
+  }
   assert(n != &ground_node);
   operator=(n);
   _own = true; // take ownership.
@@ -171,6 +206,9 @@ node_t& node_t::set_own(NODE* n)
 extern NODE ground_node;
 LOGIC_NODE& node_t::data()const
 {
+  if(_nnn == &dummy){ untested();
+  }else{
+  }
   if(auto d = dynamic_cast<LOGIC_NODE*>(_nnn)){
     return *d;
   }else if(auto e = dynamic_cast<LOGIC_NODE*>(root()._nnn)){
@@ -345,16 +383,8 @@ void node_t::allocate(int u /*, CARD* owner*/)
   }
   if(dynamic_cast<USER_NODE const*>(_nnn)) { untested();
     unreachable();
-    // not allocating, must promote to discipline first.
-    // int flat_number = CKT_BASE::_sim->newnode_user();
-    // NODE* nn = new LOGIC_NODE(flat_number);
-    // nn->set_owner(nullptr);
-    // set_own(nn);
-  }else if(is_node()) {
-    // done.
-    trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
-  }else if(_link==this) {
-    assert(!_nnn);
+  }else if(dynamic_cast<DISCIPLINE const*>(_nnn)) {
+    assert(_nnn==&dummy);
     int flat_number = INVALID_NODE;
     switch(u) {
     case 0:
@@ -362,6 +392,31 @@ void node_t::allocate(int u /*, CARD* owner*/)
       break;
     case 1:
       flat_number = CKT_BASE::_sim->newnode_user();
+      break;
+    case 3:
+      flat_number = CKT_BASE::_sim->newnode_model();
+      break;
+    default:
+      unreachable();
+    }
+    NODE* nn = new LOGIC_NODE(flat_number);
+    nn->set_owner(nullptr);
+    set_own(nn);
+  }else if(is_node()) {
+    // done.
+    trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
+  }else if(_link==this) {
+    // incomplete(); getting here from new_model_node.
+    assert(!_nnn);
+    int flat_number = INVALID_NODE;
+    switch(u) {
+    case 0:
+      flat_number = CKT_BASE::_sim->newnode_subckt();
+      unreachable();
+      break;
+    case 1:
+      flat_number = CKT_BASE::_sim->newnode_user();
+      unreachable();
       break;
     case 3:
       flat_number = CKT_BASE::_sim->newnode_model();
@@ -454,6 +509,19 @@ void node_t::clear()
 // - map to resulting structure
 void node_t::connect(node_t& target)
 {
+  assert(!_own);
+  assert(!target._own);
+  if(_nnn == &dummy){
+    _nnn = nullptr;
+    _link = this;
+    _own = false;
+  }else{
+  }
+  if(target._nnn == &dummy){ untested();
+    target._nnn=nullptr;
+    target._link = &target;
+  }else{
+  }
   build_union(&target, this);
   assert(_nnn || _link);
   assert(!_nnn || !_link);
@@ -463,10 +531,36 @@ void node_t::connect(node_t& target)
     // replace by clone_instance?
   }else if(r._nnn && r._nnn == &ground_node){
     trace1("connect", typeid(*r._nnn).name());
+  }else if(r._nnn == &dummy){
   }else{
     assert(!r._nnn);
   }
+
+  if(!r._nnn){
+    assert(r._link == &root());
+    r._link = nullptr;
+    r._nnn = &dummy;
+  }else{
+  }
 }
+/*--------------------------------------------------------------------------*/
+#if 1 // debug
+NODE const* node_t::n_()const
+{
+  if(_nnn == &dummy){
+  }else{
+  }
+  return _nnn;
+}
+/*--------------------------------------------------------------------------*/
+NODE* node_t::n_()
+{
+  if(_nnn == &dummy){
+  }else{
+  }
+  return _nnn;
+}
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 // vim:ts=8:sw=2:noet:
