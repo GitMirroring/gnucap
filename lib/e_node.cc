@@ -29,6 +29,7 @@
 #include "u_xprobe.h"
 #include "e_logicnode.h"
 #include "m_union.h"
+#include "e_usernode.h"
 /*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
  * supposedly not used, but used by a required function that is also not used
@@ -149,7 +150,7 @@ node_t& node_t::operator=(NODE* n)
     _nnn->purge();
     delete _nnn;
     _own = false;
-  }else{ untested();
+  }else{
   }
   _link = nullptr;
   _nnn = n;
@@ -342,10 +343,18 @@ void node_t::allocate(int u /*, CARD* owner*/)
     // repeat call.
   }else{
   }
-  if(is_node()) {
+  if(dynamic_cast<USER_NODE const*>(_nnn)) { untested();
+    unreachable();
+    // not allocating, must promote to discipline first.
+    // int flat_number = CKT_BASE::_sim->newnode_user();
+    // NODE* nn = new LOGIC_NODE(flat_number);
+    // nn->set_owner(nullptr);
+    // set_own(nn);
+  }else if(is_node()) {
     // done.
     trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
   }else if(_link==this) {
+    assert(!_nnn);
     int flat_number = INVALID_NODE;
     switch(u) {
     case 0:
@@ -448,6 +457,15 @@ void node_t::connect(node_t& target)
   build_union(&target, this);
   assert(_nnn || _link);
   assert(!_nnn || !_link);
+
+  node_t& r = root();
+  if(dynamic_cast<USER_NODE const*>(r._nnn)) { untested();
+    // replace by clone_instance?
+  }else if(r._nnn && r._nnn == &ground_node){
+    trace1("connect", typeid(*r._nnn).name());
+  }else{
+    assert(!r._nnn);
+  }
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

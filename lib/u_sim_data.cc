@@ -302,7 +302,13 @@ static void map_user_nodes(CARD_LIST* scope)
       int u = n->user_number();
       assert(u == n->n_(0).e_());
       n->n_(0).clear();
+#if 1
       n->n_(0).link_to(&top_nodes[u]);
+      // top_nodes[u] = n;
+#else
+      n->n_(0).map_subckt_node(&top_nodes[0], nullptr);
+      // top_nodes[i] links to self.
+#endif
     }
     assert((*p).first == n->short_label()); // BUG: redundant storage.
 					    // use std::set and c++14?
