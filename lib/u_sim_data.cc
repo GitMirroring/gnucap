@@ -222,12 +222,10 @@ void SIM_DATA::map__nodes(CARD_LIST* scope)
   ::status.order.stop();
 }
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-/* CARD_LIST::card_list.map_subckt_nodes(top_nodes); <= similar
- * reset top level device ports to what was read in.
- */
 extern NODE ground_node;
-static void map_toplevel_nodes(CARD_LIST* scope)
+/* prepare top level for node mapping
+ */
+static void clear_top_nodes(CARD_LIST* scope)
 {
   assert(scope);
   if (scope == &CARD_LIST::card_list) {
@@ -250,6 +248,20 @@ static void map_toplevel_nodes(CARD_LIST* scope)
   top_nodes[0].map();
   assert(top_nodes[0].m_()==0);
 #endif
+}
+/*--------------------------------------------------------------------------*/
+/* CARD_LIST::card_list.map_subckt_nodes(top_nodes); <= similar
+ * reset top level device ports to what was read in.
+ */
+static void map_toplevel_nodes(CARD_LIST* scope)
+{
+  assert(scope);
+  if (scope == &CARD_LIST::card_list) {
+  }else{itested();
+  }
+  assert(scope->nodes());
+  NODE_MAP& top_nodes = *scope->nodes();
+  // assert(top_nodes[0].n_() == &ground_node);
 
   for (CARD_LIST::iterator ci = scope->begin(); ci != scope->end(); ++ci) {
     // for each card in card_list
@@ -310,6 +322,7 @@ void SIM_DATA::init(CARD_LIST* scope)
   if (is_first_expand()) {
     uninit();
     init_node_count(0, 0, 0);
+    clear_top_nodes(scope);
     map_toplevel_nodes(scope);
     map_user_nodes(scope);
     scope->expand();
