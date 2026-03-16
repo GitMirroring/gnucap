@@ -107,6 +107,8 @@ class INTERFACE node_t {
 private: // this should eventually fit into 64 bits.
   NODE* _nnn{nullptr};
   mutable node_t* _link{nullptr};
+  int _index{INVALID_NODE}; // index in node map
+  int _m{INVALID_NODE};	// mapped, after reordering
   bool _own{false}; // indicate that _nnn is ours.
   enum dir_t {
     dir_none = 0,
@@ -114,8 +116,6 @@ private: // this should eventually fit into 64 bits.
     dir_out  = 2,
     dir_io   = 3
   } _dir{dir_none};
-  int _index{INVALID_NODE}; // index in node map
-  int _m{INVALID_NODE};	// mapped, after reordering
 private: // treee stuff.
   bool is_node()const;
   bool is_link()const;
