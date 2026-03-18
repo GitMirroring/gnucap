@@ -188,8 +188,7 @@ double NODE::tr_probe_num(const std::string& x)const
     return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {
     return port_impedance(node_t(const_cast<NODE*>(this)), node_t(&ground_node), _sim->_aa, 0.);
-  }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) { untested();
-    unreachable();
+  }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) {
     return NOT_VALID;
   }else if (Umatch(x, "mdy ")) {
     // matrix diagonal admittance

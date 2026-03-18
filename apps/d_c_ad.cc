@@ -31,6 +31,7 @@
 #include "e_logic.h"
 #include "u_xprobe.h"
 #include "e_elemnt.h"
+#include "e_logicnode.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -97,6 +98,10 @@ private: // override virtuals
   }
 public:
   static int count()			{untested();return _count;}
+private:
+  node_l& n_(int i)const override {
+    return reinterpret_cast<node_l&>(ELEMENT::n_(i));
+  }
 };
 /*--------------------------------------------------------------------------*/
 DEV_A_D::DEV_A_D(COMMON_COMPONENT* c)
@@ -245,7 +250,7 @@ private:
   COMMON_COMPONENT* clone()const override {return new LOGIC_NONE(*this);}
 public:
   explicit LOGIC_NONE(int c=0)		  :COMMON_LOGIC(c) {}
-  LOGICVAL logic_eval(const node_t*, int)const override {untested();
+  LOGICVAL logic_eval(const node_l*, int)const override {untested();
     return lvUNKNOWN;
   }
   std::string name()const override	  {untested();return "error";}
