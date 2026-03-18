@@ -33,6 +33,7 @@
 #include "e_logic.h"
 #include "e_elemnt.h"
 #include "e_hsparam.h"
+#include "e_logicnode.h"
 /*--------------------------------------------------------------------------*/
 struct node_l : node_t
 {
