@@ -34,6 +34,7 @@
 #include "e_elemnt.h"
 #include "e_hsparam.h"
 #include "e_logicnode.h"
+#include "e_node_type.h"
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -64,6 +65,7 @@ private: // override virtuals
   int	   matrix_nodes()const override	{ untested();return 2;}
   int	   net_nodes()const override {return _net_nodes;}
   CARD*	   clone()const override {return new DEV_LOGIC(*this);}
+  void	   reset_ports()override;
   void	   precalc_first()override {ELEMENT::precalc_first(); if (subckt()) {subckt()->precalc_first();}}
   void	   expand()override;
   void	   precalc_last() override;
@@ -262,6 +264,18 @@ DEV_LOGIC::DEV_LOGIC(const DEV_LOGIC& p)
     _nodes[ii] = p._nodes[ii];
   }
   ++_count;
+}
+/*--------------------------------------------------------------------------*/
+void DEV_LOGIC::reset_ports()
+{
+  CARD::reset_ports();
+  assert(OPT::default_logic);
+  _nodes[0].set_type(OPT::default_logic);
+  _nodes[0].set_output();
+  for (int ii = 1;  ii < net_nodes();  ++ii) {
+    _nodes[ii].set_type(OPT::default_logic);
+    _nodes[ii].set_input();
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_LOGIC::precalc_last()

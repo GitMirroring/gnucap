@@ -253,7 +253,7 @@ XPROBE NODE::ac_probe_ext(const std::string& x)const
 void node_t::new_node(const std::string& node_name, const CARD* Owner)
 {
 #ifdef TRACE_UNTESTED
-  if (dynamic_cast<NODE_TYPE const*>(_nnn)) {
+  if (dynamic_cast<NODE_TYPE const*>(_nnn)) { untested();
 //  }else if (dynamic_cast<NODE_DECL const*>(_nnn)) { untested();
   }else if (dynamic_cast<USER_NODE const*>(_nnn)) { untested();
     // a port with a discipline associated with it.
@@ -270,7 +270,7 @@ void node_t::new_node(const std::string& node_name, const CARD* Owner)
   CARD_LIST const* scope; // the CARD_LIST that owns this device.
   if(Owner) {
     scope = Owner->scope();
-  }else{
+  }else{ untested();
     scope = &CARD_LIST::card_list;
   }
   assert(scope);
@@ -507,7 +507,7 @@ void node_t::connect(node_t& lower)
 
   NODE const* upper_type = old_root->n_();
 
-  if(!old_root->_nnn){
+  if(!old_root->_nnn){ untested();
     // too late?
     old_root->set_type(OPT::default_logic);
     assert(old_root->_nnn == OPT::default_logic);
@@ -607,7 +607,7 @@ NODE const* node_t::set_type(NODE const* d)
   }else{
   }
 
-  if(dynamic_cast<USER_NODE*>(_nnn)){
+  if(dynamic_cast<USER_NODE*>(_nnn)){ untested();
     _link = nullptr;
   }else{
   }
