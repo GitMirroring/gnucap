@@ -140,6 +140,7 @@ public:	// label -- in CKT_BASE
   /*virtual*/ const std::string long_label()const final;
   //--------------------------------------------------------------------
 public:	// ports -- mostly defer to COMPONENT
+  virtual void reset_ports();
   virtual node_t& n_(int i)const;
   int     connects_to(const node_t& node)const;
   //--------------------------------------------------------------------
