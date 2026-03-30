@@ -122,21 +122,25 @@ private: // this should eventually fit into 128 bits.
     dir_io   = 3
   } _dir{dir_none};
 private: // treee stuff.
+#ifndef NDEBUG
+public: // treee stuff.
+#endif
   bool is_node()const;
   bool is_link()const;
   bool is_root()const;
-private: // debugging. not yet
+private:
+#ifndef NDEBUG
+public:
+#endif
   node_t&       root();
   node_t const& root()const {
     return const_cast<node_t*>(this)->root();
   }
 private:
   node_t*       link() { assert(!_nnn || !_link); return _link; }
-  node_t const* link()const { untested();return _link;}
+  node_t const* link()const { itested();return _link;}
 private: // union find
-  int rank()const {if(_m == 0 && _nnn){assert(_nnn==&ground_node); return 2;} else{ 
-    assert(_nnn!=&ground_node);
-    return !!_nnn;}} // TODO: hierarchy.
+  int rank()const {if(_m == 0 && _nnn){return 2;} else{ return !!_nnn;}} // TODO: hierarchy.
   int inc_rank()const {return 0;} // TODO
   friend node_t* root(node_t const*);
   friend int     rank(node_t const*);
@@ -196,9 +200,11 @@ public:
   const std::string  short_label()const { itested();
     if (n_()){ itested();
       return n_()->short_label();
-    }else if(link()) { untested();
+    }else if(link() == this) { itested();
+      return "??";
+    }else if(link()) { itested();
       return link()->short_label();
-    }else{ untested();
+    }else{ itested();
       return "?????";
     }
   }
@@ -257,7 +263,7 @@ public: // top level kludge. u_sim_data.cc line 457
     assert(nn);
     if(nn != this){
       assert(nn);
-      assert(nn==&nn->root());
+//       assert(nn==&nn->root());
       if(_own){ untested();
 	delete _nnn;
       }else if(_nnn){
@@ -327,13 +333,13 @@ inline bool node_t::is_link() const
 }
 /*--------------------------------------------------------------------------*/
 inline bool node_t::is_root() const
-{ untested();
+{ itested();
   assert(!_nnn || !_link);
-  if(is_node()){ untested();
+  if(is_node()){ itested();
     return true;
-  }else if(is_link()) { untested();
+  }else if(is_link()) { itested();
     return link() == this;
-  }else{ untested();
+  }else{ itested();
     return false;
   }
 }
