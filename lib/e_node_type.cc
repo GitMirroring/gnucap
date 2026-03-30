@@ -59,6 +59,33 @@ public:
   }
 }logic;
 /*--------------------------------------------------------------------------*/
+class CONNECTRULES : public CARD {
+  mutable node_t _n[3];
+public:
+  explicit CONNECTRULES() : CARD() {
+
+    assert(electrical.type_number()==0);
+    assert(hybrid.type_number()==1);
+    assert(logic.type_number()==2);
+
+    OPT::connect_rules = this;
+    _n[0+0*3] = &electrical;
+    _n[0+1*3] = &hybrid;
+    _n[0+2*3] = &hybrid;
+    _n[1+0*3] = &hybrid;
+    _n[1+1*3] = &hybrid;
+    _n[1+2*3] = &hybrid;
+    _n[2+0*3] = &hybrid;
+    _n[2+1*3] = &hybrid;
+    _n[2+2*3] = &logic;
+
+    OPT::connect_rules = this;
+  }
+  CARD* clone()const override {unreachable(); return nullptr;}
+  int net_nodes()const override {return 3;}
+  node_t& n_(int i)const override {assert(i<3); return _n[i*3];}
+} p3;
+/*--------------------------------------------------------------------------*/
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
