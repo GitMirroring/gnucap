@@ -138,10 +138,12 @@ node_t& node_t::operator=(node_t&& p)
 }
 /*--------------------------------------------------------------------------*/
 // ordinary pointer assignment
+// but keep index (!)
 node_t& node_t::operator=(NODE* n)
 {
   assert(n);
   assert(!_link || _link == this);
+  _dir = dir_none;
   // clear();
   if(!_nnn){
     _own = false;
