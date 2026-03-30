@@ -45,6 +45,8 @@ NODE_MAP::NODE_MAP(const NODE_MAP& p)
     assert(i.second);
     int idx = i.second->user_number();
     // copy index, and possibly link to global node or ground
+    // or discipline.
+    // what does node_t = do??
     _nodes[idx] = i.second->n_(0);
     trace3("NODE_MAP::NODE_MAP1", idx, i.first, i.second->n_(0).n_());
 #if 0
