@@ -27,6 +27,8 @@
 #include "u_sim_data.h"
 #include "e_card.h"
 /*--------------------------------------------------------------------------*/
+class NODE;
+/*--------------------------------------------------------------------------*/
 enum {
   OUT1 = 0,
   OUT2 = 1,
@@ -132,7 +134,7 @@ private:
   node_t*       link() { assert(!_nnn || !_link); return _link; }
   node_t const* link()const { untested();return _link;}
 private: // union find
-  int rank()const {return !!_nnn;} // TODO: hierarchy.
+  int rank()const {if(_nnn == &ground_node)return 2;return !!_nnn;} // TODO: hierarchy.
   int inc_rank()const {return 0;} // TODO
   friend node_t* root(node_t const*);
   friend int     rank(node_t const*);
@@ -244,18 +246,19 @@ public:
   node_t& operator=(node_t&& p);
   node_t& operator=(NODE* p);
 
-  bool operator==(const node_t& p)const { return _link==p._link && _nnn==p._nnn && _m==p._m;}
+  bool operator==(const node_t& p)const {return _link==p._link && _nnn==p._nnn && _m==p._m;}
 
 private:
 public: // top level kludge. u_sim_data.cc line 457
         // & used in set_parent.
   node_t& link_to(node_t* nn){
+    assert(nn);
     if(nn != this){
       assert(nn);
       assert(nn==&nn->root());
       if(_own){ untested();
 	delete _nnn;
-      }else if(_nnn){ untested();
+      }else if(_nnn){
       }else{
       }
       _nnn = nullptr;
