@@ -14,7 +14,4 @@ vccs #(.gm({alpha*adap}))) iF(0 f cd 0);
                          ^ ? what's this?
 // error .. extra paren, rest of line not parsed
 vccs #(.gm({alpha*adap})) G_unnamed (.sink(\????? ),.src(\????? ),.ps(\????? ),.ns(\????? ));
-print tran v(x) v(y)
-             ^ ? no match
-print tran v(x) v(y)
-                  ^ ? no match
+G_unnamed: invalid nodes

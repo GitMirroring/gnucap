@@ -296,6 +296,7 @@ static void map_user_nodes(CARD_LIST* scope)
     USER_NODE* un = prechecked_cast<USER_NODE*>(n);
     assert(un);
     assert(n->net_nodes()==1);
+    trace1("top map", un->short_label());
 
     if(un->user_number()==0){
     }else if(un->is_global()){
@@ -388,6 +389,7 @@ void SIM_DATA::alloc_hold_vectors(CARD_LIST* scope)
 
   assert(top_nodes.size());
   for (int ii=top_nodes.size(); --ii;) {
+    trace2("top node allocate", ii, top_nodes[ii].short_label());
     top_nodes[ii].allocate(1 /*bump user node count*/);
   }
 
