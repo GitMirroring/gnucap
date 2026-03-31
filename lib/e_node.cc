@@ -29,6 +29,7 @@
 #include "e_card.h"
 #include "e_aux.h"
 #include "e_logicnode.h"
+#include "e_matrixnode.h"
 #include "m_union.h"
 #include "e_usernode.h" // BUG
 #include "e_node_type.h" // DNDEBUG?
@@ -202,7 +203,7 @@ double NODE::tr_probe_num(const std::string& x)const
     return floor(v0()/OPT::vfloor + .5) * OPT::vfloor;
   }else if (Umatch(x, "z ")) {
     return port_impedance(node_t(const_cast<NODE*>(this)), node_t(&ground_node), _sim->_aa, 0.);
-  }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) { untested();
+  }else if (Umatch(x, "l{ogic} |la{stchange} |fi{naltime} |di{ter} |ai{ter} |count ")) {
     unreachable();
     return NOT_VALID;
   }else if (Umatch(x, "mdy ")) {
@@ -368,7 +369,7 @@ void node_t::allocate(int u /*, CARD* owner*/)
   }
   if(dynamic_cast<USER_NODE const*>(_nnn)) { untested();
     unreachable();
-  }else if(dynamic_cast<NODE_TYPE const*>(_nnn)) {
+  }else if(auto dd = dynamic_cast<NODE_TYPE const*>(_nnn)) {
     int flat_number = INVALID_NODE;
     switch(u) {
     case 0:
@@ -383,7 +384,17 @@ void node_t::allocate(int u /*, CARD* owner*/)
     default:
       unreachable();
     }
-    NODE* nn = new LOGIC_NODE();
+    NODE* nn = nullptr;
+    if(dd->is_mixed()) {
+      nn = new LOGIC_NODE();
+    }else if(dd->is_continuous()) {
+      nn = new MATRIX_NODE();
+    }else if(dd->is_discrete()) {
+      incomplete();
+      nn = new LOGIC_NODE();
+    }else{
+      unreachable();
+    }
     nn->set_user_number(flat_number);
     nn->set_owner(nullptr);
     set_own(nn);
@@ -485,6 +496,23 @@ void node_t::connect_port(node_t& port)
   connect(port);
 }
 /*--------------------------------------------------------------------------*/
+static NODE const* resolve_type(NODE const* upper, NODE const* lower)
+{
+  if(upper == lower){
+    return upper;
+  }else if(upper && lower && OPT::connect_rules){
+    int u = upper->user_number();
+    int l = lower->user_number();
+    assert(u<OPT::connect_rules->net_nodes());
+    assert(l<OPT::connect_rules->net_nodes());
+    return (&OPT::connect_rules->n_(u))[l].n_();
+  }else if(upper) { untested();
+    return upper;
+  }else{ untested();
+    return lower;
+  }
+}
+/*--------------------------------------------------------------------------*/
 // make a connection to a node, usually further up the hierarchy.
 // this will have to transport type information,
 // negotiate with the target node, and flag it as used.
@@ -499,7 +527,7 @@ void node_t::connect(node_t& lower)
   bool used = is_used() || target.is_used();
 
   if(!_nnn){
-    incomplete();
+    // incomplete();
     set_type(&electrical);
   }else{
   }
@@ -588,7 +616,8 @@ void node_t::connect(node_t& lower)
 //  }else if(!r._nnn){ untested();
     assert(r._link == &root() || !r._link);
     r._link = nullptr;
-    r.set_type(OPT::default_logic);
+    r.set_type(resolve_type(upper_type, lower_type));
+    trace3("resolved", upper_type->short_label(), lower_type->short_label(), r.short_label());
     r.set_used();
   }else{
     r._link = nullptr;

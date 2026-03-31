@@ -1,5 +1,6 @@
-/*                -*- C++ -*-
- * Copyright (C) 2025-26 Felix Salfelder
+/*$Id: e_logicnode.h $ -*- C++ -*-
+ * Copyright (C) 2001 Albert Davis
+ * Author: Albert Davis <aldavis@gnu.org>
  *
  * This file is part of "Gnucap", the Gnu Circuit Analysis Package
  *
@@ -18,39 +19,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *------------------------------------------------------------------
- * node type, aka "discipline"
+ * circuit node class
  */
-#ifndef E_NODE_TYPE
-#define E_NODE_TYPE
+//testing=script,sparse 2006.07.11
+#ifndef E_MATRIXNODE_H
+#define E_MATRIXNODE_H
+#include "e_logicval.h"
 #include "e_node.h"
 /*--------------------------------------------------------------------------*/
-class NODE_TYPE : public NODE {
-  enum domain_type {
-    dom_unknown = 0,
-    dom_mixed = 1,
-    dom_continuous = 2,
-    dom_discrete = 3
-  };
-  int _type_number{INVALID_NODE};
-  domain_type _domain{dom_unknown};
-public:
-  explicit NODE_TYPE(std::string const&);
-  ~NODE_TYPE();
-
-public:
-  void set_continuous() {_domain = dom_continuous;}
-  void set_mixed()     {_domain = dom_mixed;}
-  void set_discrete()   { _domain = dom_discrete;}
-  bool is_continuous()const  {return _domain == dom_continuous;}
-  bool is_mixed()const      {return _domain == dom_mixed;}
-  bool is_discrete()const    {untested(); return _domain == dom_discrete;}
-
-  int user_number()const override   { return _type_number;}
+class INTERFACE MATRIX_NODE : public NODE {
 private:
-  int flat_number()const override   {unreachable(); return INVALID_NODE;}
-  int matrix_number()const override {unreachable(); return INVALID_NODE;}
+  int _user_number{INVALID_NODE};
+private: // inhibited
+  explicit MATRIX_NODE(const MATRIX_NODE&):NODE(){incomplete();unreachable();}
+public: // general use
+  explicit MATRIX_NODE(std::string const& s) : NODE(s) {untested();}
+  explicit MATRIX_NODE() {}
+	   ~MATRIX_NODE() {}
+
+private:
+  // int 	      _a_iter;		/* iteration of last update - analog */
+
 public:
-  int type_number()const override   { return _type_number;}
+  int user_number()const override { return _user_number;}
+  int flat_number()const override { return _user_number;}
+  int matrix_number()const override;
+  NODE& set_user_number(int n)override {_user_number = n; return *this;}
+
+  // so it is not pure virtual
+  //const	      std::string long_label()const;
+public: // virtuals
+  //double	tr_probe_num(const std::string&)const override;
+  //XPROBE	ac_probe_ext(const std::string&)const;
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

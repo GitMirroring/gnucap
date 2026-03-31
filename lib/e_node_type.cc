@@ -25,7 +25,7 @@
 /*--------------------------------------------------------------------------*/
 NODE_TYPE::NODE_TYPE(std::string const& name)
   : NODE(name)
-{ untested();
+{
   set_label(name);
   static int k;
   _type_number = k++;
@@ -48,7 +48,7 @@ namespace{
 /*--------------------------------------------------------------------------*/
 class HYBRID : public NODE_TYPE {
 public:
-  explicit HYBRID() : NODE_TYPE("hybrid") { untested();
+  explicit HYBRID() : NODE_TYPE("hybrid") {
     OPT::default_logic = this;
     set_mixed();
     // set_potential("Voltage");
@@ -66,7 +66,7 @@ public:
 class CONNECTRULES : public CARD {
   mutable node_t _n[9];
 public:
-  explicit CONNECTRULES() : CARD() { untested();
+  explicit CONNECTRULES() : CARD() {
 
     assert(electrical.type_number()==0);
     assert(hybrid.type_number()==1);
@@ -86,8 +86,8 @@ public:
     OPT::connect_rules = this;
   }
   CARD* clone()const override { untested();unreachable(); return nullptr;}
-  int net_nodes()const override { untested();return 3;}
-  node_t& n_(int i)const override { untested();assert(i<3); return _n[i*3];}
+  int net_nodes()const override {return 3;}
+  node_t& n_(int i)const override {assert(i<3); return _n[i*3];}
 } p3;
 /*--------------------------------------------------------------------------*/
 }
