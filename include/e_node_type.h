@@ -25,9 +25,26 @@
 #include "e_node.h"
 /*--------------------------------------------------------------------------*/
 class NODE_TYPE : public NODE {
+  enum domain_type {
+    dom_unknown = 0,
+    dom_mixed = 1,
+    dom_continuous = 2,
+    dom_discrete = 3
+  };
   int _type_number{INVALID_NODE};
+  domain_type _domain{dom_unknown};
 public:
   explicit NODE_TYPE(std::string const&);
+  ~NODE_TYPE();
+
+public:
+  void set_continuous() {_domain = dom_continuous;}
+  void set_mixed()     {_domain = dom_mixed;}
+  void set_discrete()   {untested(); _domain = dom_discrete;}
+  bool is_continuous()const  {return _domain == dom_continuous;}
+  bool is_mixed()const      {return _domain == dom_mixed;}
+  bool is_discrete()const    {untested(); return _domain == dom_discrete;}
+
 private:
   int user_number()const override   {unreachable(); return INVALID_NODE;}
   int flat_number()const override   {unreachable(); return INVALID_NODE;}

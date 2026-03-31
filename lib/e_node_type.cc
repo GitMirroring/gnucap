@@ -33,8 +33,8 @@ NODE_TYPE::NODE_TYPE(std::string const& name)
 /*--------------------------------------------------------------------------*/
 class ELECTRICAL : public NODE_TYPE {
 public:
-  explicit ELECTRICAL() : NODE_TYPE("electrical") { untested();
-    // set_continuous();
+  explicit ELECTRICAL() : NODE_TYPE("electrical") {
+    set_continuous();
     // set_potential("Voltage");
     // set_flow("Current");
   }
@@ -46,7 +46,7 @@ class HYBRID : public NODE_TYPE {
 public:
   explicit HYBRID() : NODE_TYPE("hybrid") { untested();
     OPT::default_logic = this;
-    // set_mixed();
+    set_mixed();
     // set_potential("Voltage");
     // set_flow("Current");
   }
@@ -54,8 +54,8 @@ public:
 /*--------------------------------------------------------------------------*/
 class LOGIC : public NODE_TYPE {
 public:
-  explicit LOGIC() : NODE_TYPE("logic") { untested();
-    // set_discrete();
+  explicit LOGIC() : NODE_TYPE("logic") {
+    set_discrete();
   }
 }logic;
 /*--------------------------------------------------------------------------*/
