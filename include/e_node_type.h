@@ -32,7 +32,8 @@ private:
   int user_number()const override   {unreachable(); return INVALID_NODE;}
   int flat_number()const override   {unreachable(); return INVALID_NODE;}
   int matrix_number()const override {unreachable(); return INVALID_NODE;}
-  int type_number()const override   {untested(); return _type_number;}
+public:
+  int type_number()const override   { return _type_number;}
 };
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

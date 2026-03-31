@@ -552,7 +552,7 @@ void node_t::connect(node_t& lower)
     _own = false;
   }else{
   }
-  if(dynamic_cast<NODE_TYPE const*>(target._nnn)){ untested();
+  if(dynamic_cast<NODE_TYPE const*>(target._nnn)){
     target._nnn=nullptr;
     target._link = &target;
   }else{
