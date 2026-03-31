@@ -25,7 +25,7 @@
 /*--------------------------------------------------------------------------*/
 NODE_TYPE::NODE_TYPE(std::string const& name)
   : NODE(name)
-{
+{ untested();
   set_label(name);
   static int k;
   _type_number = k++;
@@ -33,7 +33,7 @@ NODE_TYPE::NODE_TYPE(std::string const& name)
 /*--------------------------------------------------------------------------*/
 class ELECTRICAL : public NODE_TYPE {
 public:
-  explicit ELECTRICAL() : NODE_TYPE("electrical") {
+  explicit ELECTRICAL() : NODE_TYPE("electrical") { untested();
     // set_continuous();
     // set_potential("Voltage");
     // set_flow("Current");
@@ -44,7 +44,7 @@ namespace{
 /*--------------------------------------------------------------------------*/
 class HYBRID : public NODE_TYPE {
 public:
-  explicit HYBRID() : NODE_TYPE("hybrid") {
+  explicit HYBRID() : NODE_TYPE("hybrid") { untested();
     OPT::default_logic = this;
     // set_mixed();
     // set_potential("Voltage");
@@ -54,7 +54,7 @@ public:
 /*--------------------------------------------------------------------------*/
 class LOGIC : public NODE_TYPE {
 public:
-  explicit LOGIC() : NODE_TYPE("logic") {
+  explicit LOGIC() : NODE_TYPE("logic") { untested();
     // set_discrete();
   }
 }logic;
@@ -62,7 +62,7 @@ public:
 class CONNECTRULES : public CARD {
   mutable node_t _n[9];
 public:
-  explicit CONNECTRULES() : CARD() {
+  explicit CONNECTRULES() : CARD() { untested();
 
     assert(electrical.type_number()==0);
     assert(hybrid.type_number()==1);
@@ -81,9 +81,9 @@ public:
 
     OPT::connect_rules = this;
   }
-  CARD* clone()const override {unreachable(); return nullptr;}
-  int net_nodes()const override {return 3;}
-  node_t& n_(int i)const override {assert(i<3); return _n[i*3];}
+  CARD* clone()const override { untested();unreachable(); return nullptr;}
+  int net_nodes()const override { untested();return 3;}
+  node_t& n_(int i)const override { untested();assert(i<3); return _n[i*3];}
 } p3;
 /*--------------------------------------------------------------------------*/
 }
