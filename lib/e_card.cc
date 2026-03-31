@@ -282,6 +282,13 @@ void CARD::renew_subckt(const CARD* Model, PARAM_LIST const* Params)
   }
 }
 /*--------------------------------------------------------------------------*/
+void CARD::reset_ports()
+{
+  for (int ii = 0;  ii < net_nodes();  ++ii) {
+    n_(ii).set_used(); // kludge
+  }
+}
+/*--------------------------------------------------------------------------*/
 node_t& CARD::n_(int)const
 {untested();
   unreachable();
