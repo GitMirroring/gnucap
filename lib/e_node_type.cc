@@ -31,6 +31,10 @@ NODE_TYPE::NODE_TYPE(std::string const& name)
   _type_number = k++;
 }
 /*--------------------------------------------------------------------------*/
+NODE_TYPE::~NODE_TYPE()
+{
+}
+/*--------------------------------------------------------------------------*/
 class ELECTRICAL : public NODE_TYPE {
 public:
   explicit ELECTRICAL() : NODE_TYPE("electrical") {

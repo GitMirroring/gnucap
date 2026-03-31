@@ -618,10 +618,11 @@ static void connect_ports(NODE_MAP& nodes, CARD const* owner, CARD const* model)
   int num_nodes_in_subckt = nodes.size();
   for (int port = 0; port < nn; ++port) {
     assert(model->n_(port).e_() <= num_nodes_in_subckt);
+    assert(!owner->n_(port).n_());
     //assert(model->n_(port).e_() == port+1);
     int idx = model->n_(port).e_();
     if(owner->n_(port).is_connected()){
-      build_union(&nodes[idx], &owner->n_(port));
+      nodes[idx].connect_port(owner->n_(port));
       // assert(&node_map[idx].root()==&owner->n_(port).root());
     }else{
       // floating?
