@@ -329,6 +329,7 @@ void LANG_SPICE_BASE::parse_ports(CS& cmd, COMPONENT* x, int minnodes,
   
   // ground unused input nodes
   for (int iii = index;  iii < minnodes;  ++iii) {untested();
+    // set_port_by_index(iii, "0") .. want_ground_zero..
     x->set_port_to_ground(iii);
   }
   //assert(x->_net_nodes >= index);

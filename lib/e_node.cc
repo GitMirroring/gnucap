@@ -384,7 +384,7 @@ void node_t::set_to_ground(CARD* Owner)
     }
   }else{
   }
-  if(Owner){itested();
+  if(Owner){untested();
     // fallback
     // maybe reached from spice?
     assert(Owner->scope());
