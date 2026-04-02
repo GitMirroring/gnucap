@@ -28,6 +28,15 @@ class NODE_TYPE : public NODE {
   int _type_number{INVALID_NODE};
 public:
   explicit NODE_TYPE(std::string const&);
+  ~NODE_TYPE();
+
+  virtual NODE* allocate()const = 0;
+
+public:
+  virtual bool is_continuous()const {untested(); return false; }
+  virtual bool is_mixed()const      {untested(); return false; }
+  virtual bool is_discrete()const   {untested(); return false; }
+
 private:
   int user_number()const override   {unreachable(); return INVALID_NODE;}
   int flat_number()const override   {unreachable(); return INVALID_NODE;}

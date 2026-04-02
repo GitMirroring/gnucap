@@ -20,49 +20,64 @@
  *------------------------------------------------------------------
  * discipline and nature
  */
-#include "e_node_type.h"
 #include "globals.h"
+#include "e_node_type.h"
+#include "e_logicnode.h"
 /*--------------------------------------------------------------------------*/
 NODE_TYPE::NODE_TYPE(std::string const& name)
   : NODE(name)
-{ untested();
+{
   set_label(name);
   static int k;
   _type_number = k++;
 }
 /*--------------------------------------------------------------------------*/
+NODE_TYPE::~NODE_TYPE()
+{
+}
+/*--------------------------------------------------------------------------*/
 class ELECTRICAL : public NODE_TYPE {
 public:
-  explicit ELECTRICAL() : NODE_TYPE("electrical") { untested();
-    // set_continuous();
+  explicit ELECTRICAL() : NODE_TYPE("electrical") {
     // set_potential("Voltage");
     // set_flow("Current");
   }
+  NODE* allocate()const override { untested();
+    incomplete();
+    return nullptr; // new MATRIX_NODE();
+  }
+  bool is_continuous()const override {untested(); return true; }
 }electrical;
 /*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
 class HYBRID : public NODE_TYPE {
 public:
-  explicit HYBRID() : NODE_TYPE("hybrid") { untested();
+  explicit HYBRID() : NODE_TYPE("hybrid") {
     OPT::default_logic = this;
-    // set_mixed();
     // set_potential("Voltage");
     // set_flow("Current");
   }
+  NODE* allocate()const override {
+    return new LOGIC_NODE();
+  }
+  bool is_mixed()const override {untested(); return true; }
 }hybrid;
 /*--------------------------------------------------------------------------*/
 class LOGIC : public NODE_TYPE {
 public:
-  explicit LOGIC() : NODE_TYPE("logic") { untested();
-    // set_discrete();
+  explicit LOGIC() : NODE_TYPE("logic") {
   }
+  NODE* allocate()const override {untested();
+    return new LOGIC_NODE();
+  }
+  bool is_discrete()const override {untested(); return true; }
 }logic;
 /*--------------------------------------------------------------------------*/
 class CONNECTRULES : public CARD {
   mutable node_t _n[9];
 public:
-  explicit CONNECTRULES() : CARD() { untested();
+  explicit CONNECTRULES() : CARD() {
 
     assert(electrical.type_number()==0);
     assert(hybrid.type_number()==1);
