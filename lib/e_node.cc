@@ -29,7 +29,11 @@
 #include "e_card.h"
 #include "e_aux.h"
 #include "e_logicnode.h"
+#include "m_union.h"
+#include "e_usernode.h" // BUG
 #include "e_node_type.h"
+/*--------------------------------------------------------------------------*/
+extern NODE electrical;
 /*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
  * supposedly not used, but used by a required function that is also not used
@@ -157,7 +161,7 @@ node_t& node_t::operator=(NODE* n)
     _nnn->purge();
     delete _nnn;
     _own = false;
-  }else{ untested();
+  }else{
   }
   _link = nullptr;
   _nnn = n;
@@ -297,7 +301,8 @@ void node_t::new_model_node(const std::string& node_name, CARD* Owner)
   (void) node_name;
   (void) Owner;
   assert(!_nnn);
-  find_subset(this);
+  // find_subset(this);
+  _nnn = &electrical;
   allocate(3);
 }
 /*--------------------------------------------------------------------------*/
@@ -332,22 +337,16 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
 // 2: misc device internal nodes "model_node"
 void node_t::allocate(int u /*, CARD* owner*/)
 {
-  if(u==2){ untested();
-    // obsolete new_model_node supplementary call.
-    unreachable();
-    return;
-  }else{
-  }
+  assert(u!=2); // obsolete new_model_node supplementary call.
 
   if(_nnn == &ground_node){
   }else if(is_node() && CKT_BASE::_sim->is_first_expand()) {
     // repeat call.
   }else{
   }
-  if(is_node()) {
-    // done.
-    trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
-  }else if(_link==this) {
+  if(dynamic_cast<USER_NODE const*>(_nnn)) { untested();
+    unreachable();
+  }else if(dynamic_cast<NODE_TYPE const*>(_nnn)) {
     int flat_number = INVALID_NODE;
     switch(u) {
     case 0:
@@ -366,6 +365,9 @@ void node_t::allocate(int u /*, CARD* owner*/)
     nn->set_user_number(flat_number);
     nn->set_owner(nullptr);
     set_own(nn);
+  }else if(is_node()) {
+    // done.
+    trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
   }else if(_link==this) { untested();
     unreachable();
   }else{
@@ -451,13 +453,68 @@ void node_t::connect(node_t& target)
 {
   bool used = is_used() || target.is_used();
 
-  node_t* r = build_union(&target, this);
-  assert(r);
+  if(!_nnn){
+    incomplete();
+    set_type(&electrical);
+  }else{
+  }
+
+  assert(root()._nnn == &ground_node
+      || dynamic_cast<NODE_TYPE const*>(root()._nnn));
+
+  if(!target.root()._nnn){
+    // no discipline specified.
+    // target.root().set_type(OPT::default_node);
+  }else{
+    assert(target.root()._nnn == &ground_node
+	|| dynamic_cast<NODE_TYPE const*>(target.root()._nnn));
+  }
+
+  assert(!_own);
+  assert(!target._own);
+  if(dynamic_cast<NODE_TYPE const*>(_nnn)){
+    _nnn = nullptr;
+    _link = this;
+    _own = false;
+  }else{
+  }
+  if(dynamic_cast<NODE_TYPE const*>(target._nnn)){ untested();
+    target._nnn=nullptr;
+    target._link = &target;
+  }else{
+  }
+  node_t* u = build_union(&target, this);
+  assert(u);
+  node_t& r = *u;
+
   assert(_nnn || _link);
   assert(!_nnn || !_link);
 
-  if(used){
-    r->set_used();
+  if(dynamic_cast<USER_NODE const*>(r._nnn)) { untested();
+    // replace by clone_instance?
+  }else if(r._nnn && r._nnn == &ground_node){
+    trace1("connect", typeid(*r._nnn).name());
+  }else if(dynamic_cast<NODE_TYPE const*>(r._nnn)) {
+  }else{
+    assert(!r._nnn);
+  }
+
+  if(r._nnn == &ground_node){
+    // HACK.
+    r.set_used();
+  }else if(used){
+//  }else if(!r._nnn){ untested();
+    assert(r._link == &root() || !r._link);
+    r._link = nullptr;
+    r.set_type(&electrical); // TODO
+    r.set_used();
+  }else{
+  }
+
+  if(!r._nnn){
+    assert(r._link == &root());
+    r._link = nullptr;
+    r.set_type(&electrical);
   }else{
   }
 }
