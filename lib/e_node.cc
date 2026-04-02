@@ -31,7 +31,7 @@
 #include "e_logicnode.h"
 #include "m_union.h"
 #include "e_usernode.h" // BUG
-#include "e_node_type.h"
+#include "e_node_type.h" // DNDEBUG?
 /*--------------------------------------------------------------------------*/
 extern NODE electrical;
 /*--------------------------------------------------------------------------*/
@@ -125,8 +125,10 @@ node_t& node_t::operator=(const node_t& p)
   }else{ untested();
     // assert(dynamic_cast<USER_NODE const*>(p.n_()));
     clear();
+    // _link = nullptr;
     _dir = dir_none;
     _nnn = p._nnn;
+    _own = false;
     assert(!p._link);
     return *this;
   }
@@ -250,12 +252,21 @@ XPROBE NODE::ac_probe_ext(const std::string& x)const
  */
 void node_t::new_node(const std::string& node_name, const CARD* Owner)
 {
-  if (_nnn) {//206
+#ifdef TRACE_UNTESTED
+  if (dynamic_cast<NODE_TYPE const*>(_nnn)) {
+//  }else if (dynamic_cast<NODE_DECL const*>(_nnn)) { untested();
+  }else if (dynamic_cast<USER_NODE const*>(_nnn)) { untested();
+    // a port with a discipline associated with it.
+  }else if (_nnn) {untested();
     // Repeat assign to this port, must be by name.  Probably an error.
     // Just clobber it.  Might be a leak but probably isn't.
   }else{//33312
     // proper first assign to this port.  The usual case.
   }
+  if(_link){ untested();
+  }else{
+  }
+#endif
   CARD_LIST const* scope; // the CARD_LIST that owns this device.
   if(Owner) {
     scope = Owner->scope();
@@ -303,6 +314,7 @@ void node_t::new_model_node(const std::string& node_name, CARD* Owner)
   assert(!_nnn);
   // find_subset(this);
   _nnn = &electrical;
+  _own = false;
   allocate(3);
 }
 /*--------------------------------------------------------------------------*/
@@ -318,7 +330,7 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
   }
   assert(m);
   if (e_() != INVALID_NODE) {
-    clear(); // keep index.
+    // clear(); // keep index.
     m[e_()].connect(*this);
     assert(_link);
     assert(!_nnn);
@@ -338,6 +350,7 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
     assert(m->n_() == &ground_node);
   }else{
   }
+//  assert(_nnn || _link);
 }
 /*--------------------------------------------------------------------------*/
 // nodes are all the same. only difference is counter
@@ -379,8 +392,15 @@ void node_t::allocate(int u /*, CARD* owner*/)
     trace3("node_t::allocate is_node", this, &root(), _nnn->short_label());
   }else if(_link==this) { untested();
     unreachable();
+  }else if(dynamic_cast<NODE_TYPE const*>(root().n_())){
+ //    trace3("node_t::allocate disc allocate", _index, u, short_label());
+ //    int flat_number = CKT_BASE::_sim->newnode_subckt();
+ //    NODE* nn = new LOGIC_NODE(flat_number);
+ //    clear();
+ //    nn->set_owner(nullptr);
+ //    set_own(nn);
   }else{
-    trace2("node_t::allocate no allocate", _index, u);
+    trace3("node_t::allocate no allocate", _index, u, short_label());
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -441,14 +461,23 @@ bool node_t::is_grounded() const
 /*--------------------------------------------------------------------------*/
 void node_t::clear()
 {
-  if(!_nnn){
-  }else if(_own){
-    _nnn->purge();
-    delete _nnn;
+  if(_nnn == &ground_node){
   }else{
   }
-  _own = false;
-  _nnn = nullptr;
+  if(!_nnn){
+//  }else if(dynamic_cast<DISCIPLINE const*>(_nnn)){ untested();
+//  }else if(_nnn == &ground_node){ untested();
+  }else{
+    if(_own){
+      _nnn->purge();
+      delete _nnn;
+    }else{
+    }
+    _own = false;
+    _nnn = nullptr;
+  }
+
+// _link = nullptr;
 }
 /*--------------------------------------------------------------------------*/
 // make a connection to a node, usually further up the hierarchy.
@@ -459,7 +488,8 @@ void node_t::clear()
 // - expand/deflate target node
 // - map to resulting structure
 void node_t::connect(node_t& lower)
-{ untested();
+{
+  assert(OPT::default_logic);
   node_t& target = lower;
   bool used = is_used() || target.is_used();
 
@@ -553,7 +583,7 @@ void node_t::connect(node_t& lower)
 //  }else if(!r._nnn){ untested();
     assert(r._link == &root() || !r._link);
     r._link = nullptr;
-    r.set_type(&electrical); // TODO
+    r.set_type(OPT::default_logic);
     r.set_used();
   }else{
     r._link = nullptr;
@@ -568,6 +598,7 @@ void node_t::connect(node_t& lower)
 /*--------------------------------------------------------------------------*/
 NODE const* node_t::set_type(NODE const* d)
 {
+  _m = -1;
   assert(d);
   assert(!_own);
   if(_link == this){
@@ -576,14 +607,20 @@ NODE const* node_t::set_type(NODE const* d)
   }else{
   }
 
+  if(dynamic_cast<USER_NODE*>(_nnn)){
+    _link = nullptr;
+  }else{
+  }
+
   if(_link){
-    unreachable();
+    // unreachable();
     return nullptr;
   }else{
     _link = nullptr;
     _nnn = const_cast<NODE*>(d);
     assert(prechecked_cast<NODE_TYPE*>(_nnn));
     _dir = dir_none;
+    _own = false;
     return _nnn;
   }
   return _nnn;

@@ -282,9 +282,12 @@ void CARD::renew_subckt(const CARD* Model, PARAM_LIST const* Params)
   }
 }
 /*--------------------------------------------------------------------------*/
+extern NODE electrical;
 void CARD::reset_ports()
 {
   for (int ii = 0;  ii < net_nodes();  ++ii) {
+    n_(ii).clear(); // kludge
+    n_(ii).set_type(&electrical);
     n_(ii).set_used(); // kludge
   }
 }
