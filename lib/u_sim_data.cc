@@ -29,6 +29,7 @@
 #include "e_cardlist.h"
 #include "e_usernode.h"
 #include "c_comand.h"
+#include "e_node_type.h"
 /*--------------------------------------------------------------------------*/
 SIM_DATA::SIM_DATA()
   :_time0(0.),
@@ -248,9 +249,38 @@ static void clear_top_nodes(CARD_LIST* scope)
   top_nodes[0].map();
   assert(top_nodes[0].m_()==0);
 #endif
+
+  // reset.
+  for (NODE_MAP::iterator p = top_nodes.begin(); p != top_nodes.end(); ++p ){
+    NODE* n = (*p).second;
+    USER_NODE* un = prechecked_cast<USER_NODE*>(n);
+    assert(un);
+    assert(n->net_nodes()==1);
+
+    int u = n->user_number();
+    if(u){
+      top_nodes[u].clear();
+      un->reset_ports();
+      top_nodes[u] = (node_t const&) n->n_(0);
+    }else{
+      top_nodes[u].set_input(); // flag "used"
+      assert(top_nodes[u].n_() == &ground_node);
+    }
+  }
+  for (NODE_MAP::iterator p = top_nodes.begin(); p != top_nodes.end(); ++p ){
+    NODE* n = (*p).second;
+    USER_NODE* un = prechecked_cast<USER_NODE*>(n);
+    assert(un);
+    assert(n->net_nodes()==1);
+
+    int u = n->user_number();
+    trace3("DBG0 map", u, p->first, top_nodes[u].n_());
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* map USER_NODEs (top level only)
+ * make them point to the actual nodes, so they can serve as probes.
+ * ought to be same procedure as with top level devices.
  */
 static void map_user_nodes(CARD_LIST* scope)
 {
@@ -260,6 +290,7 @@ static void map_user_nodes(CARD_LIST* scope)
   }
   assert(scope->nodes());
   NODE_MAP& top_nodes = *scope->nodes();
+  assert(top_nodes[0].n_() == &ground_node);
   for (NODE_MAP::iterator p = top_nodes.begin(); p != top_nodes.end(); ++p ){
     NODE* n = (*p).second;
     USER_NODE* un = prechecked_cast<USER_NODE*>(n);
@@ -267,21 +298,28 @@ static void map_user_nodes(CARD_LIST* scope)
     assert(n->net_nodes()==1);
 
     if(un->user_number()==0){
-      n->n_(0).map_subckt_node(&top_nodes[0], nullptr);
     }else if(un->is_global()){
-      // node has link. must be global.. map as usual
-      n->n_(0).map_subckt_node(&top_nodes[0], nullptr);
     }else{
-      // just link, but do not mark for allocation.
-      int u = n->user_number();
-      assert(u == n->n_(0).e_());
-      n->n_(0).clear();
-      n->n_(0).link_to(&top_nodes[u]);
     }
+
+    assert(top_nodes[0].n_() == &ground_node);
+    n->n_(0).map_subckt_node(&top_nodes[0], nullptr);
+    assert(top_nodes[0].n_() == &ground_node);
+
     assert((*p).first == n->short_label()); // BUG: redundant storage.
 					    // use std::set and c++14?
   }
+  for (NODE_MAP::iterator p = top_nodes.begin(); p != top_nodes.end(); ++p ){
+    NODE* n = (*p).second;
+    USER_NODE* un = prechecked_cast<USER_NODE*>(n);
+    assert(un);
+    assert(n->net_nodes()==1);
 
+    int u = n->user_number();
+    trace3("DBG map", u, p->first, top_nodes[u].n_());
+  }
+
+  assert(top_nodes[0].n_() == &ground_node);
 }
 /*--------------------------------------------------------------------------*/
 /* init: allocate, set up, etc ... for any type of simulation
@@ -297,8 +335,8 @@ void SIM_DATA::init(CARD_LIST* scope)
     uninit();
     init_node_count(0, 0, 0);
     clear_top_nodes(scope);
-    scope->map_subckt_nodes(nullptr, nullptr);
     map_user_nodes(scope);
+    scope->map_subckt_nodes(nullptr, nullptr);
     scope->expand();
     expand_last();
     alloc_hold_vectors(scope);

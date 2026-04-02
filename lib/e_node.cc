@@ -312,6 +312,10 @@ void node_t::new_model_node(const std::string& node_name, CARD* Owner)
  */
 void node_t::map_subckt_node(node_t* m, const CARD* d)
 {
+  if(!d){
+    assert(m->n_() == &ground_node);
+  }else{
+  }
   assert(m);
   if (e_() != INVALID_NODE) {
     clear(); // keep index.
@@ -328,6 +332,11 @@ void node_t::map_subckt_node(node_t* m, const CARD* d)
     _nnn = nullptr;
   }else{
     (void)d; // probably floating. handle elsewhere
+  }
+
+  if(!d){
+    assert(m->n_() == &ground_node);
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -491,7 +500,10 @@ void node_t::connect(node_t& target)
   assert(!_nnn || !_link);
 
   if(dynamic_cast<USER_NODE const*>(r._nnn)) { untested();
+    // THIS IS WRONG.
     // replace by clone_instance?
+    // r._link = nullptr;
+    // r._nnn = &dummy;
   }else if(r._nnn && r._nnn == &ground_node){
     trace1("connect", typeid(*r._nnn).name());
   }else if(dynamic_cast<NODE_TYPE const*>(r._nnn)) {
@@ -509,14 +521,14 @@ void node_t::connect(node_t& target)
     r.set_type(&electrical); // TODO
     r.set_used();
   }else{
+    r._link = nullptr;
   }
 
-  if(!r._nnn){
-    assert(r._link == &root());
-    r._link = nullptr;
-    r.set_type(&electrical);
-  }else{
-  }
+  assert(target._link);
+
+  assert(!used
+      || target.root()._nnn == &ground_node
+      || dynamic_cast<NODE_TYPE const*>(target.root()._nnn));
 }
 /*--------------------------------------------------------------------------*/
 NODE const* node_t::set_type(NODE const* d)
