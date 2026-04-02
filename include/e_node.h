@@ -212,6 +212,7 @@ public:
   void	new_node(const std::string&, const CARD*);
   void	new_model_node(const std::string& n, CARD* d);
   void	map_subckt_node(node_t* map_array, const CARD* d);
+  void	connect_port(node_t& port);
   bool	is_grounded()const;
   bool	is_connected()const { return _m==0 || e_()!=INVALID_NODE; }
   bool	is_short_to(node_t const& n)const {return &root() == &n.root();}

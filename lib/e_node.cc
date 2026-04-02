@@ -480,6 +480,11 @@ void node_t::clear()
 // _link = nullptr;
 }
 /*--------------------------------------------------------------------------*/
+void node_t::connect_port(node_t& port)
+{
+  connect(port);
+}
+/*--------------------------------------------------------------------------*/
 // make a connection to a node, usually further up the hierarchy.
 // this will have to transport type information,
 // negotiate with the target node, and flag it as used.
