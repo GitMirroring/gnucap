@@ -492,8 +492,8 @@ static NODE const* resolve_type(NODE const* upper, NODE const* lower)
   if(upper == lower){
     return upper;
   }else if(upper && lower && OPT::connect_rules){
-    int u = upper->user_number();
-    int l = lower->user_number();
+    int u = upper->flat_number();
+    int l = lower->flat_number();
     assert(u<OPT::connect_rules->net_nodes());
     assert(l<OPT::connect_rules->net_nodes());
     return (&OPT::connect_rules->n_(u))[l].n_();

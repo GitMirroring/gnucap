@@ -1,4 +1,4 @@
-
+load ./legacy_logic.so
 * options trace
 
 .model logic logic ( delay=1n rise=1n fall=1n  rs= 100.  rw= 1.G

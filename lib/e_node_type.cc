@@ -49,6 +49,12 @@ public:
   bool is_continuous()const override {untested(); return true; }
 }electrical;
 /*--------------------------------------------------------------------------*/
+NODE_TYPE* electrical_()
+{
+  // incomplete. dispatch.
+  return &electrical;
+}
+/*--------------------------------------------------------------------------*/
 namespace{
 /*--------------------------------------------------------------------------*/
 class HYBRID : public NODE_TYPE {

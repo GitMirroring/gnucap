@@ -1,3 +1,4 @@
+load ./legacy_logic.so
 **************
 * not meant to be a useful circuit, but a good test.
 **************
