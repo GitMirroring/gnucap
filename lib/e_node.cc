@@ -354,10 +354,12 @@ void node_t::allocate(int u /*, CARD* owner*/)
     default:
       unreachable();
     }
-    trace3("node_t::allocate new", this, &root(), flat_number);
-    NODE* nn = new LOGIC_NODE(flat_number);
+    NODE* nn = new LOGIC_NODE();
+    nn->set_user_number(flat_number);
     nn->set_owner(nullptr);
     set_own(nn);
+  }else if(_link==this) { untested();
+    unreachable();
   }else{
     trace2("node_t::allocate no allocate", _index, u);
   }

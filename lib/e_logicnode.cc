@@ -27,7 +27,7 @@
 /*--------------------------------------------------------------------------*/
 LOGIC_NODE::LOGIC_NODE(int i)
   :NODE(),
-   _flat_number(i),
+   _user_number(i),
    _family(0),
    _d_iter(-1), // initially d_iter is older than a_iter
    _a_iter(0),
@@ -40,9 +40,6 @@ LOGIC_NODE::LOGIC_NODE(int i)
    _quality(qBAD),
    _failure_mode("initial")
 {
-  if(i!=-1){
-  }else{ untested();
-  }
 }
 /*--------------------------------------------------------------------------*/
 double LOGIC_NODE::tr_probe_num(const std::string& x)const
