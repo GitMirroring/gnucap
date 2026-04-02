@@ -458,8 +458,9 @@ void node_t::clear()
 // - resolve target node type
 // - expand/deflate target node
 // - map to resulting structure
-void node_t::connect(node_t& target)
-{
+void node_t::connect(node_t& lower)
+{ untested();
+  node_t& target = lower;
   bool used = is_used() || target.is_used();
 
   if(!_nnn){
@@ -471,6 +472,27 @@ void node_t::connect(node_t& target)
   assert(root()._nnn == &ground_node
       || dynamic_cast<NODE_TYPE const*>(root()._nnn));
 
+  node_t* old_root = &root();
+  node_t* lower_root = &lower.root();
+
+  NODE const* upper_type = old_root->n_();
+
+  if(!old_root->_nnn){
+    // too late?
+    old_root->set_type(OPT::default_logic);
+    assert(old_root->_nnn == OPT::default_logic);
+    upper_type = OPT::default_logic;
+  }else{
+  }
+  assert(!old_root->_link);
+
+  if(upper_type == &ground_node){
+    upper_type = &electrical; // HACK.
+  }else{
+  }
+
+  assert(dynamic_cast<NODE_TYPE const*>(upper_type));
+
   if(!target.root()._nnn){
     // no discipline specified.
     // target.root().set_type(OPT::default_node);
@@ -478,6 +500,19 @@ void node_t::connect(node_t& target)
     assert(target.root()._nnn == &ground_node
 	|| dynamic_cast<NODE_TYPE const*>(target.root()._nnn));
   }
+
+  NODE const* lower_type = lower_root->n_();
+  if(lower_type == &ground_node){
+    // incomplete();
+    lower_type = &electrical;
+  }else if(lower_type){
+  }else if(upper_type){
+    lower_type = lower_root->set_type(upper_type);
+  }else{ untested();
+  }
+  assert(lower_type);
+  assert(dynamic_cast<NODE_TYPE const*>(lower_type));
+  trace2("DBG connect", lower_type->short_label(), upper_type->short_label());
 
   assert(!_own);
   assert(!target._own);
@@ -533,13 +568,23 @@ void node_t::connect(node_t& target)
 /*--------------------------------------------------------------------------*/
 NODE const* node_t::set_type(NODE const* d)
 {
+  assert(d);
   assert(!_own);
+  if(_link == this){
+    // incomplete(); // why?
+    _link = nullptr;
+  }else{
+  }
+
   if(_link){
+    unreachable();
+    return nullptr;
   }else{
     _link = nullptr;
     _nnn = const_cast<NODE*>(d);
     assert(prechecked_cast<NODE_TYPE*>(_nnn));
     _dir = dir_none;
+    return _nnn;
   }
   return _nnn;
 }

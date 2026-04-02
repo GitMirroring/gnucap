@@ -303,6 +303,9 @@ static void map_user_nodes(CARD_LIST* scope)
     }
 
     assert(top_nodes[0].n_() == &ground_node);
+    // assert(n->n_(0)._link); // ??
+    n->n_(0).clear(); // knock out link. why?
+    // assert(!top_nodes[n->n_(0).e_()].is_link());
     n->n_(0).map_subckt_node(&top_nodes[0], nullptr);
     assert(top_nodes[0].n_() == &ground_node);
 
