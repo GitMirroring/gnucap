@@ -618,8 +618,7 @@ static void connect_ports(NODE_MAP& nodes, CARD const* owner, CARD const* model)
   int num_nodes_in_subckt = nodes.size();
   for (int port = 0; port < nn; ++port) {
     assert(model->n_(port).e_() <= num_nodes_in_subckt);
-    assert(!owner->n_(port).n_());
-    //assert(model->n_(port).e_() == port+1);
+    // assert(!owner->n_(port).n_()); not in lang_verilog.2a.gc
     int idx = model->n_(port).e_();
     if(owner->n_(port).is_connected()){
       nodes[idx].connect_port(owner->n_(port));

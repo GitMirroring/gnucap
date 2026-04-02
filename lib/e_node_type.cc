@@ -97,8 +97,8 @@ public:
     OPT::connect_rules = this;
   }
   CARD* clone()const override { untested();unreachable(); return nullptr;}
-  int net_nodes()const override { untested();return 3;}
-  node_t& n_(int i)const override { untested();assert(i<3); return _n[i*3];}
+  int net_nodes()const override {return 3;}
+  node_t& n_(int i)const override {assert(i<3); return _n[i*3];}
 } p3;
 /*--------------------------------------------------------------------------*/
 }
