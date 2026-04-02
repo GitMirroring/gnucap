@@ -22,6 +22,7 @@
  */
 #include "globals.h"
 #include "e_node_type.h"
+#include "e_matrixnode.h"
 #include "e_logicnode.h"
 /*--------------------------------------------------------------------------*/
 NODE_TYPE::NODE_TYPE(std::string const& name)
@@ -42,9 +43,8 @@ public:
     // set_potential("Voltage");
     // set_flow("Current");
   }
-  NODE* allocate()const override { untested();
-    incomplete();
-    return nullptr; // new MATRIX_NODE();
+  NODE* allocate()const override {
+    return new MATRIX_NODE();
   }
   bool is_continuous()const override {untested(); return true; }
 }electrical;

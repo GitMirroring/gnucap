@@ -383,17 +383,9 @@ void node_t::allocate(int u /*, CARD* owner*/)
     default:
       unreachable();
     }
-    NODE* nn = nullptr;
-    if(dd->is_mixed()) {
-      nn = new LOGIC_NODE();
-    }else if(dd->is_continuous()) {
-      nn = new MATRIX_NODE();
-    }else if(dd->is_discrete()) { untested();
-      incomplete();
-      nn = new LOGIC_NODE();
-    }else{
-      unreachable();
-    }
+    CARD* ni = dd->allocate();
+    auto nn = prechecked_cast<NODE*>(ni);
+    assert(nn);
     nn->set_user_number(flat_number);
     nn->set_owner(nullptr);
     set_own(nn);
