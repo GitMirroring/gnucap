@@ -22,13 +22,14 @@
  * node probes
  */
 //testing=script,sparse 2006.07.11
+#include "m_union.h"
+#include "u_nodemap.h"
+#include "u_xprobe.h"
 #include "e_cardlist.h"
 #include "e_card.h"
-#include "u_nodemap.h"
 #include "e_aux.h"
-#include "u_xprobe.h"
 #include "e_logicnode.h"
-#include "m_union.h"
+#include "e_node_type.h"
 /*--------------------------------------------------------------------------*/
 /* constructor taking a pointer : it must be valid
  * supposedly not used, but used by a required function that is also not used
@@ -463,6 +464,19 @@ void node_t::connect(node_t& target)
     r->set_used();
   }else{
   }
+}
+/*--------------------------------------------------------------------------*/
+NODE const* node_t::set_type(NODE const* d)
+{
+  assert(!_own);
+  if(_link){
+  }else{
+    _link = nullptr;
+    _nnn = const_cast<NODE*>(d);
+    assert(prechecked_cast<NODE_TYPE*>(_nnn));
+    _dir = dir_none;
+  }
+  return _nnn;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
