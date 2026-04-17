@@ -665,9 +665,9 @@ void CARD_LIST::map_subckt_nodes(const CARD* model, const CARD* owner)
   for (CARD_LIST::iterator ci = begin(); ci != end(); ++ci) {
     // for each card in card_list
     if ((**ci).is_device()) {
+      (**ci).reset_ports();
       for (int ii = 0;  ii < (**ci).net_nodes();  ++ii) {
 	// for each connection node in card
-	(**ci).n_(ii).set_used(); // kludge
 	(**ci).n_(ii).map_subckt_node(&node_map[0], owner);
 	// assert(&node_map[(**ci).n_(ii).e_()].root() == &(**ci).n_(ii).root());
       }
