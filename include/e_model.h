@@ -83,6 +83,45 @@ public:
   const CARD* component_proto()const {itested(); return _component_proto;}
 };
 /*--------------------------------------------------------------------------*/
+class MODEL_SUBCKT : public MODEL_CARD {
+  COMPONENT* _c{nullptr};
+  bool _own_proto{false};
+protected:
+  explicit MODEL_SUBCKT(MODEL_SUBCKT const& p) : MODEL_CARD(p){ }
+public:
+  explicit MODEL_SUBCKT(COMPONENT* c) : MODEL_CARD(c), _c(c), _own_proto{true} { }
+  ~MODEL_SUBCKT() {
+    if(_own_proto){
+      assert(component_proto());
+      const_cast<CARD*>(component_proto())->purge();
+      delete component_proto();
+    }else{
+    }
+  }
+
+  CARD* clone()const override {
+    return new MODEL_SUBCKT(*this);
+  }
+  CARD* clone_instance()const override {
+    assert(component_proto());
+    return component_proto()->clone_instance();
+  }
+public:
+  void precalc_first()override {
+    MODEL_CARD::precalc_first();
+    if(_c){ untested();
+      ((CARD*)_c)->precalc_first();
+    }else{ untested();
+    }
+  }
+  void expand()override { }
+  void precalc_last()override { }
+  CARD* deflate()override { return this; }
+
+public:
+  char id_letter()const override{ untested();return 'X';}
+};
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 #endif
 // vim:ts=8:sw=2:noet:
