@@ -24,6 +24,7 @@
 //testing=script,complete 2006.07.14
 #include "u_nodemap.h"
 #include "e_usernode.h"
+#include "e_node_type.h"
 /*--------------------------------------------------------------------------*/
 NODE ground_node("0", 0);
 /*--------------------------------------------------------------------------*/
@@ -138,7 +139,7 @@ std::string const& NODE_MAP::name(int i) const
   assert(i<size());
   static std::string dunno("??????");
   node_t const& n = at(i);
-  if(n.n_()) {
+  if(n.n_() && !dynamic_cast<NODE_TYPE const*>(n.n_())) {
     std::string const& l = n.n_()->short_label();
     assert(!_map || _map->at(l)->user_number() == i);
     trace2("NODE_MAP::name", i, l);

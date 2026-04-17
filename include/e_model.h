@@ -109,9 +109,9 @@ public:
 public:
   void precalc_first()override {
     MODEL_CARD::precalc_first();
-    if(_c){ untested();
+    if(_c){
       ((CARD*)_c)->precalc_first();
-    }else{ untested();
+    }else{
     }
   }
   void expand()override { }
