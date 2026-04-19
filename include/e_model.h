@@ -111,7 +111,7 @@ public:
     MODEL_CARD::precalc_first();
     if(_c){
       // ((CARD*)_c)->precalc_first(); // not yet.
-    }else{ untested();
+    }else{
     }
   }
   void expand()override { }
@@ -120,11 +120,11 @@ public:
   CARD_LIST* scope()override {
     if(_c){
       return ((CARD*)_c)->subckt();
-    }else{ untested();
+    }else{
       return nullptr;
     }
   }
-  CARD_LIST const* scope()const override { untested();
+  CARD_LIST const* scope()const override {
     return const_cast<MODEL_SUBCKT*>(this)->scope();
   }
   bool makes_own_scope()const override { return scope(); }
