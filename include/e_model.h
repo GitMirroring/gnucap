@@ -110,7 +110,7 @@ public:
   void precalc_first()override {
     MODEL_CARD::precalc_first();
     if(_c){
-      ((CARD*)_c)->precalc_first();
+      // ((CARD*)_c)->precalc_first(); // not yet.
     }else{ untested();
     }
   }
