@@ -297,6 +297,8 @@ void SIM_DATA::init(CARD_LIST* scope)
     uninit();
     init_node_count(0, 0, 0);
     clear_top_nodes(scope);
+    scope->precalc_first();
+    scope->expand_first();
     scope->map_subckt_nodes(nullptr, nullptr);
     map_user_nodes(scope);
     scope->expand();

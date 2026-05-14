@@ -363,6 +363,8 @@ static void make_dev_expand(std::ofstream& out, const Device& d)
     "    //precalc();\n"
     "  }\n"
     "  //precalc();\n"
+    "  subckt()->precalc_first();\n"
+    "  subckt()->expand_first();\n"
     "  subckt()->expand();\n"
     "  //subckt()->precalc();\n";
   if (d.circuit().sync()) {

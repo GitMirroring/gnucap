@@ -242,14 +242,6 @@ CARD_LIST& CARD_LIST::expand()
 {
   for (iterator ci=begin(); ci!=end(); ++ci) {
     trace_func_comp();
-    (**ci).precalc_first(); // remove
-  }
-  for (iterator ci=begin(); ci!=end(); ++ci) {
-    trace_func_comp();
-    (**ci).expand_first(); // remove
-  }
-  for (iterator ci=begin(); ci!=end(); ++ci) {
-    trace_func_comp();
     (**ci).expand();
   }
 
