@@ -76,7 +76,9 @@ public: // override virtual
   void	   tr_advance() override;
   void	   tr_advance_recursive() override;
   void	   tr_regress() override;
-  bool	   tr_needs_eval()const override {/*assert(!is_q_for_eval());*/ return !is_constant();}
+  bool	   tr_needs_eval()const override {/*assert(!is_q_for_eval());*/
+    return !is_constant() && _time[0] == _sim->_time0;
+  }
 #if 0
   void	   tr_queue_eval()	{ untested();
     if(tr_needs_eval()) { untested();
