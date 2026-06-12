@@ -1,8 +1,7 @@
- 
-#          
- 27.       
-.subckt foo ( 1 2 3 4 )
+.subckt foo (1 2 3 4) 
+.ends 
+ ^ ? ends: no match
+x1: can't find: foo
 e1 ( 1 2 3 4 )  1.
-.ends foo
 v1 ( 1 0 )  DC  1.
-x1 ( 1 2 )  foo 
+x1 ( 1 2 ) foo

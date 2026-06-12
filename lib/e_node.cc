@@ -72,10 +72,12 @@ NODE::~NODE()
 /*--------------------------------------------------------------------------*/
 void NODE::tr_advance_recursive()
 {
-  if (tr_needs_advance()) {untested();
+  if (!subckt()){
+    assert(m_()==0);
+  }else if (tr_needs_advance()) {
     assert(subckt());
     subckt()->tr_advance_recursive();
-  }else{untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
