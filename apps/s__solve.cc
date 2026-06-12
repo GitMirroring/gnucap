@@ -175,7 +175,12 @@ void SIM::advance_time(void)
       }else{//847 // first step, no history
 	std::copy_n(_sim->_vt1, _sim->_total_nodes+1, _sim->_v0);
       }
-      _scope->tr_advance();
+      if (_event_device) {untested();
+	_event_device->tr_advance_recursive();
+	//_scope->tr_advance();
+      }else{untested();
+	_scope->tr_advance();
+      }
     }else{//767 // moving backward
       /* don't save voltages.  They're wrong! */
       /* instead, restore a clean start for iteration */

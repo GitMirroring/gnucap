@@ -52,6 +52,7 @@ protected:
     ofKEEP  = 4
   };
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+  CARD* _event_device{nullptr};
   CARD_LIST* _scope;
   OMSTREAM   _out;		/* places to send the results		*/
 public:
