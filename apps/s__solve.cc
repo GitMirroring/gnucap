@@ -177,7 +177,7 @@ void SIM::advance_time(void)
       }
       if (_event_device) {untested();
 	_event_device->tr_advance_recursive();
-	//_scope->tr_advance();
+	_scope->tr_advance_dummy();
       }else{untested();
 	_scope->tr_advance();
       }

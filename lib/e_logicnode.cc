@@ -310,7 +310,7 @@ void LOGIC_NODE::force_initial_value(LOGICVAL v)
   set_last_change_time();
 }
 /*--------------------------------------------------------------------------*/
-void LOGIC_NODE::set_event(double delay, LOGICVAL v)
+void LOGIC_NODE::set_event(double delay, LOGICVAL v, CARD* Device)
 {
   _lv.set_in_transition(v);
   if (_sim->analysis_is_tran_dynamic()  &&  in_transit()) {
@@ -320,7 +320,7 @@ void LOGIC_NODE::set_event(double delay, LOGICVAL v)
     // leaving quality as it was
   }
   set_d_iter();
-  double ft = CKT_BASE::_sim->new_event(_sim->_time0 + delay, this);
+  double ft = CKT_BASE::_sim->new_event(_sim->_time0 + delay, Device);
   trace4("set_event", _sim->_time0, delay, ft, _sim->_dtmin);
   set_final_time(ft);
   if (OPT::picky <= bTRACE) {

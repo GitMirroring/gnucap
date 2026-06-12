@@ -316,9 +316,7 @@ void SIM_DATA::init(CARD_LIST* scope)
     alloc_hold_vectors(scope);
     scope->make_fanout();
     map__nodes(scope);
-    //scope->make_fanout();	// ok, pre m_()
     scope->map_nodes();
-    //scope->make_fanout();	// ok, post m_()
     _aa.reinit(_total_nodes);
     _acx.reinit(_total_nodes);
     scope->tr_iwant_matrix();

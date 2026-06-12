@@ -372,13 +372,32 @@ CARD_LIST& CARD_LIST::tr_advance()
 {
   for (iterator ci=begin(); ci!=end(); ++ci) {
     trace_func_comp();
-    if ((**ci).tr_needs_advance()) {untested();
+    if ((**ci).tr_needs_advance()) {
       (**ci).tr_advance();
     }else{untested();
     }
   }
   return *this;
 }
+/*--------------------------------------------------------------------------*/
+/* tr_advance_dummy: try to catch missed by recursive
+ */
+//#include "trace_on.h"
+CARD_LIST& CARD_LIST::tr_advance_dummy()
+{
+  for (iterator ci=begin(); ci!=end(); ++ci) {
+    //trace_func_comp();
+    if (!(**ci).is_device()) {untested();
+      trace1("ok-not-device", (**ci).long_label());
+    }else if ((**ci).tr_needs_advance()) {untested();
+      trace1("missed", (**ci).long_label());
+    }else{untested();
+      trace1("ok-done", (**ci).long_label());
+    }
+  }
+  return *this;
+}
+//#include "trace_off.h"
 /*--------------------------------------------------------------------------*/
 /* tr_advance_recursive:
  */
