@@ -7,6 +7,8 @@ U2   2  1  mos inv
 + thh= 0.75  thl= 0.25  mr= 5.  mf= 5.  over=10k vmax= 5.  vmin= 0. )
 
 
-.print tran v(nodes) logic(nodes) control(0)
-.tran 10n
+.print tran v(nodes) logic(nodes) control(0) iter(0)
+.tran 10n trace=i
+
+.status notime
 .end

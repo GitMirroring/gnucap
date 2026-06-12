@@ -241,7 +241,7 @@ void ELEMENT::ac_begin()
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_restore()
-{
+{ untested();
   if (_time[0] > _sim->_time0) {untested();
     // _freezetime
     incomplete();
@@ -286,7 +286,7 @@ void ELEMENT::dc_advance()
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_advance()
-{
+{ untested();
   assert(_time[0] < _sim->_time0); // moving forward
   
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
@@ -300,10 +300,10 @@ void ELEMENT::tr_advance()
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_advance_recursive()
-{
-  if (tr_needs_advance()) {
+{ untested();
+  if (tr_needs_advance()) { untested();
     tr_advance();
-    for (int ii=0; ii<net_nodes(); ++ii) {
+    for (int ii=0; ii<net_nodes(); ++ii) { untested();
       assert(n_(ii));
       n_(ii)->tr_advance_recursive();
     }
@@ -313,9 +313,8 @@ void ELEMENT::tr_advance_recursive()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_regress()
 {
-  if(_time[0] >= _sim->_time0){
-    // moving backwards
-  }else{
+  if(_time[0] >= _sim->_time0){ untested();
+  }else{untested();
   }
   assert(_time[1] <= _sim->_time0); // but not too far backwards
 
@@ -336,6 +335,7 @@ TIME_PAIR ELEMENT::tr_review()
     _time_by.min_error_estimate(newtime);
   }else{
   }
+  trace2("ELEMENT::tr_review", long_label(), _time_by._error_estimate);
   return _time_by;
 }
 /*--------------------------------------------------------------------------*/

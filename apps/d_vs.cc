@@ -122,6 +122,13 @@ void DEV_VS::tr_begin()
 /*--------------------------------------------------------------------------*/
 bool DEV_VS::do_tr()
 {
+  if(_time[0] < _sim->_time0){
+    // should not get here. advance has been omitted on this one.
+    trace2("DEV_VS::do_tr stray call", _time[0], _sim->_time0);
+    unreachable();
+    return true;
+  }else{
+  }
   assert(_m0.x == 0.);
   if (using_tr_eval()) {
     _y[0].x = _sim->_time0;

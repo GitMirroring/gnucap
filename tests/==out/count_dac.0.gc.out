@@ -1,5 +1,6 @@
 #          
  0.        
+<<<<<<< HEAD
 #Time       v(d0)      v(d1)      v(d2)      v(clk)     v(aout)    iter(0)   
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -545,8 +546,10 @@ transient timesteps: accepted=237, rejected=12, total=249
  0.001514   0.         5.         5.         0.         0.049399   3.        
  0.001516   0.         5.         5.         0.         0.049399   3.        
  0.0016     0.         5.         5.         0.         0.050853   4.        
+=======
+>>>>>>> cbc0e2497 (omit stray do_tr in DEV_VS)
 Gnucap   System status
-iterations: op=0, dc=64, tran=778, fourier=0, total=1026
-transient timesteps: accepted=172, rejected=12, total=184
+iterations: op=0, dc=64, tran=30364, fourier=0, total=37845
+transient timesteps: accepted=7023, rejected=394, total=7417
 nodes: user=37, subckt=289, model=0, total=326
 dctran density=14.8%, ac density=14.8%
