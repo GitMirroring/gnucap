@@ -212,7 +212,7 @@ TIME_PAIR STORAGE::tr_review()
     // Backward Euler, no step control, take it as it comes
   }else{
     double timestep = tr_review_trunc_error(_y);
-    _time_by.min_error_estimate(tr_review_check_and_convert(timestep));
+    _time_by.min_dt_estimate(tr_review_check(timestep));
   }
   return _time_by;
 }

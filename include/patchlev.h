@@ -1,1 +1,1 @@
-#define PATCHLEVEL "snapshot 2026.07.29"
+#define PATCHLEVEL "dtime 2026.08.05"

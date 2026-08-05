@@ -26,27 +26,29 @@
 #define U_TIME_PAIR_H_INCLUDED
 #include "constant.h"
 /*--------------------------------------------------------------------------*/
-struct TIME_PAIR {
-  double _error_estimate;
+class TIME_PAIR {
+private:
+  double _dt_estimate;
   double _event;
 
-  explicit TIME_PAIR() : _error_estimate(NEVER), _event(NEVER) {}
-  explicit TIME_PAIR(double Error, double Event) : _error_estimate(Error), _event(Event) {}
-	   TIME_PAIR(const TIME_PAIR& P) : _error_estimate(P._error_estimate), _event(P._event) {}
+public:
+  explicit TIME_PAIR() : _dt_estimate(NEVER), _event(NEVER) {}
+  explicit TIME_PAIR(double Error, double Event) : _dt_estimate(Error), _event(Event) {}
+	   TIME_PAIR(const TIME_PAIR& P) : _dt_estimate(P._dt_estimate), _event(P._event) {}
 
   TIME_PAIR& operator=(const TIME_PAIR& P) {
-    _error_estimate = P._error_estimate;
+    _dt_estimate = P._dt_estimate;
     _event = P._event;
     return *this;
   }
   TIME_PAIR& reset() {
-    _error_estimate = NEVER;
+    _dt_estimate = NEVER;
     _event = NEVER;
     return *this;
   }
-  TIME_PAIR& min_error_estimate(double E) {
-    if (E < _error_estimate) {
-      _error_estimate = E;
+  TIME_PAIR& min_dt_estimate(double E) {
+    if (E < _dt_estimate) {
+      _dt_estimate = E;
     }else{
     }
     return *this;
@@ -59,11 +61,13 @@ struct TIME_PAIR {
     return *this;
   }
   TIME_PAIR& min(const TIME_PAIR& P) {
-    return min_error_estimate(P._error_estimate).min_event(P._event);
+    return min_dt_estimate(P._dt_estimate).min_event(P._event);
   }
   TIME_PAIR& min(double Error_Estimate, double Event) {untested();
-    return min_error_estimate(Error_Estimate).min_event(Event);
+    return min_dt_estimate(Error_Estimate).min_event(Event);
   }
+  double dt_estimate()const {return _dt_estimate;}
+  double event()const {return _event;}
 };
 /*--------------------------------------------------------------------------*/
 inline TIME_PAIR min(TIME_PAIR A, const TIME_PAIR& B)

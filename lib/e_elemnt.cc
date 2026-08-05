@@ -328,8 +328,8 @@ TIME_PAIR ELEMENT::tr_review()
   COMPONENT::tr_review();
   if (order() > 0 && _y[0].f0 != LINEAR) {
     double timestep = tr_review_trunc_error(_y);
-    double newtime = tr_review_check_and_convert(timestep);
-    _time_by.min_error_estimate(newtime);
+    timestep = tr_review_check(timestep);
+    _time_by.min_dt_estimate(timestep);
   }else{
   }
   return _time_by;
@@ -500,9 +500,7 @@ double ELEMENT::tr_probe_num(const std::string& x)const
   }else if (Umatch(x, "dt ")) {
     return _dt;
   }else if (Umatch(x, "dtr{equired} ")) {
-    return ((_time_by._error_estimate - _time[0]) > 0)
-      ? _time_by._error_estimate - _time[0]
-      : _time_by._error_estimate - _time[1];
+    return _time_by.dt_estimate();
   }else if (Umatch(x, "time ")) {untested();
     return _time[0];
   }else if (Umatch(x, "timeo{ld} ")) {untested();
@@ -626,12 +624,9 @@ double ELEMENT::tr_review_trunc_error(const FPOLY1* q)
   return timestep;
 }
 /*--------------------------------------------------------------------------*/
-double ELEMENT::tr_review_check_and_convert(double timestep)
+double ELEMENT::tr_review_check(double timestep)
 {
-  double time_future;
-  if (timestep == NEVER) {
-    time_future = NEVER;
-  }else{
+  {
     if (timestep < _sim->_dtmin) {
       timestep = _sim->_dtmin;
     }else{
@@ -647,16 +642,13 @@ double ELEMENT::tr_review_check_and_convert(double timestep)
 	error(bTRACE, "new=%g  old=%g  required=%g\n",
 	      timestep, _dt, _dt * OPT::trreject);
       }
-      time_future = _time[1] + timestep;
-      trace3("reject", timestep, _dt, time_future);
+      trace2("reject", timestep, _dt);
     }else{
-      time_future = _time[0] + timestep;
-      trace3("accept", timestep, _dt, time_future);
+      trace2("accept", timestep, _dt);
     }
   }
-  assert(time_future > 0.);
-  assert(time_future > _time[1]);
-  return time_future;
+  assert(timestep > 0.);
+  return timestep;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

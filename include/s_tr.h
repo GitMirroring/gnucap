@@ -56,7 +56,7 @@ public:
     _cont(false),
     _trace(tNONE),
     _time_by_user_request(0.),
-    _time_by_error_estimate(0.),
+    _dt_by_estimate(0.),
     _time_by_ambiguous_event(0.),
     _converged(false),
     _accepted(false)
@@ -125,7 +125,7 @@ protected:
 private:
   TRACE _trace;		// enum: show extended diagnostics
   double _time_by_user_request;
-  double _time_by_error_estimate;
+  double _dt_by_estimate;
   double _time_by_ambiguous_event;
   bool _converged;
   bool _accepted;

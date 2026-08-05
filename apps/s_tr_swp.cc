@@ -77,6 +77,7 @@ public:
   bool   operator<(const TIME_t& B)const {return (_t < B._t);}
   bool   operator<=(const TIME_t& B)const {return (_t <= B._t);}
   bool   operator==(const TIME_t& B)const {return (_t == B._t);}
+  bool   operator!=(const TIME_t& B)const {return (_t != B._t);}
 
   double to_double()const {return _t*_dtmin;}
   int64_t ticks()const	  {return int64_t(_t);}
@@ -150,6 +151,7 @@ void TRANSIENT::sweep()
     _converged = solve(OPT::TRHIGH,_trace);
 
     _accepted = _converged && review();
+    trace1("converged", _accepted);
 
     if (_accepted) {//42421
       assert(_converged);
@@ -292,11 +294,14 @@ bool TRANSIENT::next()
   TIME_t time0(_sim->_time0);
   
   TIME_t reftime;
+  double reftime_;
   if (_accepted) {//42742
     reftime = time0;
+    reftime_ = _sim->_time0;
     trace0("accepted");
   }else{//707
     reftime = time1;
+    reftime_ = _time1;
     trace0("rejected");
   }
   trace3("", _time1, _sim->_time0, reftime.to_double());
@@ -338,8 +343,19 @@ bool TRANSIENT::next()
   check_consistency();
   
   // device error estimates
-  if (TIME_t(_time_by_error_estimate) < newtime) {//12904
-    newtime = TIME_t(_time_by_error_estimate);
+  double time_by_error_estimate  = reftime_ + _dt_by_estimate;
+  {
+    double mintime(reftime_ + 2*_sim->_dtmin);
+    if (time_by_error_estimate < mintime) {//24
+      time_by_error_estimate = mintime;
+    }else{//43394
+      time_by_error_estimate = reftime_ + _dt_by_estimate;
+    }
+    trace2("DBGnext", _accepted, time_by_error_estimate);
+  }
+
+  if (TIME_t(time_by_error_estimate) < newtime) {//12904
+    newtime = TIME_t(time_by_error_estimate);
     new_dt = newtime - reftime;
     new_control = scTE;
     check_consistency();
@@ -563,20 +579,21 @@ bool TRANSIENT::review()
   _sim->count_iterations(iTOTAL);
 
   TIME_PAIR time_by = _scope->tr_review();
+  _dt_by_estimate = time_by.dt_estimate();
 
 #if 0
   // not ready for this yet.
-  _time_by_ambiguous_event = TIME_t(time_by._event).to_double();
-  _time_by_error_estimate  = TIME_t(time_by._error_estimate).to_double();
+  _time_by_ambiguous_event = TIME_t(time_by.event()).to_double();
+  _time_by_error_estimate  = TIME_t(time1 + time_by.dt_estimate()).to_double();
 #else
   double mintime    = _time1       + 2*_sim->_dtmin;
   double rejecttime = _sim->_time0 - 2*_sim->_dtmin;
   double creeptime  = _sim->_time0 + 2*_sim->_dtmin;
 
-  if (time_by._event < mintime) {//99
+  if (time_by.event() < mintime) { //99
     _time_by_ambiguous_event = mintime;
   }else{//43319
-    _time_by_ambiguous_event = time_by._event;
+    _time_by_ambiguous_event = time_by.event();
   }
   if (up_order(rejecttime, _time_by_ambiguous_event, creeptime)) {//234
     _time_by_ambiguous_event = creeptime;
@@ -584,22 +601,15 @@ bool TRANSIENT::review()
   }
 
   rejecttime = _sim->_time0 - 1.1*_sim->_dtmin;
-  creeptime  = _sim->_time0 + 1.1*_sim->_dtmin;
-  if (time_by._error_estimate < mintime) {//24
-    _time_by_error_estimate = mintime;
-  }else{//43394
-    _time_by_error_estimate = time_by._error_estimate;
-  }
-  if (up_order(rejecttime, _time_by_error_estimate, creeptime)) {//25
-    _time_by_error_estimate = creeptime;
-  }else{//43393
-  }
 #endif
-  trace4("review", _time1, _sim->_time0, _time_by_ambiguous_event, _time_by_error_estimate);
+  trace4("DBGreview", _time1, _sim->_time0, _time_by_ambiguous_event, _dt_by_estimate);
 
   ::status.review.stop();
 
-  return (_time_by_error_estimate > _sim->_time0  &&  _time_by_ambiguous_event > _sim->_time0);
+  // return (_time1 + _dt_by_estimate > rejecttime)
+  trace2("DBGreview", rejecttime - _time1, _dt_by_estimate);
+  return (OPT::trreject * (rejecttime - _time1) < _dt_by_estimate)
+      && (_time_by_ambiguous_event > _sim->_time0);
 }
 /*--------------------------------------------------------------------------*/
 void TRANSIENT::accept()

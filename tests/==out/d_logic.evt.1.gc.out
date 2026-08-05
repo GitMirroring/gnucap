@@ -21,13 +21,11 @@ new max = 5, new limit = 5.5
  0.         1.         0.         0.         Inf        0.         0.         5.         5.         0.01       0.01       3.         4.21      
 initial step rejected:V1
 new=9.6e-12  old=2e-11  required=1e-11
-backwards time step
-newtime=1.000000e-11  rejectedtime=2.000000e-11  oldtime=0.000000e+00
- 10.E-12    16.        1.         0.         Inf        0.1        0.         5.         5.         0.01       0.01       3.         4.21      
- 29.E-12    6.         0.         0.         Inf        0.29       0.         5.         5.         0.01       0.01       3.         4.21      
- 39.E-12    6.         0.         0.         Inf        0.39       0.         5.         5.         0.01       0.01       3.         4.21      
+ 20.E-12    9.         0.         0.         Inf        0.2        0.         5.         5.         0.01       0.01       3.         4.21      
+ 30.E-12    6.         0.         0.         Inf        0.3        0.         5.         5.         0.01       0.01       3.         4.21      
+ 40.E-12    6.         0.         0.         Inf        0.4        0.         5.         5.         0.01       0.01       3.         4.21      
  300.E-12   7.         0.         0.         Inf        3.         0.         5.         5.         1.01       0.01       3.         4.21      
-3:28:1.375e-09 new event
+3:24:1.375e-09 new event
  375.E-12   7.         0.         375.E-12   1.375E-9   3.75       0.75       5.         5.         3.01       0.01       2.         4.21      
  377.E-12   7.         0.         375.E-12   1.375E-9   3.77       0.77       5.         5.         3.01       0.01       2.         4.21      
  444.E-12   6.         0.         375.E-12   1.375E-9   4.44       1.44       5.         5.         3.01       1.01       2.         4.21      
@@ -50,8 +48,8 @@ newtime=9.850000e-10  rejectedtime=1.375000e-09  oldtime=8.000000e-10
  2.E-9      1.         0.         1.375E-9   Inf        5.         5.         0.020814   2.1022     3.01       3.01       0.         4.21      
 >>>>>.status notime 
 Gnucap   System status
-iterations: op=0, dc=0, tran=69, fourier=0, total=92
-transient timesteps: accepted=21, rejected=2, total=23
+iterations: op=0, dc=0, tran=66, fourier=0, total=88
+transient timesteps: accepted=21, rejected=1, total=22
 nodes: user=4, subckt=0, model=0, total=4
 dctran density=62.5%, ac density=62.5%
 >>>>>.end 
