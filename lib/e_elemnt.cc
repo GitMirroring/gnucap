@@ -313,15 +313,18 @@ void ELEMENT::tr_advance()
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_regress()
 {
-  assert(_time[0] >= _sim->_time0); // moving backwards
-  assert(_time[1] <= _sim->_time0); // but not too far backwards
+  if(_time[0] >= _sim->_time0) { // moving backwards
+    assert(_time[1] <= _sim->_time0); // not too far backwards
 
-  for (int i=OPT::_keep_time_steps-1; i>0; --i) {
-    assert(_time[i] <= _time[i-1]);
+    for (int i=OPT::_keep_time_steps-1; i>0; --i) {
+      assert(_time[i] <= _time[i-1]);
+    }
+    _time[0] = _sim->_time0;
+
+    _dt = _time[0] - _time[1];
+  }else{untested(); // not moving backwards
+    tr_advance();
   }
-  _time[0] = _sim->_time0;
-
-  _dt = _time[0] - _time[1];
 }
 /*--------------------------------------------------------------------------*/
 TIME_PAIR ELEMENT::tr_review()
