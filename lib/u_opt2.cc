@@ -143,6 +143,7 @@ bool OPT::set_values(CS& cmd, CARD_LIST* Scope)
 	   || Set(cmd, "d{igital}", &mode,	moDIGITAL)
 	   || Set(cmd, "m{ixed}",   &mode,	moMIXED)
 	   || cmd.warn(bWARNING, "need analog, digital, or mixed")))
+      || Get(cmd, "tracea{dvance}",&traceadv)
       || Get(cmd, "tr{ansits}",    &transits)
       || Get(cmd, "dup{check}",    &dupcheck)
       || Get(cmd, "byp{ass}",	   &bypass)
@@ -265,6 +266,7 @@ void OPT::print(OMSTREAM& o)
   o << "* accuracy, algorithms\n";
   o << ".options";
   o << "  method=" << method;
+  o << ((traceadv) ?"  traceadv" :"  notraceadv");
   o << ((bypass)   ?"  bypass"   :"  nobypass");
   o << ((incmode)  ?"  incmode"  :"  noincmode");    
   o << ((lcbypass) ?"  lcbypass" :"  nolcbypass");    
