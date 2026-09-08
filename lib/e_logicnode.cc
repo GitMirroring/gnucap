@@ -124,7 +124,7 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f, double input)
     }else if (_sim->analysis_is_static()) {
     }else{
     }
-    if (_sim->analysis_is_static() || _sim->analysis_is_restore()) { untested();
+    if (_sim->analysis_is_static() || _sim->analysis_is_restore()) {
       set_last_change_time(0);
       store_old_last_change_time();
       set_lv(lvUNKNOWN);
@@ -297,16 +297,16 @@ double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)const
   switch (lv()) {
   case lvSTABLE0:
     return process()->vmin;
-  case lvRISING:
   case lvZ1: untested(); // fall-through
   case lvX1: untested(); // fall-through
+  case lvRISING:
     start = process()->vmin;
     end = process()->vmax;
     risefall = process()->rise;
     break;
-  case lvFALLING:
   case lvZ0: untested(); // fall-through
-  case lvX0: untested(); // fall-through
+  case lvX0: // fall-through
+  case lvFALLING:
     start = process()->vmax;
     end = process()->vmin;
     risefall = process()->fall;

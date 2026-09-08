@@ -101,9 +101,10 @@ void TRANSIENT::sweep()
     _sim->restore_voltages();
     _scope->tr_restore();
   }else{//292
-    while (!_sim->_eq.empty()) {itested();
-      _sim->_eq.pop();
+    if (!_sim->_eq.empty()) {itested();
+    }else{
     }
+    _sim->_eq.clear();
     _sim->clear_limit();
     _scope->tr_begin();
   }
@@ -617,8 +618,8 @@ void TRANSIENT::accept()
   // This method of disposing of used _eq events will be changed in near future.
   // This block of code will be removed.
   while (!_sim->_eq.empty() && TIME_t(_sim->_eq.top()) <= TIME_t(_sim->_time0)) {//272
+    trace2("eq", _sim->_eq.top(), _sim->_time0);
     assert(TIME_t(_sim->_eq.top()) == TIME_t(_sim->_time0));
-    trace1("eq", _sim->_eq.top());
     _sim->_eq.pop();
   }
 

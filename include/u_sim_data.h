@@ -26,6 +26,7 @@
 #define U_SIM_DATA_H
 #include "constant.h"
 #include "l_compar.h"
+#include "u_event.h"
 #include "u_opt.h"
 #include "m_matrix_solver.h"
 /*--------------------------------------------------------------------------*/
@@ -37,22 +38,6 @@ class LOGIC_NODE;
 class CKT_BASE;
 /*--------------------------------------------------------------------------*/
 enum TRI_STATE {tsNO=0, tsYES=1, tsBAD=-1};
-
-class EVENT {
-private:
-  double    _time  {NEVER};
-  const CKT_BASE* _owner {nullptr};
-  EVENT() = delete;
-public:
-  EVENT(double Time, const CKT_BASE* Owner)
-    : _time(Time), _owner(Owner) {}
-  EVENT(const EVENT& E)
-    : _time(E._time), _owner(E._owner) {}
-  ~EVENT() {}
-  operator double() const {return _time;}
-  double time() const     {return _time;}
-  const CKT_BASE* owner() const {untested(); assert(_owner); return _owner;}
-};
 /*--------------------------------------------------------------------------*/
 struct INTERFACE SIM_DATA {
   double _time0;	/* time now */
@@ -91,7 +76,7 @@ public:
   BSMATRIX<double> _aa;	/* raw matrix for DC & tran */
   BSMATRIX<double>& _lu;/* alias used in modelgen models */
   BSMATRIX<COMPLEX> _acx;/* raw & decomposed matrix for AC */
-  std::priority_queue<EVENT, std::deque<EVENT>, std::greater<double> > _eq; /*event queue*/
+  EVENT_QUEUE _eq;
   std::deque<CARD*> _explast_q;
   std::deque<CARD*> _loadq;
   std::deque<CARD*> _acceptq;
@@ -139,7 +124,7 @@ public:
     case tsNO:  break;
     }
   }
-  double new_event(double Time, const CKT_BASE* Owner=NULL) {
+  double new_event(double Time, CARD* Owner=nullptr) {
     assert(Time <= BIGBIG);
     double time;
     if (_dtmin <= 0.) {
@@ -150,7 +135,7 @@ public:
     }else{
       time = std::round(Time/_dtmin) * _dtmin;
     }
-    _eq.push(EVENT(time, Owner));
+    _eq.push(time, Owner);
     return time;
   }
   void set_command_none() {_mode = s_NONE;}
