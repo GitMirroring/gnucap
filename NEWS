@@ -4,6 +4,11 @@ associated tarball. This file summarizes the important changes.
 == 2026****-dev
 - provide/dedup configure script, '0oconf'
 - split 'apps' into sections, individual plugins
+- fanout: register "in*ut" ports only
+- tr_review: return timestep and status
+- add trace advance option
+- separate out event and event queue
+- logic: support XZ states (backend only)
 - ..
 
 == 20260729-dev

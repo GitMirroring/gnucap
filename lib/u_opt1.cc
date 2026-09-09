@@ -79,6 +79,7 @@ CARD const* OPT::connect_rules = nullptr;
 // cmode_t OPT::connect_mode = cmWIP;
 int	OPT::transits = 2;
 bool	OPT::dupcheck = false;
+bool	OPT::traceadv = false;
 bool	OPT::bypass = true;
 bool	OPT::incmode = true;
 bool	OPT::lcbypass = true;

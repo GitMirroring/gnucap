@@ -117,7 +117,7 @@ private: // other internal
   }
 
 public: // action, used by logic
-  void	      set_event(double delay, LOGICVAL v);
+  void	      set_event(double delay, LOGICVAL v, CARD* c=nullptr);
   void	      force_initial_value(LOGICVAL v);
   void	      propagate();
   void	      unpropagate();
@@ -136,6 +136,12 @@ public: // general use
 
 public: // used by matrix
   LOGIC_NODE&	set_a_iter()	{_a_iter = _sim->iteration_tag(); return *this;}
+
+private: // connectmodule hacks. transition
+  bool _cm_hack{false};
+  bool is_cm_hack()const {  return _cm_hack; }
+public:
+  void set_cm_hack() {untested(); _cm_hack = true;}
 };
 /*--------------------------------------------------------------------------*/
 struct node_l : node_t {

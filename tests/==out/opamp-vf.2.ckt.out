@@ -13,8 +13,9 @@
 +  bypasstol= 0.1  loadtol= 0.1
 
 * accuracy, algorithms
-.options  method=trap  bypass  incmode  lcbypass  lubypass  fbbypass  traceload
-+  predictor= 100.  order=auto  mode=mixed  transits=2  noquitconvfail
+.options  method=trap  notraceadv  bypass  incmode  lcbypass  lubypass
++  fbbypass  traceload  predictor= 100.  order=auto  mode=mixed
++  transits=2  noquitconvfail
 
 * iteration limiting and heuristics
 .options  itl1=100  itl2=50  itl3=6  itl4=20  itl5=0  itl6=5000

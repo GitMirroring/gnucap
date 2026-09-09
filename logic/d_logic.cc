@@ -436,6 +436,7 @@ void DEV_LOGIC::tr_advance()
     break;
   }
 }
+/*--------------------------------------------------------------------------*/
 void DEV_LOGIC::tr_regress()
 {
   ELEMENT::tr_regress();
@@ -681,11 +682,22 @@ void DEV_LOGIC::tr_accept()
       }else if (future_state != n_(OUTNODE)->lv()) {
 	assert(future_state != lvUNKNOWN);
 	switch (future_state) {
-	case lvSTABLE0:	/*nothing*/		break;
-	case lvRISING:  future_state=lvSTABLE0;	break;
-	case lvFALLING: future_state=lvSTABLE1;	break;
-	case lvSTABLE1:	/*nothing*/		break;
-	case lvUNKNOWN: unreachable();		break;
+	case lv00:	/*nothing*/		break;
+	case lv0Z:
+	case lv0X:
+	case lv01: future_state=lv00;		break;
+	case lv11:	/*nothing*/		break;
+	case lv1Z:
+	case lv1X:
+	case lv10: future_state=lv11;		break;
+	case lvZZ:	/*nothing*/		break;
+	case lvZ1:
+	case lvZX:
+	case lvZ0: future_state=lvZZ;		break;
+	case lvXX:	/*nothing*/		break;
+	case lvX1:
+	case lvXZ:
+	case lvX0: future_state=lvXX;		break;
 	}
 	/* This handling of rising and falling may seem backwards.
 	 * These states occur when the value has been contaminated 
@@ -697,7 +709,7 @@ void DEV_LOGIC::tr_accept()
 	assert(future_state.lv_old() == future_state.lv_future());
 	if (n_(OUTNODE)->lv() == lvUNKNOWN
 	    || future_state.lv_future() != n_(OUTNODE)->lv_future()) {
-	  n_(OUTNODE)->set_event(c->_real_delay, future_state);
+	  n_(OUTNODE)->set_event(c->_real_delay, future_state, this);
 	  //assert(future_state == n_(OUTNODE).lv_future());
 	  if (_lastchangenode == OUTNODE) {untested();
 	    unreachable();

@@ -24,6 +24,7 @@
 //testing=script,sparse 2006.07.11
 #include "e_logicmod.h"
 #include "e_logicnode.h"
+#include "e_cardlist.h"
 /*--------------------------------------------------------------------------*/
 LOGIC_NODE::LOGIC_NODE(int i)
   :NODE(),
@@ -76,6 +77,20 @@ static bool newly_stable[lvUNKNOWN+1][lvUNKNOWN+1] = { // oldlv, _lv
   /*rise*/{false, false, false, true,  false},
   /*fall*/{true,  false, false, false, false},
   /* s1 */{true,  false, false, false, false},
+
+  /* u  */{true,  false, false, true,  false},
+  /* u  */{true,  false, false, true,  false},
+  /* u  */{true,  false, false, true,  false},
+  /* u  */{true,  false, false, true,  false},
+
+  /* u  */{true,  false, false, true,  false},
+  /* u  */{true,  false, false, true,  false},
+  /* u  */{true,  false, false, true,  false},
+  /* u  */{true,  false, false, true,  false},
+
+  /* u  */{true,  false, false, true,  false},
+  /* u  */{true,  false, false, true,  false},
+  /* u  */{true,  false, false, true,  false},
   /* u  */{true,  false, false, true,  false}
 };
 /*--------------------------------------------------------------------------*/
@@ -138,7 +153,18 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f, double input)
       case lvRISING:  dont_set_quality("begin stable 1");	break;
       case lvFALLING:untested();set_bad_quality("falling to stable 1"); break;
       case lvSTABLE1: dont_set_quality("continuing stable 1");	break;
-      case lvUNKNOWN: set_good_quality("initial 1");		break;
+      case lv0Z: untested(); // fall-through
+      case lv0X: untested(); // fall-through
+      case lv1Z: untested(); // fall-through
+      case lv1X: untested(); // fall-through
+      case lvZ0: untested(); // fall-through
+      case lvX0: untested(); // fall-through
+      case lvZ1: untested(); // fall-through
+      case lvX1: untested(); // fall-through
+      case lvZZ: untested(); // fall-through
+      case lvZX: untested(); // fall-through
+      case lvXZ: untested(); // fall-through
+      case lvXX: set_good_quality("initial 1");		break;
       }
       set_lv(lvSTABLE1);
     }else if (sv <= process()->th0) {	/* logic 0 */
@@ -147,6 +173,17 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f, double input)
       case lvRISING: untested();set_bad_quality("rising to stable 0");	break;
       case lvFALLING: dont_set_quality("begin stable 0");	break;
       case lvSTABLE1: dont_set_quality("stable 1 to stable 0");	break;
+      case lv0Z: untested(); // fall-through
+      case lv0X: untested(); // fall-through
+      case lv1Z: untested(); // fall-through
+      case lv1X: untested(); // fall-through
+      case lvZ0: untested(); // fall-through
+      case lvX0: untested(); // fall-through
+      case lvZ1: untested(); // fall-through
+      case lvX1: untested(); // fall-through
+      case lvZZ: untested(); // fall-through
+      case lvZX: untested(); // fall-through
+      case lvXZ: untested(); // fall-through
       case lvUNKNOWN: set_good_quality("initial 0");		break;
       }
       set_lv(lvSTABLE0);
@@ -158,6 +195,8 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f, double input)
 	case lvSTABLE0:
 	  dont_set_quality("begin good rise");
 	  break;
+        case lvZ1: untested(); // fall-through
+        case lvX1: untested(); // fall-through
 	case lvRISING:
 	  if (diff < dt/(process()->mr * process()->rise)) {
 	    set_bad_quality("slow rise");
@@ -165,14 +204,21 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f, double input)
 	    dont_set_quality("continuing good rise");
 	  }
 	  break;
+        case lvZ0: untested(); // fall-through
+        case lvX0: untested(); // fall-through
 	case lvFALLING:untested();
-	  untested();
 	  set_bad_quality("positive glitch in fall");
 	  break;
 	case lvSTABLE1:untested();
-	  untested();
 	  set_bad_quality("negative glitch in 1");
 	  break;
+        case lv0Z: untested(); // fall-through
+        case lv0X: untested(); // fall-through
+        case lv1Z: untested(); // fall-through
+        case lv1X: untested(); // fall-through
+        case lvZZ: untested(); // fall-through
+        case lvZX: untested(); // fall-through
+        case lvXZ: untested(); // fall-through
 	case lvUNKNOWN:
 	  set_bad_quality("initial rise");
 	  break;
@@ -184,9 +230,13 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f, double input)
 	  untested();
 	  set_bad_quality("positive glitch in 0");
 	  break;
+        case lvZ1: untested(); // fall-through
+        case lvX1: untested(); // fall-through
 	case lvRISING:
 	  set_bad_quality("negative glitch in rise");
 	  break;
+        case lvZ0: untested(); // fall-through
+        case lvX0: untested(); // fall-through
 	case lvFALLING:
 	  if (-diff < dt/(process()->mf * process()->fall)) {
 	    set_bad_quality("slow fall");
@@ -197,8 +247,14 @@ void LOGIC_NODE::to_logic(const MODEL_LOGIC*f, double input)
 	case lvSTABLE1:
 	  dont_set_quality("begin good fall");
 	  break;
+        case lv0Z: untested(); // fall-through
+        case lv0X: untested(); // fall-through
+        case lv1Z: untested(); // fall-through
+        case lv1X: untested(); // fall-through
+        case lvZZ: untested(); // fall-through
+        case lvZX: untested(); // fall-through
+        case lvXZ: untested(); // fall-through
 	case lvUNKNOWN:untested();
-	  untested();
 	  set_bad_quality("initial fall");
 	  break;
 	}
@@ -241,11 +297,15 @@ double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)const
   switch (lv()) {
   case lvSTABLE0:
     return process()->vmin;
+  case lvZ1: untested(); // fall-through
+  case lvX1: untested(); // fall-through
   case lvRISING:
     start = process()->vmin;
     end = process()->vmax;
     risefall = process()->rise;
     break;
+  case lvZ0: untested(); // fall-through
+  case lvX0: // fall-through
   case lvFALLING:
     start = process()->vmax;
     end = process()->vmin;
@@ -253,6 +313,13 @@ double LOGIC_NODE::to_analog(const MODEL_LOGIC* f)const
     break;
   case lvSTABLE1:
     return process()->vmax;
+  case lv0Z: untested(); // fall-through
+  case lv0X: untested(); // fall-through
+  case lv1Z: untested(); // fall-through
+  case lv1X: untested(); // fall-through
+  case lvZZ: untested(); // fall-through
+  case lvZX: untested(); // fall-through
+  case lvXZ: untested(); // fall-through
   case lvUNKNOWN:
     return process()->unknown;
   }
@@ -310,8 +377,11 @@ void LOGIC_NODE::force_initial_value(LOGICVAL v)
   set_last_change_time();
 }
 /*--------------------------------------------------------------------------*/
-void LOGIC_NODE::set_event(double delay, LOGICVAL v)
+void LOGIC_NODE::set_event(double delay, LOGICVAL v, CARD* Device)
 {
+  if (Device){
+  }else{ itested();
+  }
   _lv.set_in_transition(v);
   if (_sim->analysis_is_tran_dynamic()  &&  in_transit()) {
     set_bad_quality("race");
@@ -320,7 +390,7 @@ void LOGIC_NODE::set_event(double delay, LOGICVAL v)
     // leaving quality as it was
   }
   set_d_iter();
-  double ft = CKT_BASE::_sim->new_event(_sim->_time0 + delay, this);
+  double ft = CKT_BASE::_sim->new_event(_sim->_time0 + delay, Device?:this);
   trace4("set_event", _sim->_time0, delay, ft, _sim->_dtmin);
   set_final_time(ft);
   if (OPT::picky <= bTRACE) {
@@ -328,6 +398,11 @@ void LOGIC_NODE::set_event(double delay, LOGICVAL v)
 	  long_label().c_str(), d_iter(), final_time());
   }
   set_last_change_time();
+  if(!subckt()){
+  }else if(is_cm_hack()){ untested();
+    subckt()->tr_accept();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 int LOGIC_NODE::matrix_number() const

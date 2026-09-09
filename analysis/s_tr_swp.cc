@@ -77,6 +77,7 @@ public:
   bool   operator<(const TIME_t& B)const {return (_t < B._t);}
   bool   operator<=(const TIME_t& B)const {return (_t <= B._t);}
   bool   operator==(const TIME_t& B)const {return (_t == B._t);}
+  bool   operator!=(const TIME_t& B)const {untested(); return (_t != B._t);}
 
   double to_double()const {return _t*_dtmin;}
   int64_t ticks()const	  {return int64_t(_t);}
@@ -100,9 +101,10 @@ void TRANSIENT::sweep()
     _sim->restore_voltages();
     _scope->tr_restore();
   }else{//292
-    while (!_sim->_eq.empty()) {itested();
-      _sim->_eq.pop();
+    if (!_sim->_eq.empty()) {itested();
+    }else{
     }
+    _sim->_eq.clear();
     _sim->clear_limit();
     _scope->tr_begin();
   }
@@ -566,29 +568,34 @@ bool TRANSIENT::review()
 
 #if 0
   // not ready for this yet.
-  _time_by_ambiguous_event = TIME_t(time_by._event).to_double();
-  _time_by_error_estimate  = TIME_t(time_by._error_estimate).to_double();
+  _time_by_ambiguous_event = TIME_t(time_by.event()).to_double();
+  _time_by_error_estimate  = TIME_t(time_by.error_estimate()).to_double();
 #else
   double mintime    = _time1       + 2*_sim->_dtmin;
   double rejecttime = _sim->_time0 - 2*_sim->_dtmin;
   double creeptime  = _sim->_time0 + 2*_sim->_dtmin;
 
-  if (time_by._event < mintime) {//99
+  if (time_by.event() < mintime) {//99
     _time_by_ambiguous_event = mintime;
   }else{//43319
-    _time_by_ambiguous_event = time_by._event;
+    _time_by_ambiguous_event = time_by.event();
   }
   if (up_order(rejecttime, _time_by_ambiguous_event, creeptime)) {//234
     _time_by_ambiguous_event = creeptime;
   }else{//43184
   }
 
+  if (time_by.is_ok()) {
+    _time_by_error_estimate = _sim->_time0 + time_by.dt_estimate();
+  }else{
+    _time_by_error_estimate = _time1 + time_by.dt_estimate();
+    assert(_time_by_error_estimate < _sim->_time0);
+  }
   rejecttime = _sim->_time0 - 1.1*_sim->_dtmin;
   creeptime  = _sim->_time0 + 1.1*_sim->_dtmin;
-  if (time_by._error_estimate < mintime) {//24
+  if (_time_by_error_estimate < mintime) {//24
     _time_by_error_estimate = mintime;
   }else{//43394
-    _time_by_error_estimate = time_by._error_estimate;
   }
   if (up_order(rejecttime, _time_by_error_estimate, creeptime)) {//25
     _time_by_error_estimate = creeptime;
@@ -611,8 +618,8 @@ void TRANSIENT::accept()
   // This method of disposing of used _eq events will be changed in near future.
   // This block of code will be removed.
   while (!_sim->_eq.empty() && TIME_t(_sim->_eq.top()) <= TIME_t(_sim->_time0)) {//272
+    trace2("eq", _sim->_eq.top(), _sim->_time0);
     assert(TIME_t(_sim->_eq.top()) == TIME_t(_sim->_time0));
-    trace1("eq", _sim->_eq.top());
     _sim->_eq.pop();
   }
 
