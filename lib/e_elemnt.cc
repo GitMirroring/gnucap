@@ -309,6 +309,12 @@ void ELEMENT::tr_advance()
   _time[0] = _sim->_time0;
 
   _dt = _time[0] - _time[1];
+
+  if(_dt < _sim->_dtmin*1.01) { untested();
+    _time[2] = _time[1];
+    _y[2] = _y[1];
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_regress()

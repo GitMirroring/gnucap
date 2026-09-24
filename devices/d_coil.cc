@@ -341,6 +341,14 @@ void DEV_MUTUAL_L::tr_advance()
     _if[i] = _if[i-1];
     _ir[i] = _ir[i-1];
   }
+
+  if (_dt < _sim->_dtmin*1.01){ untested();
+    _yf[2] = _yf[1];
+    _yr[2] = _yr[1];
+    _if[2] = _if[1];
+    _ir[2] = _ir[1];
+  }else{ untested();
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool DEV_INDUCTANCE::do_tr()

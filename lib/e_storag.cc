@@ -101,6 +101,11 @@ void STORAGE::tr_advance()
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
     _i[i] = _i[i-1];
   }
+
+  if(_dt < _sim->_dtmin*1.01) { untested();
+    _y[2] = _y[1];
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* tr_needs_eval: check to see if this device needs to be evaluated
