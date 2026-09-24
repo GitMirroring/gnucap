@@ -101,6 +101,21 @@ void STORAGE::tr_advance()
   for (int i=OPT::_keep_time_steps-1; i>0; --i) {
     _i[i] = _i[i-1];
   }
+
+  if(_time[2] == _time[1]) {
+    _y[2] = _y[1];
+  }else{
+  }
+}
+/*--------------------------------------------------------------------------*/
+void STORAGE::tr_regress()
+{
+  ELEMENT::tr_regress();
+  
+  if(_time[2] == _time[1]) {
+    _y[2] = _y[1];
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* tr_needs_eval: check to see if this device needs to be evaluated

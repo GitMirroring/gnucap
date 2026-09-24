@@ -129,6 +129,7 @@ private: // override virtual
   void     tr_begin()override;
   void     dc_advance()override;
   void     tr_advance()override;
+  void     tr_regress()override;
   bool     do_tr()override		{_sim->_late_evalq.push_back(this); return true;}
   bool     do_tr_last()override;
   void	   tr_load()override;
@@ -341,6 +342,19 @@ void DEV_MUTUAL_L::tr_advance()
     _yr[i] = _yr[i-1];
     _if[i] = _if[i-1];
     _ir[i] = _ir[i-1];
+  }
+}
+/*--------------------------------------------------------------------------*/
+void DEV_MUTUAL_L::tr_regress()
+{
+  STORAGE::tr_regress();
+
+  if (_time[2] == _time[1]) {
+    _yf[2] = _yf[1];
+    _yr[2] = _yr[1];
+    _if[2] = _if[1];
+    _ir[2] = _ir[1];
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/

@@ -47,7 +47,7 @@ public: // override virtual
   void     tr_restore() override;
   void     dc_advance() override;
   void     tr_advance() override;
-  //void   tr_regress();	//ELEMENT
+  void     tr_regress() override;
   bool	   tr_needs_eval()const override;
   //void   tr_queue_eval()	//ELEMENT
   TIME_PAIR tr_review() override;

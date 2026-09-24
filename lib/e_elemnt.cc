@@ -322,6 +322,13 @@ void ELEMENT::tr_regress()
     _time[0] = _sim->_time0;
 
     _dt = _time[0] - _time[1];
+
+    if(_dt < _sim->_dtmin*1.01) { untested();
+      trace3("euler", long_label(), _dt, _sim->_dtmin);
+      _time[2] = _time[1];
+      _y[2] = _y[1];
+    }else{
+    }
   }else{untested(); // not moving backwards
     tr_advance();
   }
