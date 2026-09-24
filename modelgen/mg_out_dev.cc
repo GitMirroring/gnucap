@@ -300,6 +300,8 @@ static void make_dev_expand_first(std::ofstream& out, const Device& d)
     "  for (int ii = 0;  ii < net_nodes();  ++ii) {\n"
     "    n_(ii).set_type(electrical);\n"
     "    n_(ii).set_used();\n"
+    "    n_(ii).set_input();\n"
+    "    n_(ii).set_output();\n"
     "  }\n"
     "}\n"
     "/*--------------------------------------"
