@@ -312,17 +312,17 @@ void ELEMENT::tr_advance()
 }
 /*--------------------------------------------------------------------------*/
 void ELEMENT::tr_advance_recursive()
-{ untested();
-  if (tr_needs_advance()) { untested();
+{
+  if (tr_needs_advance()) {
     tr_advance();
-    for (int ii=0; ii<net_nodes(); ++ii) { untested();
+    for (int ii=0; ii<net_nodes(); ++ii) {
       assert(n_(ii));
-      if(n_(ii).is_output()){ untested();
+      if(n_(ii).is_output()){
 	n_(ii)->tr_advance_recursive();
-      }else{ untested();
+      }else{
       }
     }
-  }else{ untested();
+  }else{
   }
 }
 /*--------------------------------------------------------------------------*/
@@ -339,12 +339,11 @@ void ELEMENT::tr_regress()
     _dt = _time[0] - _time[1];
 
     if(_dt < _sim->_dtmin*1.01) { untested();
-      trace3("euler", long_label(), _dt, _sim->_dtmin);
       _time[2] = _time[1];
       _y[2] = _y[1];
     }else{
     }
-  }else{untested(); // not moving backwards
+  }else{ // not moving backwards
     tr_advance();
   }
 }

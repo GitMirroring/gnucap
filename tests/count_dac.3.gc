@@ -4,7 +4,7 @@ load ./c_order_trace.so
 * not meant to be a useful circuit, but a good test.
 **************
 
-options order=trace
+*options order=trace
 options mode=digital
 
 parameter tclk=200u
