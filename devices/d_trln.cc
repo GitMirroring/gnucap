@@ -415,6 +415,11 @@ void DEV_TRANSLINE::dc_advance()
   assert(c);
   _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
   _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
+       || !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
+    q_load();
+  }else{
+  }
 }
 void DEV_TRANSLINE::tr_advance()
 {
@@ -423,6 +428,11 @@ void DEV_TRANSLINE::tr_advance()
   assert(c);
   _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
   _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
+       || !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
+    q_load();
+  }else{
+  }
 }
 void DEV_TRANSLINE::tr_regress()
 {
@@ -431,6 +441,11 @@ void DEV_TRANSLINE::tr_regress()
   assert(c);
   _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
   _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
+       || !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
+    q_load();
+  }else{
+  }
 }
 /*--------------------------------------------------------------------------*/
 /* usually nothing, always converged.  It is all done in advance and accept.
@@ -441,11 +456,6 @@ bool DEV_TRANSLINE::do_tr()
 {
   // code to deal with short lines goes here.
   //if (_if0 != _if1  ||  _ir0 != _ir1) { untested();
-  if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
-       || !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
-    q_load();
-  }else{
-  }
   assert(converged());
   return true;
 }
