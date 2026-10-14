@@ -42,6 +42,7 @@ public:
   WAVE&	   initialize();
   WAVE&	   push(double t, double v);
   FPOLY1   v_out(double t)const;
+  double   latest()const;
   double   v_reflect(double t, double v_total)const;
   WAVE&	   operator+=(const WAVE& x);
   WAVE&	   operator+=(double x);
@@ -97,6 +98,12 @@ inline WAVE& WAVE::set_delay(double d)
 inline FPOLY1 WAVE::v_out(double t)const
 {
   return interpolate(_w.begin(), _w.end(), t, 0., 0.);
+}
+/*--------------------------------------------------------------------------*/
+inline double WAVE::latest() const
+{
+  assert(_w.size());
+  return _w.back().second;
 }
 /*--------------------------------------------------------------------------*/
 // reflect: calculate a reflection

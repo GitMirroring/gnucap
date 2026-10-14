@@ -454,10 +454,26 @@ void DEV_TRANSLINE::tr_regress()
  */
 bool DEV_TRANSLINE::do_tr()
 {
-  // code to deal with short lines goes here.
-  //if (_if0 != _if1  ||  _ir0 != _ir1) { untested();
-  assert(converged());
-  return true;
+  const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
+  if(_dt > c->real_td){
+    double ratio = c->real_td / _dt;
+    double fvinterp = _forward.latest()*ratio + tr_involts()*(1.-ratio);
+    double rvinterp = _reflect.latest()*ratio + tr_outvolts()*(1.-ratio);
+    _if0 = fvinterp / c->real_z0;
+    _ir0 = rvinterp / c->real_z0;
+
+    if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
+	|| !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
+      set_converged(false);
+      q_load();
+    }else{
+      set_converged(true);
+    }
+    return converged();
+  }else{
+    assert(converged());
+    return true;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_load()
