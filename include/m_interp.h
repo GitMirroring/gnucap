@@ -31,12 +31,11 @@
  */
 template <class Iterator>
 FPOLY1 interpolate(Iterator begin, Iterator end, double x,
-		   double below, double above)
+		   double below, double above, int order=1)
 {
   double f1 = NOT_VALID;
   double f0 = NOT_VALID;
   if (begin == end) { untested();
-    untested();
     throw Exception("interpolate table is empty");
   }
   --end;
@@ -57,6 +56,27 @@ FPOLY1 interpolate(Iterator begin, Iterator end, double x,
     DPAIR    xx(x,BIGBIG);
     Iterator upper = upper_bound(begin, end, xx);
     Iterator lower = upper-1;
+    Iterator lower1 = upper;
+
+    if(order == 2 && lower1 != begin){
+      --lower1;
+      --lower1;
+    }else{
+      --lower1;
+      order = 1;
+    }
+
+#if 0
+      x2 = x1 = x0 = -1e99
+      y2 = y1 = y0 = 0.
+      for i in self._wave:
+         x2, x1, x0 = x1, x0, i[0]
+         y2, y1, y0 = y1, y0, i[1]
+         if float(i[0]) > x:
+            break;
+
+#endif
+
 
     // set f1 (derivative)
     if ((upper == end) && (x > (*upper).first) && (above != NOT_INPUT)) {
@@ -75,15 +95,33 @@ FPOLY1 interpolate(Iterator begin, Iterator end, double x,
     }else if ((*upper).first <= (*lower).first) {itested();
       throw Exception("interpolate table is not sorted or has duplicate keys");
       f1 = 0.;
-    }else{
+    }else if(order == 1) {
       // ordinary interpolation
       assert((*upper).first != (*lower).first);
       f1 = ((*upper).second-(*lower).second) / ((*upper).first-(*lower).first);
+    }else if(order == 2) {
+      incomplete();
     }
 
-    f0 = (*lower).second + (x - (*lower).first) * f1;
+    if(order == 1){
+      f0 = (*lower).second + (x - (*lower).first) * f1;
+    }else if(order == 2){ untested();
+      double x0 = upper->first;
+      double x1 = lower->first;
+      double x2 = lower1->first;
+      double y0 = upper->second;
+      double y1 = lower->second;
+      double y2 = lower1->second;
+      double dx = x - x1;
+      double t0 = x0 - x1;
+      double d = (y0 - y2) / (x0 - x2);
+      double v0 = y0 - y1;
+      double b = ( v0/t0 - d ) / t0;
+      f0 = (d + b * dx) * dx + y1;
+    }else{
+    }
   }
-  assert(f1 != NOT_VALID);
+  assert(f1 != NOT_VALID || order==2);
   assert(f0 != NOT_VALID);
   return FPOLY1(x, f0, f1);
 }

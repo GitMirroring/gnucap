@@ -41,7 +41,7 @@ public:
   WAVE&	   set_delay(double d);
   WAVE&	   initialize();
   WAVE&	   push(double t, double v);
-  FPOLY1   v_out(double t)const;
+  FPOLY1   v_out(double t, int order=1)const;
   double   latest()const;
   double   v_reflect(double t, double v_total)const;
   WAVE&	   operator+=(const WAVE& x);
@@ -95,9 +95,9 @@ inline WAVE& WAVE::set_delay(double d)
 // v_out: return the value at the "output" end
 // args: t = the time now
 //
-inline FPOLY1 WAVE::v_out(double t)const
+inline FPOLY1 WAVE::v_out(double t, int order)const
 {
-  return interpolate(_w.begin(), _w.end(), t, 0., 0.);
+  return interpolate(_w.begin(), _w.end(), t, 0., 0., order);
 }
 /*--------------------------------------------------------------------------*/
 inline double WAVE::latest() const
