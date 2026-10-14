@@ -420,6 +420,7 @@ void DEV_TRANSLINE::dc_advance()
     q_load();
   }else{
   }
+  q_accept();
 }
 void DEV_TRANSLINE::tr_advance()
 {
@@ -433,6 +434,7 @@ void DEV_TRANSLINE::tr_advance()
     q_load();
   }else{
   }
+  q_accept();
 }
 void DEV_TRANSLINE::tr_regress()
 {
@@ -446,6 +448,7 @@ void DEV_TRANSLINE::tr_regress()
     q_load();
   }else{
   }
+  q_accept();
 }
 /*--------------------------------------------------------------------------*/
 /* usually nothing, always converged.  It is all done in advance and accept.
@@ -494,7 +497,6 @@ void DEV_TRANSLINE::tr_load()
  */
 TIME_PAIR DEV_TRANSLINE::tr_review()
 {
-  q_accept();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
   return TIME_PAIR(c->real_td, NEVER); // ok to miss the spikes, for now
