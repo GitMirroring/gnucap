@@ -431,8 +431,8 @@ void DEV_TRANSLINE::advance()
 {
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _y[0].f0  = _forward.v_out(_sim->_time0).f0; // maybe a guess.
-  _yr[0].f0 = _reflect.v_out(_sim->_time0).f0; // maybe a guess.
+  _y[0].f0  = _forward.v_out(_sim->_time0, 2).f0; // maybe a guess.
+  _yr[0].f0 = _reflect.v_out(_sim->_time0, 2).f0; // maybe a guess.
   trace2("DEV_TRANSLINE::advance", _sim->_time0, _y[0].f0);
   trace2("DEV_TRANSLINE::advance", _sim->_time0, _yr[0].f0);
   assert(_y[0]==_y[0]);

@@ -52,7 +52,7 @@ FPOLY1 interpolate(Iterator begin, Iterator end, double x,
     order = 0;
     if (x < begin->first) { untested();
       f1 = ((below != NOT_INPUT) ? below : 0.);
-    }else{ untested();
+    }else{
       f1 = ((above != NOT_INPUT) ? above : 0.);
     }
     f0 = begin->second + (x - begin->first) * f1;
@@ -120,7 +120,7 @@ FPOLY1 interpolate(Iterator begin, Iterator end, double x,
     D(0, 0) = 0.;
 
     for (int i = 1; i <= order; ++i) {
-      if(seek == orig_begin){ untested();
+      if(seek == orig_begin){
 	order = i-1;
 	break;
       }else{
