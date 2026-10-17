@@ -42,6 +42,7 @@ public:
 	  ~WAVE() {}
   WAVE&	   set_delay(double d);
   WAVE&	   initialize();
+  WAVE&    truncate(double t);
   WAVE&	   push(double t, double v);
   FPOLY1   v_out(double t, int order=1)const;
   double   latest()const;
@@ -65,6 +66,7 @@ public:
 //
 inline WAVE& WAVE::push(double t, double v)
 {
+//  assert(!_w.size() || _w.back().first < t+_delay); d_switch.nro.1gr.ckt..?
   _w.push_back(DPAIR(t+_delay, v));
   return *this;
 }
@@ -74,6 +76,14 @@ inline WAVE& WAVE::push(double t, double v)
 inline WAVE& WAVE::initialize()
 {
   _w.clear();
+  return *this;
+}
+/*--------------------------------------------------------------------------*/
+inline WAVE& WAVE::truncate(double t)
+{
+  while(_w.size() && _w.back().first >= t+_delay) {
+    _w.pop_back();
+  }
   return *this;
 }
 /*--------------------------------------------------------------------------*/
