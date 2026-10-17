@@ -76,6 +76,8 @@ private:
   COMPLEX _y12;// AC equiv ckt
   // using base class _loss0 and _loss1 to stash 1/z0 so it can be passed by pointer
   // to tr_load.  It is not "loss".  This model is for a lossless t-line,
+  FPOLY1   _yr[OPT::_keep_time_steps]; /* _y reverse */
+  FPOLY1   _yr1;                       /* _y1 reverse */
 private:
   explicit	DEV_TRANSLINE(const DEV_TRANSLINE& p)
     :ELEMENT(p), _forward(), _reflect(), _if0(0), _ir0(0), _if1(0), _ir1(0) {}
@@ -119,11 +121,15 @@ private: // override virtual
   }
 private:
   void		setinitcond(CS&);
+private: // "reverse ELEMENT" extras
+  double	tr_review_trunc_error_();
+  void		store_values();
 };
 /*--------------------------------------------------------------------------*/
 inline bool DEV_TRANSLINE::tr_needs_eval()const
 {
   assert(!is_q_for_eval());
+  return true;// TODO
   return (_if0!=_if1 || _ir0!=_ir1);
 }
 /*--------------------------------------------------------------------------*/
@@ -403,6 +409,9 @@ void DEV_TRANSLINE::tr_begin()
   _forward.initialize().push(0.-c->real_td, 0.);
   _reflect.initialize().push(0.-c->real_td, 0.);
   _time_by.min_dt_estimate(c->real_td);
+
+  _y[0] = _yr[0] = FPOLY1(0., 0., 0.);
+  _y1 = _yr1 = FPOLY1(0., 0., 0.);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_restore()
@@ -422,26 +431,69 @@ void DEV_TRANSLINE::advance()
 {
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
-  _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  _y[0].f0  = _forward.v_out(_sim->_time0).f0; // maybe a guess.
+  _yr[0].f0 = _reflect.v_out(_sim->_time0).f0; // maybe a guess.
+  trace2("DEV_TRANSLINE::advance", _sim->_time0, _y[0].f0);
+  trace2("DEV_TRANSLINE::advance", _sim->_time0, _yr[0].f0);
+  assert(_y[0]==_y[0]);
+  assert(_yr[0]==_yr[0]);
+// was: _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
+// was: _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  _if0 = _y[0].f0 / c->real_z0;
+  _ir0 = _yr[0].f0/ c->real_z0;
   if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
        || !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
     q_load();
   }else{
   }
+  store_values();
   q_accept();
+  set_converged(_dt <= c->real_td);
 }
 /*--------------------------------------------------------------------------*/
+//  reflect(t, v_total) ==  return (v_total*2 - v_out(t)); // de-noised
 /* usually nothing, always converged.  It is all done in advance and accept.
  * UNLESS ... it is a very short line .. then we fake it here.
  * very short line means delay is less than internal time step.
  */
 bool DEV_TRANSLINE::do_tr()
 {
-  // code to deal with short lines goes here.
-  //if (_if0 != _if1  ||  _ir0 != _ir1) { untested();
-  assert(converged());
-  return true;
+  const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
+  if(_dt > c->real_td){
+    _y[0].f0 = tr_involts() * 2. - _yr1.f0;
+    _yr[0].f0 = tr_outvolts() * 2. - _y1.f0;
+    double ratio = c->real_td / _dt;
+    assert(_forward.latest_time() == _time[1] + c->real_td);
+    _y[0].f0 = _forward.latest()*ratio + _y[0].f0*(1.-ratio);
+    _yr[0].f0 = _reflect.latest()*ratio + _yr[0].f0*(1.-ratio);
+    assert(_y[0]==_y[0]);
+    assert(_yr[0]==_yr[0]);
+    _if0 = _y[0].f0 / c->real_z0;
+    _ir0 = _yr[0].f0 / c->real_z0;
+
+    if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
+	|| !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
+      set_converged(false);
+      q_load();
+    }else{
+      set_converged(true);
+    }
+    set_converged(converged() && conchk(_y1.f0, _y[0].f0));
+    set_converged(converged() && conchk(_yr1.f0, _yr[0].f0));
+
+    store_values();
+    return converged();
+  }else{
+    // _y[0].f0 = tr_involts() * 2. - _yr1.f0;
+    // _yr[0].f0 = tr_outvolts() * 2. - _y1.f0;
+    _yr[0].f0 = _forward.v_reflect(_sim->_time0, tr_outvolts());
+    _y[0].f0 = _reflect.v_reflect(_sim->_time0, tr_involts());
+    assert(_y[0]==_y[0]);
+    assert(_yr[0]==_yr[0]);
+    trace3("do_tr,nointerp", _sim->_time0, _y[0].f0, _yr[0].f0);
+    assert(converged());
+    return true;
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_load()
@@ -472,9 +524,24 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
  */
 void DEV_TRANSLINE::tr_accept()
 {
+  for(int i=0; i<OPT::_keep_time_steps; ++i) {
+    trace3("dumpDBGACC", _sim->_time0, _time[i], _y[i].f0);
+  }
   trace1(short_label().c_str(), _sim->_time0);
-  _reflect.push(_sim->_time0, _forward.v_reflect(_sim->_time0, tr_outvolts()));
-  _forward.push(_sim->_time0, _reflect.v_reflect(_sim->_time0, tr_involts()));
+  // store_values();
+//  _reflect.push(_yr1);
+//  _reflect.push(_y1);
+
+  const COMMON_TRANSLINE*c=prechecked_cast<const COMMON_TRANSLINE*>(common());
+  assert(c);
+  double rd = c->real_td;
+  trace3("acccheck, push", _sim->_time0,  _reflect.latest_time(), _sim->_time0 + rd);
+  if(_reflect.latest_time() == _sim->_time0 + rd){ untested();
+    // incomplete. dc??
+  }else{
+    _reflect.push(_sim->_time0, _forward.v_reflect(_sim->_time0, tr_outvolts()));
+    _forward.push(_sim->_time0, _reflect.v_reflect(_sim->_time0, tr_involts()));
+  }
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_unload()
@@ -507,6 +574,13 @@ void DEV_TRANSLINE::ac_load()
   ac_load_asymmetric(n_(IN1),  n_(IN2),  n_(OUT2), n_(OUT1), _y12); // really _y21
 }
 /*--------------------------------------------------------------------------*/
+void DEV_TRANSLINE::store_values()
+{
+  assert(_y[0]==_y[0]);
+  assert(_yr[0]==_yr[0]);
+  _y1 = _y[0];
+  _yr1 = _yr[0];
+}
 /*--------------------------------------------------------------------------*/
 COMMON_TRANSLINE Default_TRANSLINE(CC_STATIC);
 DEV_TRANSLINE p1(&Default_TRANSLINE);
