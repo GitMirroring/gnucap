@@ -382,8 +382,10 @@ bool TRANSIENT::next()
       if(new_control == scTE){//36
       }else if(new_control == scAMBEVENT){//1
       }else if(new_control == scUSER){//28
+      }else if(new_control == scAMBEVENT + scUSER){
       }else if(new_control & scEVENTQ){ untested();
       }else{untested();
+	assert(0);
       }
       // convergence failure
       if (old_dt / OPT::trstepshrink < new_dt) {//65
@@ -403,6 +405,7 @@ bool TRANSIENT::next()
       }else if(new_control == scEVENTQ){//54
       }else if(new_control == scITER_R){//65
       }else if(new_control == scAMBEVENT){//7
+      }else if(new_control == scAMBEVENT + scTE){untested();
       }else{ untested();
       }
       if (old_dt * OPT::trstephold < new_dt) {untested();
