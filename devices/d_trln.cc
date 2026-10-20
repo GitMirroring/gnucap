@@ -521,10 +521,30 @@ void DEV_TRANSLINE::tr_load()
  */
 TIME_PAIR DEV_TRANSLINE::tr_review()
 {
-  const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
-  assert(c);
-  assert(_time_by.dt_estimate() == c->real_td);
-  return _time_by; // ok to miss the spikes, for now
+    const COMMON_TRANSLINE* c = prechecked_cast<const COMMON_TRANSLINE*>(common());
+    assert(c);
+  COMPONENT::tr_review();
+  assert(_time_by.dt_estimate() != NEVER || _time_by.is_ok());
+  if (order() > 0 && _y[0].f0 != LINEAR) {
+    double timestep = tr_review_trunc_error_();
+    if(tr_review_check(timestep)){
+    }else{
+      // event in the past indicates non-convergence.
+      //_time_by.min_event(_time[1] + timestep);
+      _time_by.set_nok();
+    }
+    if(timestep < c->real_td){
+      timestep = c->real_td;
+    }else{
+    }
+    _time_by.min_dt_estimate(timestep);
+//    _time_by.min_dt_estimate(c->real_td);
+    trace3("TLINE::tr_review values", _sim->_time0, _y[0].f0, _yr[0].f0);
+    trace3("TLINE::tr_review", _time_by.is_ok(), timestep, _time_by.dt_estimate());
+  }else{ untested();
+  }
+  assert(_time_by.dt_estimate() != NEVER || _time_by.is_ok());
+  return _time_by;
 }
 /*--------------------------------------------------------------------------*/
 /* after this step is all done, determine the reflections and send them on.
@@ -579,6 +599,73 @@ void DEV_TRANSLINE::ac_load()
   ac_load_shunt(n_(IN1),  n_(IN2),  _y11); // really _y22
   ac_load_asymmetric(n_(OUT1), n_(OUT2), n_(IN2),  n_(IN1),  _y12);
   ac_load_asymmetric(n_(IN1),  n_(IN2),  n_(OUT2), n_(OUT1), _y12); // really _y21
+}
+/*--------------------------------------------------------------------------*/
+double DEV_TRANSLINE::tr_review_trunc_error_()
+{
+  const COMMON_TRANSLINE*c=prechecked_cast<const COMMON_TRANSLINE*>(common());
+  assert(c);
+  double rd = c->real_td;
+  WAVE::const_reverse_iterator wf = _forward.rbegin();
+  WAVE::const_reverse_iterator wr = _reflect.rbegin();
+  trace3("match----", _forward.size(), _time[0], _time[0]+rd);
+  for(int i=0; i<OPT::_keep_time_steps-1; ++i, ++wf) {
+    if(wf == _forward.rend()){
+      break;
+    }
+    if(_time[i] == _time[i+1]){
+      break;
+    }else{
+    }
+    trace5("match", _sim->_time0, i, _time[i+1]+rd, wf->first, _forward.size());
+    if(_time[i+1]+rd ==  wf->first){
+    }else{
+      for(auto p : _forward){
+	trace1("what??", p.first);
+      }
+      for(int j=0; j<OPT::_keep_time_steps; ++j) {
+	trace3("what??", j, _time[j], _time[j] + rd);
+      }
+    }
+    // assert(_time[i+1]+rd ==  wf->first);
+  }
+
+  wf = _forward.rbegin();
+  if(_time[0] == wf->first){
+    incomplete();
+  }else{
+  }
+
+  if(_time[0]+rd ==  wf->first){ untested();
+    // already accepted. happens after a restore...
+    ++wf;
+    ++wr;
+    trace1("try?? shifted", _time[0] + rd - wf->first);
+  }else{
+  }
+
+  double t = _time[0];
+  for(int i=1; i<OPT::_keep_time_steps; ++i, ++wf, ++wr) {
+    if(wf == _forward.rend()){ untested();
+      assert(wr == _reflect.rend());
+      break;
+    }else if(_time[i] == _time[i-1]){
+      break;
+    }else if(t == _time[i]){ untested();
+      break;
+    }else{
+      assert(_time[i] + rd == wf->first);
+      assert(_time[i] + rd == wr->first);
+      _y[i].f0 = wf->second;
+      _yr[i].f0 = wr->second;
+      t = _time[i];
+    }
+  }
+  double timestep = tr_review_trunc_error(_y);
+  timestep = std::min(timestep, tr_review_trunc_error(_yr));
+
+  trace2("trunc?", _sim->_time0, timestep);
+  return timestep;
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::store_values()
