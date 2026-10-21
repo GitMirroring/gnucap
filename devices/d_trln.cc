@@ -68,17 +68,19 @@ class DEV_TRANSLINE : public ELEMENT {
 private:
   WAVE	 _forward;
   WAVE	 _reflect;
-  double _if0; // value of current source representing incident wave
-  double _ir0; // value of current source representing reflected wave
-  double _if1; // val of cs rep incident wave, one load ago
-  double _ir1; // val of cs rep reflected wave, one load ago
+//   double _if0; // value of current source representing incident wave
+//   double _ir0; // value of current source representing reflected wave
+//   double _if1; // val of cs rep incident wave, one load ago
+//   double _ir1; // val of cs rep reflected wave, one load ago
+  CPOLY1  _mr0; // reflect matrix parameters, new
+  CPOLY1  _mr1; // reflect matrix parameters, 1 fill ago
   COMPLEX _y11;// AC equiv ckt
   COMPLEX _y12;// AC equiv ckt
   // using base class _loss0 and _loss1 to stash 1/z0 so it can be passed by pointer
   // to tr_load.  It is not "loss".  This model is for a lossless t-line,
 private:
   explicit	DEV_TRANSLINE(const DEV_TRANSLINE& p)
-    :ELEMENT(p), _forward(), _reflect(), _if0(0), _ir0(0), _if1(0), _ir1(0) {}
+    :ELEMENT(p), _forward(), _reflect() {}
 public:
   explicit	DEV_TRANSLINE(COMMON_COMPONENT* c=nullptr);
 private: // override virtual
@@ -124,7 +126,7 @@ private:
 inline bool DEV_TRANSLINE::tr_needs_eval()const
 {
   assert(!is_q_for_eval());
-  return (_if0!=_if1 || _ir0!=_ir1);
+  return (_m0.c0 != _m1.c0 || _mr0.c0 != _mr1.c0);
 }
 /*--------------------------------------------------------------------------*/
 inline double DEV_TRANSLINE::tr_involts()const
@@ -371,7 +373,6 @@ void COMMON_TRANSLINE::precalc_last(const PARAM_LIST* Scope)
 DEV_TRANSLINE::DEV_TRANSLINE(COMMON_COMPONENT* c)
   :ELEMENT(c),
    _forward(), _reflect(),
-   _if0(0), _ir0(0), _if1(0), _ir1(0),
    _y11(), _y12()
 {
 }
@@ -422,10 +423,10 @@ void DEV_TRANSLINE::advance()
 {
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
-  _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
-  if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
-       || !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
+  _m0.c0 = - _forward.v_out(_sim->_time0).f0/c->real_z0;
+  _mr0.c0 = - _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  if (!conchk(_m0.c0, _m1.c0, OPT::abstol, OPT::reltol*.01)
+       || !conchk(_mr0.c0, _mr1.c0, OPT::abstol, OPT::reltol*.01)) {
     q_load();
   }else{
   }
@@ -454,8 +455,14 @@ void DEV_TRANSLINE::tr_load()
     tr_load_shunt(n_(IN1),  n_(IN2),   &_loss0, &_loss1);
   }else{
   }
-  tr_load_source(n_(OUT2), n_(OUT1), &_if0, &_if1);
-  tr_load_source(n_(IN2),  n_(IN1),  &_ir0, &_ir1);
+/// was:  tr_load_source(n_(OUT2), n_(OUT1), &_if0, &_if1);
+/// was:  tr_load_source(n_(IN2),  n_(IN1),  &_ir0, &_ir1);
+  tr_load_source(n_(OUT1), n_(OUT2), &_m0.c0, &_m1.c0); // "tr_load_source"
+  tr_load_source(n_(IN1) , n_(IN2), &_mr0.c0, &_mr1.c0);
+  /*
+  void	   tr_load_passive()	{tr_load_shunt(n_(OUT1), n_(OUT2), &_m0.c1, &_m1.c1);
+				 tr_load_source(n_(OUT1), n_(OUT2),&_m0.c0, &_m1.c0);}
+  */
 }
 /*--------------------------------------------------------------------------*/
 /* limit the time step to no larger than a line length.
