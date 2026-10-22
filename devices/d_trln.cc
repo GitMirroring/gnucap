@@ -84,8 +84,8 @@ private:
 public:
   explicit	DEV_TRANSLINE(COMMON_COMPONENT* c=nullptr);
 private: // override virtual
-  char		id_letter()const override	{return 'T';}
-  std::string   value_name()const override	{return "#";}
+  char		id_letter()const override	{ untested();return 'T';}
+  std::string   value_name()const override	{ untested();return "#";}
   std::string	dev_type()const override	{ return "tline";}
   int		max_nodes()const override	{return 4;}
   int		min_nodes()const override	{return 4;}
@@ -98,7 +98,11 @@ private: // override virtual
   void		tr_restore()override;
   void		advance();
   void		dc_advance()override {ELEMENT::dc_advance(); advance();}
-  void		tr_advance()override {ELEMENT::tr_advance(); advance();}
+  void		tr_advance()override {ELEMENT::tr_advance();
+    for (int i=OPT::_keep_time_steps-1; i>0; --i) {
+      _yr[i] = _yr[i-1];
+    }
+    advance();}
   void		tr_regress()override {ELEMENT::tr_regress(); advance();}
   bool		tr_needs_eval()const override;
   bool		do_tr()override;
@@ -113,7 +117,7 @@ private: // override virtual
   void		ac_load()override;
   COMPLEX	ac_involts()const override;
 
-  std::string port_name(int i)const override {
+  std::string port_name(int i)const override { untested();
     assert(i >= 0);
     assert(i < 4);
     static std::string names[] = {"t1", "b1", "t2", "b2"};
@@ -124,6 +128,11 @@ private:
 private: // "reverse ELEMENT" extras
   double	tr_review_trunc_error_();
   void		store_values();
+//   double   error_factor()const override {
+// //    const double f[]={1./2., 1./2., 1./12., 2./9., 1./2.};
+//  //   return f[_method_a];
+//  return .5;
+//   }
 };
 /*--------------------------------------------------------------------------*/
 inline bool DEV_TRANSLINE::tr_needs_eval()const
@@ -243,7 +252,7 @@ void COMMON_TRANSLINE::set_param_by_index(int I, std::string& Value, int Offset)
 }
 /*--------------------------------------------------------------------------*/
 bool COMMON_TRANSLINE::param_is_printable(int I)const
-{
+{ untested();
   switch (I) {
   case 0:  return len.has_hard_value();
   case 1:  return R.has_hard_value();
@@ -303,7 +312,7 @@ std::string COMMON_TRANSLINE::param_name(int I, int j)const
 }
 /*--------------------------------------------------------------------------*/
 std::string COMMON_TRANSLINE::param_value(int I)const
-{
+{ untested();
   switch (I) {
   case 0:  return len.string();
   case 1:  return R.string();
@@ -335,16 +344,16 @@ void COMMON_TRANSLINE::precalc_last(const PARAM_LIST* Scope)
   nl.e_val(_default_nl, Scope);
 
   { // real_td
-    if (td.has_hard_value()) {
+    if (td.has_hard_value()) { untested();
       real_td = len * td;
       if (f.has_hard_value()) {untested(); // check for conflicts
 	if (!conchk(td, nl/f, OPT::vntol)) {untested();
 	  error(bDANGER, "td, f&nl conflict.  using td\n");
 	}else{untested();
 	}
-      }else{
+      }else{ untested();
       }
-    }else if (f.has_hard_value()) {
+    }else if (f.has_hard_value()) { untested();
       real_td = len * nl / f;      
     }else if (L.has_hard_value() && C.has_hard_value()) {itested();
       real_td = len * sqrt(L * C);
@@ -355,11 +364,11 @@ void COMMON_TRANSLINE::precalc_last(const PARAM_LIST* Scope)
   }
   
   { // real_z0
-    if (z0.has_hard_value()) {
+    if (z0.has_hard_value()) { untested();
       real_z0 = z0;
       if (L.has_hard_value() && C.has_hard_value()) {untested();
 	error(bDANGER, "redundant specification both Z0 and LC, using Z0\n");
-      }else{
+      }else{ untested();
       }
     }else{itested();
       if (L.has_hard_value() && C.has_hard_value()) {itested();
@@ -415,7 +424,7 @@ void DEV_TRANSLINE::tr_begin()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_restore()
-{
+{ untested();
   ELEMENT::tr_restore();
   _forward.truncate(_sim->_time0);
   _reflect.truncate(_sim->_time0);
@@ -431,16 +440,11 @@ void DEV_TRANSLINE::advance()
 {
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _y[0].f0  = _forward.v_out(_sim->_time0, 2).f0; // maybe a guess.
-  _yr[0].f0 = _reflect.v_out(_sim->_time0, 2).f0; // maybe a guess.
-  trace2("DEV_TRANSLINE::advance", _sim->_time0, _y[0].f0);
-  trace2("DEV_TRANSLINE::advance", _sim->_time0, _yr[0].f0);
+  double z0 = c->real_z0;
+  _if0 = _y[0].f0 = _forward.v_out(_sim->_time0, OPT::trsteporder).f0 / z0; // could be a guess.
+  _ir0 = _yr[0].f0 = _reflect.v_out(_sim->_time0, OPT::trsteporder).f0 / z0; // could be a guess.
   assert(_y[0]==_y[0]);
   assert(_yr[0]==_yr[0]);
-// was: _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
-// was: _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
-  _if0 = _y[0].f0 / c->real_z0;
-  _ir0 = _yr[0].f0/ c->real_z0;
   if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
        || !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
     q_load();
@@ -451,7 +455,6 @@ void DEV_TRANSLINE::advance()
   set_converged(_dt <= c->real_td);
 }
 /*--------------------------------------------------------------------------*/
-//  reflect(t, v_total) ==  return (v_total*2 - v_out(t)); // de-noised
 /* usually nothing, always converged.  It is all done in advance and accept.
  * UNLESS ... it is a very short line .. then we fake it here.
  * very short line means delay is less than internal time step.
@@ -459,17 +462,29 @@ void DEV_TRANSLINE::advance()
 bool DEV_TRANSLINE::do_tr()
 {
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
-  if(_dt > c->real_td){
-    _y[0].f0 = tr_involts() * 2. - _yr1.f0;
-    _yr[0].f0 = tr_outvolts() * 2. - _y1.f0;
-    double ratio = c->real_td / _dt;
+  assert(c);
+  double z0 = c->real_z0;
+  if(_dt > c->real_td){ untested();
+    // short line or big step
     assert(_forward.latest_time() == _time[1] + c->real_td);
-    _y[0].f0 = _forward.latest()*ratio + _y[0].f0*(1.-ratio);
-    _yr[0].f0 = _reflect.latest()*ratio + _yr[0].f0*(1.-ratio);
-    assert(_y[0]==_y[0]);
-    assert(_yr[0]==_yr[0]);
-    _if0 = _y[0].f0 / c->real_z0;
-    _ir0 = _yr[0].f0 / c->real_z0;
+
+    double fwd_tmp = dn_diff(2.*tr_involts(), _ir0 * z0);
+    double ref_tmp = dn_diff(2.*tr_outvolts(), _if0 * z0);
+
+    _forward.push(_sim->_time0, fwd_tmp);
+    _reflect.push(_sim->_time0, ref_tmp);
+    _if0 = _forward.v_out(_sim->_time0, OPT::trsteporder).f0 / z0;
+    _ir0 = _reflect.v_out(_sim->_time0, OPT::trsteporder).f0 / z0;
+    _forward.pop();
+    _reflect.pop();
+
+    assert(_if0 == _if0);
+    assert(_ir0 == _ir0);
+    trace3("DBGI", _sim->_time0, _if0, _ir0);
+
+    if (_dt < _sim->_dtmin * 1.01){ untested();
+    }else{
+    }
 
     if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
 	|| !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
@@ -478,19 +493,18 @@ bool DEV_TRANSLINE::do_tr()
     }else{
       set_converged(true);
     }
-    set_converged(converged() && conchk(_y1.f0, _y[0].f0));
-    set_converged(converged() && conchk(_yr1.f0, _yr[0].f0));
 
     store_values();
+    if(!converged()){
+    }else{
+    }
     return converged();
   }else{
-    // _y[0].f0 = tr_involts() * 2. - _yr1.f0;
-    // _yr[0].f0 = tr_outvolts() * 2. - _y1.f0;
-    _yr[0].f0 = _forward.v_reflect(_sim->_time0, tr_outvolts());
-    _y[0].f0 = _reflect.v_reflect(_sim->_time0, tr_involts());
-    assert(_y[0]==_y[0]);
-    assert(_yr[0]==_yr[0]);
-    trace3("do_tr,nointerp", _sim->_time0, _y[0].f0, _yr[0].f0);
+    // incomplete. unreachable();
+    _if0 = _forward.v_out(_sim->_time0, OPT::trsteporder).f0 / z0;
+    _ir0 = _reflect.v_out(_sim->_time0, OPT::trsteporder).f0 / z0;
+
+    q_load();
     assert(converged());
     return true;
   }
@@ -514,8 +528,12 @@ void DEV_TRANSLINE::tr_load()
  */
 TIME_PAIR DEV_TRANSLINE::tr_review()
 {
-    const COMMON_TRANSLINE* c = prechecked_cast<const COMMON_TRANSLINE*>(common());
-    assert(c);
+    _time_by.reset();
+  _y[0].f0 = _if0;
+  _yr[0].f0 = _ir0;
+
+  const COMMON_TRANSLINE* c = prechecked_cast<const COMMON_TRANSLINE*>(common());
+  assert(c);
   COMPONENT::tr_review();
   assert(_time_by.dt_estimate() != NEVER || _time_by.is_ok());
   if (order() > 0 && _y[0].f0 != LINEAR) {
@@ -526,14 +544,7 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
       //_time_by.min_event(_time[1] + timestep);
       _time_by.set_nok();
     }
-    if(timestep < c->real_td){
-      timestep = c->real_td;
-    }else{
-    }
     _time_by.min_dt_estimate(timestep);
-//    _time_by.min_dt_estimate(c->real_td);
-    trace3("TLINE::tr_review values", _sim->_time0, _y[0].f0, _yr[0].f0);
-    trace3("TLINE::tr_review", _time_by.is_ok(), timestep, _time_by.dt_estimate());
   }else{ untested();
   }
   assert(_time_by.dt_estimate() != NEVER || _time_by.is_ok());
@@ -544,20 +555,11 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
  */
 void DEV_TRANSLINE::tr_accept()
 {
-  for(int i=0; i<OPT::_keep_time_steps; ++i) {
-    trace3("dumpDBGACC", _sim->_time0, _time[i], _y[i].f0);
-  }
-  trace1(short_label().c_str(), _sim->_time0);
-  // store_values();
-//  _reflect.push(_yr1);
-//  _reflect.push(_y1);
-
   const COMMON_TRANSLINE*c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
   double rd = c->real_td;
-  trace3("acccheck, push", _sim->_time0,  _reflect.latest_time(), _sim->_time0 + rd);
   if(_reflect.latest_time() == _sim->_time0 + rd){ untested();
-    // incomplete. dc??
+    unreachable(); // dc?
   }else{
     _reflect.push(_sim->_time0, _forward.v_reflect(_sim->_time0, tr_outvolts()));
     _forward.push(_sim->_time0, _reflect.v_reflect(_sim->_time0, tr_involts()));
@@ -569,7 +571,7 @@ void DEV_TRANSLINE::tr_unload()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::do_ac()
-{
+{ untested();
   const COMMON_TRANSLINE*c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
   double lenth = _sim->_freq * c->real_td * 4;  /* length in quarter waves */
@@ -578,7 +580,7 @@ void DEV_TRANSLINE::do_ac()
     error(bDEBUG,
 	  long_label() + ": transmission line too close to resonance\n");
     lenth = (dif<0.) ? floor(lenth+.5)-LINLENTOL : floor(lenth+.5)+LINLENTOL;
-  }else{
+  }else{ untested();
   }
   lenth *= (M_PI_2);	/* now in radians */
   
@@ -587,7 +589,7 @@ void DEV_TRANSLINE::do_ac()
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::ac_load()
-{
+{ untested();
   ac_load_shunt(n_(OUT1), n_(OUT2), _y11);
   ac_load_shunt(n_(IN1),  n_(IN2),  _y11); // really _y22
   ac_load_asymmetric(n_(OUT1), n_(OUT2), n_(IN2),  n_(IN1),  _y12);
@@ -598,74 +600,16 @@ double DEV_TRANSLINE::tr_review_trunc_error_()
 {
   const COMMON_TRANSLINE*c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  double rd = c->real_td;
-  WAVE::const_reverse_iterator wf = _forward.rbegin();
-  WAVE::const_reverse_iterator wr = _reflect.rbegin();
-  trace3("match----", _forward.size(), _time[0], _time[0]+rd);
-  for(int i=0; i<OPT::_keep_time_steps-1; ++i, ++wf) {
-    if(wf == _forward.rend()){
-      break;
-    }
-    if(_time[i] == _time[i+1]){
-      break;
-    }else{
-    }
-    trace5("match", _sim->_time0, i, _time[i+1]+rd, wf->first, _forward.size());
-    if(_time[i+1]+rd ==  wf->first){
-    }else{
-      for(auto p : _forward){
-	trace1("what??", p.first);
-      }
-      for(int j=0; j<OPT::_keep_time_steps; ++j) {
-	trace3("what??", j, _time[j], _time[j] + rd);
-      }
-    }
-    // assert(_time[i+1]+rd ==  wf->first);
-  }
-
-  wf = _forward.rbegin();
-  if(_time[0] == wf->first){
-    incomplete();
-  }else{
-  }
-
-  if(_time[0]+rd ==  wf->first){ untested();
-    // already accepted. happens after a restore...
-    ++wf;
-    ++wr;
-    trace1("try?? shifted", _time[0] + rd - wf->first);
-  }else{
-  }
-
-  double t = _time[0];
-  for(int i=1; i<OPT::_keep_time_steps; ++i, ++wf, ++wr) {
-    if(wf == _forward.rend()){ untested();
-      assert(wr == _reflect.rend());
-      break;
-    }else if(_time[i] == _time[i-1]){
-      break;
-    }else if(t == _time[i]){ untested();
-      break;
-    }else{
-      assert(_time[i] + rd == wf->first);
-      assert(_time[i] + rd == wr->first);
-      _y[i].f0 = wf->second;
-      _yr[i].f0 = wr->second;
-      t = _time[i];
-    }
-  }
   double timestep = tr_review_trunc_error(_y);
   timestep = std::min(timestep, tr_review_trunc_error(_yr));
 
-  trace2("trunc?", _sim->_time0, timestep);
   return timestep;
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::store_values()
 {
-  assert(_y[0]==_y[0]);
+  ELEMENT::store_values();
   assert(_yr[0]==_yr[0]);
-  _y1 = _y[0];
   _yr1 = _yr[0];
 }
 /*--------------------------------------------------------------------------*/

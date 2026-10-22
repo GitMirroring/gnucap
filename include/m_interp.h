@@ -94,7 +94,7 @@ FPOLY1 interpolate(Iterator begin, Iterator end, double x,
     Iterator orig_begin2 = begin;
     ++orig_begin2;
     ++begin;
-    if(end == upper){
+    if(end == upper){ untested();
       // extrapolating.
       --upper;
     }else{
