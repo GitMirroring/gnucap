@@ -1,6 +1,6 @@
 verilog
 
-options trsteporder 1
+// options trsteporder 1
 options trtol 1
 
 ground g;
@@ -14,5 +14,8 @@ V30 nin 0 pulse(0 1.8 0p 100p 100p .5n 1n) ac 1
 
 .print tr v(nodes) dtr(t1) iter(0) control(0)
 .tr 1n basic
+
+.print tr v(nodes) dtr(t1) iter(0) control(0)
+* .tr 0 1n 10p basic
 
 .status notime

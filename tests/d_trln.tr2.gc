@@ -1,7 +1,7 @@
 verilog
 
-options trsteporder 1
-options trtol 1
+//options trsteporder 1
+// options trtol 1
 
 ground g;
 

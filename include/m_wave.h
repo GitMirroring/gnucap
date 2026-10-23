@@ -44,6 +44,7 @@ public:
   WAVE&	   initialize();
   WAVE&    truncate(double t);
   WAVE&	   push(double t, double v);
+  WAVE&	   pop() {assert(_w.size()); _w.pop_back(); return *this;}
   FPOLY1   v_out(double t, int order=1)const;
   double   latest()const;
   double   latest_time()const;

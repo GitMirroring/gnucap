@@ -128,7 +128,7 @@ void TRANSIENT::sweep()
   first();
   _sim->_genout = gen();
   
-  if (_sim->uic_now()) {//12
+  if (_sim->uic_now()) {untested();//12
     advance_time();
     _sim->zero_voltages();
     _scope->do_tr();    //evaluate_models
@@ -141,7 +141,7 @@ void TRANSIENT::sweep()
     //BUG// UIC needs further analysis.
   }else{//373
     _converged = solve_with_homotopy(OPT::DCBIAS,_trace);
-    if (!_converged) {//3
+    if (!_converged) {untested();//3
       error(bWARNING, "did not converge\n");
     }else{//370
     }
@@ -156,7 +156,7 @@ void TRANSIENT::sweep()
     int outflags = ofNONE;
     if (printnow) {//384
       outflags = ofPRINT | ofSTORE | ofKEEP;
-    }else{//1
+    }else{untested();//1
       outflags = ofSTORE;
     }
     outdata(_sim->_time0, outflags);
@@ -241,7 +241,7 @@ void TRANSIENT::first()
   //_time_by_user_request = _sim->_time0 + _tstrobe;	/* set next user step */
   //set_step_cause(scUSER);
 
-  if (_sim->_time0 < _tstart) {//2		// skip until _tstart
+  if (_sim->_time0 < _tstart) {untested();//2		// skip until _tstart
     set_step_cause(scINITIAL);				// suppressed 
     _time_by_user_request = _tstart;			// set first strobe
   }else{//319					// no skip
@@ -313,9 +313,9 @@ bool TRANSIENT::next()
   // At this point, use it, don't pop,
   // in case this step is rejected or not used.
   // Pop happens in accept.
-  if (!_sim->_eq.empty() && TIME_t(_sim->_eq.top()) == newtime) {//13
+  if (!_sim->_eq.empty() && TIME_t(_sim->_eq.top()) == newtime) {untested();//13
     new_control |= scEVENTQ;
-  }else if (!_sim->_eq.empty() && TIME_t(_sim->_eq.top()) < newtime) {//8995
+  }else if (!_sim->_eq.empty() && TIME_t(_sim->_eq.top()) < newtime) {untested();//8995
     newtime = TIME_t(_sim->_eq.top());
     new_dt = newtime - reftime;
     new_control = scEVENTQ;
@@ -340,6 +340,7 @@ bool TRANSIENT::next()
   
   const TIME_t almost_fixed_time = newtime;
   check_consistency();
+  trace1("iSWP", _time_by_error_estimate);
   
   // device error estimates
   if (TIME_t(_time_by_error_estimate) == newtime) {//4
@@ -353,7 +354,7 @@ bool TRANSIENT::next()
   }
   
   // skip, dtmax user parameter
-  if (TIME_t(_dtmax) < new_dt) {//1754
+  if (TIME_t(_dtmax) < new_dt) {untested();//1754
     new_dt = TIME_t(_dtmax);
     assert(newtime != reftime + new_dt);
     newtime = reftime + new_dt;
@@ -381,11 +382,10 @@ bool TRANSIENT::next()
     if (!_converged) {//65
       if(new_control == scTE){//36
       }else if(new_control == scAMBEVENT){//1
-      }else if(new_control == scUSER){//28
+      }else if(new_control == scUSER){untested();//28
       }else if(new_control == scAMBEVENT + scUSER){
       }else if(new_control & scEVENTQ){ untested();
       }else{untested();
-	assert(0);
       }
       // convergence failure
       if (old_dt / OPT::trstepshrink < new_dt) {//65
@@ -393,7 +393,7 @@ bool TRANSIENT::next()
 	new_dt = old_dt / OPT::trstepshrink;
 	newtime = reftime + new_dt;
 	new_control = scITER_R;
-      }else{untested();
+      }else{
       }
     }else{//63010
     }
@@ -401,11 +401,11 @@ bool TRANSIENT::next()
     // converged but with more iterations than we like
     if (_sim->exceeds_iteration_limit(OPT::TRLOW)) {//3325
       if(new_control == scTE){//2583
-      }else if(new_control == scUSER){//616
-      }else if(new_control == scEVENTQ){//54
+      }else if(new_control == scUSER){untested();//616
+      }else if(new_control == scEVENTQ){untested();//54
       }else if(new_control == scITER_R){//65
       }else if(new_control == scAMBEVENT){//7
-      }else if(new_control == scAMBEVENT + scTE){untested();
+      }else if(new_control == scTE + scAMBEVENT){untested();//1
       }else{ untested();
       }
       if (old_dt * OPT::trstephold < new_dt) {untested();
@@ -439,7 +439,7 @@ bool TRANSIENT::next()
     unreachable();
   }else if (newtime == TIME_t(_time_by_user_request)) {//28200
     assert(new_control & scUSER);
-  }else if (newtime == fixed_time) {//1645
+  }else if (newtime == fixed_time) {untested();//1645
     assert(new_control & scEVENTQ);
   }else if (newtime == almost_fixed_time) {//2275
     assert(new_control & scAMBEVENT);
@@ -456,7 +456,7 @@ bool TRANSIENT::next()
     // Use exactly old_dt again, to have a sequence of steps exactly the same size.
     if (up_order(old_dt*.8, new_dt, old_dt*1.5) && reftime + old_dt <= almost_fixed_time) {//15054
       if (new_control == scTE) {//13408
-      }else if (new_control == scSKIP) {//1646
+      }else if (new_control == scSKIP) {untested();//1646
       }else{untested();
       }
       if (new_dt == old_dt) {//646
@@ -471,11 +471,11 @@ bool TRANSIENT::next()
       }else if (newtime == TIME_t(_time_by_ambiguous_event)) {//8
 	assert(TIME_t(_time_by_ambiguous_event) == almost_fixed_time);
 	new_control = scTE | scAMBEVENT;
-        if (newtime == fixed_time) {//2
+        if (newtime == fixed_time) {untested();//2
 	  new_control = scTE | scEVENTQ;
 	}else{//6
 	}
-      }else if (newtime == fixed_time) {//9
+      }else if (newtime == fixed_time) {untested();//9
 	new_control = scTE | scEVENTQ;
       }else{//14571
       }
@@ -488,7 +488,7 @@ bool TRANSIENT::next()
       // removing minor changes that are supposedly irrelevant.
       // Solution is faster when time step stays the same over multiple steps.
       if (new_control == scTE) {//12913
-      }else if (new_control == scSKIP) {//89
+      }else if (new_control == scSKIP) {untested();//89
       }else if (new_control == scINITIAL) {//341
       }else{untested();
       }
