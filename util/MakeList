@@ -29,7 +29,7 @@ INSTALL_DIR = $(PREFIX)/lib/gnucap/${SECTION}
 # some have multiple commands in a file
 RAW_SRCS = \
 c_clear.cc c_comand.cc c_delete.cc c_exp.cc \
-c_global.cc c_ground.cc c_help.cc \
+c_genrat.cc c_global.cc c_ground.cc c_help.cc \
 c_list.cc c_measure.cc c_modify.cc c_param.cc c_prbcmd.cc \
 c_status.cc c_sweep.cc c_sim.cc c_system.cc
 

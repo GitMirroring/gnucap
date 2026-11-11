@@ -27,8 +27,7 @@ TARGET = $(TARGET_LIB)$(TARGET_LIB_EXT)
 INSTALL_FILES = $(TARGET)
 INSTALL_DIR = $(PREFIX)/lib/gnucap/${SECTION}
 #------------------------------------------------------------------------
-# kludge. does not belong here.
-C_SRCS = c_genrat.cc
+C_SRCS =
 #------------------------------------------------------------------------
 # simulation commands, usually multiple files for one command
 RAW_SRCS = ${C_SRCS} \
