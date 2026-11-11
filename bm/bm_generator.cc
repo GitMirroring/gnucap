@@ -23,7 +23,7 @@
  * used with tc, etc, and conditionals
  */
 //testing=script 2015.01.08
-//BUG// no step control
+//BUG// no step control, except delay
 //BUG// encapsulation violation: _sim->_genout
 #include "globals.h"
 #include "e_elemnt.h"
@@ -152,6 +152,20 @@ void EVAL_BM_GENERATOR::tr_eval(ELEMENT* d)const
     _g = 0.;
   }else{
     _g = gen();
+  }
+  double dtmin = d->_sim->_dtmin;
+  if(!d->_sim->_time0){
+    if(_delay > 2.01*dtmin){
+      d->_sim->new_event(_delay, d);
+      d->_sim->new_event(_delay+dtmin, d);
+    }else{
+    }
+    if(_rise > 2.01*dtmin){
+      d->_sim->new_event(_delay+_rise, d);
+      d->_sim->new_event(_delay+_rise+dtmin, d);
+    }else{
+    }
+  }else{
   }
   tr_finish_tdv(d, _g);
 }
