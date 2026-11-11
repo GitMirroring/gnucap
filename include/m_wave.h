@@ -137,7 +137,7 @@ inline double WAVE::latest() const
 inline double WAVE::v_reflect(double t, double v_total)const
 {
   // return (v_total*2 - v_out(t)); // de-noised
-  return dn_diff(v_total*2, v_out(t).f0);
+  return dn_diff(v_total*2, v_out(t, 1, false).f0);
 }
 /*--------------------------------------------------------------------------*/
 inline WAVE& WAVE::operator+=(const WAVE& x)
