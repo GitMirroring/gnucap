@@ -23,23 +23,23 @@
  */
 //testing=script,complete 2015.01.08
 //BUG// no step control
-//BUG// encapsulation violation: gen() is global
 #include "u_sim_data.h"
 #include "globals.h"
 #include "c_comand.h"
+#include "e_compon.h"
 /*--------------------------------------------------------------------------*/
-static double freq = 0;
-static double ampl = 1;
-static double phaz = 0.;
-static double maxv = 1.;
-static double minv = 0.;
-static double offset = 0.;
-static double init_ = 0.;
-static double rise = 1e-12;
-static double fall = 1e-12;
-static double delay = 0.;
-static double width = 0.;
-static double period = 0.;
+static std::string freq = "0.";
+static std::string ampl = "1.";
+static std::string phaz = "0.";
+static std::string maxv = "1.";
+static std::string minv = "0.";
+static std::string offset = "0.";
+static std::string init_ = "0.";
+static std::string rise = "1e-12";
+static std::string fall = "1e-12";
+static std::string delay = "0.";
+static std::string width = "0.";
+static std::string period = "0.";
 /*--------------------------------------------------------------------------*/
 namespace {
 /*--------------------------------------------------------------------------*/
@@ -48,25 +48,39 @@ public:
   void do_it(CS& cmd, CARD_LIST*)override {
     OMSTREAM where = (cmd.more())  ?  OMSTREAM()  :  IO::mstdout;
     size_t here = cmd.cursor();
+    COMMON_COMPONENT* gen = bm_dispatcher["gen"];
+    assert(gen);
     do{
       ONE_OF
-	|| ::Get(cmd, "f{requency}",&freq,   mPOSITIVE)
-	|| ::Get(cmd, "a{mplitude}",&ampl)
-	|| ::Get(cmd, "p{hase}",    &phaz)
-	|| ::Get(cmd, "ma{x}",	    &maxv)
-	|| ::Get(cmd, "mi{n}",	    &minv)
-	|| ::Get(cmd, "o{ffset}",   &offset)
-	|| ::Get(cmd, "i{nitial}",  &init_)
-	|| ::Get(cmd, "r{ise}",	    &rise,   mPOSITIVE)
-	|| ::Get(cmd, "f{all}",	    &fall,   mPOSITIVE)
-	|| ::Get(cmd, "d{elay}",    &delay,  mPOSITIVE)
-	|| ::Get(cmd, "w{idth}",    &width,  mPOSITIVE)
-	|| ::Get(cmd, "pe{riod}",   &period, mPOSITIVE)
+	|| (::Get(cmd, "f{requency}",&freq)
+	      && (gen->set_param_by_name("freq", freq), true))
+	|| (::Get(cmd, "a{mplitude}",&ampl)
+	      && (gen->set_param_by_name("ampl", ampl), true))
+	|| (::Get(cmd, "p{hase}",    &phaz)
+	      && (gen->set_param_by_name("phase", phaz), true))
+	|| (::Get(cmd, "ma{x}",      &maxv)
+	      && (gen->set_param_by_name("max", maxv), true))
+	|| (::Get(cmd, "mi{n}",      &minv)
+	      && (gen->set_param_by_name("min", minv), true))
+	|| (::Get(cmd, "o{ffset}",   &offset)
+	      && (gen->set_param_by_name("offset", offset), true))
+	|| (::Get(cmd, "i{nitial}",  &init_)
+	      && (gen->set_param_by_name("init", init_), true))
+	|| (::Get(cmd, "r{ise}",     &rise)
+	      && (gen->set_param_by_name("rise", rise), true))
+	|| (::Get(cmd, "f{all}",     &fall)
+	      && (gen->set_param_by_name("fall", fall), true))
+	|| (::Get(cmd, "d{elay}",    &delay)
+	      && (gen->set_param_by_name("delay", delay), true))
+	|| (::Get(cmd, "w{idth}",    &width)
+	      && (gen->set_param_by_name("width", width), true))
+	|| (::Get(cmd, "pe{riod}",   &period)
+	      && (gen->set_param_by_name("period", period), true))
 	;
     }while (cmd.more() && !cmd.stuck(&here));
     cmd.check(bWARNING, "what's this");
     
-    where.setfloatwidth(7);
+    // where.setfloatwidth(7);
     where <<   "freq="	<< freq;
     where << "  ampl="	<< ampl;
     where << "  phase="	<< phaz;
@@ -83,43 +97,6 @@ public:
   }
 } p;
 DISPATCHER<CMD>::INSTALL d(&command_dispatcher, "generator", &p);
-}
-/*--------------------------------------------------------------------------*/
-double gen()
-{
-  if (CKT_BASE::_sim->_time0 <= delay) {
-    return init_;
-  }else{
-  }
-  double loctime = CKT_BASE::_sim->_time0 - delay;
-  if (period > 0.) {
-    
-    loctime = fmod(loctime, period);
-  }else{
-    // not periodic
-  }
-
-  double level;
-  if (CKT_BASE::_sim->_time0 <= delay + rise) {			/* initial rise */
-    level = (maxv - 0) * (loctime/rise) + 0;
-  }else if (loctime <= rise) {				/* rising       */
-    
-    level = (maxv - minv) * (loctime/rise) + minv;
-  }else if (width==0.  ||  (loctime-=rise) <= width) {	/* pulse on     */
-    level = maxv;
-  }else if ((loctime-=width) <= fall) {			/* falling      */
-    
-    level = (minv - maxv) * (loctime/fall) + maxv;
-  }else{						/* pulse off    */
-    
-    level = minv;
-  }
-  level *= (freq == 0.) 
-    ? ampl
-    : ampl * sin(M_TWO_PI * freq*(CKT_BASE::_sim->_time0-delay) + phaz * DTOR);
-  return (CKT_BASE::_sim->_time0 <= delay + rise)
-    ? level + (offset - init_) * (loctime/rise) + init_
-    : level + offset;
 }
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

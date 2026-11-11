@@ -569,7 +569,7 @@ int COMMON_COMPONENT::set_param_by_name(std::string Name, std::string Value)
     int idx = c->set_param_by_name(Name, Value); //  + param_count();
     attach_next(c);
     return idx;
-  }else if (has_parse_params_obsolete_callback()) {itested();
+  }else if (has_parse_params_obsolete_callback()) {untested();
     std::string args(Name + "=" + Value);
     CS cmd(CS::_STRING, args); //obsolete_callback
     bool ok = parse_params_obsolete_callback(cmd); //BUG//callback

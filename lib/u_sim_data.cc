@@ -36,7 +36,6 @@ SIM_DATA::SIM_DATA()
    _freq(0.),
    _damp(0.),
    _dtmin(0.),
-   _genout(0.),
    _bypass_ok(true),
    _fulldamp(false),
    _last_time(0.),

@@ -1,5 +1,5 @@
 ' c_genrat -- generator transnient test 
-freq= 0.  ampl= 1.  phase= 0.  max= 7.  min=-5.  offset= 100.  init= 2.  rise= 3.  fall= 2.  delay= 2.  width= 10.  period= 20.
+freq=0.  ampl=1.  phase=0.  max=7  min=-5  offset=100  init=2  rise=3  fall=2  delay=2  width=10  period=20
 #           v(1)       v(2)      
  27.        0.         0.        
 #Time       v(1)       v(2)      

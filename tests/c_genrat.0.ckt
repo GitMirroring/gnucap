@@ -1,0 +1,9 @@
+' c_genrat -- generator transnient test
+.generator max=7 min=-5 rise=3 fall=2 width=10 delay=2 offset=100 init=2 period=20
+.generator
+v1 (1 0) generator(1)
+.print op v(1) gen(0)
+.print tran v(1) gen(0)
+.op
+.tran 10 1
+.end

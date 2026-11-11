@@ -22,12 +22,14 @@
  * general probe object
  */
 //testing=script 2009.06.21
+#include "l_denoise.h"
 #include "u_sim_data.h"
 #include "u_status.h"
 #include "u_probe.h"
 #include "e_card.h"
 #include "e_cardlist.h"
-#include "l_denoise.h"
+#include "e_compon.h" // BUG: gen
+#include "globals.h" // BUG: gen
 /*--------------------------------------------------------------------------*/
 PROBE::PROBE(const std::string& what,const CARD *brh)
   :CKT_BASE(),
@@ -125,8 +127,13 @@ double PROBE::probe_node(void)const
     return ::status.control;
   }else if (Umatch(_what, "damp ")) {untested();
     return _sim->_damp;
-  }else if (Umatch(_what, "gen{erator} ")) {untested();
-    return _sim->_genout;
+  }else if (Umatch(_what, "gen{erator} ")) {
+    static COMMON_COMPONENT const* gen = bm_dispatcher["gen"];
+    if(gen) {
+      return gen->value();
+    }else{ untested();
+      return NOT_VALID;
+    }
   }else if (Umatch(_what, "hidden ")) {
     return ::status.hidden_steps;
   }else if (Umatch(_what, "temp{erature} ")) {

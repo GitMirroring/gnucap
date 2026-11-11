@@ -58,6 +58,7 @@ With no arg, it lists plugins already loaded
 ../util/c_comand.so
 ../util/c_delete.so
 ../util/c_exp.so
+../util/c_genrat.so
 ../util/c_global.so
 ../util/c_ground.so
 ../util/c_help.so
@@ -130,6 +131,7 @@ With no arg, it lists plugins already loaded
 ../util/c_comand.so
 ../util/c_delete.so
 ../util/c_exp.so
+../util/c_genrat.so
 ../util/c_global.so
 ../util/c_ground.so
 ../util/c_help.so

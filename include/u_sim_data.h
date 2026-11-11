@@ -44,7 +44,6 @@ struct INTERFACE SIM_DATA {
   double _freq;		/* AC frequency to analyze at (Hertz) */
   double _damp;		/* Newton-Raphson damping coefficient actual */
   double _dtmin;	/* min internal step size */
-  double _genout;	/* tr dc input to circuit (generator) */
   bool   _bypass_ok;	/* flag: ok to bypass model evaluation */
   bool	_fulldamp; 	/* flag: big iter. jump. use full (min) damp */
   double _last_time;	/* time at which "volts" is valid */

@@ -104,6 +104,7 @@ protected:
   TRACE _trace;			/* enum: show extended diagnostics */
   enum {ONE_PT, LIN_STEP, LIN_PTS, TIMES, OCTAVE, DECADE} _stepmode[DCNEST];
   bool _have_param;             /* sweep a param */
+  double _genout; // dummy.
 protected: // tmp hack
   double _temp_c;
 protected:
@@ -137,6 +138,12 @@ protected:
       auto c=prechecked_cast<SWEEPVAL*>(_ctrl[i]);
       assert(c);
       c->set_value(d);
+    }else if(_sweepval[i] == &_genout){
+      static COMMON_COMPONENT* gen = bm_dispatcher["gen"];
+      assert(gen);
+      gen->set_param_by_name("init", "");
+      gen->set_param_by_name("init", to_string(d));
+      gen->precalc_last(nullptr);
     }else{
     }
     *_sweepval[i] = d;
@@ -232,7 +239,7 @@ DCOP::DCOP()
     _reverse[ii] = false;
     _step[ii]=0.;
     _linswp[ii]=true;
-    _sweepval[ii]=&_sim->_genout;
+    _sweepval[ii]=&_genout;
     _zap[ii] = nullptr;
     _ctrl[ii] = nullptr;
     _stepmode[ii] = ONE_PT;
@@ -326,7 +333,6 @@ void OP::setup(CS& Cmd)
   }
   
   _step[0] = 0.;
-  _sim->_genout = 0.;
 
   options(Cmd,0);
 
@@ -393,7 +399,6 @@ void DC::setup(CS& Cmd)
 	// leave it as it was .. repeat Cmd with no args
       }
       
-      _sim->_genout = 0.;
       options(Cmd,_n_sweeps);
     }
   }else{
@@ -418,7 +423,7 @@ void DC::setup(CS& Cmd)
     }else if (_param_name[ii] != "") {
       _sweepval[ii] = &_param[ii];
     }else{ // generator
-      _sweepval[ii] = &_sim->_genout;			// point to value to patch
+      _sweepval[ii] = &_genout;			// point to value to patch
     }
   }
   _sim->_freq = 0;

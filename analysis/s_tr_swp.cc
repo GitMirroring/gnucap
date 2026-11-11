@@ -126,7 +126,6 @@ void TRANSIENT::sweep()
   }
   
   first();
-  _sim->_genout = gen();
   
   if (_sim->uic_now()) {//12
     advance_time();
@@ -165,7 +164,6 @@ void TRANSIENT::sweep()
   while (next()) {//63075
     _sim->_bypass_ok = false;
     _sim->_phase = p_TRAN;
-    _sim->_genout = gen();
     _converged = solve(OPT::TRHIGH,_trace);
 
     _accepted = _converged && review();
