@@ -509,7 +509,7 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
       _time_by.set_nok();
     }
     _time_by.min_dt_estimate(timestep);
-    _time_by.min_dt_estimate(c->real_td);
+   //  _time_by.min_dt_estimate(c->real_td);
   }else{ untested();
   }
   assert(_time_by.dt_estimate() != NEVER || _time_by.is_ok());
