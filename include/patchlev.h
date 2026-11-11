@@ -1,1 +1,1 @@
-#define PATCHLEVEL "print_cmd 2026.11.05"
+#define PATCHLEVEL "trln_trunc 2026.11.11"

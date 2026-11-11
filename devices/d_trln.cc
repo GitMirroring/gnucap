@@ -93,6 +93,7 @@ private: // override virtual
   void		precalc_last()override;
   void		tr_iwant_matrix()override;
   void		tr_begin()override;
+  void		tr_restore()override;
   void		dc_advance()override;
   void		tr_advance()override;
   void		tr_regress()override;
@@ -398,9 +399,16 @@ void DEV_TRANSLINE::tr_begin()
   ELEMENT::tr_begin();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _forward.initialize().push(0.-c->real_td, 0.).push(0., 0.);
-  _reflect.initialize().push(0.-c->real_td, 0.).push(0., 0.);
+  _forward.initialize().push(0.-c->real_td, 0.);
+  _reflect.initialize().push(0.-c->real_td, 0.);
   _time_by.min_dt_estimate(c->real_td);
+}
+/*--------------------------------------------------------------------------*/
+void DEV_TRANSLINE::tr_restore()
+{
+  ELEMENT::tr_restore();
+  _forward.truncate(_sim->_time0);
+  _reflect.truncate(_sim->_time0);
 }
 /*--------------------------------------------------------------------------*/
 /* before anything else .. see what is coming out
