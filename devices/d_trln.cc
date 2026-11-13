@@ -127,6 +127,7 @@ private: // override virtual
   }
 private:
   void		setinitcond(CS&);
+  double error_factor()const override{ return 1.; }
 };
 /*--------------------------------------------------------------------------*/
 inline bool DEV_TRANSLINE::tr_needs_eval()const
@@ -463,9 +464,9 @@ void DEV_TRANSLINE::tr_load()
  */
 TIME_PAIR DEV_TRANSLINE::tr_review()
 {
+  // COMPONENT::tr_review();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  assert(_time_by.dt_estimate() == c->real_td);
   double td = c->real_td;
 
   if(_forward.latest_time() >= _sim->_time0){
@@ -483,7 +484,28 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
     _yF[0].f0 = (vi - (1.-r)*(vo)) / ((2.-r)*r);
   }
 
-  return _time_by; // ok to miss the spikes, for now
+  _time_by.reset();
+  if (order() > 0 && (1||_y[0].f0 != LINEAR)) {
+    double timestep = tr_review_trunc_error(_yF);
+    timestep = std::min(timestep, tr_review_trunc_error(_yR));
+
+    trace3("TLINE::tr_review", _time_by.is_ok(), timestep, _time_by.dt_estimate());
+    if(timestep < c->real_td){
+  //    timestep = c->real_td;
+    }else{
+    }
+    if(tr_review_check(timestep)){
+    }else{
+      // event in the past indicates non-convergence.
+      //_time_by.min_event(_time[1] + timestep);
+      _time_by.set_nok();
+    }
+    _time_by.min_dt_estimate(timestep);
+    _time_by.min_dt_estimate(c->real_td);
+  }else{ untested();
+  }
+  assert(_time_by.dt_estimate() != NEVER || _time_by.is_ok());
+  return _time_by;
 }
 /*--------------------------------------------------------------------------*/
 /* after this step is all done, determine the reflections and send them on.
