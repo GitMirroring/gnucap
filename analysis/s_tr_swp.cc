@@ -398,11 +398,12 @@ bool TRANSIENT::next()
     
     // converged but with more iterations than we like
     if (_sim->exceeds_iteration_limit(OPT::TRLOW)) {//3325
-      if(new_control == scTE){//2583
-      }else if(new_control == scUSER){//616
-      }else if(new_control == scEVENTQ){//54
-      }else if(new_control == scITER_R){//65
-      }else if(new_control == scAMBEVENT){//7
+      if(new_control == scTE){//1583
+      }else if(new_control == scUSER){//612
+      }else if(new_control == scEVENTQ){//46
+      }else if(new_control == scITER_R){//42
+      }else if(new_control == scAMBEVENT){ untested();
+      }else if(new_control == scAMBEVENT+scEVENTQ){//1
       }else{ untested();
       }
       if (old_dt * OPT::trstephold < new_dt) {untested();

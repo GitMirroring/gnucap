@@ -59,6 +59,7 @@ private: // override vitrual
   void		precalc_last(const PARAM_LIST*)override;
   void		tr_eval(ELEMENT*)const override;
   TIME_PAIR	tr_review(COMPONENT*)const override;
+  void		tr_accept(COMPONENT*)const override;
   std::string	name()const override		{return "pulse";}
   bool		ac_too()const override		{return false;}
   bool		parse_numlist(CS&)override;
@@ -181,6 +182,8 @@ void EVAL_BM_PULSE::tr_eval(ELEMENT* d)const
 /*--------------------------------------------------------------------------*/
 TIME_PAIR EVAL_BM_PULSE::tr_review(COMPONENT* d)const
 {
+  ELEMENT* e = prechecked_cast<ELEMENT*>(d);
+  assert(e);
   double raw_time = d->_sim->_time0 + d->_sim->_dtmin * 2;
 
   if (raw_time <= _delay) {
@@ -211,7 +214,43 @@ TIME_PAIR EVAL_BM_PULSE::tr_review(COMPONENT* d)const
   assert(d->_time_by.event() > d->_sim->_time0 + d->_sim->_dtmin);
   assert(d->_time_by.dt_estimate() > d->_sim->_dtmin);
 
+  if(e->_y1.x == e->_time[0]){
+    d->q_accept();
+  }else{
+  }
+
   return d->_time_by;
+}
+/*--------------------------------------------------------------------------*/
+void EVAL_BM_PULSE::tr_accept(COMPONENT* d)const
+{
+  ELEMENT* e = prechecked_cast<ELEMENT*>(d);
+  assert(e);
+  double raw_time = d->_sim->_time0 + d->_sim->_dtmin;
+  double& evt_time = e->_y1.x;
+
+  if (d->_sim->_time0 != evt_time){untested();
+  }else if (raw_time < _delay) {
+    evt_time = d->_sim->new_event(_delay, d);
+  }else{
+    double reltime;
+    if (0 < _period && _period < BIGBIG) {
+      reltime = fmod(raw_time - _delay, _period);
+    }else{
+      reltime = raw_time - _delay;
+    }
+    double time_offset = raw_time - reltime;
+    
+    if (reltime < _rise) {				/* rising 	*/
+      evt_time = d->_sim->new_event(_rise + time_offset);
+    }else if (reltime < _rise + _width) {		/* pulse val 	*/
+      evt_time = d->_sim->new_event(_rise + _width + time_offset);
+    }else if (reltime < _rise + _width + _fall) {	/* falling 	*/
+      evt_time = d->_sim->new_event(_rise + _width + _fall + time_offset);
+    }else{						/* past pulse	*/
+      evt_time = d->_sim->new_event(_period + time_offset);
+    }
+  }
 }
 /*--------------------------------------------------------------------------*/
 bool EVAL_BM_PULSE::parse_numlist(CS& cmd)
