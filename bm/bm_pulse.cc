@@ -184,6 +184,7 @@ TIME_PAIR EVAL_BM_PULSE::tr_review(COMPONENT* d)const
 {
   ELEMENT* e = prechecked_cast<ELEMENT*>(d);
   assert(e);
+#if 0
   double raw_time = d->_sim->_time0 + d->_sim->_dtmin * 2;
 
   if (raw_time <= _delay) {
@@ -213,6 +214,7 @@ TIME_PAIR EVAL_BM_PULSE::tr_review(COMPONENT* d)const
   assert(d->_time_by.dt_estimate() > 0);
   assert(d->_time_by.event() > d->_sim->_time0 + d->_sim->_dtmin);
   assert(d->_time_by.dt_estimate() > d->_sim->_dtmin);
+#endif
 
   if(e->_y1.x == e->_time[0]){
     d->q_accept();
@@ -242,13 +244,13 @@ void EVAL_BM_PULSE::tr_accept(COMPONENT* d)const
     double time_offset = raw_time - reltime;
     
     if (reltime < _rise) {				/* rising 	*/
-      evt_time = d->_sim->new_event(_rise + time_offset);
+      evt_time = d->_sim->new_event(_rise + time_offset, d);
     }else if (reltime < _rise + _width) {		/* pulse val 	*/
-      evt_time = d->_sim->new_event(_rise + _width + time_offset);
+      evt_time = d->_sim->new_event(_rise + _width + time_offset, d);
     }else if (reltime < _rise + _width + _fall) {	/* falling 	*/
-      evt_time = d->_sim->new_event(_rise + _width + _fall + time_offset);
+      evt_time = d->_sim->new_event(_rise + _width + _fall + time_offset, d);
     }else{						/* past pulse	*/
-      evt_time = d->_sim->new_event(_period + time_offset);
+      evt_time = d->_sim->new_event(_period + time_offset, d);
     }
   }
 }
