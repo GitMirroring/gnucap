@@ -133,7 +133,7 @@ FPOLY1 interpolate(Iterator begin, Iterator end, double x,
       Y(i, 0) = seek->second;
       D(i, 0) = 0.;
 
-      if(X[i-1] <= X[i]){ untested();
+      if(X[i-1] <= X[i]){ itested();
 	throw Exception("interpolate table is not sorted or has duplicate keys");
       }else{
       }
