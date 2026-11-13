@@ -414,8 +414,8 @@ void DEV_TRANSLINE::advance()
 {
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
-  _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
+  _if0 = _forward.v_out(_sim->_time0, 1, false).f0/c->real_z0;
+  _ir0 = _reflect.v_out(_sim->_time0, 1, false).f0/c->real_z0;
   if (!conchk(_if0, _if1, OPT::abstol, OPT::reltol*.01)
        || !conchk(_ir0, _ir1, OPT::abstol, OPT::reltol*.01)) {
     q_load();
