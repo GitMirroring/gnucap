@@ -93,9 +93,10 @@ private: // override virtual
   void		precalc_last()override;
   void		tr_iwant_matrix()override;
   void		tr_begin()override;
-  void		dc_advance()override;
-  void		tr_advance()override;
-  void		tr_regress()override;
+  void		advance();
+  void		dc_advance()override {ELEMENT::dc_advance(); advance();}
+  void		tr_advance()override {ELEMENT::tr_advance(); advance();}
+  void		tr_regress()override {ELEMENT::tr_regress(); advance();}
   bool		tr_needs_eval()const override;
   bool		do_tr()override;
   void		tr_load()override;
@@ -409,25 +410,8 @@ void DEV_TRANSLINE::tr_begin()
  * because the simulator uses the Norton equivalent circuit.
  * This makes the Thevenin to Norton conversion.
  */
-void DEV_TRANSLINE::dc_advance()
+void DEV_TRANSLINE::advance()
 {
-  ELEMENT::dc_advance();
-  const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
-  assert(c);
-  _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
-  _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
-}
-void DEV_TRANSLINE::tr_advance()
-{
-  ELEMENT::tr_advance();
-  const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
-  assert(c);
-  _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
-  _ir0 = _reflect.v_out(_sim->_time0).f0/c->real_z0;
-}
-void DEV_TRANSLINE::tr_regress()
-{
-  ELEMENT::tr_regress();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
   _if0 = _forward.v_out(_sim->_time0).f0/c->real_z0;
