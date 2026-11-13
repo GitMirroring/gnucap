@@ -76,6 +76,8 @@ private:
   COMPLEX _y12;// AC equiv ckt
   // using base class _loss0 and _loss1 to stash 1/z0 so it can be passed by pointer
   // to tr_load.  It is not "loss".  This model is for a lossless t-line,
+  FPOLY1 _yR[5]; // candidate _reflect push
+  FPOLY1 _yF[5]; // candidate _forward push
 private:
   explicit	DEV_TRANSLINE(const DEV_TRANSLINE& p)
     :ELEMENT(p), _forward(), _reflect(), _if0(0), _ir0(0), _if1(0), _ir1(0) {}
@@ -95,7 +97,14 @@ private: // override virtual
   void		tr_begin()override;
   void		advance();
   void		dc_advance()override {ELEMENT::dc_advance(); advance();}
-  void		tr_advance()override {ELEMENT::tr_advance(); advance();}
+  void		tr_advance()override {
+    ELEMENT::tr_advance();
+    for (int i=OPT::_keep_time_steps-1; i>0; --i) {
+      _yR[i] = _yR[i-1];
+      _yF[i] = _yF[i-1];
+    }
+    advance();
+  }
   void		tr_regress()override {ELEMENT::tr_regress(); advance();}
   bool		tr_needs_eval()const override;
   bool		do_tr()override;
@@ -457,6 +466,23 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
   assert(_time_by.dt_estimate() == c->real_td);
+  double td = c->real_td;
+
+  if(_forward.latest_time() >= _sim->_time0){
+    // assert(td >= _dt); BUG?
+    _yR[0].f0 = _forward.v_reflect(_sim->_time0, tr_outvolts());
+    _yF[0].f0 = _reflect.v_reflect(_sim->_time0, tr_involts());
+  }else{
+    double r = td / _dt;
+    assert(r<1.);
+
+    double vi = 2.*tr_involts() - r*_reflect.latest();
+    double vo = 2.*tr_outvolts() - r*_forward.latest();
+
+    _yR[0].f0 = (vo - (1.-r)*(vi)) / ((2.-r)*r);
+    _yF[0].f0 = (vi - (1.-r)*(vo)) / ((2.-r)*r);
+  }
+
   return _time_by; // ok to miss the spikes, for now
 }
 /*--------------------------------------------------------------------------*/
@@ -464,28 +490,10 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
  */
 void DEV_TRANSLINE::tr_accept()
 {
-  double R;
-  double F;
-  if(_forward.latest_time() >= _sim->_time0){
-    assert(td >= _dt);
-    R = _forward.v_reflect(_sim->_time0, tr_outvolts());
-    F = _reflect.v_reflect(_sim->_time0, tr_involts());
-  }else{
-    const COMMON_TRANSLINE* c = prechecked_cast<const COMMON_TRANSLINE*>(common());
-    assert(c);
-    double td = c->real_td;
-    double r = td / _dt;
-    assert(r<1.);
+  trace1(short_label().c_str(), _sim->_time0);
 
-    double vi = 2.*tr_involts() - r*_reflect.latest();
-    double vo = 2.*tr_outvolts() - r*_forward.latest();
-
-    R = (vo - (1.-r)*(vi)) / ((2.-r)*r);
-    F = (vi - (1.-r)*(vo)) / ((2.-r)*r);
-  }
-
-  _reflect.push(_sim->_time0, R);
-  _forward.push(_sim->_time0, F);
+  _reflect.push(_sim->_time0, _yR[0].f0);
+  _forward.push(_sim->_time0, _yF[0].f0);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_unload()
