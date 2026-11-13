@@ -65,6 +65,11 @@ public:
 //
 inline WAVE& WAVE::push(double t, double v)
 {
+#if 0
+  assert(!_w.size() || _w.back().first < t+_delay);
+  incomplete(); // d_switch.nro.1gr.ckt?
+#endif
+
   _w.push_back(DPAIR(t+_delay, v));
   return *this;
 }

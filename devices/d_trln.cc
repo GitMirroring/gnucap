@@ -398,8 +398,8 @@ void DEV_TRANSLINE::tr_begin()
   ELEMENT::tr_begin();
   const COMMON_TRANSLINE* c=prechecked_cast<const COMMON_TRANSLINE*>(common());
   assert(c);
-  _forward.initialize().push(0.-c->real_td, 0.).push(0., 0.);
-  _reflect.initialize().push(0.-c->real_td, 0.).push(0., 0.);
+  _forward.initialize().push(0.-c->real_td, 0.);
+  _reflect.initialize().push(0.-c->real_td, 0.);
   _time_by.min_dt_estimate(c->real_td);
 }
 /*--------------------------------------------------------------------------*/
@@ -480,7 +480,7 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
  */
 void DEV_TRANSLINE::tr_accept()
 {
-  trace1(short_label().c_str(), _sim->_time0);
+  trace3("TRLN::tr_acc", short_label(), _sim->_time0, _sim->is_advance_iteration());
   _reflect.push(_sim->_time0, _forward.v_reflect(_sim->_time0, tr_outvolts()));
   _forward.push(_sim->_time0, _reflect.v_reflect(_sim->_time0, tr_involts()));
 }
