@@ -464,9 +464,28 @@ TIME_PAIR DEV_TRANSLINE::tr_review()
  */
 void DEV_TRANSLINE::tr_accept()
 {
-  trace3("TRLN::tr_acc", short_label(), _sim->_time0, _sim->is_advance_iteration());
-  _reflect.push(_sim->_time0, _forward.v_reflect(_sim->_time0, tr_outvolts()));
-  _forward.push(_sim->_time0, _reflect.v_reflect(_sim->_time0, tr_involts()));
+  double R;
+  double F;
+  if(_forward.latest_time() >= _sim->_time0){
+    assert(td >= _dt);
+    R = _forward.v_reflect(_sim->_time0, tr_outvolts());
+    F = _reflect.v_reflect(_sim->_time0, tr_involts());
+  }else{
+    const COMMON_TRANSLINE* c = prechecked_cast<const COMMON_TRANSLINE*>(common());
+    assert(c);
+    double td = c->real_td;
+    double r = td / _dt;
+    assert(r<1.);
+
+    double vi = 2.*tr_involts() - r*_reflect.latest();
+    double vo = 2.*tr_outvolts() - r*_forward.latest();
+
+    R = (vo - (1.-r)*(vi)) / ((2.-r)*r);
+    F = (vi - (1.-r)*(vo)) / ((2.-r)*r);
+  }
+
+  _reflect.push(_sim->_time0, R);
+  _forward.push(_sim->_time0, F);
 }
 /*--------------------------------------------------------------------------*/
 void DEV_TRANSLINE::tr_unload()
